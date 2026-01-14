@@ -70,6 +70,26 @@ public class BantuanServlet extends HttpServlet {
             }
             // ================================================================
 
+            // ... inside doGet method ...
+// Add this AFTER if ("/list".equals(action)) block
+
+// ================== NEW: SHOW EDIT FORM ==================
+if ("/edit".equals(action)) {
+    int id = Integer.parseInt(request.getParameter("id"));
+    PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
+    PermohonanBantuan pb = pbDao.getById(id);
+
+    // Security check: Ensure user owns this record (optional but recommended)
+    if (pb != null && pb.getIdPenduduk() == user.getIdPengguna()) {
+        request.setAttribute("pb", pb);
+        request.getRequestDispatcher("/bantuanEdit.jsp").forward(request, response);
+    } else {
+        response.sendRedirect(request.getContextPath() + "/bantuan/list?error=access");
+    }
+    return; // Important to return here
+}
+// =========================================================
+            
         } catch (SQLException e) {
             throw new ServletException(e);
         }
@@ -161,6 +181,43 @@ public class BantuanServlet extends HttpServlet {
                 pbDao.deleteByIdAndPenduduk(idPermohonan, user.getIdPengguna());
                 response.sendRedirect(request.getContextPath() + "/bantuan/list");
             }
+            
+            // ... inside doPost method ...
+
+// ================== NEW: PROCESS UPDATE (PENDUDUK) ==================
+if ("/updateMyRequest".equals(action) && "Penduduk".equals(user.getJawatan())) {
+    
+    int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
+    String oldDokumen = request.getParameter("oldDokumen"); // Hidden field in JSP
+    
+    // 1. Handle File Upload (Similar to /apply)
+    Part filePart = request.getPart("dokumenSokongan");
+    String fileName = oldDokumen; // Default to old file
+
+    if (filePart != null && filePart.getSize() > 0) {
+        String submittedFileName = filePart.getSubmittedFileName().replaceAll("\\s+", "_");
+        fileName = System.currentTimeMillis() + "_" + submittedFileName;
+        
+        String uploadPath = getServletContext().getRealPath("/uploads");
+        File uploadDir = new File(uploadPath);
+        if (!uploadDir.exists()) uploadDir.mkdirs();
+
+        filePart.write(uploadPath + File.separator + fileName);
+    }
+
+    // 2. Setup Object
+    PermohonanBantuan pb = new PermohonanBantuan();
+    pb.setIdPermohonan(idPermohonan);
+    pb.setIdBantuan(Integer.parseInt(request.getParameter("jenisBantuan")));
+    pb.setCatatan(request.getParameter("keterangan"));
+    pb.setDokumen(fileName); // New file or Old file
+
+    // 3. Update DB
+    pbDao.updateByPenduduk(pb);
+    
+    response.sendRedirect(request.getContextPath() + "/bantuan/list?status=updated");
+}
+// ====================================================================
 
         } catch (SQLException e) {
             throw new ServletException(e);

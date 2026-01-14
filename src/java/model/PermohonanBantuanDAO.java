@@ -133,4 +133,46 @@ public void updateInfo(int idPermohonan, String catatan, String dokumenBalik) th
     }
 }
 
+// 1. Method to get single record for the Edit Form
+public PermohonanBantuan getById(int idPermohonan) throws SQLException {
+    PermohonanBantuan pb = null;
+    Connection conn = DBUtil.getConnection();
+    String sql = "SELECT * FROM Permohonan_Bantuan WHERE idPermohonan = ?";
+    PreparedStatement ps = conn.prepareStatement(sql);
+    ps.setInt(1, idPermohonan);
+    ResultSet rs = ps.executeQuery();
+    
+    if (rs.next()) {
+        pb = new PermohonanBantuan();
+        pb.setIdPermohonan(rs.getInt("idPermohonan"));
+        pb.setIdPenduduk(rs.getInt("idPenduduk"));
+        pb.setIdBantuan(rs.getInt("idBantuan"));
+        pb.setTarikhMohon(rs.getDate("tarikhMohon"));
+        pb.setStatus(rs.getInt("status"));
+        pb.setCatatan(rs.getString("catatan"));
+        pb.setDokumen(rs.getString("dokumen")); // Start filename
+        pb.setDokumenBalik(rs.getString("dokumenBalik"));
+    }
+    rs.close();
+    ps.close();
+    conn.close();
+    return pb;
+}
+
+// 2. Method for Penduduk to update their own application
+public void updateByPenduduk(PermohonanBantuan pb) throws SQLException {
+    Connection conn = DBUtil.getConnection();
+    // Only update fields allowed for the user (Jenis, Catatan, Dokumen)
+    String sql = "UPDATE Permohonan_Bantuan SET idBantuan = ?, catatan = ?, dokumen = ? WHERE idPermohonan = ?";
+    PreparedStatement ps = conn.prepareStatement(sql);
+    ps.setInt(1, pb.getIdBantuan());
+    ps.setString(2, pb.getCatatan());
+    ps.setString(3, pb.getDokumen());
+    ps.setInt(4, pb.getIdPermohonan());
+    
+    ps.executeUpdate();
+    ps.close();
+    conn.close();
+}
+
 }

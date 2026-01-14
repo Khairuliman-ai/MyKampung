@@ -1,7 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="model.PermohonanBantuan" %>
-<%@ page import="model.Pengguna" %>
 <%@ page import="java.net.URLEncoder" %>
 <html>
 <head>
@@ -10,20 +9,27 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     
     <style>
-        /* Gaya CSS asas (boleh copy dari fail asal) */
         body { background-color: #f0f2f5; font-family: sans-serif; }
         .status-badge { padding: 5px 10px; border-radius: 6px; font-weight: 600; font-size: 0.8rem; }
-        .bg-status-0 { background: #e2e8f0; color: #475569; } /* Baharu - Kelabu */
+        .bg-status-0 { background: #e2e8f0; color: #475569; } /* Dalam Proses - Kelabu */
         .bg-status-1 { background: #dcfce7; color: #166534; } /* Lulus - Hijau */
         .bg-status-2 { background: #fee2e2; color: #991b1b; } /* Ditolak - Merah */
     </style>
 </head>
 <body>
     <div class="container py-5">
+        
+        <% if (request.getParameter("status") != null) { %>
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <strong>Berjaya!</strong> Rekod telah dikemaskini.
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <% } %>
+
         <div class="d-flex justify-content-between align-items-center mb-4">
             <div>
                 <h4 class="fw-bold">Rekod Bantuan Saya</h4>
-                <p class="text-muted">Semak status permohonan bantuan anda di sini.</p>
+                <p class="text-muted">Senarai permohonan yang telah anda buat.</p>
             </div>
             <button class="btn btn-primary fw-bold" data-bs-toggle="modal" data-bs-target="#modalMohon">
                 <i class="bi bi-plus-lg me-2"></i>Mohon Bantuan Baru
@@ -37,10 +43,11 @@
                         <tr>
                             <th class="ps-4">Tarikh</th>
                             <th>Jenis Bantuan</th>
-                            <th>Dokumen Saya</th>
+                            <th>Dokumen</th>
                             <th>Status</th>
-                            <th>Catatan Ketua Kampung</th>
+                            <th>Catatan Admin</th>
                             <th>Dokumen Balas</th>
+                            <th class="text-center">Tindakan</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -48,21 +55,48 @@
                             List<PermohonanBantuan> list = (List<PermohonanBantuan>) request.getAttribute("permohonanList");
                             if (list != null && !list.isEmpty()) {
                                 for (PermohonanBantuan pb : list) {
+                                    // Logic Warna Status
                                     String statusClass = pb.getStatus() == 0 ? "bg-status-0" : (pb.getStatus() == 1 ? "bg-status-1" : "bg-status-2");
                                     String statusText = pb.getStatus() == 0 ? "Dalam Proses" : (pb.getStatus() == 1 ? "Lulus" : "Ditolak");
+                                    
+                                    // Logic Nama Bantuan (UPDATED: ID 6 - 20)
+                                    String namaBantuan = "Lain-lain / Tidak Diketahui";
+                                    int idB = pb.getIdBantuan();
+                                    
+                                    if (idB == 6) namaBantuan = "BANTUAN AM";
+                                    else if (idB == 7) namaBantuan = "BANTUAN HARI RAYA";
+                                    else if (idB == 8) namaBantuan = "BANTUAN KEPADA GHARIMIN";
+                                    else if (idB == 9) namaBantuan = "BANTUAN MELANJUT PELAJARAN KE IPT";
+                                    else if (idB == 10) namaBantuan = "BANTUAN PEMBANGUNAN ASNAF";
+                                    else if (idB == 11) namaBantuan = "BANTUAN PEMULIHAN RUMAH KEDIAMAN";
+                                    else if (idB == 12) namaBantuan = "BANTUAN RAWATAN PERUBATAN";
+                                    else if (idB == 13) namaBantuan = "BANTUAN SEWA RUMAH";
+                                    else if (idB == 14) namaBantuan = "BANTUAN TETAP BULANAN";
+                                    else if (idB == 15) namaBantuan = "BIASISWA PENDIDIKAN DALAM NEGARA (BPDN)";
+                                    else if (idB == 16) namaBantuan = "BIASISWA PENDIDIKAN LUAR NEGARA (BPLN)";
+                                    else if (idB == 17) namaBantuan = "BIASISWA PROFESIONAL PERAKAUNAN (BPP)";
+                                    else if (idB == 18) namaBantuan = "PROG. BIASISWA SULTAN ISMAIL PETRA (BSIP)";
+                                    else if (idB == 19) namaBantuan = "PROGRAM DERMASISWA SULTAN ISMAIL PETRA (DSIP)";
+                                    else if (idB == 20) namaBantuan = "SUMBANGAN IPT - FISABILILLAH";
                         %>
                         <tr>
                             <td class="ps-4"><%= pb.getTarikhMohon() %></td>
-                            <td class="fw-bold">Bantuan <%= pb.getIdBantuan() %></td>
+                            <td class="fw-bold"><%= namaBantuan %></td>
+                            
                             <td>
-                                <% if (pb.getDokumen() != null) { %>
-                                    <a href="#" class="text-decoration-none small"><i class="bi bi-paperclip"></i> Lihat Fail</a>
+                                <% if (pb.getDokumen() != null) { 
+                                     String encodedFile = URLEncoder.encode(pb.getDokumen(), "UTF-8").replace("+", "%20");
+                                %>
+                                    <a href="<%= request.getContextPath() %>/uploads/<%= encodedFile %>" target="_blank" class="text-decoration-none small">
+                                        <i class="bi bi-paperclip"></i> Lihat
+                                    </a>
                                 <% } else { %> - <% } %>
                             </td>
+
                             <td><span class="status-badge <%= statusClass %>"><%= statusText %></span></td>
                             
-                            <td class="text-muted small">
-                                <%= (pb.getCatatan() != null) ? pb.getCatatan() : "Tiada catatan" %>
+                            <td class="text-muted small" style="max-width: 200px;">
+                                <%= (pb.getCatatan() != null) ? pb.getCatatan() : "-" %>
                             </td>
 
                             <td>
@@ -76,12 +110,33 @@
                                     <span class="text-muted small">-</span>
                                 <% } %>
                             </td>
+
+                            <td class="text-center">
+                                <% if (pb.getStatus() == 0) { // Hanya boleh edit jika 'Dalam Proses' %>
+                                    
+                                    <a href="<%= request.getContextPath() %>/bantuan/edit?id=<%= pb.getIdPermohonan() %>" 
+                                       class="btn btn-sm btn-warning text-dark fw-bold me-1"
+                                       title="Kemaskini">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </a>
+
+                                    <a href="<%= request.getContextPath() %>/bantuan/delete?idPermohonan=<%= pb.getIdPermohonan() %>" 
+                                       class="btn btn-sm btn-danger text-white"
+                                       onclick="return confirm('Adakah anda pasti ingin memadam permohonan ini?');"
+                                       title="Padam">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+
+                                <% } else { %>
+                                    <span class="text-muted small"><i class="bi bi-lock-fill"></i> Selesai</span>
+                                <% } %>
+                            </td>
                         </tr>
                         <% 
                                 }
                             } else { 
                         %>
-                            <tr><td colspan="6" class="text-center py-5 text-muted">Anda belum membuat sebarang permohonan.</td></tr>
+                            <tr><td colspan="7" class="text-center py-5 text-muted">Anda belum membuat sebarang permohonan.</td></tr>
                         <% } %>
                     </tbody>
                 </table>
@@ -101,9 +156,22 @@
                         <div class="mb-3">
                             <label class="form-label">Jenis Bantuan</label>
                             <select name="jenisBantuan" class="form-select" required>
-                                <option value="B01">Bantuan Sara Hidup</option>
-                                <option value="B02">Bantuan Bencana</option>
-                                <option value="B03">Bantuan Persekolahan</option>
+                                <option value="" disabled selected>-- Sila Pilih Bantuan --</option>
+                                <option value="6">BANTUAN AM</option>
+                                <option value="7">BANTUAN HARI RAYA</option>
+                                <option value="8">BANTUAN KEPADA GHARIMIN</option>
+                                <option value="9">BANTUAN MELANJUT PELAJARAN KE IPT</option>
+                                <option value="10">BANTUAN PEMBANGUNAN ASNAF</option>
+                                <option value="11">BANTUAN PEMULIHAN RUMAH KEDIAMAN</option>
+                                <option value="12">BANTUAN RAWATAN PERUBATAN</option>
+                                <option value="13">BANTUAN SEWA RUMAH</option>
+                                <option value="14">BANTUAN TETAP BULANAN</option>
+                                <option value="15">BIASISWA PENDIDIKAN DALAM NEGARA (BPDN) MAIK</option>
+                                <option value="16">BIASISWA PENDIDIKAN LUAR NEGARA (BPLN) MAIK</option>
+                                <option value="17">BIASISWA PROFESIONAL PERAKAUNAN (BPP) MAIK</option>
+                                <option value="18">PROG. BIASISWA SULTAN ISMAIL PETRA (BSIP) MAIK</option>
+                                <option value="19">PROGRAM DERMASISWA SULTAN ISMAIL PETRA (DSIP) MAIK</option>
+                                <option value="20">SUMBANGAN MELANJUTKAN PENGAJIAN KE IPT - FISABILILLAH</option>
                             </select>
                         </div>
                         <div class="mb-3">
