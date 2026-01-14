@@ -215,7 +215,7 @@
                             <i class="bi bi-send me-2"></i>Hantar Permohonan
                         </button>
                         <a href="list" class="btn btn-cancel">
-                            Batal
+                            Batalkan
                         </a>
                     </div>
                 </form>
