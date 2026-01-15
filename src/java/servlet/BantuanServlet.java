@@ -5,16 +5,14 @@ import model.BantuanDAO;
 import model.PermohonanBantuan;
 import model.PermohonanBantuanDAO;
 import model.Pengguna;
-// import util.DBUtil; // Tidak digunakan secara direct di sini, tapi okay jika ada
 
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.net.URLEncoder;
-
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
+import javax.servlet.annotation.WebServlet; // Added this in case you need it, usually mapped in web.xml
 import javax.servlet.http.*;
 
 @MultipartConfig(
@@ -23,6 +21,10 @@ import javax.servlet.http.*;
     maxRequestSize = 10 * 1024 * 1024
 )
 public class BantuanServlet extends HttpServlet {
+
+    // === CONSTANT PATH (So you only change it once!) ===
+    // Note: Java needs double backslashes (\\) for Windows paths.
+    private static final String SAVE_DIR = "C:\\Users\\khayx\\OneDrive\\Documents\\SEM5_UMT\\PITA1\\MyKampungData\\lampiranBantuan";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -39,57 +41,62 @@ public class BantuanServlet extends HttpServlet {
         String action = request.getPathInfo();
 
         try {
-            // Jika akses root /bantuan, kita redirect terus ke list
             if (action == null || "/".equals(action)) {
                 response.sendRedirect(request.getContextPath() + "/bantuan/list");
                 return;
             }
 
-            // ================== UBAH DI SINI (ROUTING JSP) ==================
+            // ================== SHOW LIST ==================
             if ("/list".equals(action)) {
                 PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
                 List<PermohonanBantuan> list;
 
                 if ("Penduduk".equals(user.getJawatan())) {
-                    // 1. Penduduk: Tengok list sendiri
                     int idPenduduk = user.getIdPengguna(); 
                     list = pbDao.getByPenduduk(idPenduduk);
                     request.setAttribute("permohonanList", list);
-                    
-                    // Hantar ke JSP Penduduk yang baru
                     request.getRequestDispatcher("/bantuanPenduduk.jsp").forward(request, response);
-                
                 } else {
-                    // 2. Ketua Kampung: Tengok semua list
                     list = pbDao.getAll();
                     request.setAttribute("permohonanList", list);
-                    
-                    // Hantar ke JSP Ketua Kampung yang baru
                     request.getRequestDispatcher("/bantuanKetua.jsp").forward(request, response);
                 }
             }
-            // ================================================================
-
-            // ... inside doGet method ...
-// Add this AFTER if ("/list".equals(action)) block
-
-// ================== NEW: SHOW EDIT FORM ==================
-if ("/edit".equals(action)) {
-    int id = Integer.parseInt(request.getParameter("id"));
-    PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
-    PermohonanBantuan pb = pbDao.getById(id);
-
-    // Security check: Ensure user owns this record (optional but recommended)
-    if (pb != null && pb.getIdPenduduk() == user.getIdPengguna()) {
-        request.setAttribute("pb", pb);
-        request.getRequestDispatcher("/bantuanEdit.jsp").forward(request, response);
-    } else {
-        response.sendRedirect(request.getContextPath() + "/bantuan/list?error=access");
-    }
-    return; // Important to return here
-}
-// =========================================================
             
+            // ================== SHOW EDIT FORM ==================
+            else if ("/edit".equals(action)) {
+                int id = Integer.parseInt(request.getParameter("id"));
+                PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
+                PermohonanBantuan pb = pbDao.getById(id);
+
+                if (pb != null && pb.getIdPenduduk() == user.getIdPengguna()) {
+                    request.setAttribute("pb", pb);
+                    request.getRequestDispatcher("/bantuanEdit.jsp").forward(request, response);
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/bantuan/list?error=access");
+                }
+            }
+            
+            
+            // ===== STEP 2: PAPAR BANTUAN RASMI (MINIMUM) =====
+else if ("/rasmi".equals(action)) {
+
+    if (!"Penduduk".equals(user.getJawatan())) {
+        response.sendRedirect(request.getContextPath() + "/bantuan/list");
+        return;
+    }
+
+    PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
+    List<PermohonanBantuan> list = pbDao.getByPenduduk(user.getIdPengguna());
+
+    request.setAttribute("permohonanList", list);
+
+    // 👉 GUNA JSP AWAK TERUS (JANGAN DUPLICATE)
+    request.getRequestDispatcher("/bantuanPenduduk.jsp")
+           .forward(request, response);
+}
+
+
         } catch (SQLException e) {
             throw new ServletException(e);
         }
@@ -109,30 +116,30 @@ if ("/edit".equals(action)) {
 
         String action = request.getPathInfo();
 
+        // Ensure the directory exists
+        File fileSaveDir = new File(SAVE_DIR);
+        if (!fileSaveDir.exists()) {
+            fileSaveDir.mkdirs();
+        }
+
         try {
             PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
 
             // ===================== 1. APPLY (PENDUDUK) =====================
             if ("/apply".equals(action) && "Penduduk".equals(user.getJawatan())) {
-                Part filePart = request.getPart("dokumenSokongan"); // Pastikan nama input di form ialah 'dokumenSokongan'
+                Part filePart = request.getPart("dokumenSokongan");
                 
                 String fileName = null;
                 if (filePart != null && filePart.getSize() > 0) {
                     String submittedFileName = filePart.getSubmittedFileName().replaceAll("\\s+", "_");
                     fileName = System.currentTimeMillis() + "_" + submittedFileName;
                     
-                    String uploadPath = getServletContext().getRealPath("/uploads");
-                    File uploadDir = new File(uploadPath);
-                    if (!uploadDir.exists()) uploadDir.mkdirs();
-
-                    filePart.write(uploadPath + File.separator + fileName);
+                    // SAVE TO ONEDRIVE PATH
+                    filePart.write(SAVE_DIR + File.separator + fileName);
                 }
 
                 PermohonanBantuan pb = new PermohonanBantuan();
                 pb.setIdPenduduk(user.getIdPengguna());
-                // Pastikan input name="jenisBantuan" di form menghantar ID Bantuan (contoh: 1, 2, 3)
-                // Jika value="B01", anda kena convert string 'B01' ke int ID atau ubah database structure.
-                // Di sini saya anggap user hantar int ID.
                 pb.setIdBantuan(Integer.parseInt(request.getParameter("jenisBantuan"))); 
                 pb.setCatatan(request.getParameter("keterangan"));
                 pb.setDokumen(fileName);
@@ -148,13 +155,12 @@ if ("/edit".equals(action)) {
                 pbDao.updateStatus(idPermohonan, newStatus, request.getParameter("catatan"));
                 response.sendRedirect(request.getContextPath() + "/bantuan/list");
 
-            // ===================== 3. UPDATE / UPLOAD DOKUMEN BALAS (KETUA KAMPUNG) =====================
+            // ===================== 3. UPDATE INFO / REPLY DOC (KETUA KAMPUNG) =====================
             } else if ("/update".equals(action)) {
                 
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 String catatan = request.getParameter("catatan");
                 
-                // Proses upload 'dokumenBalik'
                 Part filePart = request.getPart("dokumenBalik");
                 String fileName = null;
                 
@@ -162,17 +168,11 @@ if ("/edit".equals(action)) {
                     String submittedFileName = filePart.getSubmittedFileName().replaceAll("\\s+", "_");
                     fileName = "BALAS_" + System.currentTimeMillis() + "_" + submittedFileName;
                     
-                    String uploadPath = getServletContext().getRealPath("/uploads");
-                    File uploadDir = new File(uploadPath);
-                    if (!uploadDir.exists()) uploadDir.mkdirs();
-
-                    filePart.write(uploadPath + File.separator + fileName);
+                    // SAVE TO ONEDRIVE PATH
+                    filePart.write(SAVE_DIR + File.separator + fileName);
                 }
 
-                // Panggil method update tambahan di DAO (Anda perlu buat method ini di DAO jika belum ada)
-                // updateInfo(int id, String catatan, String dokumenBalik)
                 pbDao.updateInfo(idPermohonan, catatan, fileName);
-                
                 response.sendRedirect(request.getContextPath() + "/bantuan/list");
 
             // ===================== 4. DELETE (PENDUDUK) =====================
@@ -180,44 +180,34 @@ if ("/edit".equals(action)) {
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 pbDao.deleteByIdAndPenduduk(idPermohonan, user.getIdPengguna());
                 response.sendRedirect(request.getContextPath() + "/bantuan/list");
+
+            // ===================== 5. EDIT REQUEST (PENDUDUK) =====================
+            } else if ("/updateMyRequest".equals(action) && "Penduduk".equals(user.getJawatan())) {
+                
+                int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
+                String oldDokumen = request.getParameter("oldDokumen");
+                
+                Part filePart = request.getPart("dokumenSokongan");
+                String fileName = oldDokumen; // Default to old file if no new upload
+
+                if (filePart != null && filePart.getSize() > 0) {
+                    String submittedFileName = filePart.getSubmittedFileName().replaceAll("\\s+", "_");
+                    fileName = System.currentTimeMillis() + "_" + submittedFileName;
+                    
+                    // SAVE TO ONEDRIVE PATH
+                    filePart.write(SAVE_DIR + File.separator + fileName);
+                }
+
+                PermohonanBantuan pb = new PermohonanBantuan();
+                pb.setIdPermohonan(idPermohonan);
+                pb.setIdBantuan(Integer.parseInt(request.getParameter("jenisBantuan")));
+                pb.setCatatan(request.getParameter("keterangan"));
+                pb.setDokumen(fileName);
+
+                pbDao.updateByPenduduk(pb);
+                
+                response.sendRedirect(request.getContextPath() + "/bantuan/list?status=updated");
             }
-            
-            // ... inside doPost method ...
-
-// ================== NEW: PROCESS UPDATE (PENDUDUK) ==================
-if ("/updateMyRequest".equals(action) && "Penduduk".equals(user.getJawatan())) {
-    
-    int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
-    String oldDokumen = request.getParameter("oldDokumen"); // Hidden field in JSP
-    
-    // 1. Handle File Upload (Similar to /apply)
-    Part filePart = request.getPart("dokumenSokongan");
-    String fileName = oldDokumen; // Default to old file
-
-    if (filePart != null && filePart.getSize() > 0) {
-        String submittedFileName = filePart.getSubmittedFileName().replaceAll("\\s+", "_");
-        fileName = System.currentTimeMillis() + "_" + submittedFileName;
-        
-        String uploadPath = getServletContext().getRealPath("/uploads");
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) uploadDir.mkdirs();
-
-        filePart.write(uploadPath + File.separator + fileName);
-    }
-
-    // 2. Setup Object
-    PermohonanBantuan pb = new PermohonanBantuan();
-    pb.setIdPermohonan(idPermohonan);
-    pb.setIdBantuan(Integer.parseInt(request.getParameter("jenisBantuan")));
-    pb.setCatatan(request.getParameter("keterangan"));
-    pb.setDokumen(fileName); // New file or Old file
-
-    // 3. Update DB
-    pbDao.updateByPenduduk(pb);
-    
-    response.sendRedirect(request.getContextPath() + "/bantuan/list?status=updated");
-}
-// ====================================================================
 
         } catch (SQLException e) {
             throw new ServletException(e);

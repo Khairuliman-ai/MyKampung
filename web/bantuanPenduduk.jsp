@@ -87,7 +87,7 @@
                                 <% if (pb.getDokumen() != null) { 
                                      String encodedFile = URLEncoder.encode(pb.getDokumen(), "UTF-8").replace("+", "%20");
                                 %>
-                                    <a href="<%= request.getContextPath() %>/uploads/<%= encodedFile %>" target="_blank" class="text-decoration-none small">
+                                   <a href="<%= request.getContextPath() %>/file/<%= encodedFile %>" target="_blank" class="text-decoration-none small">
                                         <i class="bi bi-paperclip"></i> Lihat
                                     </a>
                                 <% } else { %> - <% } %>
