@@ -1,7 +1,8 @@
-package model;
+package dao;
 
 import util.DBUtil;
 import java.sql.*;
+import model.Penduduk;
 
 public class PendudukDAO {
     public void insert(Penduduk pd) throws SQLException {

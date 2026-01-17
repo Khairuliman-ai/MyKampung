@@ -1,4 +1,4 @@
-package servlet;
+package controller;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
@@ -17,6 +17,6 @@ public class LogoutServlet extends HttpServlet {
         }
         
         // Redirect ke login page
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        response.sendRedirect(request.getContextPath());
     }
 }

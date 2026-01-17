@@ -136,7 +136,8 @@
         </form>
 
         <p class="text-center register-link">
-            Belum mempunyai akaun? <a href="register.jsp">Daftar Sini</a>
+            Belum mempunyai akaun? 
+            <a href="${pageContext.request.contextPath}/views/auth/register.jsp">Daftar Sini</a>
         </p>
     </div>
 

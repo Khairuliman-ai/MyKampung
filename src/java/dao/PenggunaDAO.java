@@ -1,8 +1,9 @@
-package model;
+package dao;
 
 import util.DBUtil;
 import java.sql.*;
 import java.util.Date;
+import model.Pengguna;
 
 public class PenggunaDAO {
     public Pengguna getByNomborKP(String nomborKP) throws SQLException {

@@ -1,9 +1,9 @@
-package servlet;
+package controller;
 
 import model.Bantuan;
-import model.BantuanDAO;
+import dao.BantuanDAO;
 import model.PermohonanBantuan;
-import model.PermohonanBantuanDAO;
+import dao.PermohonanBantuanDAO;
 import model.Pengguna;
 
 import java.io.File;
@@ -34,7 +34,7 @@ public class BantuanServlet extends HttpServlet {
         Pengguna user = (Pengguna) session.getAttribute("user");
 
         if (user == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect(request.getContextPath());
             return;
         }
 
@@ -55,7 +55,7 @@ public class BantuanServlet extends HttpServlet {
                     int idPenduduk = user.getIdPengguna(); 
                     list = pbDao.getByPenduduk(idPenduduk);
                     request.setAttribute("permohonanList", list);
-                    request.getRequestDispatcher("/bantuanPenduduk.jsp").forward(request, response);
+                    request.getRequestDispatcher("/views/bantuan/jenisBantuan.jsp").forward(request, response);
                 } else {
                     list = pbDao.getAll();
                     request.setAttribute("permohonanList", list);
@@ -92,7 +92,7 @@ else if ("/rasmi".equals(action)) {
     request.setAttribute("permohonanList", list);
 
     // 👉 GUNA JSP AWAK TERUS (JANGAN DUPLICATE)
-    request.getRequestDispatcher("/bantuanPenduduk.jsp")
+    request.getRequestDispatcher("/views/bantuan/bantuanRas.jsp")
            .forward(request, response);
 }
 
@@ -110,7 +110,7 @@ else if ("/rasmi".equals(action)) {
         Pengguna user = (Pengguna) session.getAttribute("user");
 
         if (user == null) {
-            response.sendRedirect(request.getContextPath() + "/login.jsp");
+            response.sendRedirect(request.getContextPath());
             return;
         }
 
