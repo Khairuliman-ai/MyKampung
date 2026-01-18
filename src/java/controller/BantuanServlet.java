@@ -71,7 +71,7 @@ public class BantuanServlet extends HttpServlet {
 
                 if (pb != null && pb.getIdPenduduk() == user.getIdPengguna()) {
                     request.setAttribute("pb", pb);
-                    request.getRequestDispatcher("/bantuanEdit.jsp")
+                    request.getRequestDispatcher("/views/bantuan/bantuanEdit.jsp")
                            .forward(request, response);
                 } else {
                     response.sendRedirect(request.getContextPath() + "/bantuan/list?error=access");
@@ -93,6 +93,24 @@ public class BantuanServlet extends HttpServlet {
                 request.setAttribute("permohonanList", list);
                 request.getRequestDispatcher("/views/bantuan/bantuanRas.jsp")
                        .forward(request, response);
+            }
+            
+            // ================== TAMBAH INI (DELETE) ==================
+            else if ("/delete".equals(action)) {
+                // Pastikan hanya PENDUDUK boleh delete (Security Check)
+                if ("Penduduk".equals(user.getJawatan())) {
+                    PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
+                    int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
+                    
+                    // Delete dari database
+                    pbDao.deleteByIdAndPenduduk(idPermohonan, user.getIdPengguna());
+                    
+                    // Redirect balik ke page list dengan mesej berjaya
+                    response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?status=deleted");
+                } else {
+                    // Kalau bukan penduduk cuba delete, tendang balik
+                    response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?error=denied");
+                }
             }
 
         } catch (SQLException e) {
@@ -169,7 +187,7 @@ public class BantuanServlet extends HttpServlet {
                 // ----------------------------------------------------
 
                 pbDao.insert(pb);
-                response.sendRedirect(request.getContextPath() + "/bantuan/list?status=success");
+                response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?status=success");
             }
 
             // ===================== 2. APPROVE / REJECT =====================
@@ -199,12 +217,7 @@ public class BantuanServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/bantuan/list");
             }
 
-            // ===================== 4. DELETE (PENDUDUK) =====================
-            else if ("/delete".equals(action) && "Penduduk".equals(user.getJawatan())) {
-                int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
-                pbDao.deleteByIdAndPenduduk(idPermohonan, user.getIdPengguna());
-                response.sendRedirect(request.getContextPath() + "/bantuan/list");
-            }
+
 
             // ===================== 5. UPDATE MY REQUEST (EDIT) =====================
             else if ("/updateMyRequest".equals(action) && "Penduduk".equals(user.getJawatan())) {
@@ -246,7 +259,7 @@ public class BantuanServlet extends HttpServlet {
                 // -----------------------------------
 
                 pbDao.updateByPenduduk(pb);
-                response.sendRedirect(request.getContextPath() + "/bantuan/list?status=updated");
+                response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?status=updated");
             }
 
         } catch (SQLException e) {
