@@ -209,8 +209,13 @@
             if (mainList != null) {
                 Collections.sort(mainList, (o1, o2) -> Integer.compare(o2.getIdPermohonan(), o1.getIdPermohonan()));
                 for (PermohonanBantuan pb : mainList) {
-                    if (pb.getStatus() == 0) listProses.add(pb);
-                    else listSejarah.add(pb);
+                   // Status 0 (Baru), 2 (Hantar Balik), 3 (Pending Ketua) -> Masuk list PROSES
+if (pb.getStatus() == 0 || pb.getStatus() == 2 || pb.getStatus() == 3) {
+    listProses.add(pb);
+} else {
+    // Status 1 (Lulus) atau Reject Muktamad -> Masuk SEJARAH
+    listSejarah.add(pb);
+}
                 }
             }
         %>
@@ -253,7 +258,7 @@
                                 <th>Jenis Bantuan</th>
                                 <th>Dokumen</th>
                                 <th>Keterangan</th>
-                                <th>Ulasan</th>
+                                <th>Ulasan JKKK</th>
                                 <th>Status</th>
                                 <th class="text-center">Tindakan</th>
                             </tr>
@@ -307,13 +312,51 @@
                                         <a href="<%= request.getContextPath() %>/file/<%= enc %>" target="_blank" class="btn btn-sm btn-light border text-muted"><i class="bi bi-file-earmark-pdf text-danger"></i> PDF</a>
                                     <% } else { %> - <% } %>
                                 </td>
-                                <td class="small text-muted search-col" style="max-width: 200px;"><%= keteranganDisplay %></td>
-                                <td class="small text-muted">-</td>
-                                <td><span class="status-badge bg-status-0"><i class="bi bi-arrow-repeat me-1"></i>Proses</span></td>
-                                <td class="text-center">
-                                    <a href="<%= request.getContextPath() %>/bantuan/edit?id=<%= pb.getIdPermohonan() %>" class="btn btn-sm btn-outline-warning border-0 rounded-circle" title="Edit"><i class="bi bi-pencil-fill"></i></a>
-                                    <a href="<%= request.getContextPath() %>/bantuan/delete?idPermohonan=<%= pb.getIdPermohonan() %>" class="btn btn-sm btn-outline-danger border-0 rounded-circle" onclick="return confirm('Padam?');" title="Padam"><i class="bi bi-trash-fill"></i></a>
-                                </td>
+<td class="small text-muted" style="max-width: 200px;">
+    <%= (pb.getCatatan() != null) ? pb.getCatatan() : "-" %>
+</td>
+                                <td class="small">
+    <% if (pb.getStatus() == 2) { %>
+        <span class="text-danger fw-bold">
+            <i class="bi bi-exclamation-circle-fill me-1"></i>
+            <%= (pb.getUlasanAdmin() != null) ? pb.getUlasanAdmin() : "Sila kemaskini permohonan." %>
+        </span>
+    <% } else { %>
+        <span class="text-muted">-</span>
+    <% } %>
+</td>
+                                <td>
+    <% if (pb.getStatus() == 0) { %>
+        <span class="status-badge bg-status-0">
+            <i class="bi bi-arrow-repeat me-1"></i> Dalam Proses
+        </span>
+        
+    <% } else if (pb.getStatus() == 2) { %>
+        <span class="status-badge bg-status-2">
+            <i class="bi bi-exclamation-triangle-fill me-1"></i> Tidak Lengkap
+        </span>
+        
+    <% } else if (pb.getStatus() == 3) { %>
+        <span class="status-badge bg-status-3">
+            <i class="bi bi-check-circle me-1"></i> Disemak JKKK
+        </span>
+    <% } %>
+</td>
+                               <td class="text-center">
+    <% if (pb.getStatus() == 2) { %>
+        <a href="<%= request.getContextPath() %>/bantuan/edit?id=<%= pb.getIdPermohonan() %>" 
+           class="btn btn-sm btn-warning fw-bold text-dark shadow-sm">
+           <i class="bi bi-pencil-square"></i> Betulkan
+        </a>
+        
+    <% } else if (pb.getStatus() == 0) { %>
+        <a href="<%= request.getContextPath() %>/bantuan/edit?id=<%= pb.getIdPermohonan() %>" class="btn btn-sm btn-outline-warning border-0 rounded-circle"><i class="bi bi-pencil-fill"></i></a>
+        <a href="<%= request.getContextPath() %>/bantuan/delete?idPermohonan=<%= pb.getIdPermohonan() %>" class="btn btn-sm btn-outline-danger border-0 rounded-circle" onclick="return confirm('Padam?');"><i class="bi bi-trash-fill"></i></a>
+        
+    <% } else { %>
+        <span class="text-muted small"><i class="bi bi-lock-fill"></i></span>
+    <% } %>
+</td>
                             </tr>
                             <% } } else { %>
                                 <tr class="no-data"><td colspan="7" class="empty-state"><i class="bi bi-inbox"></i>Tiada permohonan sedang diproses.</td></tr>

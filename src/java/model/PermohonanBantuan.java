@@ -10,8 +10,11 @@ public class PermohonanBantuan {
     private Date tarikhMohon;
     private int status;  // 0: Baru, 1: Lulus, 2: Tolak
     private String catatan;
+    private String ulasanAdmin;
     private String dokumen;      // PDF dari penduduk
     private String dokumenBalik; // PDF dari ketua kampung
+    private String namaPemohon;
+    private String namaBantuan;
 
     // Getters & Setters
     public int getIdPermohonan() {
@@ -77,4 +80,29 @@ public class PermohonanBantuan {
     public void setDokumenBalik(String dokumenBalik) {
         this.dokumenBalik = dokumenBalik;
     }
+    
+    public String getNamaPemohon() {
+        return namaPemohon;
+    }
+
+    public void setNamaPemohon(String namaPemohon) {
+        this.namaPemohon = namaPemohon;
+    }
+    
+    public String getUlasanAdmin() {
+        return ulasanAdmin;
+    }
+
+    public void setUlasanAdmin(String ulasanAdmin) {
+        this.ulasanAdmin = ulasanAdmin;
+    }
+    
+    public String getNamaBantuan() {
+        return namaBantuan;
+    }
+
+    public void setNamaBantuan(String namaBantuan) {
+        this.namaBantuan = namaBantuan;
+    }
+    
 }

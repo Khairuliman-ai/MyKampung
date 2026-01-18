@@ -43,7 +43,7 @@
                 <i class="bi bi-people-fill"></i> Urus Penduduk
             </a>
             <a class="nav-link" href="<%= request.getContextPath() %>/bantuan/list">
-                <i class="bi bi-check-circle"></i> Kelulusan Bantuan
+                <i class="bi bi-check-circle"></i> Sokongan Bantuan
             </a>
             <a class="nav-link" href="#">
                 <i class="bi bi-building"></i> Urus Kemudahan
@@ -57,6 +57,11 @@
             <a class="nav-link" href="#">
                 <i class="bi bi-people"></i> Senarai Penduduk
             </a>
+        
+                    <<a href="<%= request.getContextPath() %>/bantuan/list" class="nav-link">
+    <i class="bi bi-briefcase-fill"></i> Pengurusan Bantuan
+</a>
+        
             <a class="nav-link" href="#">
                 <i class="bi bi-building"></i> Semak Kemudahan
             </a>
