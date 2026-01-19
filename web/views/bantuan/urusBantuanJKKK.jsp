@@ -1,3 +1,6 @@
+<%@ include file="/views/common/header.jsp" %>
+<%@ include file="/views/common/navbar.jsp" %>
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.text.SimpleDateFormat" %>
@@ -26,10 +29,20 @@
 
 <div class="container py-5">
     
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h4 class="fw-bold text-dark">Senarai Permohonan (Status: Baharu)</h4>
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h4 class="fw-bold text-dark mb-1">Semakan Permohonan JKKK</h4>
+        <p class="text-muted small m-0">Senarai permohonan baharu dari penduduk.</p>
+    </div>
+    
+    <div class="d-flex gap-2">
+        <button class="btn btn-primary btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahBantuan">
+            <i class="bi bi-plus-circle me-1"></i> Jenis Bantuan Baru
+        </button>
+        
         <a href="<%= request.getContextPath() %>/logout" class="btn btn-outline-secondary btn-sm">Log Keluar</a>
     </div>
+</div>
 
     <%
         List<PermohonanBantuan> list = (List<PermohonanBantuan>) request.getAttribute("permohonanList");
@@ -215,6 +228,33 @@
         new bootstrap.Modal(document.getElementById('modalTindakan')).show();
     }
 </script>
+
+<div class="modal fade" id="modalTambahBantuan" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title fw-bold"><i class="bi bi-collection text-primary me-2"></i>Tambah Jenis Bantuan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form action="<%= request.getContextPath() %>/bantuan/tambahJenisBantuan" method="post">
+                <div class="modal-body">
+                    <div class="alert alert-info small border-0 bg-opacity-10 bg-info">
+                        <i class="bi bi-info-circle me-1"></i> Bantuan baru akan dimasukkan ke dalam senarai "Bantuan Komuniti".
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label fw-bold small text-muted">Nama Bantuan</label>
+                        <input type="text" name="namaBantuanBaru" class="form-control" placeholder="Contoh: SUMBANGAN RAMADHAN" required>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-0">
+                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary fw-bold">Simpan</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 
 </body>
 </html>

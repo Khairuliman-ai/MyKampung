@@ -1,4 +1,5 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ include file="/views/common/header.jsp" %>
+
 <%@ page import="java.util.List" %>
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.util.Collections" %>
@@ -117,6 +118,7 @@
                             <th>Jenis Bantuan</th>
                             <th>Semakan JKKK</th>
                             <th>Dokumen</th>
+                         
                             <th class="text-center" style="width: 200px;">Keputusan</th>
                         </tr>
                     </thead>
@@ -235,7 +237,7 @@
                 <h5 class="modal-title fw-bold" id="modalTitle">Pengesahan Akhir</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="<%= request.getContextPath() %>/bantuan/keputusanKetua" method="post">
+            <form action="<%= request.getContextPath() %>/bantuan/keputusanKetua" method="post" enctype="multipart/form-data">
                 <div class="modal-body">
                     <input type="hidden" name="idPermohonan" id="modalId">
                     <input type="hidden" name="keputusan" id="modalKeputusanValue">
@@ -261,6 +263,13 @@
                             <textarea name="ulasan" id="ulasanBox" class="form-control" rows="3" placeholder="Contoh: Tidak menetap di kampung ini..."></textarea>
                         </div>
                     </div>
+                    
+                    <div class="mb-3">
+    <label class="form-label fw-bold small text-primary">Muat Naik Dokumen (Pilihan):</label>
+    <input type="file" name="dokumenBalas" class="form-control" accept="application/pdf">
+    <div class="form-text small text-muted">Contoh: Surat Kelulusan Rasmi / Memo</div>
+</div>
+                    
                 </div>
                 <div class="modal-footer border-0 bg-light">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>

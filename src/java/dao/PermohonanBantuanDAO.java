@@ -36,17 +36,34 @@ public class PermohonanBantuanDAO {
         conn.close();
     }
 
-    public void updateStatus(int idPermohonan, int status, String ulasanAdmin) throws SQLException {
-        Connection conn = DBUtil.getConnection();
-        String sql = "UPDATE Permohonan_Bantuan SET status = ?, ulasan_admin = ? WHERE idPermohonan = ?";
-        PreparedStatement ps = conn.prepareStatement(sql);
-        ps.setInt(1, status);
-        ps.setString(2, ulasanAdmin);
-        ps.setInt(3, idPermohonan);
-        ps.executeUpdate();
-        ps.close();
-        conn.close();
+// Method updateStatus yang telah ditambah column dokumenBalik
+public void updateStatus(int idPermohonan, int status, String ulasanAdmin, String dokumenBalik) throws SQLException {
+    Connection conn = DBUtil.getConnection();
+    
+    String sql;
+    if (dokumenBalik != null) {
+        // Kalau ada fail baru, update status, ulasan DAN dokumen_balik
+        sql = "UPDATE Permohonan_Bantuan SET status = ?, ulasan_admin = ?, dokumenBalik = ? WHERE idPermohonan = ?";
+    } else {
+        // Kalau tiada fail, update status & ulasan sahaja
+        sql = "UPDATE Permohonan_Bantuan SET status = ?, ulasan_admin = ? WHERE idPermohonan = ?";
     }
+    
+    PreparedStatement ps = conn.prepareStatement(sql);
+    ps.setInt(1, status);
+    ps.setString(2, ulasanAdmin);
+    
+    if (dokumenBalik != null) {
+        ps.setString(3, dokumenBalik);
+        ps.setInt(4, idPermohonan);
+    } else {
+        ps.setInt(3, idPermohonan);
+    }
+    
+    ps.executeUpdate();
+    ps.close();
+    conn.close();
+}
 
 public List<PermohonanBantuan> getAll() throws SQLException {
     List<PermohonanBantuan> list = new ArrayList<>();
@@ -114,8 +131,7 @@ public List<PermohonanBantuan> getByPenduduk(int idPenduduk) throws SQLException
     List<PermohonanBantuan> list = new ArrayList<>();
     Connection conn = DBUtil.getConnection();
     
-    // SQL JOIN: Kita gabungkan table Permohonan dengan table Bantuan
-    // "b.namaBantuan" ialah column dari table Bantuan.java anda
+    // SQL JOIN
     String sql = "SELECT pb.*, b.namaBantuan " +
                  "FROM Permohonan_Bantuan pb " +
                  "JOIN bantuan b ON pb.idBantuan = b.idBantuan " + 
@@ -128,39 +144,40 @@ public List<PermohonanBantuan> getByPenduduk(int idPenduduk) throws SQLException
     
     while (rs.next()) {
         PermohonanBantuan pb = new PermohonanBantuan();
+        
+        // 1. SET DATA ASAL (PENTING: Jangan tertinggal mana-mana!)
         pb.setIdPermohonan(rs.getInt("idPermohonan"));
-        // ... set data lain ...
+        pb.setIdPenduduk(rs.getInt("idPenduduk"));
         pb.setIdBantuan(rs.getInt("idBantuan"));
+        pb.setTarikhMohon(rs.getDate("tarikhMohon"));
+        pb.setStatus(rs.getInt("status"));
+        pb.setCatatan(rs.getString("catatan"));
+        pb.setUlasanAdmin(rs.getString("ulasan_admin"));
         
-        // --- LOGIC NAMA BANTUAN ---
-        // 1. Ambil nama dari DB (hasil JOIN tadi)
+        // --- INI YANG HILANG SEBELUM NI (PUNCA PDF TAK KELUAR) ---
+        pb.setDokumen(rs.getString("dokumen")); 
+        pb.setDokumenBalik(rs.getString("dokumenBalik")); 
+        
+        // 2. LOGIC NAMA BANTUAN
         String namaDariDB = rs.getString("namaBantuan"); 
-        
-        // 2. Check kalau ID 999 (Lain-lain)
         if (pb.getIdBantuan() == 999) {
-             String fullCatatan = rs.getString("catatan");
-             if (fullCatatan != null && fullCatatan.contains("LAIN-LAIN:")) {
+             String fullCatatan = pb.getCatatan(); // Guna getter sbb dah set kat atas
+             if (fullCatatan != null && fullCatatan.contains("|")) {
                  String bersih = fullCatatan.replace("LAIN-LAIN: ", "");
-                 if (bersih.contains("|")) {
-                     pb.setNamaBantuan(bersih.split("\\|")[0].trim().toUpperCase());
-                 } else {
-                     pb.setNamaBantuan(bersih.toUpperCase());
-                 }
+                 pb.setNamaBantuan(bersih.split("\\|")[0].trim().toUpperCase());
              } else {
                  pb.setNamaBantuan("LAIN-LAIN");
              }
         } else {
-             // 3. Kalau bukan 999, guna nama dari table Bantuan terus!
-             pb.setNamaBantuan(namaDariDB.toUpperCase());
+             pb.setNamaBantuan(namaDariDB != null ? namaDariDB.toUpperCase() : "TIDAK DIKETAHUI");
         }
-        
-        // ... set data lain ...
-        pb.setCatatan(rs.getString("catatan"));
-        pb.setUlasanAdmin(rs.getString("ulasan_admin"));
         
         list.add(pb);
     }
-    // ... close connection ...
+    
+    rs.close();
+    ps.close();
+    conn.close();
     return list;
 }
 
@@ -180,10 +197,10 @@ public void updateInfo(int idPermohonan, String catatan, String dokumenBalik) th
     
     // Jika ada file baru diupload, update column dokumen_balik
     if (dokumenBalik != null) {
-        sql = "UPDATE permohonan_bantuan SET catatan = ?, dokumen_balik = ? WHERE id_permohonan = ?";
+        sql = "UPDATE permohonan_bantuan SET catatan = ?, dokumen_balik = ? WHERE idPermohonan = ?";
     } else {
         // Jika tiada file, cuma update catatan sahaja
-        sql = "UPDATE permohonan_bantuan SET catatan = ? WHERE id_permohonan = ?";
+        sql = "UPDATE permohonan_bantuan SET catatan = ? WHERE idPermohonan = ?";
     }
 
     try (Connection conn = DBUtil.getConnection();
