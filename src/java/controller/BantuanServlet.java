@@ -176,7 +176,17 @@ public class BantuanServlet extends HttpServlet {
     request.setAttribute("senaraiJenisBantuan", listPilihanBantuan); // Untuk Dropdown Modal
     
     request.getRequestDispatcher("/views/bantuan/bantuanKom.jsp").forward(request, response);
-}// ================== TAMBAH INI (DELETE) ==================
+}
+
+// ... (kod sedia ada)
+
+// ================== BORANG DIGITAL (TAMBAHAN BARU) ==================
+else if ("/borangDigital.jsp".equals(action)) {
+    // Forward request ke lokasi sebenar fail JSP dalam folder views
+    request.getRequestDispatcher("/views/bantuan/borangDigital.jsp").forward(request, response);
+}
+
+// ... (kod sedia ada seterusnya, contohnya /delete atau /rasmi)// ================== TAMBAH INI (DELETE) ==================
             else if ("/delete".equals(action)) {
                 // Pastikan hanya PENDUDUK boleh delete (Security Check)
                 if ("Penduduk".equals(user.getJawatan())) {
@@ -267,8 +277,18 @@ public class BantuanServlet extends HttpServlet {
                 }
                 // ----------------------------------------------------
 
-                pbDao.insert(pb);
-                response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?status=success");
+               pbDao.insert(pb);
+
+// --- LOGIK REDIRECT PINTAR (UPDATE INI) ---
+// Jika ID Bantuan > 20 atau 999, ia adalah Bantuan Komuniti.
+// Jadi kita hantar user balik ke halaman Komuniti, bukan Rasmi.
+int idBantuanCheck = pb.getIdBantuan();
+if (idBantuanCheck > 20 || idBantuanCheck == 999) {
+    response.sendRedirect(request.getContextPath() + "/bantuan/komuniti?status=success");
+} else {
+    // Jika ID 1-20, ia Bantuan Rasmi
+    response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?status=success");
+}
             } // ===================== 2. APPROVE / REJECT =====================
             else if ("/approve".equals(action) || "/reject".equals(action)) {
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));

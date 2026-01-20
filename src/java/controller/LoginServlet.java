@@ -31,5 +31,7 @@ public class LoginServlet extends HttpServlet {
             request.setAttribute("error", "Ralat sambungan DB.");
             request.getRequestDispatcher("/views/auth/login.jsp").forward(request, response);
         }
+        
+        
     }
 }

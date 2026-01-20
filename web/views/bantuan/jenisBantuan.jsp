@@ -1,86 +1,89 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="model.Pengguna" %>
+
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
 
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <title>Pusat Bantuan - MyKampung</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-    
-    <style>
-        body { background-color: #f8f9fa; }
-        .card-bantuan {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            cursor: pointer;
-            border: none;
-            border-radius: 15px;
-        }
-        .card-bantuan:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-        }
-        .icon-large { font-size: 3rem; margin-bottom: 15px; }
-        .bg-komuniti { background-color: #28a745; color: white; } /* Hijau */
-        .bg-rasmi { background-color: #007bff; color: white; }    /* Biru */
-    </style>
-</head>
-<body>
+<div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth h-full bg-[#F7F7F9]">
 
-    <nav class="navbar navbar-light bg-white shadow-sm mb-5">
-        <div class="container">
-            <a class="navbar-brand fw-bold text-primary" href="#">MyKampung</a>
-            <a href="${pageContext.request.contextPath}/logout" class="btn btn-outline-danger btn-sm">Log Keluar</a>
-        </div>
-    </nav>
+    <header class="text-center mb-10 max-w-2xl mx-auto">
+        <h2 class="text-3xl font-bold text-gray-800 mb-2">Pusat Bantuan</h2>
+        <p class="text-gray-500">Sila pilih kategori bantuan yang anda perlukan. Kami sedia membantu memudahkan urusan anda.</p>
+    </header>
 
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="fw-bold">Apa yang boleh kami bantu?</h2>
-            <p class="text-muted">Sila pilih kategori bantuan yang anda perlukan.</p>
-        </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        
+        <a href="<%= request.getContextPath() %>/bantuan/komuniti" class="group">
+            <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 h-full text-center transition-all duration-300 hover:shadow-xl hover:shadow-purple-100 hover:-translate-y-2 hover:border-[#6C5DD3] relative overflow-hidden">
+                
+                <div class="absolute inset-0 bg-gradient-to-br from-[#6C5DD3]/0 to-[#6C5DD3]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
 
-        <div class="row justify-content-center">
-            
-            <div class="col-md-5 col-lg-4 mb-4">
-                <a href="${pageContext.request.contextPath}/bantuan/komuniti" class="text-decoration-none">
-                    <div class="card card-bantuan h-100 shadow-sm">
-                        <div class="card-body text-center p-5">
-                            <div class="icon-large text-success">
-                                <i class="bi bi-people-fill"></i>
-                            </div>
-                            <h4 class="card-title text-dark fw-bold">Bantuan Komuniti</h4>
-                            <p class="card-text text-muted mt-3">
-                                Gotong-royong, sumbangan jiran tetangga, aduan kerosakan fasiliti kampung, dan aktiviti sukarelawan.
-                            </p>
-                            <button class="btn btn-success mt-3 rounded-pill px-4">Pilih Komuniti</button>
-                        </div>
-                    </div>
-                </a>
+                <div class="w-24 h-24 rounded-3xl bg-green-50 text-green-500 flex items-center justify-center mx-auto mb-6 text-4xl group-hover:bg-[#6C5DD3] group-hover:text-white transition-colors duration-300 shadow-sm">
+                    <i class="fas fa-users"></i>
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-[#6C5DD3] transition-colors">Bantuan Komuniti</h3>
+                
+                <p class="text-gray-500 text-sm mb-6 leading-relaxed">
+                    Gotong-royong, sumbangan khairat kematian, bantuan bencana, dan aktiviti sukarelawan kampung.
+                </p>
+
+                <span class="inline-block px-6 py-2 rounded-full border border-gray-200 text-gray-600 font-bold text-xs uppercase tracking-wider group-hover:bg-[#6C5DD3] group-hover:text-white group-hover:border-[#6C5DD3] transition-all">
+                    Pilih Komuniti
+                </span>
             </div>
+        </a>
 
-            <div class="col-md-5 col-lg-4 mb-4">
-                <a href="${pageContext.request.contextPath}/bantuan/rasmi" class="text-decoration-none">
-                    <div class="card card-bantuan h-100 shadow-sm">
-                        <div class="card-body text-center p-5">
-                            <div class="icon-large text-primary">
-                                <i class="bi bi-building-fill-check"></i>
-                            </div>
-                            <h4 class="card-title text-dark fw-bold">Bantuan Rasmi</h4>
-                            <p class="card-text text-muted mt-3">
-                                Permohonan bantuan JKM, pengesahan penghulu, surat sokongan, dan urusan rasmi kerajaan.
-                            </p>
-                            <a href="${pageContext.request.contextPath}/bantuan/rasmi" class="btn btn-primary mt-3 rounded-pill px-4"> Pilih Rasmi</a>
-                        </div>
-                    </div>
-                </a>
+        <a href="<%= request.getContextPath() %>/bantuan/rasmi" class="group">
+            <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 h-full text-center transition-all duration-300 hover:shadow-xl hover:shadow-purple-100 hover:-translate-y-2 hover:border-[#6C5DD3] relative overflow-hidden">
+                
+                <div class="absolute inset-0 bg-gradient-to-br from-[#6C5DD3]/0 to-[#6C5DD3]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                <div class="w-24 h-24 rounded-3xl bg-blue-50 text-blue-500 flex items-center justify-center mx-auto mb-6 text-4xl group-hover:bg-[#6C5DD3] group-hover:text-white transition-colors duration-300 shadow-sm">
+                    <i class="fas fa-file-signature"></i>
+                </div>
+
+                <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-[#6C5DD3] transition-colors">Bantuan Rasmi</h3>
+                
+                <p class="text-gray-500 text-sm mb-6 leading-relaxed">
+                    Permohonan bantuan JKM, surat sokongan penghulu, pengesahan dokumen, dan urusan kerajaan.
+                </p>
+
+                <span class="inline-block px-6 py-2 rounded-full border border-gray-200 text-gray-600 font-bold text-xs uppercase tracking-wider group-hover:bg-[#6C5DD3] group-hover:text-white group-hover:border-[#6C5DD3] transition-all">
+                    Pilih Rasmi
+                </span>
             </div>
+        </a>
 
-        </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-</body>
-</html>
+    <div class="mt-12 text-center">
+        <p class="text-sm text-gray-400">
+            Ada masalah lain? <a href="#" class="text-[#6C5DD3] font-bold hover:underline">Hubungi Ketua Kampung</a> secara terus.
+        </p>
+    </div>
+
+</div> 
+<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
+    <div class="flex justify-between items-start mb-8">
+        <h3 class="font-bold text-lg text-gray-800">Status Permohonan</h3>
+    </div>
+
+    <div class="text-center py-8">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+            <i class="fas fa-inbox text-xl"></i>
+        </div>
+        <p class="text-sm font-bold text-gray-800">Tiada Permohonan Aktif</p>
+        <p class="text-xs text-gray-500 mt-1">Sejarah permohonan bantuan anda akan dipaparkan di sini.</p>
+    </div>
+
+    <div class="mt-auto bg-purple-50 rounded-2xl p-6 relative overflow-hidden">
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-purple-200 rounded-full opacity-50"></div>
+        <h4 class="font-bold text-[#6C5DD3] mb-2 relative z-10">Tahukah Anda?</h4>
+        <p class="text-xs text-gray-600 leading-relaxed relative z-10">
+            Permohonan bantuan JKM memerlukan pengesahan dari Penghulu Mukim sebelum dihantar ke pejabat daerah.
+        </p>
+    </div>
+</aside>
+
+<%@ include file="/views/common/footer.jsp" %>

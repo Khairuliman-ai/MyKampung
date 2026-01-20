@@ -1,260 +1,259 @@
-<%@ include file="/views/common/header.jsp" %>
-<%@ include file="/views/common/navbar.jsp" %>
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="model.PermohonanBantuan" %>
 <%@ page import="java.net.URLEncoder" %>
 
-<!DOCTYPE html>
-<html lang="ms">
-<head>
-    <title>Semakan Permohonan JKKK | MyKampung</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-    
-    <style>
-        body { background-color: #f8fafc; font-family: sans-serif; }
-        .card-custom { border: none; border-radius: 12px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .table thead th { 
-            background-color: #f1f5f9; color: #475569; 
-            font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.5px; border: none;
-            vertical-align: middle;
-        }
-        .btn-action-group .btn { border-radius: 6px; font-size: 0.85rem; }
-    </style>
-</head>
-<body>
+<%@ include file="/views/common/header.jsp" %>
+<%@ include file="/views/common/navbar.jsp" %>
 
-<div class="container py-5">
-    
-<div class="d-flex justify-content-between align-items-center mb-4">
-    <div>
-        <h4 class="fw-bold text-dark mb-1">Semakan Permohonan JKKK</h4>
-        <p class="text-muted small m-0">Senarai permohonan baharu dari penduduk.</p>
+<div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth h-full bg-[#F7F7F9]">
+
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Semakan Permohonan JKKK</h2>
+            <p class="text-gray-500 text-sm">Senarai permohonan baharu dari penduduk untuk disemak.</p>
+        </div>
+        <div>
+            <button onclick="openModal('modalTambahBantuan')" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-md shadow-purple-200 flex items-center gap-2">
+                <i class="fas fa-plus-circle"></i> Jenis Bantuan Baru
+            </button>
+        </div>
     </div>
-    
-    <div class="d-flex gap-2">
-        <button class="btn btn-primary btn-sm shadow-sm" data-bs-toggle="modal" data-bs-target="#modalTambahBantuan">
-            <i class="bi bi-plus-circle me-1"></i> Jenis Bantuan Baru
-        </button>
-        
-        <a href="<%= request.getContextPath() %>/logout" class="btn btn-outline-secondary btn-sm">Log Keluar</a>
-    </div>
-</div>
 
     <%
         List<PermohonanBantuan> list = (List<PermohonanBantuan>) request.getAttribute("permohonanList");
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     %>
 
-    <div class="card card-custom bg-white mb-4">
-        <div class="card-body">
-            <div class="table-responsive">
-                <table class="table table-hover align-middle mb-0">
-                    <thead class="py-3">
-                        <tr>
-                            <th class="ps-3">No. Rujukan</th>
-                            <th>Tarikh Mohon</th>
-                            <th>Info Pemohon</th>
-                            <th>Jenis Bantuan</th>
-                            <th style="width: 20%;">Keterangan</th> <th>Dokumen</th>
-                            <th class="text-center" style="width: 200px;">Tindakan</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <% 
-                        boolean adaData = false;
-                        if (list != null && !list.isEmpty()) { 
-                            for (PermohonanBantuan pb : list) {
-                                
-                                // 1. FILTER: Hanya papar status 0 (Baharu/Pending)
-                                if(pb.getStatus() != 0) { continue; }
-                                adaData = true;
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+        <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse">
+                <thead>
+                    <tr class="bg-purple-50 border-b border-purple-100">
+                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">No. Rujukan</th>
+                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Tarikh Mohon</th>
+                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Info Pemohon</th>
+                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Jenis Bantuan</th>
+                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider w-1/5">Keterangan</th>
+                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Dokumen</th>
+                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider text-center w-48">Tindakan</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <% 
+                    boolean adaData = false;
+                    if (list != null && !list.isEmpty()) { 
+                        for (PermohonanBantuan pb : list) {
+                            
+                            // FILTER: Hanya status 0 (Baharu)
+                            if(pb.getStatus() != 0) { continue; }
+                            adaData = true;
 
-                                // Logic Nama Bantuan (Hardcoded mapping seperti requested)
-                                String namaBantuan = "Tidak Diketahui";
-                                if(pb.getIdBantuan() == 6) namaBantuan = "Bantuan Am";
-                                else if(pb.getIdBantuan() == 7) namaBantuan = "Bantuan Bencana";
-                                else if(pb.getIdBantuan() == 19) namaBantuan = "Bantuan Persekolahan";
-                                else if(pb.getIdBantuan() == 20) namaBantuan = "Sumbangan IPT";
-                                else namaBantuan = "Lain-lain (" + pb.getIdBantuan() + ")";
-
-                                String dateDisplay = (pb.getTarikhMohon() != null) ? sdf.format(pb.getTarikhMohon()) : "-";
-                        %>
-                        <tr>
-                            <td class="ps-3 fw-bold text-primary">#<%= pb.getIdPermohonan() %></td>
-
-                            <td><%= dateDisplay %></td>
-
-                            <td>
-                                <span class="fw-bold text-dark">
-                                    <%= (pb.getNamaPemohon() != null) ? pb.getNamaPemohon() : "TIADA REKOD NAMA" %>
-                                </span>
-                            </td>
-
-                            <td><span class="badge bg-info bg-opacity-10 text-info border border-info"><%= namaBantuan %></span></td>
-
-                            <td>
-                                <% 
-                                    String infoCatatan = pb.getCatatan();
-                                    if (infoCatatan != null && !infoCatatan.trim().isEmpty()) {
-                                %>
-                                    <span class="text-dark small"><%= infoCatatan %></span>
-                                <% } else { %>
-                                    <span class="text-muted small fst-italic">- Tiada keterangan -</span>
-                                <% } %>
-                            </td>
-
-                             <td>
-                                    <% if (pb.getDokumen() != null) { String enc = URLEncoder.encode(pb.getDokumen(), "UTF-8").replace("+", "%20"); %>
-                                        <a href="<%= request.getContextPath() %>/file/<%= enc %>" target="_blank" class="btn btn-sm btn-light border text-muted"><i class="bi bi-file-earmark-pdf text-danger"></i> PDF</a>
-                                    <% } else { %> - <% } %>
-                                </td>
-
-                            <td class="text-center">
-                                <div class="d-flex gap-2 justify-content-center">
-                                    <button class="btn btn-outline-danger btn-sm" 
-                                            onclick="openActionModal('<%= pb.getIdPermohonan() %>', '<%= namaBantuan %>', 'tak_lengkap')">
-                                        <i class="bi bi-arrow-return-left me-1"></i> Hantar Balik
-                                    </button>
-                                    
-                                    <button class="btn btn-success btn-sm text-white" 
-                                            onclick="openActionModal('<%= pb.getIdPermohonan() %>', '<%= namaBantuan %>', 'lengkap')">
-                                        <i class="bi bi-check-circle me-1"></i> Lengkap
-                                    </button>
+                            String namaBantuanDisplay = (pb.getNamaBantuan() != null) ? pb.getNamaBantuan() : "Lain-lain (" + pb.getIdBantuan() + ")";
+                            String dateDisplay = (pb.getTarikhMohon() != null) ? sdf.format(pb.getTarikhMohon()) : "-";
+                    %>
+                    <tr class="hover:bg-purple-50/30 transition">
+                        <td class="p-4 text-sm font-bold text-[#6C5DD3]">#<%= pb.getIdPermohonan() %></td>
+                        <td class="p-4 text-sm text-gray-600 font-medium"><%= dateDisplay %></td>
+                        <td class="p-4">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-full bg-purple-100 text-[#6C5DD3] flex items-center justify-center text-xs font-bold">
+                                    <%= (pb.getNamaPemohon() != null) ? pb.getNamaPemohon().substring(0,1) : "U" %>
                                 </div>
-                            </td>
-                        </tr>
-                        <% 
-                            } 
-                        } 
-                        
-                        if (!adaData) { 
-                        %>
-                            <tr>
-                                <td colspan="7" class="text-center py-5 text-muted bg-light">
-                                    <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                                    Tiada permohonan baharu untuk disemak.
-                                </td>
-                            </tr>
-                        <% } %>
-                    </tbody>
-                </table>
-            </div>
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-gray-800"><%= (pb.getNamaPemohon() != null) ? pb.getNamaPemohon() : "TIADA NAMA" %></span>
+                                    <span class="text-[10px] text-gray-400">Penduduk Sah</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-4">
+                            <span class="bg-blue-50 text-blue-600 border border-blue-100 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                <%= namaBantuanDisplay %>
+                            </span>
+                        </td>
+                        <td class="p-4 text-sm text-gray-500">
+                            <% String infoCatatan = pb.getCatatan();
+                               if (infoCatatan != null && !infoCatatan.trim().isEmpty()) { %>
+                                <%= infoCatatan %>
+                            <% } else { %>
+                                <span class="italic text-gray-400">- Tiada keterangan -</span>
+                            <% } %>
+                        </td>
+                        <td class="p-4">
+                            <% if (pb.getDokumen() != null) { String enc = URLEncoder.encode(pb.getDokumen(), "UTF-8").replace("+", "%20"); %>
+                                <a href="<%= request.getContextPath() %>/file/<%= enc %>" target="_blank" class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-xs font-bold text-gray-600 transition">
+                                    <i class="fas fa-file-pdf text-red-500"></i> PDF
+                                </a>
+                            <% } else { %> <span class="text-gray-400">-</span> <% } %>
+                        </td>
+                        <td class="p-4 text-center">
+                            <div class="flex justify-center gap-2">
+                                <button onclick="openActionModal('<%= pb.getIdPermohonan() %>', '<%= namaBantuanDisplay %>', 'tak_lengkap')" 
+                                        class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 text-xs font-bold transition">
+                                    <i class="fas fa-reply"></i> Balik
+                                </button>
+                                <button onclick="openActionModal('<%= pb.getIdPermohonan() %>', '<%= namaBantuanDisplay %>', 'lengkap')" 
+                                        class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-white text-xs font-bold shadow-sm transition">
+                                    <i class="fas fa-check"></i> Lengkap
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    <% } } 
+                    if (!adaData) { %>
+                    <tr>
+                        <td colspan="7" class="p-12 text-center">
+                            <div class="flex flex-col items-center justify-center text-gray-400">
+                                <i class="fas fa-clipboard-check text-4xl mb-4 text-gray-300"></i>
+                                <p class="text-lg font-bold text-gray-500">Semua Beres!</p>
+                                <p class="text-sm">Tiada permohonan baharu untuk disemak buat masa ini.</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <% } %>
+                </tbody>
+            </table>
         </div>
     </div>
-</div>
 
-<div class="modal fade" id="modalTindakan" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header border-0">
-                <h5 class="modal-title fw-bold" id="modalTitle">Pengesahan JKKK</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div> 
+<div id="modalTindakan" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalTindakan')"></div>
+
+    <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md">
+            
+            <div class="bg-gray-50 px-4 py-4 sm:px-6 border-b border-gray-100 flex justify-between items-center">
+                <h3 class="text-base font-bold leading-6 text-gray-900">Pengesahan JKKK</h3>
+                <button type="button" class="text-gray-400 hover:text-gray-500" onclick="closeModal('modalTindakan')">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
+
             <form action="<%= request.getContextPath() %>/bantuan/reviewJKKK" method="post">
-                <div class="modal-body">
-                    <input type="hidden" name="idPermohonan" id="modalId">
+                <input type="hidden" name="idPermohonan" id="modalId">
+                <input type="radio" name="keputusan" value="lengkap" id="radioLengkap" class="hidden">
+                <input type="radio" name="keputusan" value="tak_lengkap" id="radioTakLengkap" class="hidden">
+
+                <div class="bg-white px-6 py-6">
                     
-                    <div class="alert alert-light border mb-3">
-                        <strong>Bantuan:</strong> <span id="modalBantuanName"></span>
-                    </div>
-
-                    <div class="d-none">
-                        <input type="radio" name="keputusan" value="lengkap" id="radioLengkap">
-                        <input type="radio" name="keputusan" value="tak_lengkap" id="radioTakLengkap">
-                    </div>
-
-                    <div id="viewLengkap" class="text-center py-3 d-none">
-                        <i class="bi bi-check-circle-fill text-success fs-1 mb-2"></i>
-                        <h5>Sahkan Dokumen Lengkap?</h5>
-                        <p class="text-muted small">Permohonan ini akan dihantar kepada <strong>Ketua Kampung</strong> untuk kelulusan akhir.</p>
-                    </div>
-
-                    <div id="viewTakLengkap" class="d-none">
-                        <div class="text-center mb-3">
-                            <i class="bi bi-exclamation-circle-fill text-danger fs-1"></i>
-                            <h5 class="mt-2">Hantar Balik Permohonan</h5>
-                            <p class="text-muted small">Sila nyatakan sebab atau dokumen yang perlu diperbetulkan oleh penduduk.</p>
-                        </div>
-                        <div class="form-group">
-                            <label class="form-label fw-bold">Ulasan / Sebab:</label>
-                            <textarea name="ulasan" id="ulasanBox" class="form-control" rows="3" placeholder="Contoh: Salinan IC kabur, sila muat naik semula..."></textarea>
+                    <div class="bg-blue-50 text-blue-700 p-4 rounded-xl text-sm mb-6 flex items-start gap-3">
+                        <i class="fas fa-info-circle mt-1 text-lg"></i>
+                        <div>
+                            <p class="text-xs font-bold uppercase text-blue-400 mb-1">Permohonan</p>
+                            <p class="font-bold" id="modalBantuanName"></p>
                         </div>
                     </div>
+
+                    <div id="viewLengkap" class="hidden text-center">
+                        <div class="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                            <i class="fas fa-check"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-gray-900 mb-2">Sahkan Dokumen Lengkap?</h4>
+                        <p class="text-sm text-gray-500">Permohonan ini akan dimajukan kepada <strong>Ketua Kampung</strong> untuk kelulusan muktamad.</p>
+                    </div>
+
+                    <div id="viewTakLengkap" class="hidden text-center">
+                        <div class="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+                            <i class="fas fa-undo-alt"></i>
+                        </div>
+                        <h4 class="text-lg font-bold text-gray-900 mb-2">Hantar Balik Permohonan</h4>
+                        <p class="text-sm text-gray-500 mb-4">Sila nyatakan sebab/dokumen yang perlu diperbetulkan oleh pemohon.</p>
+                        
+                        <textarea name="ulasan" id="ulasanBox" rows="3" placeholder="Contoh: Salinan Kad Pengenalan kabur..."
+                                  class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-red-500 focus:border-transparent text-sm transition"></textarea>
+                    </div>
+
                 </div>
-                <div class="modal-footer border-0 bg-light">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary" id="btnSubmit">Sahkan</button>
+
+                <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse gap-2">
+                    <button type="submit" id="btnSubmit" class="w-full inline-flex justify-center rounded-xl border border-transparent px-4 py-2.5 text-sm font-bold text-white shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 sm:w-auto transition">Sahkan</button>
+                    <button type="button" class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none sm:mt-0 sm:w-auto transition" onclick="closeModal('modalTindakan')">Batal</button>
                 </div>
             </form>
         </div>
     </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<div id="modalTambahBantuan" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalTambahBantuan')"></div>
+
+    <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+            
+            <div class="bg-[#6C5DD3] px-4 py-4 sm:px-6 flex justify-between items-center">
+                <h3 class="text-base font-bold leading-6 text-white flex items-center gap-2">
+                    <i class="fas fa-folder-plus"></i> Tambah Jenis Bantuan
+                </h3>
+                <button class="text-white hover:text-gray-200" onclick="closeModal('modalTambahBantuan')"><i class="fas fa-times"></i></button>
+            </div>
+
+            <form action="<%= request.getContextPath() %>/bantuan/tambahJenisBantuan" method="post">
+                <div class="bg-white px-6 py-6">
+                    <div class="bg-purple-50 text-[#6C5DD3] p-4 rounded-xl text-xs flex gap-3 items-start mb-6 border border-purple-100">
+                        <i class="fas fa-lightbulb text-lg mt-0.5"></i>
+                        <p>Bantuan baharu ini akan disenaraikan secara automatik dalam menu "Bantuan Komuniti" untuk dipilih oleh penduduk.</p>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nama Bantuan</label>
+                        <input type="text" name="namaBantuanBaru" placeholder="Contoh: SUMBANGAN RAMADHAN" required
+                               class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#6C5DD3] focus:border-transparent font-bold text-gray-800 shadow-sm">
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse gap-2">
+                    <button type="submit" class="w-full inline-flex justify-center rounded-xl bg-[#6C5DD3] px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-[#5b4eb8] sm:w-auto transition">Simpan</button>
+                    <button type="button" class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-sm hover:bg-gray-50 sm:mt-0 sm:w-auto transition" onclick="closeModal('modalTambahBantuan')">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
+    // Modal Open/Close Logic
+    function openModal(modalId) {
+        document.getElementById(modalId).classList.remove('hidden');
+    }
+
+    function closeModal(modalId) {
+        document.getElementById(modalId).classList.add('hidden');
+    }
+
+    // Logic Modal Tindakan
     function openActionModal(id, namaBantuan, actionType) {
-        // Set Data
         document.getElementById('modalId').value = id;
         document.getElementById('modalBantuanName').innerText = namaBantuan;
         
-        // Reset Views
-        document.getElementById('viewLengkap').classList.add('d-none');
-        document.getElementById('viewTakLengkap').classList.add('d-none');
-        
+        const viewLengkap = document.getElementById('viewLengkap');
+        const viewTakLengkap = document.getElementById('viewTakLengkap');
         const btnSubmit = document.getElementById('btnSubmit');
         const ulasanBox = document.getElementById('ulasanBox');
 
+        // Reset
+        viewLengkap.classList.add('hidden');
+        viewTakLengkap.classList.add('hidden');
+        btnSubmit.classList.remove('bg-green-600', 'bg-red-600', 'hover:bg-green-700', 'hover:bg-red-700');
+
         if(actionType === 'lengkap') {
-            // Setup UI untuk Lengkap
             document.getElementById('radioLengkap').checked = true;
-            document.getElementById('viewLengkap').classList.remove('d-none');
-            btnSubmit.className = "btn btn-success text-white";
-            btnSubmit.innerText = "Hantar ke Ketua Kampung";
+            viewLengkap.classList.remove('hidden');
+            
+            btnSubmit.classList.add('bg-green-600', 'hover:bg-green-700');
+            btnSubmit.innerText = "Hantar ke Ketua";
             ulasanBox.required = false;
         } else {
-            // Setup UI untuk Hantar Balik
             document.getElementById('radioTakLengkap').checked = true;
-            document.getElementById('viewTakLengkap').classList.remove('d-none');
-            btnSubmit.className = "btn btn-danger text-white";
-            btnSubmit.innerText = "Hantar Balik ke Penduduk";
+            viewTakLengkap.classList.remove('hidden');
+            
+            btnSubmit.classList.add('bg-red-600', 'hover:bg-red-700');
+            btnSubmit.innerText = "Hantar Balik";
             ulasanBox.required = true; 
         }
 
-        // Show Modal
-        new bootstrap.Modal(document.getElementById('modalTindakan')).show();
+        openModal('modalTindakan');
     }
 </script>
 
-<div class="modal fade" id="modalTambahBantuan" tabindex="-1">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title fw-bold"><i class="bi bi-collection text-primary me-2"></i>Tambah Jenis Bantuan</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <form action="<%= request.getContextPath() %>/bantuan/tambahJenisBantuan" method="post">
-                <div class="modal-body">
-                    <div class="alert alert-info small border-0 bg-opacity-10 bg-info">
-                        <i class="bi bi-info-circle me-1"></i> Bantuan baru akan dimasukkan ke dalam senarai "Bantuan Komuniti".
-                    </div>
-                    
-                    <div class="mb-3">
-                        <label class="form-label fw-bold small text-muted">Nama Bantuan</label>
-                        <input type="text" name="namaBantuanBaru" class="form-control" placeholder="Contoh: SUMBANGAN RAMADHAN" required>
-                    </div>
-                </div>
-                <div class="modal-footer bg-light border-0">
-                    <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary fw-bold">Simpan</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-</body>
-</html>
+<%@ include file="/views/common/footer.jsp" %>

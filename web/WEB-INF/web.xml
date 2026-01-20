@@ -22,7 +22,7 @@
     </servlet-mapping>
  
     <welcome-file-list>
-        <welcome-file>views/auth/login.jsp</welcome-file>
+        <welcome-file>views/auth/auth.jsp</welcome-file>
     </welcome-file-list>
     <servlet>
         <servlet-name>LogoutServlet</servlet-name>
