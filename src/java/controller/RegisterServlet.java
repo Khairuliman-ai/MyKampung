@@ -73,7 +73,7 @@ public class RegisterServlet extends HttpServlet {
 
             // 4. Redirect dengan mesej berjaya
             // Pastikan path ini betul ikut struktur folder web anda
-            response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp?success=Pendaftaran berjaya. Sila tunggu kelulusan JKKK.");
+            response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp?success=Pendaftaran berjaya. Sila tunggu kelulusan JKKK.");
 
         } catch (SQLException e) {
             e.printStackTrace();

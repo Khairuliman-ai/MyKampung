@@ -100,7 +100,7 @@
                                 <div class="flex justify-center gap-2">
                                     <button onclick="openActionModal('<%= pb.getIdPermohonan() %>', '<%= namaBantuanDisplay %>', 'tak_lengkap')" 
                                             class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 text-xs font-bold transition">
-                                        <i class="fas fa-reply"></i> Balik
+                                        <i class="fas fa-reply"></i> Hantar Semula
                                     </button>
                                     <button onclick="openActionModal('<%= pb.getIdPermohonan() %>', '<%= namaBantuanDisplay %>', 'lengkap')" 
                                             class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-white text-xs font-bold shadow-sm transition">
