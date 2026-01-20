@@ -187,17 +187,32 @@ else if ("/borangDigital.jsp".equals(action)) {
 }
 
 // ... (kod sedia ada seterusnya, contohnya /delete atau /rasmi)// ================== TAMBAH INI (DELETE) ==================
+// ================== DELETE (KEMASKINI) ==================
             else if ("/delete".equals(action)) {
                 // Pastikan hanya PENDUDUK boleh delete (Security Check)
                 if ("Penduduk".equals(user.getJawatan())) {
                     PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
                     int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
 
-                    // Delete dari database
-                    pbDao.deleteByIdAndPenduduk(idPermohonan, user.getIdPengguna());
+                    // LANGKAH 1: Dapatkan info permohonan DAHULU sebelum delete
+                    // Tujuannya untuk tahu ID Bantuan (Rasmi atau Komuniti)
+                    PermohonanBantuan pb = pbDao.getById(idPermohonan);
+                    
+                    String redirectPage = "/bantuan/rasmi"; // Default ke rasmi
 
-                    // Redirect balik ke page list dengan mesej berjaya
-                    response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?status=deleted");
+                    if (pb != null) {
+                        // Semak jenis bantuan
+                        if (pb.getIdBantuan() > 20 || pb.getIdBantuan() == 999) {
+                            redirectPage = "/bantuan/komuniti";
+                        }
+                        
+                        // LANGKAH 2: Delete dari database selepas semakan
+                        pbDao.deleteByIdAndPenduduk(idPermohonan, user.getIdPengguna());
+                    }
+
+                    // LANGKAH 3: Redirect ke page yang betul berdasarkan semakan tadi
+                    response.sendRedirect(request.getContextPath() + redirectPage + "?status=deleted");
+                    
                 } else {
                     // Kalau bukan penduduk cuba delete, tendang balik
                     response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?error=denied");
@@ -312,7 +327,9 @@ if (idBantuanCheck > 20 || idBantuanCheck == 999) {
 
                 pbDao.updateInfo(idPermohonan, catatan, fileName);
                 response.sendRedirect(request.getContextPath() + "/bantuan/list");
-            } // ===================== 5. UPDATE MY REQUEST (EDIT) =====================
+            } 
+
+// ===================== 5. UPDATE MY REQUEST (EDIT) =====================
             else if ("/updateMyRequest".equals(action) && "Penduduk".equals(user.getJawatan())) {
 
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
@@ -335,7 +352,7 @@ if (idBantuanCheck > 20 || idBantuanCheck == 999) {
                 pb.setIdPermohonan(idPermohonan);
                 pb.setDokumen(fileName);
 
-                // --- LOGIC SAMA DI SINI (ID 999) ---
+                // --- LOGIC PENENTUAN ID BANTUAN ---
                 if ("999".equals(jenisBantuan)) {
                     pb.setIdBantuan(999);
 
@@ -349,11 +366,25 @@ if (idBantuanCheck > 20 || idBantuanCheck == 999) {
                     pb.setIdBantuan(Integer.parseInt(jenisBantuan));
                     pb.setCatatan(keterangan);
                 }
-                // -----------------------------------
-
+                
+                // Simpan ke database
                 pbDao.updateByPenduduk(pb);
-                response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?status=updated");
-            } // ===================== 6. JKKK REVIEW (Semakan Dokumen) =====================
+
+                // --- LOGIK REDIRECT PINTAR (UPDATE DI SINI) ---
+                // Kita semak ID bantuan yang baru dikemaskini.
+                // Jika ID > 20 atau 999, ia adalah kategori Komuniti.
+                int idCheck = pb.getIdBantuan();
+                
+                if (idCheck > 20 || idCheck == 999) {
+                    // Redirect ke Tab Komuniti
+                    response.sendRedirect(request.getContextPath() + "/bantuan/komuniti?status=updated");
+                } else {
+                    // Redirect ke Tab Rasmi
+                    response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?status=updated");
+                }
+            }
+
+// ===================== 6. JKKK REVIEW (Semakan Dokumen) =====================
             else if ("/reviewJKKK".equals(action)) {
 
                 // 1. Ambil data dari form modal (urusBantuanJKKK.jsp)
