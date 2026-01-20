@@ -25,7 +25,7 @@
                 <h3 class="text-xl font-bold text-gray-800 mb-3 group-hover:text-[#6C5DD3] transition-colors">Bantuan Komuniti</h3>
                 
                 <p class="text-gray-500 text-sm mb-6 leading-relaxed">
-                    Gotong-royong, sumbangan khairat kematian, bantuan bencana, dan aktiviti sukarelawan kampung.
+                    Sumbangan khairat kematian, bantuan bencana, dan banyak lagi.
                 </p>
 
                 <span class="inline-block px-6 py-2 rounded-full border border-gray-200 text-gray-600 font-bold text-xs uppercase tracking-wider group-hover:bg-[#6C5DD3] group-hover:text-white group-hover:border-[#6C5DD3] transition-all">
