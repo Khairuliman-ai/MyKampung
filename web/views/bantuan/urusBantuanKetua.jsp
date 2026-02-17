@@ -13,7 +13,7 @@
 
     <header class="mb-8">
         <h2 class="text-2xl font-bold text-gray-800">Pengesahan Ketua Kampung</h2>
-        <p class="text-gray-500 text-sm">Semak dan luluskan permohonan yang telah disahkan oleh JKKK.</p>
+        <p class="text-gray-500 text-sm">Semak dan luluskan permohonan yang telah disahkan oleh AJK.</p>
     </header>
 
     <%
@@ -48,7 +48,7 @@
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Tarikh</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Pemohon</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Jenis Bantuan</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Semakan JKKK</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Semakan AJK</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Dokumen</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Keputusan</th>
                         </tr>
@@ -77,7 +77,7 @@
                                 <div class="flex items-start gap-2">
                                     <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
                                     <div>
-                                        <p class="text-xs font-bold text-green-600">Disahkan JKKK</p>
+                                        <p class="text-xs font-bold text-green-600">Disahkan AJK</p>
                                         <p class="text-[10px] text-gray-400 italic"><%= (pb.getUlasanAdmin() != null) ? pb.getUlasanAdmin() : "Tiada ulasan" %></p>
                                     </div>
                                 </div>

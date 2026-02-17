@@ -31,7 +31,7 @@
 
     <div class="flex justify-between items-center mb-8">
         <div>
-            <h2 class="text-2xl font-bold text-gray-800">Semakan Permohonan JKKK</h2>
+            <h2 class="text-2xl font-bold text-gray-800">Semakan Permohonan AJK</h2>
             <p class="text-gray-500 text-sm">Uruskan permohonan baharu dan semak sejarah tindakan.</p>
         </div>
         <div>
@@ -199,7 +199,7 @@
     <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
         <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md">
             <div class="bg-gray-50 px-4 py-4 sm:px-6 border-b border-gray-100 flex justify-between items-center">
-                <h3 class="text-base font-bold leading-6 text-gray-900">Pengesahan JKKK</h3>
+                <h3 class="text-base font-bold leading-6 text-gray-900">Pengesahan AJK</h3>
                 <button type="button" class="text-gray-400 hover:text-gray-500" onclick="closeModal('modalTindakan')"><i class="fas fa-times"></i></button>
             </div>
             <form action="<%= request.getContextPath() %>/bantuan/reviewJKKK" method="post">

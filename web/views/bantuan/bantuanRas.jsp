@@ -139,7 +139,7 @@
                                         <span class="px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-bold w-max">Tidak Lengkap</span>
                                     </div>
                                 <% } else if (pb.getStatus() == 3) { %> 
-                                    <span class="px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-xs font-bold w-max"><i class="fas fa-check-circle mr-1"></i> Disemak JKKK</span> 
+                                    <span class="px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-xs font-bold w-max"><i class="fas fa-check-circle mr-1"></i> Disemak AJK</span> 
                                 <% } else { %>
                                     <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold w-max"><i class="fas fa-sync-alt mr-1"></i> Dalam Proses</span>
                                 <% } %>
@@ -261,14 +261,14 @@
             <div class="w-10 h-10 rounded-full bg-green-50 text-green-600 flex-shrink-0 flex items-center justify-center font-bold text-lg"><i class="fas fa-user-check"></i></div>
             <div>
                 <h4 class="font-bold text-sm text-gray-800">Pengesahan</h4>
-                <p class="text-xs text-gray-500 mt-1 leading-relaxed">Permohonan akan disemak oleh JKKK sebelum dimajukan ke peringkat atasan.</p>
+                <p class="text-xs text-gray-500 mt-1 leading-relaxed">Permohonan akan disemak oleh AJK sebelum dimajukan ke peringkat atasan.</p>
             </div>
         </div>
     </div>
 
     <div class="mt-auto bg-gray-50 rounded-2xl p-6 border border-gray-100">
         <h4 class="font-bold text-gray-700 mb-2 text-sm">Masalah Permohonan?</h4>
-        <p class="text-xs text-gray-500 mb-4">Hubungi Setiausaha JKKK untuk pertanyaan lanjut mengenai status anda.</p>
+        <p class="text-xs text-gray-500 mb-4">Hubungi Setiausaha AJK untuk pertanyaan lanjut mengenai status anda.</p>
         <button class="w-full bg-white border border-gray-200 text-gray-700 py-2 rounded-xl text-xs font-bold hover:bg-gray-100 transition">Hubungi SU</button>
     </div>
 </aside>

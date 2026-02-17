@@ -127,7 +127,7 @@
     <div class="a4-container">
         
         <div class="header-logo text-center">
-            <h5 class="fw-bold m-0">JAWATANKUASA KEMAJUAN DAN KESELAMATAN KAMPUNG (JKKK)</h5>
+            <h5 class="fw-bold m-0">AHLI JAWATANKUASA (AJK)</h5>
             <h3 class="fw-bold m-0">KAMPUNG DANAN</h3>
             <p class="small m-0">16800 Pasir Puteh, Kelantan Darul Naim</p>
             <hr class="my-3 border-dark opacity-100">
@@ -178,7 +178,7 @@
 
         <div class="section-header">BAHAGIAN C: PENGAKUAN PEMOHON</div>
         <p class="text-justify fst-italic mb-4" style="font-size: 0.95rem;">
-            "Saya dengan ini mengaku bahawa segala maklumat yang diberikan di atas adalah benar dan tepat. Saya faham bahawa pihak JKKK berhak menolak permohonan ini sekiranya didapati mana-mana maklumat adalah palsu atau tidak benar."
+            "Saya dengan ini mengaku bahawa segala maklumat yang diberikan di atas adalah benar dan tepat. Saya faham bahawa pihak AJK berhak menolak permohonan ini sekiranya didapati mana-mana maklumat adalah palsu atau tidak benar."
         </p>
         
         <div class="row mt-5 pt-4">
@@ -193,7 +193,7 @@
         </div>
 
         <div class="mt-5 pt-3 border-top border-dark border-2">
-            <p class="fw-bold small m-0 text-uppercase">Untuk Kegunaan Pejabat JKKK Sahaja:</p>
+            <p class="fw-bold small m-0 text-uppercase">Untuk Kegunaan Pejabat AJK Sahaja:</p>
             <div class="d-flex justify-content-between mt-2">
                 <div class="border border-dark p-2" style="width: 150px; height: 80px;">
                     <small>Tarikh Terima:</small>

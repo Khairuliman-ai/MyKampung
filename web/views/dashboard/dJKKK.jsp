@@ -6,7 +6,7 @@
 
     <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-            <h2 class="text-2xl font-bold text-gray-800">Dashboard JKKK</h2>
+            <h2 class="text-2xl font-bold text-gray-800">Dashboard AJK</h2>
             <p class="text-gray-500 text-sm">Pantau aktiviti kampung dan uruskan permohonan.</p>
         </div>
         
@@ -134,7 +134,7 @@
 <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
     
     <div class="flex justify-between items-start mb-10">
-        <h3 class="font-bold text-lg text-gray-800">Profil JKKK</h3>
+        <h3 class="font-bold text-lg text-gray-800">Profil AJK</h3>
         <button class="text-gray-400 hover:text-gray-600"><i class="fas fa-cog"></i></button>
     </div>
 
@@ -146,7 +146,7 @@
         </div>
         
         <h2 class="text-xl font-bold text-gray-800"><%= (user != null && user.getNamaPertama() != null) ? user.getNamaPertama() : "Admin" %></h2>
-        <p class="text-xs font-bold text-[#6C5DD3] bg-purple-50 px-3 py-1 rounded-full inline-block mt-1">Setiausaha JKKK</p>
+        <p class="text-xs font-bold text-[#6C5DD3] bg-purple-50 px-3 py-1 rounded-full inline-block mt-1">Setiausaha AJK</p>
 
         <div class="flex justify-center gap-4 mt-6">
             <button class="w-10 h-10 rounded-full bg-gray-50 text-gray-500 hover:bg-gray-800 hover:text-white transition flex items-center justify-center" title="Mesyuarat">

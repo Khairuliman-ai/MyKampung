@@ -100,7 +100,7 @@
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-40">Jenis Bantuan</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Keterangan</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">Dokumen</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Ulasan JKKK</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Ulasan AJK</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">Status</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center w-32">Tindakan</th>
                         </tr>
@@ -155,7 +155,7 @@
                                 <% } else if (pb.getStatus() == 2) { %> 
                                     <span class="px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-bold whitespace-nowrap">Tidak Lengkap</span>
                                 <% } else if (pb.getStatus() == 3) { %> 
-                                    <span class="px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-xs font-bold whitespace-nowrap">Disemak JKKK</span> 
+                                    <span class="px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-xs font-bold whitespace-nowrap">Disemak AJK</span> 
                                 <% } %>
                             </td>
                             

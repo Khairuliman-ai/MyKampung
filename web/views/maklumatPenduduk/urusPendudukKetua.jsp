@@ -10,11 +10,11 @@
     <div class="flex justify-between items-center mb-8">
         <div>
             <h2 class="text-2xl font-bold text-gray-800">Pusat Kawalan</h2>
-            <p class="text-gray-500 text-sm">Urus tadbir organisasi JKKK dan penduduk kampung.</p>
+            <p class="text-gray-500 text-sm">Urus tadbir organisasi AJK dan penduduk kampung.</p>
         </div>
         <div>
             <button onclick="openModal('modalLantik')" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-md shadow-purple-200 flex items-center gap-2">
-                <i class="fas fa-user-shield"></i> Lantik JKKK
+                <i class="fas fa-user-shield"></i> Lantik AJK
             </button>
         </div>
     </div>
@@ -33,7 +33,7 @@
         <nav class="flex gap-6" aria-label="Tabs">
             <button onclick="switchTab('jkkk')" id="tab-jkkk" 
                     class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-[#6C5DD3] text-[#6C5DD3]">
-                <i class="fas fa-id-badge"></i> Senarai JKKK
+                <i class="fas fa-id-badge"></i> Senarai AJK
             </button>
             <button onclick="switchTab('penduduk')" id="tab-penduduk" 
                     class="py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center gap-2 transition-colors">
@@ -77,7 +77,7 @@
                             </td>
                         </tr>
                         <% } } else { %>
-                        <tr><td colspan="4" class="p-8 text-center text-gray-400"><i class="fas fa-user-slash text-3xl mb-2 block opacity-50"></i>Tiada ahli JKKK dilantik.</td></tr>
+                        <tr><td colspan="4" class="p-8 text-center text-gray-400"><i class="fas fa-user-slash text-3xl mb-2 block opacity-50"></i>Tiada ahli AJK dilantik.</td></tr>
                         <% } %>
                     </tbody>
                 </table>
@@ -146,7 +146,7 @@
                 <i class="fas fa-user-shield"></i>
             </div>
             <div>
-                <p class="text-xs text-gray-500 font-bold uppercase">Ahli JKKK</p>
+                <p class="text-xs text-gray-500 font-bold uppercase">Ahli AJK</p>
                 <h4 class="font-bold text-xl text-gray-800"><%= (listJKKK != null) ? listJKKK.size() : 0 %></h4>
             </div>
         </div>
@@ -165,7 +165,7 @@
     <div class="mt-auto bg-gray-50 rounded-2xl p-6 border border-gray-100">
         <h4 class="font-bold text-gray-700 mb-2 text-sm">Struktur Organisasi</h4>
         <p class="text-xs text-gray-500 leading-relaxed mb-4">
-            Pastikan setiap biro mempunyai wakil JKKK yang aktif untuk kelancaran pentadbiran kampung.
+            Pastikan setiap biro mempunyai wakil AJK yang aktif untuk kelancaran pentadbiran kampung.
         </p>
         <button class="w-full bg-white border border-gray-200 text-gray-600 py-2 rounded-xl text-xs font-bold hover:bg-gray-100 transition">
             Lihat Carta Organisasi
@@ -181,7 +181,7 @@
             
             <div class="bg-[#6C5DD3] px-4 py-4 sm:px-6">
                 <h3 class="text-base font-bold leading-6 text-white flex items-center gap-2">
-                    <i class="fas fa-user-plus"></i> Lantik JKKK Baru
+                    <i class="fas fa-user-plus"></i> Lantik AJK Baru
                 </h3>
             </div>
 
@@ -189,10 +189,28 @@
                 <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                     <div class="bg-blue-50 text-blue-700 p-3 rounded-xl text-xs flex gap-2 items-start mb-4">
                         <i class="fas fa-info-circle mt-0.5"></i>
-                        <p>Akaun ini akan mempunyai akses Pentadbir sebagai JKKK.</p>
+                        <p>Akaun ini akan mempunyai akses Pentadbir sebagai AJK .</p>
                     </div>
 
                     <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">Jawatan / Biro</label>
+                            <div class="relative">
+                                <select name="jenisAJK" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm appearance-none cursor-pointer">
+                                    <option value="Setiausaha">Setiausaha</option>
+                                    <option value="Bendahari">Bendahari</option>
+                                    <option value="AJK Biro Kebajikan">AJK Biro Kebajikan</option>
+                                    <option value="AJK Biro Keselamatan">AJK Biro Keselamatan</option>
+                                    <option value="AJK Biro Pendidikan">AJK Biro Pendidikan</option>
+                                    <option value="AJK Biro Pembangunan">AJK Biro Pembangunan</option>
+                                    <option value="AJK Biro Agama">AJK Biro Agama</option>
+                                    <option value="AJK Biasa" selected>AJK Biasa</option>
+                                </select>
+                                <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
+                                    <i class="fas fa-chevron-down text-xs"></i>
+                                </div>
+                            </div>
+                        </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-500 mb-1">Nama Penuh</label>
                             <input type="text" name="namaLengkap" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
