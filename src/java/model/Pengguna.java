@@ -1,127 +1,133 @@
 package model;
 
 import java.util.Date;
+import java.math.BigDecimal;
 
 public class Pengguna {
 
-    private int idPengguna;
-    private String namaPertama;
-    private String namaKedua;
-    private String nomborKP;
-    private String nomborTelefon;
-    private Date tarikhLahir;
-    private String jawatan;     // "Penduduk", "JKKK", "KetuaKampung"
-    private String kataLaluan;
-    private Date tarikhKemaskini;
-    private String namaJalan;
+    private int id_pengguna;
+    private String nama_penuh;
+    private String nombor_kp;
+    private String nombor_telefon;
+    private Date tarikh_lahir;
+    private String kata_laluan;
+    private String status_keluarga;
+    private String pekerjaan;
+    private BigDecimal pendapatan;
+
+    // Alamat
+    private String nama_jalan;
+    private String nombor_poskod;
     private String bandar;
-    private String nomborPoskod;
     private String negeri;
-    private int status;      // 0: Pending, 1: Aktif, 2: Ditolak
 
-    // --- 1. HELPER METHODS (TAMBAHAN PENTING) ---
-    // Ini membolehkan JSP memanggil p.getNamaLengkap() tanpa mengubah struktur DB
-    public String getNamaLengkap() {
-        return (namaPertama != null ? namaPertama : "") + " " + (namaKedua != null ? namaKedua : "");
-    }
+    // Audit & Status
+    private Date dibuat_pada;
+    private Date dikemaskini_pada;
+    private Date dipadam_pada;
+    private int status;  //users authentication
 
-    // Ini menggabungkan alamat untuk paparan mudah
-    public String getAlamat() {
-        return (namaJalan != null ? namaJalan : "") + ", " + 
+    // --- HELPER METHODS ---
+    
+    public String getAlamatLengkap() {
+        return (nama_jalan != null ? nama_jalan : "") + ", " + 
+               (nombor_poskod != null ? nombor_poskod : "") + " " + 
                (bandar != null ? bandar : "") + ", " + 
-               (nomborPoskod != null ? nomborPoskod : "") + ", " + 
                (negeri != null ? negeri : "");
     }
-    
-    // Untuk keserasian jika ada kod lama guna getPeranan()
-    public String getPeranan() {
-        return jawatan;
-    }
-    
-    public void setPeranan(String peranan) {
-        this.jawatan = peranan;
-    }
-    // ---------------------------------------------
 
-    // Getters and Setters Asal
-    public int getIdPengguna() {
-        return idPengguna;
+    public String getPendapatanFormatted() {
+        return (pendapatan != null) ? "RM " + pendapatan.setScale(2).toString() : "RM 0.00";
     }
 
-    public void setIdPengguna(int idPengguna) {
-        this.idPengguna = idPengguna;
+    // --- GETTERS AND SETTERS (Snake Case) ---
+
+    public int getId_pengguna() {
+        return id_pengguna;
     }
 
-    public String getNamaPertama() {
-        return namaPertama;
+    public void setId_pengguna(int id_pengguna) {
+        this.id_pengguna = id_pengguna;
     }
 
-    public void setNamaPertama(String namaPertama) {
-        this.namaPertama = namaPertama;
+    public String getNama_penuh() {
+        return nama_penuh;
     }
 
-    public String getNamaKedua() {
-        return namaKedua;
+    public void setNama_penuh(String nama_penuh) {
+        this.nama_penuh = nama_penuh;
     }
 
-    public void setNamaKedua(String namaKedua) {
-        this.namaKedua = namaKedua;
+    public String getNombor_kp() {
+        return nombor_kp;
     }
 
-    public String getNomborKP() {
-        return nomborKP;
+    public void setNombor_kp(String nombor_kp) {
+        this.nombor_kp = nombor_kp;
     }
 
-    public void setNomborKP(String nomborKP) {
-        this.nomborKP = nomborKP;
+    public String getNombor_telefon() {
+        return nombor_telefon;
     }
 
-    public String getNomborTelefon() {
-        return nomborTelefon;
+    public void setNombor_telefon(String nombor_telefon) {
+        this.nombor_telefon = nombor_telefon;
     }
 
-    public void setNomborTelefon(String nomborTelefon) {
-        this.nomborTelefon = nomborTelefon;
+    public Date getTarikh_lahir() {
+        return tarikh_lahir;
     }
 
-    public Date getTarikhLahir() {
-        return tarikhLahir;
+    public void setTarikh_lahir(Date tarikh_lahir) {
+        this.tarikh_lahir = tarikh_lahir;
     }
 
-    public void setTarikhLahir(Date tarikhLahir) {
-        this.tarikhLahir = tarikhLahir;
+    public String getKata_laluan() {
+        return kata_laluan;
     }
 
-    public String getJawatan() {
-        return jawatan;
+    public void setKata_laluan(String kata_laluan) {
+        this.kata_laluan = kata_laluan;
     }
 
-    public void setJawatan(String jawatan) {
-        this.jawatan = jawatan;
+    public String getStatus_keluarga() {
+        return status_keluarga;
     }
 
-    public String getKataLaluan() {
-        return kataLaluan;
+    public void setStatus_keluarga(String status_keluarga) {
+        this.status_keluarga = status_keluarga;
     }
 
-    public void setKataLaluan(String kataLaluan) {
-        this.kataLaluan = kataLaluan;
-    } 
-
-    public Date getTarikhKemaskini() {
-        return tarikhKemaskini;
+    public String getPekerjaan() {
+        return pekerjaan;
     }
 
-    public void setTarikhKemaskini(Date tarikhKemaskini) {
-        this.tarikhKemaskini = tarikhKemaskini;
+    public void setPekerjaan(String pekerjaan) {
+        this.pekerjaan = pekerjaan;
     }
 
-    public String getNamaJalan() {
-        return namaJalan;
+    public BigDecimal getPendapatan() {
+        return pendapatan;
     }
 
-    public void setNamaJalan(String namaJalan) {
-        this.namaJalan = namaJalan;
+    public void setPendapatan(BigDecimal pendapatan) {
+        this.pendapatan = pendapatan;
+    }
+
+    public String getNama_jalan() {
+        return nama_jalan;
+    }
+
+    public void setNama_jalan(String nama_jalan) {
+        this.nama_jalan = nama_jalan;
+    }
+
+    public String getNombor_poskod() {
+        return nombor_poskod;
+    }
+
+    public void setNombor_poskod(String nombor_poskod) {
+        this.nombor_poskod = nombor_poskod;
     }
 
     public String getBandar() {
@@ -132,20 +138,36 @@ public class Pengguna {
         this.bandar = bandar;
     }
 
-    public String getNomborPoskod() {
-        return nomborPoskod;
-    }
-
-    public void setNomborPoskod(String nomborPoskod) {
-        this.nomborPoskod = nomborPoskod;
-    }
-
     public String getNegeri() {
         return negeri;
     }
 
     public void setNegeri(String negeri) {
         this.negeri = negeri;
+    }
+
+    public Date getDibuat_pada() {
+        return dibuat_pada;
+    }
+
+    public void setDibuat_pada(Date dibuat_pada) {
+        this.dibuat_pada = dibuat_pada;
+    }
+
+    public Date getDikemaskini_pada() {
+        return dikemaskini_pada;
+    }
+
+    public void setDikemaskini_pada(Date dikemaskini_pada) {
+        this.dikemaskini_pada = dikemaskini_pada;
+    }
+
+    public Date getDipadam_pada() {
+        return dipadam_pada;
+    }
+
+    public void setDipadam_pada(Date dipadam_pada) {
+        this.dipadam_pada = dipadam_pada;
     }
 
     public int getStatus() {

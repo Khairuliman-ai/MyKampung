@@ -195,8 +195,8 @@
                 </div>
             <% } %>
 
-            <input type="text" name="nomborKP" class="form-control" placeholder="Nombor Kad Pengenalan" required>
-            <input type="password" name="kataLaluan" class="form-control" placeholder="Kata Laluan" required>
+            <input type="text" name="nombor_kp" class="form-control" placeholder="Nombor Kad Pengenalan" required>
+            <input type="password" name="kata_laluan" class="form-control" placeholder="Kata Laluan" required>
 
             <button type="submit" class="btn btn-primary w-100 mt-2">Log Masuk</button>
         </form>

@@ -16,16 +16,22 @@ public class DashboardServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        // Gunakan false supaya tidak create session baru jika session sudah tamat
         HttpSession session = request.getSession(false);
 
-        // 1️⃣ Check session
-        if (session == null || session.getAttribute("user") == null) {
-            response.sendRedirect("/views/auth/login.jsp");
+        // 1️⃣ Check session - Mesti guna "userSession" (sama seperti LoginServlet)
+        if (session == null || session.getAttribute("userSession") == null) {
+            response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
             return;
         }
 
-        Pengguna user = (Pengguna) session.getAttribute("user");
-        String role = user.getJawatan();
+        // Ambil objek dari session
+        Pengguna user = (Pengguna) session.getAttribute("userSession");
+        
+        // Memandangkan ERD baru menggunakan Pengguna_Peranan, 
+        // pastikan anda ada cara untuk dapatkan 'role'. 
+        // Jika anda simpan 'jawatan' dalam model Pengguna, kod ini kekal:
+        String role = user.getJawatan(); 
 
         // 2️⃣ Role-based dashboard routing
         if ("Penduduk".equalsIgnoreCase(role)) {
@@ -42,7 +48,7 @@ public class DashboardServlet extends HttpServlet {
 
         } else {
             // fallback if role unknown
-            response.sendRedirect("/views/auth/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
         }
     }
 }

@@ -2,107 +2,49 @@ package model;
 
 import java.util.Date;
 
-public class PermohonanBantuan {
+public class Permohonan_Bantuan {
+    private int id_permohonan;
+    private int id_pengguna;      // Foreign Key (Pemohon)
+    private int id_bantuan;       // Foreign Key (Jenis Bantuan)
+    private String status;         // Contoh: "Dihantar", "Disokong", "Berjaya", "Gagal"
+    private String catatan_pemohon;
+    private String catatan_pentadbir;
+    private String dokumen_pemohon;    // Path ke fail (PDF/Imej) sokongan
+    private String dokumen_pentadbir;  // Path ke fail pengesahan
+    private Date dibuat_pada;
+    private Date dikemaskini_pada;
+    private Date dipadam_pada;
 
-    private int idPermohonan;
-    private int idPenduduk;
-    private int idBantuan;
-    private Date tarikhMohon;
-    private int status;  // 0: Baru, 1: Lulus, 2: Tolak
-    private String catatan;
-    private String ulasanAdmin;
-    private String dokumen;      // PDF dari penduduk
-    private String dokumenBalik; // PDF dari ketua kampung
-    private String namaPemohon;
-    private String namaBantuan;
-
-    // Getters & Setters
-    public int getIdPermohonan() {
-        return idPermohonan;
-    }
-
-    public void setIdPermohonan(int idPermohonan) {
-        this.idPermohonan = idPermohonan;
+    // --- Helper Method ---
+    public String getStatusBadge() {
+        if ("Berjaya".equals(status)) return "label-success";
+        if ("Gagal".equals(status)) return "label-danger";
+        if ("Dihantar".equals(status)) return "label-warning";
+        return "label-default";
     }
 
-    public int getIdPenduduk() {
-        return idPenduduk;
-    }
+    // --- Getters and Setters ---
+    public int getId_permohonan() { return id_permohonan; }
+    public void setId_permohonan(int id_permohonan) { this.id_permohonan = id_permohonan; }
 
-    public void setIdPenduduk(int idPenduduk) {
-        this.idPenduduk = idPenduduk;
-    }
+    public int getId_pengguna() { return id_pengguna; }
+    public void setId_pengguna(int id_pengguna) { this.id_pengguna = id_pengguna; }
 
-    public int getIdBantuan() {
-        return idBantuan;
-    }
+    public int getId_bantuan() { return id_bantuan; }
+    public void setId_bantuan(int id_bantuan) { this.id_bantuan = id_bantuan; }
 
-    public void setIdBantuan(int idBantuan) {
-        this.idBantuan = idBantuan;
-    }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
 
-    public Date getTarikhMohon() {
-        return tarikhMohon;
-    }
+    public String getCatatan_pemohon() { return catatan_pemohon; }
+    public void setCatatan_pemohon(String catatan_pemohon) { this.catatan_pemohon = catatan_pemohon; }
 
-    public void setTarikhMohon(Date tarikhMohon) {
-        this.tarikhMohon = tarikhMohon;
-    }
+    public String getCatatan_pentadbir() { return catatan_pentadbir; }
+    public void setCatatan_pentadbir(String catatan_pentadbir) { this.catatan_pentadbir = catatan_pentadbir; }
 
-    public int getStatus() {
-        return status;
-    }
+    public String getDokumen_pemohon() { return dokumen_pemohon; }
+    public void setDokumen_pemohon(String dokumen_pemohon) { this.dokumen_pemohon = dokumen_pemohon; }
 
-    public void setStatus(int status) {
-        this.status = status;
-    }
-
-    public String getCatatan() {
-        return catatan;
-    }
-
-    public void setCatatan(String catatan) {
-        this.catatan = catatan;
-    }
-
-    public String getDokumen() {
-        return dokumen;
-    }
-
-    public void setDokumen(String dokumen) {
-        this.dokumen = dokumen;
-    }
-
-    public String getDokumenBalik() {
-        return dokumenBalik;
-    }
-
-    public void setDokumenBalik(String dokumenBalik) {
-        this.dokumenBalik = dokumenBalik;
-    }
-    
-    public String getNamaPemohon() {
-        return namaPemohon;
-    }
-
-    public void setNamaPemohon(String namaPemohon) {
-        this.namaPemohon = namaPemohon;
-    }
-    
-    public String getUlasanAdmin() {
-        return ulasanAdmin;
-    }
-
-    public void setUlasanAdmin(String ulasanAdmin) {
-        this.ulasanAdmin = ulasanAdmin;
-    }
-    
-    public String getNamaBantuan() {
-        return namaBantuan;
-    }
-
-    public void setNamaBantuan(String namaBantuan) {
-        this.namaBantuan = namaBantuan;
-    }
-    
+    public Date getDibuat_pada() { return dibuat_pada; }
+    public void setDibuat_pada(Date dibuat_pada) { this.dibuat_pada = dibuat_pada; }
 }

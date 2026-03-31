@@ -3,7 +3,7 @@ package controller;
 import model.Bantuan;
 import dao.BantuanDAO;
 import dao.PendudukDAO;
-import model.PermohonanBantuan;
+import model.Permohonan_Bantuan;
 import dao.PermohonanBantuanDAO;
 import model.Pengguna;
 
@@ -51,7 +51,7 @@ public class BantuanServlet extends HttpServlet {
             // ================== LIST ==================
             if ("/list".equals(action)) {
                 PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
-                List<PermohonanBantuan> list;
+                List<Permohonan_Bantuan> list;
 
                 if ("Penduduk".equals(user.getJawatan())) {
                     list = pbDao.getByPenduduk(user.getIdPengguna());
@@ -79,7 +79,7 @@ public class BantuanServlet extends HttpServlet {
             else if ("/edit".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
                 PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
-                PermohonanBantuan pb = pbDao.getById(id);
+                Permohonan_Bantuan pb = pbDao.getById(id);
 
                 if (pb != null && pb.getIdPenduduk() == user.getIdPengguna()) {
                     request.setAttribute("pb", pb);
@@ -109,14 +109,14 @@ public class BantuanServlet extends HttpServlet {
 
     // 3. Tarik Semua Permohonan Penduduk Ini
     PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
-    List<PermohonanBantuan> fullList = pbDao.getByPenduduk(p.getIdPenduduk());
+    List<Permohonan_Bantuan> fullList = pbDao.getByPenduduk(p.getIdPenduduk());
 
     // 4. [FILTER PENTING]: Ambil Bantuan Rasmi Sahaja (ID <= 20)
     // Kita buang bantuan ID 21, 22, 23, 24, 999 dari senarai ini
-    List<PermohonanBantuan> listRasmi = new ArrayList<>();
+    List<Permohonan_Bantuan> listRasmi = new ArrayList<>();
 
     if (fullList != null) {
-        for (PermohonanBantuan pb : fullList) {
+        for (Permohonan_Bantuan pb : fullList) {
             // Logik: Bantuan Rasmi ialah ID 1 hingga 20
             if (pb.getIdBantuan() <= 20) {
                 listRasmi.add(pb);
@@ -148,12 +148,12 @@ public class BantuanServlet extends HttpServlet {
 
     // 3. Tarik Senarai Permohonan (Sejarah)
     PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
-    List<PermohonanBantuan> fullList = pbDao.getByPenduduk(p.getIdPenduduk());
+    List<Permohonan_Bantuan> fullList = pbDao.getByPenduduk(p.getIdPenduduk());
 
     // Filter: Asingkan Bantuan Komuniti Sahaja (ID > 20 atau 999)
-    List<PermohonanBantuan> listKomuniti = new ArrayList<>();
+    List<Permohonan_Bantuan> listKomuniti = new ArrayList<>();
     if (fullList != null) {
-        for (PermohonanBantuan pb : fullList) {
+        for (Permohonan_Bantuan pb : fullList) {
             if (pb.getIdBantuan() > 20 || pb.getIdBantuan() == 999) {
                 listKomuniti.add(pb);
             }
@@ -196,7 +196,7 @@ else if ("/borangDigital.jsp".equals(action)) {
 
                     // LANGKAH 1: Dapatkan info permohonan DAHULU sebelum delete
                     // Tujuannya untuk tahu ID Bantuan (Rasmi atau Komuniti)
-                    PermohonanBantuan pb = pbDao.getById(idPermohonan);
+                    Permohonan_Bantuan pb = pbDao.getById(idPermohonan);
                     
                     String redirectPage = "/bantuan/rasmi"; // Default ke rasmi
 
@@ -267,7 +267,7 @@ else if ("/borangDigital.jsp".equals(action)) {
                 String jenisBantuanLain = request.getParameter("jenisBantuanLain"); // Input text khas
                 String keterangan = request.getParameter("keterangan"); // Textarea biasa
 
-                PermohonanBantuan pb = new PermohonanBantuan();
+                Permohonan_Bantuan pb = new Permohonan_Bantuan();
                 pb.setIdPenduduk(user.getIdPengguna());
                 pb.setDokumen(fileName);
 
@@ -348,7 +348,7 @@ if (idBantuanCheck > 20 || idBantuanCheck == 999) {
                 String jenisBantuanLain = request.getParameter("jenisBantuanLain");
                 String keterangan = request.getParameter("keterangan");
 
-                PermohonanBantuan pb = new PermohonanBantuan();
+                Permohonan_Bantuan pb = new Permohonan_Bantuan();
                 pb.setIdPermohonan(idPermohonan);
                 pb.setDokumen(fileName);
 

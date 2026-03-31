@@ -114,7 +114,7 @@
                     <span class="input-group-text bg-light border-end-0" style="border-radius: 10px 0 0 10px;">
                         <i class="bi bi-card-text text-muted"></i>
                     </span>
-                    <input type="text" class="form-control border-start-0" id="nomborKP" name="nomborKP" 
+                    <input type="text" class="form-control border-start-0" id="nombor_kp" name="nombor_kp" 
                            placeholder="Contoh: 900101035544" required style="border-radius: 0 10px 10px 0;">
                 </div>
             </div>
@@ -125,7 +125,7 @@
                     <span class="input-group-text bg-light border-end-0" style="border-radius: 10px 0 0 10px;">
                         <i class="bi bi-lock text-muted"></i>
                     </span>
-                    <input type="password" class="form-control border-start-0" id="kataLaluan" name="kataLaluan" 
+                    <input type="password" class="form-control border-start-0" id="kata_laluan" name="kata_laluan" 
                            placeholder="Masukkan kata laluan" required style="border-radius: 0 10px 10px 0;">
                 </div>
             </div>
