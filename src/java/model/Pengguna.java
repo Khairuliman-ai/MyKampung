@@ -25,23 +25,25 @@ public class Pengguna {
     private Date dibuat_pada;
     private Date dikemaskini_pada;
     private Date dipadam_pada;
-    private int status;  //users authentication
+    private int status;  // users authentication
+
+    // Variable Tambahan (Untuk Logik Dashboard/Role)
+    private String nama_peranan; // Diambil dari table 'peranan'
+    private String nama_jawatan; // Diambil dari table 'jawatan_ajk' (khusus untuk AJK)
 
     // --- HELPER METHODS ---
-    
     public String getAlamatLengkap() {
-        return (nama_jalan != null ? nama_jalan : "") + ", " + 
-               (nombor_poskod != null ? nombor_poskod : "") + " " + 
-               (bandar != null ? bandar : "") + ", " + 
-               (negeri != null ? negeri : "");
+        return (nama_jalan != null ? nama_jalan : "") + ", "
+                + (nombor_poskod != null ? nombor_poskod : "") + " "
+                + (bandar != null ? bandar : "") + ", "
+                + (negeri != null ? negeri : "");
     }
 
     public String getPendapatanFormatted() {
         return (pendapatan != null) ? "RM " + pendapatan.setScale(2).toString() : "RM 0.00";
     }
 
-    // --- GETTERS AND SETTERS (Snake Case) ---
-
+    // --- GETTERS AND SETTERS ---
     public int getId_pengguna() {
         return id_pengguna;
     }
@@ -176,5 +178,22 @@ public class Pengguna {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    // --- GETTERS & SETTERS TAMBAHAN ---
+    public String getNama_peranan() {
+        return nama_peranan;
+    }
+
+    public void setNama_peranan(String nama_peranan) {
+        this.nama_peranan = nama_peranan;
+    }
+
+    public String getNama_jawatan() {
+        return nama_jawatan;
+    }
+
+    public void setNama_jawatan(String nama_jawatan) {
+        this.nama_jawatan = nama_jawatan;
     }
 }
