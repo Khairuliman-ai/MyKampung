@@ -202,19 +202,46 @@
         </form>
     </div>
 
-    <!-- ===== REGISTER ===== -->
-    <div class="form-container sign-up-container">
-        <form action="${pageContext.request.contextPath}/register" method="post">
+            <!-- ===== Register ===== -->
+<div class="form-container sign-up-container">
+        <form action="${pageContext.request.contextPath}/RegisterServlet" method="post" enctype="multipart/form-data" class="py-3">
 
-            <h4 class="fw-bold text-center mb-3">Daftar Akaun</h4>
+            <h4 class="fw-bold text-center mb-1">Daftar Penduduk</h4>
+            <p class="text-muted text-center small mb-4">Sila isi butiran dengan lengkap untuk pengesahan</p>
 
-            <input type="text" name="nomborKP" class="form-control" placeholder="Nombor Kad Pengenalan" required>
-            <input type="text" name="namaLengkap" class="form-control" placeholder="Nama Penuh" required>
-            <textarea name="alamat" class="form-control" rows="2" placeholder="Alamat Kediaman" required></textarea>
-            <input type="text" name="noTelefon" class="form-control" placeholder="No Telefon" required>
-            <input type="password" name="kataLaluan" class="form-control" placeholder="Kata Laluan" required>
+            <input type="text" name="nama_penuh" class="form-control" placeholder="Nama Penuh (seperti MyKad)" required>
+            <input type="text" name="nombor_kp" class="form-control" placeholder="Nombor Kad Pengenalan" required>
+            <input type="text" name="nombor_tele_fon" class="form-control" placeholder="No. Telefon (cth: 0112345678)" required>
 
-            <button type="submit" class="btn btn-success w-100 mt-2">Daftar</button>
+            <div class="row g-2">
+                <div class="col-12">
+                    <input type="text" name="nama_jalan" class="form-control" placeholder="Alamat (No. Rumah & Nama Jalan)" required>
+                </div>
+                <div class="col-6">
+                    <input type="text" name="nombor_pos_kod" class="form-control" placeholder="Poskod" required>
+                </div>
+                <div class="col-6">
+                    <input type="text" name="bandar" class="form-control" placeholder="Bandar" required>
+                </div>
+                <div class="col-12">
+                    <select name="negeri" class="form-control" required>
+                        <option value="" disabled selected>Pilih Negeri</option>
+                        <option value="Kelantan">Kelantan</option>
+                        
+                        </select>
+                </div>
+            </div>
+
+            <div class="mt-2 mb-2">
+                <label class="form-label small fw-bold text-muted mb-1">Lampiran Bukti Penduduk (PDF Sahaja)</label>
+                <input type="file" name="bukti_pdf" class="form-control" accept="application/pdf" required>
+            </div>
+            
+            <input type="password" name="kata_laluan" class="form-control" placeholder="Cipta Kata Laluan" required>
+
+            <button type="submit" class="btn btn-success w-100 mt-3 shadow-sm" style="background:#10b981; border:none;">
+                Hantar Pendaftaran
+            </button>
         </form>
     </div>
 

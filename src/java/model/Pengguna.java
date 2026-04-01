@@ -14,6 +14,7 @@ public class Pengguna {
     private String status_keluarga;
     private String pekerjaan;
     private BigDecimal pendapatan;
+    private String lampiran_pengesahan;
 
     // Alamat
     private String nama_jalan;
@@ -196,4 +197,14 @@ public class Pengguna {
     public void setNama_jawatan(String nama_jawatan) {
         this.nama_jawatan = nama_jawatan;
     }
+
+    public String getLampiran_pengesahan() {
+        return lampiran_pengesahan;
+    }
+
+    public void setLampiran_pengesahan(String lampiran_pengesahan) {
+        this.lampiran_pengesahan = lampiran_pengesahan;
+    }
+    
+    
 }

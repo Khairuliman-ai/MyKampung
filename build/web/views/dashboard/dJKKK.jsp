@@ -1,3 +1,14 @@
+<%@ page import="model.Pengguna" %>
+<%
+    // 1. PEMBETULAN: Deklarasi objek user dari session (Guna 'currentUser' sepadan dengan LoginServlet)
+    Pengguna user = (Pengguna) session.getAttribute("currentUser");
+
+    // 2. SEKURITI: Redirect jika session tamat atau tidak sah
+    if (user == null) {
+        response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp");
+        return;
+    }
+%>
 
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
@@ -23,7 +34,7 @@
     <div class="relative bg-gradient-to-r from-[#1f2937] to-[#4b5563] rounded-3xl p-8 text-white mb-8 shadow-xl shadow-gray-300 overflow-hidden">
         <div class="relative z-10 max-w-lg">
             <span class="bg-white/20 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm text-yellow-300">MOD PENTADBIR</span>
-            <h1 class="text-3xl font-bold mt-4 mb-2 leading-tight">Selamat Bertugas, Tuan!</h1>
+            <h1 class="text-3xl font-bold mt-4 mb-2 leading-tight">Selamat Bertugas, <%= user.getNama_penuh() %>!</h1>
             <p class="text-gray-200 mb-6 text-sm opacity-90">
                 Terdapat <span class="font-bold text-white underline">5 permohonan bantuan</span> baru yang memerlukan pengesahan anda hari ini.
             </p>
@@ -37,6 +48,7 @@
         <div class="absolute bottom-0 right-20 w-32 h-32 bg-gray-900 opacity-20 rounded-full blur-2xl"></div>
     </div>
 
+    <%-- Statistik Ringkas --%>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white p-5 rounded-2xl shadow-sm hover:shadow-md transition border border-gray-50 flex items-center gap-4">
             <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-[#6C5DD3] text-xl">
@@ -74,6 +86,7 @@
         <a href="#" class="text-sm text-[#6C5DD3] font-medium hover:underline">Lihat Semua</a>
     </div>
 
+    <%-- Jadual Permohonan --%>
     <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden mb-8">
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
@@ -112,25 +125,13 @@
                             <span class="px-3 py-1 rounded-full bg-yellow-100 text-yellow-700 text-xs font-bold">Baru</span>
                         </td>
                     </tr>
-                    <tr class="hover:bg-gray-50/50 transition">
-                        <td class="p-4">
-                            <div class="flex items-center gap-3">
-                                <img src="https://ui-avatars.com/api/?name=Muthu+Samy&background=random" class="w-8 h-8 rounded-full">
-                                <span class="text-sm font-bold text-gray-700">Muthu Samy</span>
-                            </div>
-                        </td>
-                        <td class="p-4 text-sm text-gray-600">Aduan Jalan Rosak</td>
-                        <td class="p-4 text-sm text-gray-500">20 Jan 2026</td>
-                        <td class="p-4 text-center">
-                            <span class="px-3 py-1 rounded-full bg-blue-100 text-blue-700 text-xs font-bold">Dalam Proses</span>
-                        </td>
-                    </tr>
                 </tbody>
             </table>
         </div>
     </div>
 
 </div> 
+
 <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
     
     <div class="flex justify-between items-start mb-10">
@@ -140,13 +141,15 @@
 
     <div class="text-center mb-10">
         <div class="relative w-24 h-24 mx-auto mb-4">
-            <img src="https://ui-avatars.com/api/?name=<%= (user != null && user.getNamaPertama() != null) ? user.getNamaPertama() : "Admin" %>&background=1f2937&color=fff&size=128" 
+            <img src="https://ui-avatars.com/api/?name=<%= user.getNama_penuh() %>&background=1f2937&color=fff&size=128" 
                  class="w-full h-full rounded-full object-cover border-4 border-white shadow-lg relative z-10">
             <div class="absolute bottom-1 right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full z-20"></div>
         </div>
         
-        <h2 class="text-xl font-bold text-gray-800"><%= (user != null && user.getNamaPertama() != null) ? user.getNamaPertama() : "Admin" %></h2>
-        <p class="text-xs font-bold text-[#6C5DD3] bg-purple-50 px-3 py-1 rounded-full inline-block mt-1">Setiausaha AJK</p>
+        <h2 class="text-xl font-bold text-gray-800"><%= user.getNama_penuh() %></h2>
+        <p class="text-xs font-bold text-[#6C5DD3] bg-purple-50 px-3 py-1 rounded-full inline-block mt-1">
+            <%= (user.getNama_jawatan() != null) ? user.getNama_jawatan() : "AJK Kampung" %>
+        </p>
 
         <div class="flex justify-center gap-4 mt-6">
             <button class="w-10 h-10 rounded-full bg-gray-50 text-gray-500 hover:bg-gray-800 hover:text-white transition flex items-center justify-center" title="Mesyuarat">
@@ -161,7 +164,7 @@
     <div class="mb-8">
         <div class="flex justify-between items-center mb-4">
             <h3 class="font-bold text-sm text-gray-800">Dana Kampung</h3>
-            <span class="text-xs text-gray-400">Jan 2026</span>
+            <span class="text-xs text-gray-400">Mac 2026</span>
         </div>
         <div class="bg-gray-50 p-4 rounded-2xl">
             <div class="flex justify-between items-end mb-2">

@@ -1,96 +1,92 @@
 package controller;
 
 import java.io.IOException;
+import java.sql.Connection;
+import java.math.BigDecimal;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import dao.PenggunaDAO;
-import dao.PendudukDAO;
 import model.Pengguna;
-import model.Penduduk;
+import util.DBUtil;
 
-// 1. KEMASKINI URL PATTERNS: Tambah /profil/view
 @WebServlet(urlPatterns = {"/profil/view", "/profil/update"})
 public class ProfileServlet extends HttpServlet {
 
-    // 2. TAMBAH METHOD doGet UNTUK PAPARAN (Bila tekan Navbar)
+    // 1. Method doGet: Untuk paparkan halaman profil
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
         HttpSession session = request.getSession();
-        Pengguna user = (Pengguna) session.getAttribute("user");
+        // Gunakan 'currentUser' supaya selaras dengan LoginServlet anda
+        Pengguna user = (Pengguna) session.getAttribute("currentUser");
 
         if (user != null) {
-            // Dapatkan maklumat detail Penduduk dari DB
-            PendudukDAO pDao = new PendudukDAO();
-            Penduduk detail = pDao.getByUserId(user.getIdPengguna());
-
-            // Hantar data ke JSP melalui request attribute
-            request.setAttribute("pendudukDetail", detail);
-
-            // Forward ke halaman JSP
+            // Dalam DB v2, maklumat profil sudah ada dalam objek user di session.
+            // Kita cuma perlu forward ke JSP yang betul.
             request.getRequestDispatcher("/views/maklumatPenduduk/kemaskiniProfil.jsp").forward(request, response);
         } else {
-            // Jika tiada session, tendang ke login
-            response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp");
         }
     }
 
-    // 3. METHOD doPost UNTUK SIMPAN DATA (Kekal seperti sebelum ini)
+    // 2. Method doPost: Untuk proses simpan kemaskini profil
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
+        request.setCharacterEncoding("UTF-8");
         HttpSession session = request.getSession();
-        Pengguna currentUser = (Pengguna) session.getAttribute("user");
+        Pengguna currentUser = (Pengguna) session.getAttribute("currentUser");
         
         if (currentUser != null) {
-            try {
-                // Update Object Pengguna
-                currentUser.setNamaPertama(request.getParameter("namaPertama"));
-                currentUser.setNamaKedua(request.getParameter("namaKedua"));
-                currentUser.setNomborTelefon(request.getParameter("nomborTelefon"));
+            try (Connection conn = DBUtil.getConnection()) {
+                // A. Ambil data dari form profil.jsp
+                String namaPenuh = request.getParameter("nama_penuh");
+                String noTel = request.getParameter("nombor_telefon");
+                String jalan = request.getParameter("nama_jalan");
+                String poskod = request.getParameter("nombor_poskod");
+                String bandar = request.getParameter("bandar");
+                String negeri = request.getParameter("negeri");
                 
-                // Hanya update password jika user isi (tidak kosong)
-                String newPass = request.getParameter("kataLaluan");
-                if(newPass != null && !newPass.trim().isEmpty()){
-                    currentUser.setKataLaluan(newPass);
+                // Data Sosio-Ekonomi (Baru)
+                String statusKeluarga = request.getParameter("status_keluarga");
+                String pekerjaan = request.getParameter("pekerjaan");
+                String pendapatanStr = request.getParameter("pendapatan");
+
+                // B. Update Object currentUser
+                currentUser.setNama_penuh(namaPenuh);
+                currentUser.setNombor_telefon(noTel);
+                currentUser.setNama_jalan(jalan);
+                currentUser.setNombor_poskod(poskod);
+                currentUser.setBandar(bandar);
+                currentUser.setNegeri(negeri);
+                currentUser.setStatus_keluarga(statusKeluarga);
+                currentUser.setPekerjaan(pekerjaan);
+                
+                if (pendapatanStr != null && !pendapatanStr.isEmpty()) {
+                    currentUser.setPendapatan(new BigDecimal(pendapatanStr));
                 }
 
-                currentUser.setNamaJalan(request.getParameter("namaJalan"));
-                currentUser.setBandar(request.getParameter("bandar"));
-                currentUser.setNomborPoskod(request.getParameter("nomborPoskod"));
-                currentUser.setNegeri(request.getParameter("negeri"));
+                // C. Simpan ke Database
+                PenggunaDAO pDao = new PenggunaDAO(conn);
+                boolean success = pDao.updateProfil(currentUser); // Anda perlu cipta method ini di DAO
                 
-                // Simpan ke DB Pengguna
-                PenggunaDAO penggunaDAO = new PenggunaDAO();
-                penggunaDAO.updatePengguna(currentUser);
-                
-                // Update Object Penduduk (Jika role penduduk)
-                if ("Penduduk".equals(currentUser.getJawatan())) {
-                    Penduduk p = new Penduduk();
-                    p.setIdPengguna(currentUser.getIdPengguna());
-                    p.setStatusSemasa(request.getParameter("statusSemasa"));
-                    p.setPekerjaan(request.getParameter("pekerjaan"));
-                    p.setPendapatan(Integer.parseInt(request.getParameter("pendapatan")));
-                    
-                    PendudukDAO pendudukDAO = new PendudukDAO();
-                    pendudukDAO.updatePenduduk(p);
+                if (success) {
+                    // Update session dengan data baru
+                    session.setAttribute("currentUser", currentUser);
+                    response.sendRedirect(request.getContextPath() + "/profil/view?status=success");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/profil/view?status=error");
                 }
-                
-                // Kemaskini session
-                session.setAttribute("user", currentUser);
-                
-                // Redirect balik ke View (GET) dengan mesej sukses
-                response.sendRedirect(request.getContextPath() + "/profil/view?status=success");
                 
             } catch (Exception e) {
                 e.printStackTrace();
                 response.sendRedirect(request.getContextPath() + "/profil/view?status=error");
             }
         } else {
-            response.sendRedirect(request.getContextPath() + "/views/auth/login.jsp");
+            response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp");
         }
     }
 }

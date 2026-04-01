@@ -52,8 +52,8 @@ public class DashboardServlet extends HttpServlet {
              * Penapis Biro Spesifik:
              * Memastikan AJK Keselamatan, Kebajikan, dll. pergi ke dashboard portfolio masing-masing.
              */
-            if ("Biro Keselamatan".equals(biro)) {
-                request.getRequestDispatcher("ajk/keselamatan_dashboard.jsp").forward(request, response);
+            if ("Setiausaha".equals(biro)) {
+                request.getRequestDispatcher("views/dashboard/dJKKK.jsp").forward(request, response);
             } 
             else if ("Biro Kebajikan & Sosial".equals(biro)) {
                 request.getRequestDispatcher("ajk/kebajikan_dashboard.jsp").forward(request, response);
@@ -70,7 +70,7 @@ public class DashboardServlet extends HttpServlet {
             }
         } 
         else if ("Penduduk".equals(peranan)) {
-            request.getRequestDispatcher("penduduk/dashboard.jsp").forward(request, response);
+            request.getRequestDispatcher("views/dashboard/dPenduduk.jsp").forward(request, response);
         }
         else {
             // Jika peranan tidak dikenali, hantar balik ke login

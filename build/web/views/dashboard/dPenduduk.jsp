@@ -1,3 +1,14 @@
+<%@ page import="model.Pengguna" %>
+<%
+    // 1. Dapatkan objek user dari session (Guna 'currentUser' supaya selaras dengan Servlet)
+    Pengguna user = (Pengguna) session.getAttribute("currentUser");
+
+    // 2. Sekuriti: Jika user cuba akses terus tanpa login
+    if (user == null) {
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        return;
+    }
+%>
 
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
@@ -23,7 +34,7 @@
     <div class="relative bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] rounded-3xl p-8 text-white mb-8 shadow-xl shadow-purple-200 overflow-hidden">
         <div class="relative z-10 max-w-lg">
             <span class="bg-white/20 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm">PENGUMUMAN UTAMA</span>
-            <h1 class="text-3xl font-bold mt-4 mb-2 leading-tight">Selamat Datang, Penduduk!</h1>
+            <h1 class="text-3xl font-bold mt-4 mb-2 leading-tight">Selamat Datang, <%= user.getNama_penuh() %>!</h1>
             <p class="text-purple-100 mb-6 text-sm opacity-90">
                 Mesyuarat Agung PIBG akan diadakan pada sabtu ini. Sila semak jadual anda.
             </p>
@@ -52,8 +63,8 @@
                 <i class="fas fa-file-invoice-dollar"></i>
             </div>
             <div>
-                <p class="text-xs text-gray-400 font-bold uppercase">Tunggakan</p>
-                <h3 class="text-xl font-bold text-gray-800">RM 50.00</h3>
+                <p class="text-xs text-gray-400 font-bold uppercase">Pendapatan</p>
+                <h3 class="text-xl font-bold text-gray-800"><%= user.getPendapatanFormatted() %></h3>
             </div>
         </div>
 
@@ -62,8 +73,8 @@
                 <i class="fas fa-calendar-check"></i>
             </div>
             <div>
-                <p class="text-xs text-gray-400 font-bold uppercase">Aktiviti</p>
-                <h3 class="text-xl font-bold text-gray-800">Gotong Royong</h3>
+                <p class="text-xs text-gray-400 font-bold uppercase">Status Akaun</p>
+                <h3 class="text-xl font-bold text-gray-800"><%= (user.getStatus() == 1 ? "Aktif" : "Pending") %></h3>
             </div>
         </div>
     </div>
@@ -75,23 +86,23 @@
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-50 flex gap-4">
-            <div class="w-24 h-24 bg-gray-200 rounded-xl flex-shrink-0 bg-cover bg-center" style="background-image: url('https://source.unsplash.com/random/200x200/?community');"></div>
+            <div class="w-24 h-24 bg-gray-200 rounded-xl flex-shrink-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&q=80&w=200');"></div>
             <div class="flex-1 flex flex-col justify-center">
                 <span class="text-[10px] font-bold text-orange-500 bg-orange-50 w-max px-2 py-1 rounded mb-2">SUKAN</span>
                 <h4 class="font-bold text-gray-800 mb-1">Pertandingan Futsal Kampung</h4>
                 <div class="flex items-center text-xs text-gray-400 gap-2">
-                    <i class="far fa-clock"></i> 25 Feb 2024
+                    <i class="far fa-clock"></i> 25 Feb 2026
                 </div>
             </div>
         </div>
         
         <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-50 flex gap-4">
-            <div class="w-24 h-24 bg-gray-200 rounded-xl flex-shrink-0 bg-cover bg-center" style="background-image: url('https://source.unsplash.com/random/200x200/?meeting');"></div>
+            <div class="w-24 h-24 bg-gray-200 rounded-xl flex-shrink-0 bg-cover bg-center" style="background-image: url('https://images.unsplash.com/photo-1517457373958-b7bdd4587205?auto=format&fit=crop&q=80&w=200');"></div>
             <div class="flex-1 flex flex-col justify-center">
                 <span class="text-[10px] font-bold text-blue-500 bg-blue-50 w-max px-2 py-1 rounded mb-2">MESYUARAT</span>
                 <h4 class="font-bold text-gray-800 mb-1">Taklimat Keselamatan</h4>
                 <div class="flex items-center text-xs text-gray-400 gap-2">
-                    <i class="far fa-clock"></i> 28 Feb 2024
+                    <i class="far fa-clock"></i> 28 Feb 2026
                 </div>
             </div>
         </div>
@@ -110,13 +121,13 @@
     <div class="text-center mb-10">
         <div class="relative w-24 h-24 mx-auto mb-4">
             <div class="absolute inset-0 border-2 border-dashed border-purple-300 rounded-full animate-spin-slow"></div>
-            <img src="https://ui-avatars.com/api/?name=<%= (user != null && user.getNamaPertama() != null) ? user.getNamaPertama() : "User" %>&background=6C5DD3&color=fff&size=128" 
+            <img src="https://ui-avatars.com/api/?name=<%= user.getNama_penuh() %>&background=6C5DD3&color=fff&size=128" 
                  class="w-full h-full rounded-full object-cover border-4 border-white shadow-lg relative z-10">
             <div class="absolute bottom-1 right-1 w-6 h-6 bg-green-500 border-2 border-white rounded-full z-20"></div>
         </div>
         
-        <h2 class="text-xl font-bold text-gray-800"><%= (user != null && user.getNamaPertama() != null) ? user.getNamaPertama() : "Penduduk" %></h2>
-        <p class="text-sm text-gray-500 mb-6">No. 12, Lorong Cempaka</p>
+        <h2 class="text-xl font-bold text-gray-800"><%= user.getNama_penuh() %></h2>
+        <p class="text-sm text-gray-500 mb-6"><%= user.getNama_jalan() %>, <%= user.getBandar() %></p>
 
         <div class="flex justify-center gap-4">
             <button class="w-10 h-10 rounded-full bg-gray-50 text-gray-500 hover:bg-[#6C5DD3] hover:text-white transition flex items-center justify-center">
@@ -140,7 +151,7 @@
             <div class="flex items-center gap-3">
                 <img src="https://ui-avatars.com/api/?name=Ketua+Kampung&background=random" class="w-10 h-10 rounded-full">
                 <div class="flex-1 min-w-0">
-                    <p class="text-sm font-bold text-gray-800 truncate">En. Razak</p>
+                    <p class="text-sm font-bold text-gray-800 truncate">Ali bin Ahmad</p>
                     <p class="text-xs text-gray-500 truncate">Ketua Kampung</p>
                 </div>
                 <a href="tel:+60123456789" class="text-xs bg-purple-50 text-purple-600 px-3 py-1.5 rounded-full font-bold hover:bg-purple-100">
