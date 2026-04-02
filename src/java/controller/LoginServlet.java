@@ -18,35 +18,41 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
         
-        // 1. Ambil hanya No KP dan Kata Laluan (Peranan dibuang)
+        // 1. Ambil data dari form
         String kp = request.getParameter("nombor_kp");
         String password = request.getParameter("kata_laluan");
 
+        // 2. Bersihkan No KP (PENTING: Gunakan noKpClean selepas ini)
+        String noKpClean = (kp != null) ? kp.replaceAll("[^0-9]", "") : "";
+
         try (Connection conn = DBUtil.getConnection()) {
+            // 3. Inisialisasi DAO dengan connection
             PenggunaDAO dao = new PenggunaDAO(conn);
             
-            // 2. Panggil authenticate dengan 2 parameter sahaja
-            // Sistem akan tarik peranan tertinggi secara automatik melalui SQL 'ORDER BY'
-            Pengguna user = dao.authenticate(kp, password);
+            // 4. Panggil authenticate menggunakan noKpClean
+            Pengguna user = dao.authenticate(noKpClean, password);
 
             if (user != null) {
-                // 3. Simpan objek user yang sudah ada maklumat 'nama_peranan' & 'nama_jawatan'
+                // 5. Simpan objek user ke dalam session
                 HttpSession session = request.getSession();
                 session.setAttribute("currentUser", user);
                 
-                // 4. Hantar ke DashboardServlet untuk urusan pengalihan biro/peranan
+                // 6. Redirect ke Dashboard
                 response.sendRedirect("DashboardServlet");
             } else {
-                // Jika user == null, bermaksud sama ada KP/Pass salah atau akaun tidak aktif (status=0)
+                // Gagal login
                 request.setAttribute("errorMessage", "Log masuk gagal. Sila semak No. KP, Kata Laluan, atau pastikan akaun anda aktif.");
                 request.getRequestDispatcher("auth.jsp").forward(request, response);
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Ralat sistem pangkalan data. Sila cuba sebentar lagi.");
+            request.setAttribute("errorMessage", "Ralat sistem pangkalan data.");
             request.getRequestDispatcher("auth.jsp").forward(request, response);
         }
     }
+    
+
+
     
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 

@@ -177,6 +177,35 @@
 
 <div class="auth-container" id="authContainer">
 
+    <script>
+    function formatIC(input) {
+    // 1. Buang semua karakter bukan nombor
+    let val = input.value.replace(/\D/g, '');
+    
+    // 2. Potong jika lebih 12 digit (elak ralat)
+    if (val.length > 12) {
+        val = val.substring(0, 12);
+    }
+
+    // 3. Masukkan sempang mengikut posisi
+    let formatted = "";
+    if (val.length > 0) {
+        // Bahagian Tarikh Lahir (6 digit pertama)
+        formatted += val.substring(0, 6);
+    }
+    if (val.length > 6) {
+        // Bahagian Kod Negeri (2 digit tengah)
+        formatted += '-' + val.substring(6, 8);
+    }
+    if (val.length > 8) {
+        // Bahagian Nombor Siri (4 digit terakhir)
+        formatted += '-' + val.substring(8, 12);
+    }
+
+    input.value = formatted;
+}
+    </script>>
+    
     <!-- ===== LOGIN ===== -->
     <div class="form-container sign-in-container">
         <form action="${pageContext.request.contextPath}/login" method="post">
@@ -195,7 +224,9 @@
                 </div>
             <% } %>
 
-            <input type="text" name="nombor_kp" class="form-control" placeholder="Nombor Kad Pengenalan" required>
+            <input type="text" name="nombor_kp" class="form-control" placeholder="Contoh: 000000-00-0000" 
+       oninput="formatIC(this)" 
+       maxlength="14" required>
             <input type="password" name="kata_laluan" class="form-control" placeholder="Kata Laluan" required>
 
             <button type="submit" class="btn btn-primary w-100 mt-2">Log Masuk</button>
