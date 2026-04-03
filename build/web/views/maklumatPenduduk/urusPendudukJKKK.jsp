@@ -30,9 +30,10 @@
                     class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-[#6C5DD3] text-[#6C5DD3]">
                 <i class="fas fa-user-plus"></i> Permohonan Baru
                 <% 
-                   List<Pengguna> pendingList = (List<Pengguna>) request.getAttribute("pendingList");
+             List<Pengguna> pendingList = (List<Pengguna>) request.getAttribute("pendingList");
                    if(pendingList != null && !pendingList.isEmpty()) { 
                 %>
+                
                     <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><%= pendingList.size() %></span>
                 <% } %>
             </button>
@@ -60,22 +61,22 @@
                         <% if (pendingList != null && !pendingList.isEmpty()) {
                             for (Pengguna p : pendingList) { %>
                         <tr class="hover:bg-gray-50/50 transition">
-                            <td class="p-4 text-sm font-bold text-gray-800"><%= p.getNamaLengkap() %></td>
+                            <td class="p-4 text-sm font-bold text-gray-800"><%= p.getNama_penuh() %></td>
                             <td class="p-4 text-sm text-gray-600">
-                                <span class="bg-gray-100 px-2 py-1 rounded text-xs font-mono"><%= p.getNomborKP() %></span>
+                                <span class="bg-gray-100 px-2 py-1 rounded text-xs font-mono"><%= p.getNombor_kp() %></span>
                             </td>
-                            <td class="p-4 text-sm text-gray-500"><%= p.getAlamat() %></td>
-                            <td class="p-4 text-sm text-gray-500"><%= p.getNomborTelefon() %></td>
+                            <td class="p-4 text-sm text-gray-500"><%= p.getNama_jalan() %></td>
+                            <td class="p-4 text-sm text-gray-500"><%= p.getNombor_telefon() %></td>
                             <td class="p-4 text-center">
                                 <div class="flex justify-center gap-2">
                                     <form action="<%= request.getContextPath() %>/penduduk/approve" method="post">
-                                        <input type="hidden" name="idPengguna" value="<%= p.getIdPengguna() %>">
+                                        <input type="hidden" name="idPengguna" value="<%= p.getId_pengguna() %>">
                                         <button type="submit" class="bg-green-100 text-green-600 hover:bg-green-200 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition">
                                             <i class="fas fa-check"></i> Lulus
                                         </button>
                                     </form>
                                     <form action="<%= request.getContextPath() %>/penduduk/reject" method="post">
-                                        <input type="hidden" name="idPengguna" value="<%= p.getIdPengguna() %>">
+                                        <input type="hidden" name="idPengguna" value="<%= p.getId_pengguna() %>">
                                         <button type="submit" class="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition">
                                             <i class="fas fa-times"></i> Tolak
                                         </button>
@@ -93,7 +94,6 @@
     </div>
 
     <div id="content-active" class="hidden">
-        
         <div class="mb-4">
             <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
@@ -121,12 +121,12 @@
                             for (Pengguna p : activeList) { 
                         %>
                         <tr class="hover:bg-gray-50/50 transition">
-                            <td class="p-4 text-sm font-bold text-gray-800 search-col"><%= p.getNamaLengkap() %></td>
-                            <td class="p-4 text-sm text-gray-600 search-col"><%= p.getNomborKP() %></td>
-                            <td class="p-4 text-sm text-gray-500 max-w-xs truncate search-col"><%= p.getAlamat() %></td>
-                            <td class="p-4 text-sm text-gray-500"><%= p.getNomborTelefon() %></td>
+                            <td class="p-4 text-sm font-bold text-gray-800 search-col"><%= p.getNama_penuh() %></td>
+                            <td class="p-4 text-sm text-gray-600 search-col"><%= p.getNombor_kp() %></td>
+                            <td class="p-4 text-sm text-gray-500 max-w-xs truncate search-col"><%= p.getNama_jalan() %></td>
+                            <td class="p-4 text-sm text-gray-500"><%= p.getNombor_telefon() %></td>
                             <td class="p-4 text-center">
-                                <button onclick="openEditModal('<%= p.getIdPengguna() %>', '<%= p.getNamaLengkap() %>', '<%= p.getNomborKP() %>', '<%= p.getNomborTelefon() %>', '<%= p.getNamaJalan() %>', '<%= p.getBandar() %>', '<%= p.getNomborPoskod() %>', '<%= p.getNegeri() %>', '<%= p.getKataLaluan() %>')"
+                                <button onclick="openEditModal('<%= p.getId_pengguna() %>', '<%= p.getNama_penuh() %>', '<%= p.getNombor_kp() %>', '<%= p.getNombor_telefon() %>', '<%= p.getNama_jalan() %>', '<%= p.getBandar() %>', '<%= p.getNombor_poskod() %>', '<%= p.getNegeri() %>', '<%= p.getKata_laluan() %>')"
                                         class="text-[#6C5DD3] hover:bg-purple-50 p-2 rounded-lg transition">
                                     <i class="fas fa-edit"></i>
                                 </button>
@@ -142,6 +142,7 @@
     </div>
 
 </div> 
+
 <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
     <div class="flex justify-between items-start mb-8">
         <h3 class="font-bold text-lg text-gray-800">Statistik</h3>
@@ -250,9 +251,7 @@
 </div>
 
 <script>
-    // Tab Logic
     function switchTab(tabName) {
-        // Update Buttons
         document.querySelectorAll('nav button').forEach(btn => {
             btn.classList.remove('border-[#6C5DD3]', 'text-[#6C5DD3]');
             btn.classList.add('border-transparent', 'text-gray-500');
@@ -260,13 +259,11 @@
         document.getElementById('tab-' + tabName).classList.add('border-[#6C5DD3]', 'text-[#6C5DD3]');
         document.getElementById('tab-' + tabName).classList.remove('border-transparent', 'text-gray-500');
 
-        // Update Content
         document.getElementById('content-pending').classList.add('hidden');
         document.getElementById('content-active').classList.add('hidden');
         document.getElementById('content-' + tabName).classList.remove('hidden');
     }
 
-    // Search Logic
     document.getElementById('searchActive').addEventListener('keyup', function() {
         let val = this.value.toLowerCase();
         let rows = document.querySelectorAll('#tableActive tbody tr');
@@ -277,16 +274,15 @@
         });
     });
 
-    // Modal Logic
     function openEditModal(id, nama, kp, tel, jalan, bandar, poskod, negeri, pass) {
         document.getElementById('editId').value = id;
         document.getElementById('editNama').value = nama;
         document.getElementById('editKP').value = kp;
         document.getElementById('editTel').value = tel;
         document.getElementById('editJalan').value = jalan;
-        document.getElementById('editBandar').value = (bandar === 'null' || bandar === '-') ? '' : bandar;
-        document.getElementById('editPoskod').value = (poskod === 'null' || poskod === '-') ? '' : poskod;
-        document.getElementById('editNegeri').value = (negeri === 'null' || negeri === '-') ? 'Kelantan' : negeri;
+        document.getElementById('editBandar').value = (bandar === 'null' || bandar === '-' || bandar === '') ? '' : bandar;
+        document.getElementById('editPoskod').value = (poskod === 'null' || poskod === '-' || poskod === '') ? '' : poskod;
+        document.getElementById('editNegeri').value = (negeri === 'null' || negeri === '-' || negeri === '') ? 'Kelantan' : negeri;
         document.getElementById('editPass').value = pass;
         
         document.getElementById('modalEdit').classList.remove('hidden');

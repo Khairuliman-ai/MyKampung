@@ -201,4 +201,42 @@ public class PenggunaDAO {
 
         return p;
     }
+    
+    public List<Pengguna> getPendingPenduduk() {
+    List<Pengguna> senarai = new ArrayList<>();
+    // Query untuk mencari pengguna status 2 yang mempunyai peranan Penduduk (ID 4)
+    String sql = "SELECT p.*, r.nama_peranan FROM pengguna p "
+               + "JOIN pengguna_peranan pp ON p.id_pengguna = pp.id_pengguna "
+               + "JOIN peranan r ON pp.id_peranan = r.id_peranan "
+               + "WHERE p.status = 2 AND r.id_peranan = 4";
+
+    try (PreparedStatement ps = conn.prepareStatement(sql); 
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+            // Menggunakan helper method mapResultSetToPengguna yang anda sudah ada
+            senarai.add(mapResultSetToPengguna(rs));
+        }
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return senarai;
+}
+    
+public boolean updateStatus(int idPengguna, int statusBaru) {
+    // Query untuk mengemaskini status berdasarkan ID pengguna 
+    String sql = "UPDATE pengguna SET status = ?, dikemaskini_pada = CURRENT_TIMESTAMP WHERE id_pengguna = ?";
+    
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, statusBaru);
+        ps.setInt(2, idPengguna);
+        
+        // Memulangkan true jika baris berjaya dikemaskini
+        return ps.executeUpdate() > 0;
+    } catch (SQLException e) {
+        e.printStackTrace();
+        return false;
+    }
+}
+    
 }
