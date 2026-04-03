@@ -118,10 +118,8 @@
                         </h4>
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="md:col-span-2">
-                                <label class="block text-xs font-bold text-gray-500 mb-2">Nama Penuh (Seperti MyKad)</label>
-                                <input type="text" name="nama_penuh" value="<%= pDetail.getNama_penuh()%>" required placeholder="000000-00-0000" 
-       oninput="formatIC(this)" 
-       maxlength="14"
+                                <label class="block text-xs font-bold text-gray-500 mb-2">Nama Penuh</label>
+                                <input type="text" name="nama_penuh" value="<%= pDetail.getNama_penuh()%>" required placeholder=" Nama seperti dalam MyKad" 
                                        class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
                             </div>
                             <div>
@@ -132,7 +130,7 @@
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-2">No. Telefon</label>
                                 <input type="text" name="nombor_telefon" value="<%= pDetail.getNombor_telefon()%>" required oninput="formatPhoneNumber(this)" 
-                                       maxlength="13" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
+                                       maxlength="13" placeholder="Contoh: 012-6047 0421" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
                             </div>
                         </div>
                     </div>

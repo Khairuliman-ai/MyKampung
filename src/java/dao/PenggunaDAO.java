@@ -96,6 +96,8 @@ public class PenggunaDAO {
                     user.setNombor_kp(rs.getString("nombor_kp"));
                     user.setNombor_telefon(rs.getString("nombor_telefon"));
                     user.setTarikh_lahir(rs.getDate("tarikh_lahir"));
+                     user.setPekerjaan(rs.getString("pekerjaan"));
+                      user.setPendapatan(rs.getBigDecimal("pendapatan"));
                     user.setKata_laluan(rs.getString("kata_laluan"));
                     user.setNama_jalan(rs.getString("nama_jalan"));
                     user.setNombor_poskod(rs.getString("nombor_poskod"));

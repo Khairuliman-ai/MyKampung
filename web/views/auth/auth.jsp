@@ -224,8 +224,8 @@
                 </div>
             <% } %>
 
-            <input type="text" name="nombor_kp" class="form-control" placeholder="Contoh: 000000-00-0000" 
-       oninput="formatIC(this)" 
+            <input type="text" name="nombor_kp" class="form-control" placeholder="Contoh: 900502-11-4032" 
+       oninput="formatIC(this)"
        maxlength="14" required>
             <input type="password" name="kata_laluan" class="form-control" placeholder="Kata Laluan" required>
 
