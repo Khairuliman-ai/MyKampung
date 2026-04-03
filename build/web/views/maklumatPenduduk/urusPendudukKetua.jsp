@@ -56,21 +56,22 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <% 
-                        List<Pengguna> listJKKK = (List<Pengguna>) request.getAttribute("listJKKK");
+                        // Sesuai dengan request.setAttribute("listAJK", listAJK) di Servlet
+                        List<Pengguna> listJKKK = (List<Pengguna>) request.getAttribute("listAJK");
                         if (listJKKK != null && !listJKKK.isEmpty()) {
                             for (Pengguna p : listJKKK) { 
                         %>
                         <tr class="hover:bg-purple-50/30 transition">
                             <td class="p-4 text-sm font-bold text-gray-800 flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-[#6C5DD3] flex items-center justify-center text-xs font-bold">
-                                    <%= p.getNamaLengkap().substring(0,1) %>
+                                    <%= (p.getNama_penuh() != null) ? p.getNama_penuh().substring(0,1).toUpperCase() : "U" %>
                                 </div>
-                                <%= p.getNamaLengkap() %>
+                                <%= p.getNama_penuh() %>
                             </td>
-                            <td class="p-4 text-sm text-gray-600 font-mono"><%= p.getNomborKP() %></td>
-                            <td class="p-4 text-sm text-gray-500"><%= p.getNomborTelefon() %></td>
+                            <td class="p-4 text-sm text-gray-600 font-mono"><%= p.getNombor_kp() %></td>
+                            <td class="p-4 text-sm text-gray-500"><%= p.getNombor_telefon() %></td>
                             <td class="p-4 text-center">
-                                <button onclick="openEditModal('<%= p.getIdPengguna() %>', '<%= p.getNamaLengkap() %>', '<%= p.getNomborKP() %>', '<%= p.getNomborTelefon() %>', '<%= p.getNamaJalan() %>', '<%= p.getBandar() %>', '<%= p.getNomborPoskod() %>', '<%= p.getNegeri() %>', '<%= p.getKataLaluan() %>')"
+                                <button onclick="openEditModal('<%= p.getId_pengguna() %>', '<%= p.getNama_penuh() %>', '<%= p.getNombor_kp() %>', '<%= p.getNombor_telefon() %>', '<%= p.getNama_jalan() %>', '<%= p.getBandar() %>', '<%= p.getNombor_poskod() %>', '<%= p.getNegeri() %>', '<%= p.getKata_laluan() %>')"
                                         class="bg-purple-50 text-[#6C5DD3] hover:bg-[#6C5DD3] hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">
                                     <i class="fas fa-edit"></i> Edit
                                 </button>
@@ -86,7 +87,6 @@
     </div>
 
     <div id="content-penduduk" class="hidden">
-        
         <div class="mb-4">
             <div class="relative">
                 <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
@@ -114,12 +114,12 @@
                             for (Pengguna p : listPenduduk) { 
                         %>
                         <tr class="hover:bg-gray-50/50 transition">
-                            <td class="p-4 text-sm font-bold text-gray-800 search-col"><%= p.getNamaLengkap() %></td>
-                            <td class="p-4 text-sm text-gray-600 search-col"><%= p.getNomborKP() %></td>
-                            <td class="p-4 text-sm text-gray-500 max-w-xs truncate search-col"><%= p.getAlamat() %></td>
-                            <td class="p-4 text-sm text-gray-500"><%= p.getNomborTelefon() %></td>
+                            <td class="p-4 text-sm font-bold text-gray-800 search-col"><%= p.getNama_penuh() %></td>
+                            <td class="p-4 text-sm text-gray-600 search-col"><%= p.getNombor_kp() %></td>
+                            <td class="p-4 text-sm text-gray-500 max-w-xs truncate search-col"><%= p.getNama_jalan() %></td>
+                            <td class="p-4 text-sm text-gray-500"><%= p.getNombor_telefon() %></td>
                             <td class="p-4 text-center">
-                                <button onclick="openEditModal('<%= p.getIdPengguna() %>', '<%= p.getNamaLengkap() %>', '<%= p.getNomborKP() %>', '<%= p.getNomborTelefon() %>', '<%= p.getNamaJalan() %>', '<%= p.getBandar() %>', '<%= p.getNomborPoskod() %>', '<%= p.getNegeri() %>', '<%= p.getKataLaluan() %>')"
+                                <button onclick="openEditModal('<%= p.getId_pengguna() %>', '<%= p.getNama_penuh() %>', '<%= p.getNombor_kp() %>', '<%= p.getNombor_telefon() %>', '<%= p.getNama_jalan() %>', '<%= p.getBandar() %>', '<%= p.getNombor_poskod() %>', '<%= p.getNegeri() %>', '<%= p.getKata_laluan() %>')"
                                         class="text-gray-400 hover:text-[#6C5DD3] transition">
                                     <i class="fas fa-pencil-alt"></i>
                                 </button>
@@ -135,11 +135,9 @@
     </div>
 
 </div> 
-<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
-    <div class="flex justify-between items-start mb-8">
-        <h3 class="font-bold text-lg text-gray-800">Statistik Organisasi</h3>
-    </div>
 
+<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
+    <h3 class="font-bold text-lg text-gray-800 mb-8">Statistik Organisasi</h3>
     <div class="space-y-4">
         <div class="bg-purple-50 p-4 rounded-2xl flex items-center gap-4 border border-purple-100">
             <div class="w-10 h-10 bg-purple-100 text-[#6C5DD3] rounded-full flex items-center justify-center font-bold">
@@ -150,7 +148,6 @@
                 <h4 class="font-bold text-xl text-gray-800"><%= (listJKKK != null) ? listJKKK.size() : 0 %></h4>
             </div>
         </div>
-
         <div class="bg-blue-50 p-4 rounded-2xl flex items-center gap-4 border border-blue-100">
             <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold">
                 <i class="fas fa-users"></i>
@@ -161,83 +158,41 @@
             </div>
         </div>
     </div>
-
-    <div class="mt-auto bg-gray-50 rounded-2xl p-6 border border-gray-100">
-        <h4 class="font-bold text-gray-700 mb-2 text-sm">Struktur Organisasi</h4>
-        <p class="text-xs text-gray-500 leading-relaxed mb-4">
-            Pastikan setiap biro mempunyai wakil AJK yang aktif untuk kelancaran pentadbiran kampung.
-        </p>
-        <button class="w-full bg-white border border-gray-200 text-gray-600 py-2 rounded-xl text-xs font-bold hover:bg-gray-100 transition">
-            Lihat Carta Organisasi
-        </button>
-    </div>
 </aside>
 
 <div id="modalLantik" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalLantik')"></div>
-
-    <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-            
-            <div class="bg-[#6C5DD3] px-4 py-4 sm:px-6">
-                <h3 class="text-base font-bold leading-6 text-white flex items-center gap-2">
-                    <i class="fas fa-user-plus"></i> Lantik AJK Baru
-                </h3>
+    <div class="flex min-h-full items-center justify-center p-4">
+        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:w-full sm:max-w-lg">
+            <div class="bg-[#6C5DD3] px-6 py-4">
+                <h3 class="font-bold text-white flex items-center gap-2"><i class="fas fa-user-plus"></i> Lantik AJK Baru</h3>
             </div>
-
-            <form action="<%= request.getContextPath() %>/ketua/lantik" method="post">
-                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                    <div class="bg-blue-50 text-blue-700 p-3 rounded-xl text-xs flex gap-2 items-start mb-4">
-                        <i class="fas fa-info-circle mt-0.5"></i>
-                        <p>Akaun ini akan mempunyai akses Pentadbir sebagai AJK .</p>
+            <form action="<%= request.getContextPath() %>/ketua/lantik" method="post" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Nama Penuh</label>
+                    <input type="text" name="namaLengkap" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">No. KP</label>
+                        <input type="text" name="nomborKP" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
                     </div>
-
-                    <div class="space-y-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Jawatan / Biro</label>
-                            <div class="relative">
-                                <select name="jenisAJK" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm appearance-none cursor-pointer">
-                                    <option value="Setiausaha">Setiausaha</option>
-                                    <option value="Bendahari">Bendahari</option>
-                                    <option value="AJK Biro Kebajikan">AJK Biro Kebajikan</option>
-                                    <option value="AJK Biro Keselamatan">AJK Biro Keselamatan</option>
-                                    <option value="AJK Biro Pendidikan">AJK Biro Pendidikan</option>
-                                    <option value="AJK Biro Pembangunan">AJK Biro Pembangunan</option>
-                                    <option value="AJK Biro Agama">AJK Biro Agama</option>
-                                    <option value="AJK Biasa" selected>AJK Biasa</option>
-                                </select>
-                                <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
-                                    <i class="fas fa-chevron-down text-xs"></i>
-                                </div>
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Nama Penuh</label>
-                            <input type="text" name="namaLengkap" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                        </div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1">No. KP</label>
-                                <input type="text" name="nomborKP" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-1">No. Telefon</label>
-                                <input type="text" name="nomborTelefon" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                            </div>
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Alamat Ringkas</label>
-                            <input type="text" name="alamat" placeholder="Contoh: Kg. Danan" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Kata Laluan Sementara</label>
-                            <input type="text" name="kataLaluan" value="jkkk123" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                        </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">No. Telefon</label>
+                        <input type="text" name="nomborTelefon" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
                     </div>
                 </div>
-                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 gap-2">
-                    <button type="submit" class="inline-flex w-full justify-center rounded-xl bg-[#6C5DD3] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#5b4eb8] sm:ml-3 sm:w-auto">Lantik</button>
-                    <button type="button" class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto" onclick="closeModal('modalLantik')">Batal</button>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Alamat Ringkas</label>
+                    <input type="text" name="alamat" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-1">Kata Laluan Sementara</label>
+                    <input type="text" name="kataLaluan" value="jkkk123" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                </div>
+                <div class="flex flex-row-reverse gap-2 pt-4">
+                    <button type="submit" class="bg-[#6C5DD3] text-white px-6 py-2 rounded-xl font-bold text-sm">Lantik</button>
+                    <button type="button" onclick="closeModal('modalLantik')" class="text-gray-500 px-6 py-2">Batal</button>
                 </div>
             </form>
         </div>
@@ -246,58 +201,46 @@
 
 <div id="modalEdit" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalEdit')"></div>
-
-    <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
-            
-            <div class="bg-gray-50 px-4 py-4 sm:px-6 border-b border-gray-100">
-                <h3 class="text-base font-bold leading-6 text-gray-900 flex items-center gap-2">
-                    <i class="fas fa-user-edit text-[#6C5DD3]"></i> Kemaskini Maklumat
-                </h3>
+    <div class="flex min-h-full items-center justify-center p-4">
+        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:w-full sm:max-w-2xl">
+            <div class="bg-gray-50 px-6 py-4 border-b border-gray-100">
+                <h3 class="font-bold text-gray-900 flex items-center gap-2"><i class="fas fa-user-edit text-[#6C5DD3]"></i> Kemaskini Maklumat</h3>
             </div>
-
-            <form action="<%= request.getContextPath() %>/ketua/update" method="post">
+            <form action="<%= request.getContextPath() %>/ketua/update" method="post" class="p-6">
                 <input type="hidden" name="idPengguna" id="editId">
-                
-                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Nama Penuh</label>
-                            <input type="text" name="namaLengkap" id="editNama" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">No. KP</label>
-                            <input type="text" name="nomborKP" id="editKP" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">No. Telefon</label>
-                            <input type="text" name="nomborTelefon" id="editTel" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Kata Laluan</label>
-                            <input type="text" name="kataLaluan" id="editPass" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                        </div>
-
-                        <div class="md:col-span-2 border-t border-gray-100 my-2"></div>
-                        <h4 class="md:col-span-2 text-xs font-bold text-[#6C5DD3] uppercase">Alamat</h4>
-
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Jalan / No. Rumah</label>
-                            <input type="text" name="namaJalan" id="editJalan" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Poskod</label>
-                            <input type="text" name="nomborPoskod" id="editPoskod" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-1">Bandar</label>
-                            <input type="text" name="bandar" id="editBandar" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                        </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Nama Penuh</label>
+                        <input type="text" name="namaLengkap" id="editNama" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">No. KP</label>
+                        <input type="text" name="nomborKP" id="editKP" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">No. Telefon</label>
+                        <input type="text" name="nomborTelefon" id="editTel" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Kata Laluan</label>
+                        <input type="text" name="kataLaluan" id="editPass" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                    </div>
+                    <div class="md:col-span-2">
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Jalan / No. Rumah</label>
+                        <input type="text" name="namaJalan" id="editJalan" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Poskod</label>
+                        <input type="text" name="nomborPoskod" id="editPoskod" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Bandar</label>
+                        <input type="text" name="bandar" id="editBandar" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
                     </div>
                 </div>
-                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 gap-2">
-                    <button type="submit" class="inline-flex w-full justify-center rounded-xl bg-[#6C5DD3] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#5b4eb8] sm:ml-3 sm:w-auto">Simpan</button>
-                    <button type="button" class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto" onclick="closeModal('modalEdit')">Batal</button>
+                <div class="flex flex-row-reverse gap-2 pt-6">
+                    <button type="submit" class="bg-[#6C5DD3] text-white px-6 py-2 rounded-xl font-bold text-sm">Simpan</button>
+                    <button type="button" onclick="closeModal('modalEdit')" class="text-gray-500 px-6 py-2">Batal</button>
                 </div>
             </form>
         </div>
@@ -305,31 +248,20 @@
 </div>
 
 <script>
-    // Tab Switching
     function switchTab(tabName) {
-        // Reset Buttons
         document.querySelectorAll('nav button').forEach(btn => {
             btn.classList.remove('border-[#6C5DD3]', 'text-[#6C5DD3]');
             btn.classList.add('border-transparent', 'text-gray-500');
         });
-        // Activate Button
         document.getElementById('tab-' + tabName).classList.add('border-[#6C5DD3]', 'text-[#6C5DD3]');
         document.getElementById('tab-' + tabName).classList.remove('border-transparent', 'text-gray-500');
-
-        // Toggle Content
         document.getElementById('content-jkkk').classList.add('hidden');
         document.getElementById('content-penduduk').classList.add('hidden');
         document.getElementById('content-' + tabName).classList.remove('hidden');
     }
 
-    // Modal Functions
-    function openModal(modalId) {
-        document.getElementById(modalId).classList.remove('hidden');
-    }
-
-    function closeModal(modalId) {
-        document.getElementById(modalId).classList.add('hidden');
-    }
+    function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
+    function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
 
     function openEditModal(id, nama, kp, tel, jalan, bandar, poskod, negeri, pass) {
         document.getElementById('editId').value = id;
@@ -339,12 +271,10 @@
         document.getElementById('editJalan').value = jalan;
         document.getElementById('editBandar').value = (bandar === 'null' || bandar === '-') ? '' : bandar;
         document.getElementById('editPoskod').value = (poskod === 'null' || poskod === '-') ? '' : poskod;
-        document.getElementById('editPass').value = pass;
-        
+        document.getElementById('editPass').value = (pass === 'null') ? '' : pass;
         openModal('modalEdit');
     }
 
-    // Search Filter
     document.getElementById('searchPenduduk').addEventListener('keyup', function() {
         let val = this.value.toLowerCase();
         let rows = document.querySelectorAll('#tablePenduduk tbody tr');

@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PenggunaDAO {
+
     private Connection conn;
 
     public PenggunaDAO(Connection conn) {
@@ -13,15 +14,15 @@ public class PenggunaDAO {
     }
 
     /**
-     * Mendaftar pengguna baru (Penduduk) dengan status Pending (2).
-     * Menggunakan Transaction untuk insert ke table pengguna & pengguna_peranan.
+     * Mendaftar pengguna baru (Penduduk) dengan status Pending (2). Menggunakan
+     * Transaction untuk insert ke table pengguna & pengguna_peranan.
      */
     public boolean daftarPengguna(Pengguna u) {
         boolean success = false;
-        String sqlUser = "INSERT INTO pengguna (nama_penuh, nombor_kp, nombor_telefon, kata_laluan, " +
-                         "nama_jalan, nombor_poskod, bandar, negeri, tarikh_lahir, " +
-                         "lampiran_pengesahan, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
-        
+        String sqlUser = "INSERT INTO pengguna (nama_penuh, nombor_kp, nombor_telefon, kata_laluan, "
+                + "nama_jalan, nombor_poskod, bandar, negeri, tarikh_lahir, "
+                + "lampiran_pengesahan, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
         String sqlRole = "INSERT INTO pengguna_peranan (id_pengguna, id_peranan) VALUES (?, ?)";
 
         try {
@@ -48,7 +49,7 @@ public class PenggunaDAO {
                     ResultSet rs = ps1.getGeneratedKeys();
                     if (rs.next()) {
                         int newUserId = rs.getInt(1);
-                        
+
                         try (PreparedStatement ps2 = conn.prepareStatement(sqlRole)) {
                             ps2.setInt(1, newUserId);
                             ps2.setInt(2, 3); // ID 3 biasanya untuk peranan Penduduk
@@ -75,14 +76,14 @@ public class PenggunaDAO {
      */
     public Pengguna authenticate(String kp, String password) {
         Pengguna user = null;
-        String sql = "SELECT p.*, r.nama_peranan, j.nama_jawatan " +
-                     "FROM pengguna p " +
-                     "JOIN pengguna_peranan pp ON p.id_pengguna = pp.id_pengguna " +
-                     "JOIN peranan r ON pp.id_peranan = r.id_peranan " +
-                     "LEFT JOIN ajk_jawatan aj ON p.id_pengguna = aj.id_pengguna " +
-                     "LEFT JOIN jawatan_ajk j ON aj.id_jawatan = j.id_jawatan " +
-                     "WHERE p.nombor_kp = ? AND p.kata_laluan = ? AND p.status = 1 " +
-                     "ORDER BY r.id_peranan ASC LIMIT 1";
+        String sql = "SELECT p.*, r.nama_peranan, j.nama_jawatan "
+                + "FROM pengguna p "
+                + "JOIN pengguna_peranan pp ON p.id_pengguna = pp.id_pengguna "
+                + "JOIN peranan r ON pp.id_peranan = r.id_peranan "
+                + "LEFT JOIN ajk_jawatan aj ON p.id_pengguna = aj.id_pengguna "
+                + "LEFT JOIN jawatan_ajk j ON aj.id_jawatan = j.id_jawatan "
+                + "WHERE p.nombor_kp = ? AND p.kata_laluan = ? AND p.status = 1 "
+                + "ORDER BY r.id_peranan ASC LIMIT 1";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, kp);
@@ -96,8 +97,8 @@ public class PenggunaDAO {
                     user.setNombor_kp(rs.getString("nombor_kp"));
                     user.setNombor_telefon(rs.getString("nombor_telefon"));
                     user.setTarikh_lahir(rs.getDate("tarikh_lahir"));
-                     user.setPekerjaan(rs.getString("pekerjaan"));
-                      user.setPendapatan(rs.getBigDecimal("pendapatan"));
+                    user.setPekerjaan(rs.getString("pekerjaan"));
+                    user.setPendapatan(rs.getBigDecimal("pendapatan"));
                     user.setKata_laluan(rs.getString("kata_laluan"));
                     user.setNama_jalan(rs.getString("nama_jalan"));
                     user.setNombor_poskod(rs.getString("nombor_poskod"));
@@ -114,27 +115,90 @@ public class PenggunaDAO {
         }
         return user;
     }
-    
+
     public boolean updateProfil(Pengguna u) {
-    String sql = "UPDATE pengguna SET nama_penuh=?, nombor_telefon=?, nama_jalan=?, " +
-                 "nombor_poskod=?, bandar=?, negeri=?, status_keluarga=?, pekerjaan=?, pendapatan=? " +
-                 "WHERE id_pengguna=?";
-    try (PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setString(1, u.getNama_penuh());
-        ps.setString(2, u.getNombor_telefon());
-        ps.setString(3, u.getNama_jalan());
-        ps.setString(4, u.getNombor_poskod());
-        ps.setString(5, u.getBandar());
-        ps.setString(6, u.getNegeri());
-        ps.setString(7, u.getStatus_keluarga());
-        ps.setString(8, u.getPekerjaan());
-        ps.setBigDecimal(9, u.getPendapatan());
-        ps.setInt(10, u.getId_pengguna());
-        
-        return ps.executeUpdate() > 0;
-    } catch (SQLException e) {
-        e.printStackTrace();
-        return false;
+        String sql = "UPDATE pengguna SET nama_penuh=?, nombor_telefon=?, nama_jalan=?, "
+                + "nombor_poskod=?, bandar=?, negeri=?, status_keluarga=?, pekerjaan=?, pendapatan=? "
+                + "WHERE id_pengguna=?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, u.getNama_penuh());
+            ps.setString(2, u.getNombor_telefon());
+            ps.setString(3, u.getNama_jalan());
+            ps.setString(4, u.getNombor_poskod());
+            ps.setString(5, u.getBandar());
+            ps.setString(6, u.getNegeri());
+            ps.setString(7, u.getStatus_keluarga());
+            ps.setString(8, u.getPekerjaan());
+            ps.setBigDecimal(9, u.getPendapatan());
+            ps.setInt(10, u.getId_pengguna());
+
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
-}
+
+    public List<Pengguna> getAllActivePenduduk() {
+        List<Pengguna> senarai = new ArrayList<>();
+       String sql = "SELECT p.*, r.nama_peranan FROM pengguna p "
+           + "JOIN pengguna_peranan pp ON p.id_pengguna = pp.id_pengguna "
+           + "JOIN peranan r ON pp.id_peranan = r.id_peranan "
+           + "WHERE p.status = 1 AND r.id_peranan = 4"; // Guna status 0 ikut data DB anda
+
+        // JANGAN panggil DBUtil.getConnection() di sini
+        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                senarai.add(mapResultSetToPengguna(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return senarai;
+    }
+
+    public List<Pengguna> getAllAJK() {
+        List<Pengguna> senarai = new ArrayList<>();
+        String sql = "SELECT p.*, r.nama_peranan, j.nama_jawatan FROM pengguna p "
+           + "JOIN pengguna_peranan pp ON p.id_pengguna = pp.id_pengguna "
+           + "JOIN peranan r ON pp.id_peranan = r.id_peranan "
+           + "LEFT JOIN ajk_jawatan aj ON p.id_pengguna = aj.id_pengguna " // Table ajk_jawatan di page 2
+           + "LEFT JOIN jawatan_ajk j ON aj.id_jawatan = j.id_jawatan "   // Table jawatan_ajk di page 6
+           + "WHERE r.id_peranan = 3 AND p.status = 1";
+
+        // JANGAN panggil DBUtil.getConnection() di sini
+        try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                senarai.add(mapResultSetToPengguna(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return senarai;
+    }
+
+    // Helper Method (Pastikan nama method dalam model Pengguna.java sepadan)
+    private Pengguna mapResultSetToPengguna(ResultSet rs) throws SQLException {
+        Pengguna p = new Pengguna();
+        // Guna nama method yang ada dalam Pengguna.java anda (id_pengguna vs idPengguna)
+        p.setId_pengguna(rs.getInt("id_pengguna"));
+        p.setNombor_kp(rs.getString("nombor_kp"));
+        p.setNama_penuh(rs.getString("nama_penuh"));
+        p.setNombor_telefon(rs.getString("nombor_telefon"));
+        p.setNama_jalan(rs.getString("nama_jalan"));
+        p.setBandar(rs.getString("bandar"));
+        p.setNombor_poskod(rs.getString("nombor_poskod"));
+        p.setNegeri(rs.getString("negeri"));
+        p.setStatus(rs.getInt("status"));
+
+        try {
+            p.setNama_peranan(rs.getString("nama_peranan"));
+            p.setNama_jawatan(rs.getString("nama_jawatan"));
+        } catch (SQLException e) {
+        }
+
+        return p;
+    }
 }
