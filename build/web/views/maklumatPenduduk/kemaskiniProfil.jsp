@@ -13,6 +13,8 @@
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
 
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+
 <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth h-full bg-[#F7F7F9]">
 
     <header class="mb-8">
@@ -122,11 +124,18 @@
                                 <input type="text" name="nama_penuh" value="<%= pDetail.getNama_penuh()%>" required placeholder=" Nama seperti dalam MyKad" 
                                        class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
                             </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-2">No. Kad Pengenalan</label>
-                                <input type="text" value="<%= pDetail.getNombor_kp()%>" readonly
-                                       class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-400 text-sm cursor-not-allowed font-medium">
-                            </div>
+<div>
+    <label class="block text-xs font-bold text-gray-500 mb-2">No. Kad Pengenalan</label>
+    <% 
+        String icRaw = pDetail.getNombor_kp();
+        String icFormatted = (icRaw != null && icRaw.length() == 12) ? 
+            icRaw.substring(0, 6) + "-" + icRaw.substring(6, 8) + "-" + icRaw.substring(8, 12) : icRaw;
+    %>
+    <input type="text" 
+           value="<%= icFormatted %>" 
+           readonly
+           class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-400 text-sm cursor-not-allowed font-medium">
+</div>
                             <div>
                                 <label class="block text-xs font-bold text-gray-500 mb-2">No. Telefon</label>
                                 <input type="text" name="nombor_telefon" value="<%= pDetail.getNombor_telefon()%>" required oninput="formatPhoneNumber(this)" 
