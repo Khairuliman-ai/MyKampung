@@ -135,6 +135,12 @@
 
             <% } else if ("AJK Kampung".equalsIgnoreCase(role)) { %>
 
+            <a href="<%= contextPath %>/profil/view" 
+                   class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 <%= currentPath.contains("profil") ? activeClass : inactiveClass %>">
+                    <div class="w-6 text-center"><i class="fas fa-user <%= currentPath.contains("profil") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i></div>
+                    <span class="font-medium text-sm">Profil Saya</span>
+                </a>
+            
             <a href="<%= contextPath %>/penduduk/urus" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
                <%= (currentPath.contains("/penduduk/") || (currentPath.contains("urus") && !currentPath.contains("bantuan"))) ? activeClass : inactiveClass %>">
