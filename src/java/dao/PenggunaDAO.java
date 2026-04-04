@@ -192,6 +192,7 @@ public class PenggunaDAO {
         p.setNombor_poskod(rs.getString("nombor_poskod"));
         p.setNegeri(rs.getString("negeri"));
         p.setStatus(rs.getInt("status"));
+       p.setLampiran_pengesahan(rs.getString("lampiran_pengesahan"));
 
         try {
             p.setNama_peranan(rs.getString("nama_peranan"));

@@ -54,6 +54,7 @@
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">No. Kad Pengenalan</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Alamat</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">No. Telefon</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Lampiran Pengesahan</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Tindakan</th>
                         </tr>
                     </thead>
@@ -67,6 +68,15 @@
                             </td>
                             <td class="p-4 text-sm text-gray-500"><%= p.getNama_jalan() %></td>
                             <td class="p-4 text-sm text-gray-500"><%= p.getNombor_telefon() %></td>
+                             <td class="p-4 text-sm">
+    <% if (p.getLampiran_pengesahan() != null && !p.getLampiran_pengesahan().isEmpty()) { %>
+     <a href="<%= request.getContextPath() %>/file/pengguna/<%= p.getLampiran_pengesahan() %>" target="_blank">
+   Lihat Lampiran
+</a>
+    <% } else { %>
+        <span class="text-gray-400 italic text-xs">Tiada lampiran</span>
+    <% } %>
+</td>
                             <td class="p-4 text-center">
                                 <div class="flex justify-center gap-2">
                                     <form action="<%= request.getContextPath() %>/penduduk/approve" method="post">

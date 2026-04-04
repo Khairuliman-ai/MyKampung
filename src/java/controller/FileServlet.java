@@ -9,35 +9,56 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet("/file/*") // URL pattern for accessing files
+@WebServlet("/file/*")
 public class FileServlet extends HttpServlet {
 
-    // Must match the path you set in BantuanServlet
-    private static final String UPLOAD_DIR = "C:\\Users\\khayx\\OneDrive\\Documents\\SEM5_UMT\\PITA1\\MyKampungData\\lampiranBantuan";
+    private static final String BASE_PATH = "C:\\Users\\khayx\\OneDrive\\Documents\\SEM5_UMT\\PITA1\\MyKampungData\\";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         
-        // 1. Get the filename from the URL (e.g., /file/myphoto.jpg)
-        String filename = request.getPathInfo().substring(1); 
+        String pathInfo = request.getPathInfo(); 
         
-        File file = new File(UPLOAD_DIR, filename);
-
-        // 2. Check if file exists
-        if (!file.exists()) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND); // 404
+        if (pathInfo == null || pathInfo.equals("/")) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
 
-        // 3. Set content type (PDF, Image, etc.)
-        String contentType = getServletContext().getMimeType(file.getName());
-        if (contentType == null) {
-            contentType = "application/octet-stream";
+        String[] parts = pathInfo.split("/");
+        if (parts.length < 3) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
         }
-        response.setContentType(contentType);
 
-        // 4. Send file content to browser
+        String type = parts[1];      // "pengguna"
+        String filename = parts[2];  // "bukti_xxx.pdf"
+
+        String subFolder = "";
+        if ("pengguna".equals(type)) {
+            subFolder = "lampiranPengguna";
+        } else if ("bantuan".equals(type)) {
+            subFolder = "lampiranBantuan";
+        } else {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        File file = new File(BASE_PATH + subFolder, filename);
+
+        // --- SEMAK CONSOLE NETBEANS ANDA ---
+        System.out.println("=== LOG FILE SERVLET ===");
+        System.out.println("Mencari di: " + file.getAbsolutePath());
+        System.out.println("Wujud?: " + file.exists());
+        System.out.println("========================");
+
+        if (!file.exists()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND);
+            return;
+        }
+
+        String contentType = getServletContext().getMimeType(file.getName());
+        response.setContentType(contentType != null ? contentType : "application/octet-stream");
         Files.copy(file.toPath(), response.getOutputStream());
     }
 }
