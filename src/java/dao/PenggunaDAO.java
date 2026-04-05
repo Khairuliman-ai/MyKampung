@@ -17,59 +17,64 @@ public class PenggunaDAO {
      * Mendaftar pengguna baru (Penduduk) dengan status Pending (2). Menggunakan
      * Transaction untuk insert ke table pengguna & pengguna_peranan.
      */
-    public boolean daftarPengguna(Pengguna u) {
-        boolean success = false;
-        String sqlUser = "INSERT INTO pengguna (nama_penuh, nombor_kp, nombor_telefon, kata_laluan, "
-                + "nama_jalan, nombor_poskod, bandar, negeri, tarikh_lahir, "
-                + "lampiran_pengesahan, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+public boolean daftarPengguna(Pengguna u) {
+    boolean success = false;
+    String sqlUser = "INSERT INTO pengguna (nama_penuh, nombor_kp, nombor_telefon, kata_laluan, "
+            + "nama_jalan, nombor_poskod, bandar, negeri, tarikh_lahir, "
+            + "lampiran_pengesahan, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
-        String sqlRole = "INSERT INTO pengguna_peranan (id_pengguna, id_peranan) VALUES (?, ?)";
+    String sqlRole = "INSERT INTO pengguna_peranan (id_pengguna, id_peranan) VALUES (?, ?)";
 
-        try {
-            // Mulakan Transaction
-            conn.setAutoCommit(false);
+    try {
+        // Mulakan Transaction - sangat penting supaya jika ps2 gagal, ps1 tidak akan disimpan
+        conn.setAutoCommit(false);
 
-            try (PreparedStatement ps1 = conn.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS)) {
-                ps1.setString(1, u.getNama_penuh());
-                ps1.setString(2, u.getNombor_kp());
-                ps1.setString(3, u.getNombor_telefon());
-                ps1.setString(4, u.getKata_laluan());
-                ps1.setString(5, u.getNama_jalan());
-                ps1.setString(6, u.getNombor_poskod());
-                ps1.setString(7, u.getBandar());
-                ps1.setString(8, u.getNegeri());
-                ps1.setDate(9, new java.sql.Date(u.getTarikh_lahir().getTime()));
-                ps1.setString(10, u.getLampiran_pengesahan());
-                ps1.setInt(11, u.getStatus()); // Nilai 2 (Pending) dari Servlet
+        try (PreparedStatement ps1 = conn.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS)) {
+            ps1.setString(1, u.getNama_penuh());
+            ps1.setString(2, u.getNombor_kp());
+            ps1.setString(3, u.getNombor_telefon());
+            ps1.setString(4, u.getKata_laluan());
+            ps1.setString(5, u.getNama_jalan());
+            ps1.setString(6, u.getNombor_poskod());
+            ps1.setString(7, u.getBandar());
+            ps1.setString(8, u.getNegeri());
+            ps1.setDate(9, new java.sql.Date(u.getTarikh_lahir().getTime()));
+            ps1.setString(10, u.getLampiran_pengesahan());
+            ps1.setInt(11, u.getStatus()); // Nilai 2 (Pending) dari Servlet
 
-                int rows = ps1.executeUpdate();
+            int rows = ps1.executeUpdate();
 
-                if (rows > 0) {
-                    // Dapatkan ID pengguna yang baru di-generate
-                    ResultSet rs = ps1.getGeneratedKeys();
-                    if (rs.next()) {
-                        int newUserId = rs.getInt(1);
+            if (rows > 0) {
+                // Ambil ID pengguna yang baru dicipta oleh database (Auto Increment)
+                ResultSet rs = ps1.getGeneratedKeys();
+                if (rs.next()) {
+                    int newUserId = rs.getInt(1);
 
-                        try (PreparedStatement ps2 = conn.prepareStatement(sqlRole)) {
-                            ps2.setInt(1, newUserId);
-                            ps2.setInt(2, 3); // ID 3 biasanya untuk peranan Penduduk
-                            ps2.executeUpdate();
-                        }
+                    try (PreparedStatement ps2 = conn.prepareStatement(sqlRole)) {
+                        ps2.setInt(1, newUserId);
+                        // KEMASKINI: Tukar kepada 4 mengikut table 'peranan' anda (ID 4 = Penduduk)
+                        ps2.setInt(2, 4); 
+                        ps2.executeUpdate();
                     }
-                    conn.commit(); // Simpan semua perubahan
-                    success = true;
                 }
-            } catch (SQLException e) {
-                conn.rollback(); // Batalkan jika ada ralat
-                e.printStackTrace();
-            } finally {
-                conn.setAutoCommit(true);
+                
+                // Jika sampai ke sini tanpa ralat, barulah simpan data secara kekal
+                conn.commit(); 
+                success = true;
             }
         } catch (SQLException e) {
+            // Jika ps1 atau ps2 gagal, batalkan kemasukan data pengguna
+            conn.rollback(); 
             e.printStackTrace();
+        } finally {
+            // Sentiasa set semula auto-commit supaya tidak mengganggu method lain
+            conn.setAutoCommit(true);
         }
-        return success;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return success;
+}
 
     /**
      * Authenticate pengguna (Hanya status 1/Aktif dibenarkan masuk).
