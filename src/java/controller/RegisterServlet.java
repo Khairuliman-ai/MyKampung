@@ -18,12 +18,12 @@ import javax.servlet.http.Part;
 
 @WebServlet("/RegisterServlet")
 @MultipartConfig(
-    fileSizeThreshold = 1024 * 1024 * 2, // 2MB
-    maxFileSize = 1024 * 1024 * 10,      // 10MB
-    maxRequestSize = 1024 * 1024 * 50    // 50MB
+        fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+        maxFileSize = 1024 * 1024 * 10, // 10MB
+        maxRequestSize = 1024 * 1024 * 50 // 50MB
 )
 public class RegisterServlet extends HttpServlet {
-    
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         // Set encoding untuk elak ralat tulisan/simbol
@@ -35,24 +35,28 @@ public class RegisterServlet extends HttpServlet {
             String nombor_kp = request.getParameter("nombor_kp");
             String nombor_telefon = request.getParameter("nombor_telefon");
             String kata_laluan = request.getParameter("kata_laluan");
-            
+
             String nama_jalan = request.getParameter("nama_jalan");
             String nombor_poskod = request.getParameter("nombor_poskod");
             String bandar = request.getParameter("bandar");
             String negeri = request.getParameter("negeri");
 
-            // 2. Proses Muat Naik Fail PDF
+// 2. Proses Muat Naik Fail PDF
             Part filePart = request.getPart("bukti_pdf");
             String fileName = "";
-            
+
             if (filePart != null && filePart.getSize() > 0) {
                 fileName = "bukti_" + nombor_kp + "_" + System.currentTimeMillis() + ".pdf";
-                
-                // Lokasi simpanan: WebContent/uploads/bukti_penduduk
-                String uploadPath = getServletContext().getRealPath("") + File.separator + "uploads" + File.separator + "bukti_penduduk";
+
+                // TUKAR: Gunakan path yang sama dengan FileServlet anda
+                String uploadPath = "C:\\Users\\khayx\\OneDrive\\Documents\\SEM5_UMT\\PITA1\\MyKampungData\\lampiranPengguna";
+
                 File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) uploadDir.mkdirs();
-                
+                if (!uploadDir.exists()) {
+                    uploadDir.mkdirs();
+                }
+
+                // Simpan fail terus ke folder OneDrive
                 filePart.write(uploadPath + File.separator + fileName);
             }
 
@@ -84,7 +88,7 @@ public class RegisterServlet extends HttpServlet {
             // Guna DBUtil untuk dapatkan connection (Pastikan class DBUtil anda wujud)
             try (Connection conn = DBUtil.getConnection()) {
                 PenggunaDAO pDao = new PenggunaDAO(conn); // Pass connection ke constructor
-                boolean isSuccess = pDao.daftarPengguna(p); 
+                boolean isSuccess = pDao.daftarPengguna(p);
 
                 if (isSuccess) {
                     String msg = "Pendaftaran berjaya dihantar. Sila tunggu pengesahan daripada Ketua Kampung.";
