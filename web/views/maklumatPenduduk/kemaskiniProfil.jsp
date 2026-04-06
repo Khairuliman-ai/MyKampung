@@ -145,36 +145,42 @@
                     </div>
 
                     <%-- Bahagian 2: Alamat --%>
-                    <div class="mb-8">
-                        <h4 class="text-sm font-bold text-[#6C5DD3] uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">
-                            2. Alamat Tempat Tinggal
-                        </h4>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div class="md:col-span-3">
-                                <label class="block text-xs font-bold text-gray-500 mb-2">Nama Jalan / No. Rumah</label>
-                                <input type="text" name="nama_jalan" value="<%= pDetail.getNama_jalan()%>" required
-                                       class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-2">Poskod</label>
-                                <input type="text" name="nombor_poskod" value="<%= (pDetail.getNombor_poskod() != null) ? pDetail.getNombor_poskod() : ""%>"
-                                       class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-2">Bandar</label>
-                                <input type="text" name="bandar" value="<%= (pDetail.getBandar() != null) ? pDetail.getBandar() : ""%>"
-                                       class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold text-gray-500 mb-2">Negeri</label>
-                                <select name="negeri" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium">
-                                    <option value="Terengganu" <%= "Terengganu".equals(pDetail.getNegeri()) ? "selected" : ""%>>Terengganu</option>
-                                    <option value="Kelantan" <%= "Kelantan".equals(pDetail.getNegeri()) ? "selected" : ""%>>Kelantan</option>
-                                    <option value="Pahang" <%= "Pahang".equals(pDetail.getNegeri()) ? "selected" : ""%>>Pahang</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+<div class="mb-8">
+    <h4 class="text-sm font-bold text-[#6C5DD3] uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">
+        2. Alamat Tempat Tinggal
+    </h4>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="md:col-span-3">
+            <label class="block text-xs font-bold text-gray-500 mb-2">Nama Jalan / No. Rumah</label>
+            <input type="text" name="nama_jalan" value="<%= pDetail.getNama_jalan()%>" readonly
+                   class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium cursor-not-allowed">
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-gray-500 mb-2">Daerah</label>
+            <input type="text" name="daerah" value="<%= (pDetail.getDaerah() != null) ? pDetail.getDaerah() : "Selising"%>" readonly
+                   class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium cursor-not-allowed">
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-gray-500 mb-2">Poskod</label>
+            <input type="text" name="nombor_poskod" value="<%= (pDetail.getNombor_poskod() != null) ? pDetail.getNombor_poskod() : "16810"%>" readonly
+                   class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium cursor-not-allowed">
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-gray-500 mb-2">Bandar</label>
+            <input type="text" name="bandar" value="<%= (pDetail.getBandar() != null) ? pDetail.getBandar() : "Pasir Puteh"%>" readonly
+                   class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium cursor-not-allowed">
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-gray-500 mb-2">Negeri</label>
+            <input type="text" name="negeri" value="<%= (pDetail.getNegeri() != null) ? pDetail.getNegeri() : "Kelantan"%>" readonly
+                   class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium cursor-not-allowed">
+        </div>
+    </div>
+</div>
 
                     <%-- Bahagian 3: Sosio-Ekonomi --%>
                     <div class="mb-8">

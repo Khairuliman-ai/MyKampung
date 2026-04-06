@@ -123,7 +123,7 @@ public boolean daftarPengguna(Pengguna u) {
     }
 
     public boolean updateProfil(Pengguna u) {
-        String sql = "UPDATE pengguna SET nama_penuh=?, nombor_telefon=?, nama_jalan=?, daerah=? "
+        String sql = "UPDATE pengguna SET nama_penuh=?, nombor_telefon=?, nama_jalan=?, daerah=?, "
                 + "nombor_poskod=?, bandar=?, negeri=?, status_keluarga=?, pekerjaan=?, pendapatan=? "
                 + "WHERE id_pengguna=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
