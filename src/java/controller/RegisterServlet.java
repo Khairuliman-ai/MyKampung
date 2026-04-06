@@ -35,8 +35,8 @@ public class RegisterServlet extends HttpServlet {
             String nombor_kp = request.getParameter("nombor_kp");
             String nombor_telefon = request.getParameter("nombor_telefon");
             String kata_laluan = request.getParameter("kata_laluan");
-
             String nama_jalan = request.getParameter("nama_jalan");
+            String daerah = request.getParameter("daerah");
             String nombor_poskod = request.getParameter("nombor_poskod");
             String bandar = request.getParameter("bandar");
             String negeri = request.getParameter("negeri");
@@ -67,6 +67,7 @@ public class RegisterServlet extends HttpServlet {
             p.setNombor_telefon(nombor_telefon);
             p.setKata_laluan(kata_laluan);
             p.setNama_jalan(nama_jalan);
+            p.setDaerah(daerah);
             p.setNombor_poskod(nombor_poskod);
             p.setBandar(bandar);
             p.setNegeri(negeri);
@@ -98,6 +99,7 @@ public class RegisterServlet extends HttpServlet {
                     request.setAttribute("errorMessage", "Pendaftaran gagal. Nombor KP mungkin sudah berdaftar.");
                     request.getRequestDispatcher("/views/auth/auth.jsp").forward(request, response);
                 }
+                
             }
 
         } catch (Exception e) {

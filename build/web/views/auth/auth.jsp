@@ -204,7 +204,7 @@
 
     input.value = formatted;
 }
-    </script>>
+    </script>
     
     <!-- ===== LOGIN ===== -->
     <div class="form-container sign-in-container">
@@ -235,46 +235,70 @@
 
             <!-- ===== Register ===== -->
 <div class="form-container sign-up-container">
-        <form action="${pageContext.request.contextPath}/RegisterServlet" method="post" enctype="multipart/form-data" class="py-3">
+    <form action="${pageContext.request.contextPath}/RegisterServlet" method="post" enctype="multipart/form-data" class="py-3 px-4">
 
-            <h4 class="fw-bold text-center mb-1">Daftar Penduduk</h4>
-            <p class="text-muted text-center small mb-4">Sila isi butiran dengan lengkap untuk pengesahan</p>
+        <h4 class="fw-bold text-center mb-1">Daftar Penduduk</h4>
+        <p class="text-muted text-center small mb-4">Sila isi butiran dengan lengkap untuk pengesahan JKKK</p>
 
-            <input type="text" name="nama_penuh" class="form-control" placeholder="Nama Penuh (seperti MyKad)" required>
-            <input type="text" name="nombor_kp" class="form-control" placeholder="Nombor Kad Pengenalan" required>
-            <input type="text" name="nombor_tele_fon" class="form-control" placeholder="No. Telefon (cth: 0112345678)" required>
+        <div class="mb-3 text-start">
+            <label class="form-label small fw-bold text-dark">Nama Penuh (Seperti dalam MyKad):</label>
+            <input type="text" name="nama_penuh" class="form-control" placeholder="Contoh: KHAIRUL BIN ABDULLAH" required>
+        </div>
 
-            <div class="row g-2">
-                <div class="col-12">
-                    <input type="text" name="nama_jalan" class="form-control" placeholder="Alamat (No. Rumah & Nama Jalan)" required>
-                </div>
-                <div class="col-6">
-                    <input type="text" name="nombor_pos_kod" class="form-control" placeholder="Poskod" required>
-                </div>
-                <div class="col-6">
-                    <input type="text" name="bandar" class="form-control" placeholder="Bandar" required>
-                </div>
-                <div class="col-12">
-                    <select name="negeri" class="form-control" required>
-                        <option value="" disabled selected>Pilih Negeri</option>
-                        <option value="Kelantan">Kelantan</option>
-                        
-                        </select>
-                </div>
-            </div>
+        <div class="mb-3 text-start">
+            <label class="form-label small fw-bold text-dark">Nombor Kad Pengenalan:</label>
+            <input type="text" name="nombor_kp" class="form-control" placeholder="Contoh: 010203030441" required>
+            <div class="form-text" style="font-size: 10px;">Masukkan 12 digit tanpa tanda sempang (-)</div>
+        </div>
 
-            <div class="mt-2 mb-2">
-                <label class="form-label small fw-bold text-muted mb-1">Lampiran Bukti Penduduk (PDF Sahaja)</label>
-                <input type="file" name="bukti_pdf" class="form-control" accept="application/pdf" required>
+        <div class="mb-3 text-start">
+            <label class="form-label small fw-bold text-dark">Nombor Telefon:</label>
+            <input type="text" name="nombor_telefon" class="form-control" placeholder="Contoh: 0123456789" required>
+        </div>
+
+        <div class="row g-2 text-start">
+            <div class="col-12 mb-2">
+                <label class="form-label small fw-bold text-dark">Alamat (No. Rumah & Nama Jalan):</label>
+                <input type="text" name="nama_jalan" class="form-control" placeholder="Contoh: No 12, Jalan Melati" required>
             </div>
             
-            <input type="password" name="kata_laluan" class="form-control" placeholder="Cipta Kata Laluan" required>
+            <div class="col-6 mb-2">
+                <label class="form-label small fw-bold text-muted">Daerah:</label>
+                <input type="text" name="daerah" class="form-control bg-light" value="Selising" readonly required>
+            </div>
+            
+            <div class="col-6 mb-2">
+                <label class="form-label small fw-bold text-muted">Poskod:</label>
+                <input type="text" name="nombor_poskod" class="form-control bg-light" value="16810" readonly required>
+            </div>
+            
+            <div class="col-6 mb-2">
+                <label class="form-label small fw-bold text-muted">Bandar:</label>
+                <input type="text" name="bandar" class="form-control bg-light" value="Pasir Puteh" readonly required>
+            </div>
+            
+            <div class="col-6 mb-2">
+                <label class="form-label small fw-bold text-muted">Negeri:</label>
+                <input type="text" name="negeri" class="form-control bg-light" value="Kelantan" readonly required>
+            </div>
+        </div>
 
-            <button type="submit" class="btn btn-success w-100 mt-3 shadow-sm" style="background:#10b981; border:none;">
-                Hantar Pendaftaran
-            </button>
-        </form>
-    </div>
+        <div class="mt-2 mb-3 text-start">
+            <label class="form-label small fw-bold text-danger">Muat Naik Lampiran Bukti (PDF Sahaja):</label>
+            <input type="file" name="bukti_pdf" class="form-control form-control-sm" accept="application/pdf" required>
+            <div class="form-text" style="font-size: 10px;">Sila sertakan salinan MyKad atau Bil Utiliti(alamat yang dipaparkan dalam bil air atau elektrik)untuk pengesahan alamat.</div>
+        </div>
+        
+        <div class="mb-3 text-start">
+            <label class="form-label small fw-bold text-dark">Cipta Kata Laluan:</label>
+            <input type="password" name="kata_laluan" class="form-control" placeholder="Gunakan gabungan huruf dan nombor" required>
+        </div>
+
+        <button type="submit" class="btn btn-success w-100 mt-2 shadow-sm py-2" style="background:#10b981; border:none; font-weight: bold;">
+            Hantar Pendaftaran <i class="fas fa-paper-plane ms-2"></i>
+        </button>
+    </form>
+</div>
 
     <!-- ===== OVERLAY ===== -->
     <div class="overlay-container">

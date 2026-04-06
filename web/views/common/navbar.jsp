@@ -6,7 +6,7 @@
     Pengguna userNav = (Pengguna) session.getAttribute("currentUser");
 
     if (userNav == null) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        response.sendRedirect(request.getContextPath() + "/auth.jsp");
         return;
     }
     

@@ -18,6 +18,7 @@ public class Pengguna {
 
     // Alamat
     private String nama_jalan;
+    private String daerah;
     private String nombor_poskod;
     private String bandar;
     private String negeri;
@@ -124,6 +125,16 @@ public class Pengguna {
     public void setNama_jalan(String nama_jalan) {
         this.nama_jalan = nama_jalan;
     }
+
+    public String getDaerah() {
+        return daerah;
+    }
+
+    public void setDaerah(String daerah) {
+        this.daerah = daerah;
+    }
+    
+    
 
     public String getNombor_poskod() {
         return nombor_poskod;

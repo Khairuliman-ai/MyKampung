@@ -20,8 +20,8 @@ public class PenggunaDAO {
 public boolean daftarPengguna(Pengguna u) {
     boolean success = false;
     String sqlUser = "INSERT INTO pengguna (nama_penuh, nombor_kp, nombor_telefon, kata_laluan, "
-            + "nama_jalan, nombor_poskod, bandar, negeri, tarikh_lahir, "
-            + "lampiran_pengesahan, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            + "nama_jalan, daerah, nombor_poskod, bandar, negeri, tarikh_lahir, "
+            + "lampiran_pengesahan, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     String sqlRole = "INSERT INTO pengguna_peranan (id_pengguna, id_peranan) VALUES (?, ?)";
 
@@ -35,12 +35,13 @@ public boolean daftarPengguna(Pengguna u) {
             ps1.setString(3, u.getNombor_telefon());
             ps1.setString(4, u.getKata_laluan());
             ps1.setString(5, u.getNama_jalan());
-            ps1.setString(6, u.getNombor_poskod());
-            ps1.setString(7, u.getBandar());
-            ps1.setString(8, u.getNegeri());
-            ps1.setDate(9, new java.sql.Date(u.getTarikh_lahir().getTime()));
-            ps1.setString(10, u.getLampiran_pengesahan());
-            ps1.setInt(11, u.getStatus()); // Nilai 2 (Pending) dari Servlet
+            ps1.setString(6, u.getDaerah());
+            ps1.setString(7, u.getNombor_poskod());
+            ps1.setString(8, u.getBandar());
+            ps1.setString(9, u.getNegeri());
+            ps1.setDate(10, new java.sql.Date(u.getTarikh_lahir().getTime()));
+            ps1.setString(11, u.getLampiran_pengesahan());
+            ps1.setInt(12, u.getStatus()); // Nilai 2 (Pending) dari Servlet
 
             int rows = ps1.executeUpdate();
 
@@ -122,20 +123,21 @@ public boolean daftarPengguna(Pengguna u) {
     }
 
     public boolean updateProfil(Pengguna u) {
-        String sql = "UPDATE pengguna SET nama_penuh=?, nombor_telefon=?, nama_jalan=?, "
+        String sql = "UPDATE pengguna SET nama_penuh=?, nombor_telefon=?, nama_jalan=?, daerah=? "
                 + "nombor_poskod=?, bandar=?, negeri=?, status_keluarga=?, pekerjaan=?, pendapatan=? "
                 + "WHERE id_pengguna=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, u.getNama_penuh());
             ps.setString(2, u.getNombor_telefon());
             ps.setString(3, u.getNama_jalan());
-            ps.setString(4, u.getNombor_poskod());
-            ps.setString(5, u.getBandar());
-            ps.setString(6, u.getNegeri());
-            ps.setString(7, u.getStatus_keluarga());
-            ps.setString(8, u.getPekerjaan());
-            ps.setBigDecimal(9, u.getPendapatan());
-            ps.setInt(10, u.getId_pengguna());
+            ps.setString(4, u.getDaerah());
+            ps.setString(5, u.getNombor_poskod());
+            ps.setString(6, u.getBandar());
+            ps.setString(7, u.getNegeri());
+            ps.setString(8, u.getStatus_keluarga());
+            ps.setString(9, u.getPekerjaan());
+            ps.setBigDecimal(10, u.getPendapatan());
+            ps.setInt(11, u.getId_pengguna());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -193,6 +195,7 @@ public boolean daftarPengguna(Pengguna u) {
         p.setNama_penuh(rs.getString("nama_penuh"));
         p.setNombor_telefon(rs.getString("nombor_telefon"));
         p.setNama_jalan(rs.getString("nama_jalan"));
+        p.setDaerah(rs.getString("daerah"));
         p.setBandar(rs.getString("bandar"));
         p.setNombor_poskod(rs.getString("nombor_poskod"));
         p.setNegeri(rs.getString("negeri"));
