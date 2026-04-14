@@ -65,11 +65,13 @@
                     <span class="font-medium text-sm">Mohon Bantuan</span>
                 </a>
 
-                <a href="<%= constructionPage %>?menu=fasiliti" 
-                   class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= (isConstruction && query.contains("menu=fasiliti")) ? activeClass : inactiveClass %>">
-                    <div class="w-6 text-center"><i class="fas fa-building <%= (isConstruction && query.contains("menu=fasiliti")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i></div>
-                    <span class="font-medium text-sm">Fasiliti Kampung</span>
-                </a>
+             <a href="${pageContext.request.contextPath}/TempahanServlet" 
+   class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= request.getRequestURI().contains("TempahanServlet") ? activeClass : inactiveClass %>">
+    <div class="w-6 text-center">
+        <i class="fas fa-building <%= request.getRequestURI().contains("TempahanServlet") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+    </div>
+    <span class="font-medium text-sm">Fasiliti Kampung</span>
+</a>
 
                 <a href="<%= constructionPage %>?menu=aduan" 
                    class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= (isConstruction && query.contains("menu=aduan")) ? activeClass : inactiveClass %>">

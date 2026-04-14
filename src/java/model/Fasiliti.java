@@ -5,10 +5,11 @@ import java.sql.Timestamp;
 public class Fasiliti {
     private int id_fasiliti;
     private String nama_fasiliti;
-    private String kategori;
-    private Integer kapasiti; // Menggunakan Integer jenis objek supaya boleh menerima nilai null
-    private boolean ketersediaan;
+    private String lokasi;
+    private String status;
     private Timestamp dibuat_pada;
+    private Timestamp dikemaskini_pada;
+    private Timestamp dipadam_pada;
 
     // --- Constructor Kosong ---
     public Fasiliti() {}
@@ -30,28 +31,20 @@ public class Fasiliti {
         this.nama_fasiliti = nama_fasiliti;
     }
 
-    public String getKategori() {
-        return kategori;
+    public String getLokasi() {
+        return lokasi;
     }
 
-    public void setKategori(String kategori) {
-        this.kategori = kategori;
+    public void setLokasi(String lokasi) {
+        this.lokasi = lokasi;
     }
 
-    public Integer getKapasiti() {
-        return kapasiti;
+    public String getStatus() {
+        return status;
     }
 
-    public void setKapasiti(Integer kapasiti) {
-        this.kapasiti = kapasiti;
-    }
-
-    public boolean isKetersediaan() {
-        return ketersediaan;
-    }
-
-    public void setKetersediaan(boolean ketersediaan) {
-        this.ketersediaan = ketersediaan;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     public Timestamp getDibuat_pada() {
@@ -60,5 +53,21 @@ public class Fasiliti {
 
     public void setDibuat_pada(Timestamp dibuat_pada) {
         this.dibuat_pada = dibuat_pada;
+    }
+
+    public Timestamp getDikemaskini_pada() {
+        return dikemaskini_pada;
+    }
+
+    public void setDikemaskini_pada(Timestamp dikemaskini_pada) {
+        this.dikemaskini_pada = dikemaskini_pada;
+    }
+
+    public Timestamp getDipadam_pada() {
+        return dipadam_pada;
+    }
+
+    public void setDipadam_pada(Timestamp dipadam_pada) {
+        this.dipadam_pada = dipadam_pada;
     }
 }
