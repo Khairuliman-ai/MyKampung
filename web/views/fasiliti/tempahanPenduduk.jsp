@@ -1,10 +1,9 @@
 <%@page import="model.Pengguna"%>
 <%
-    // Pastikan session menggunakan kunci yang betul iaitu "currentUser"
+    // Kawalan sesi: Pastikan pengguna telah log masuk
     Pengguna pDetail = (Pengguna) session.getAttribute("currentUser");
 
     if (pDetail == null) {
-        // Jika session kosong, tendang balik ke page login
         response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp");
         return;
     }
@@ -45,14 +44,13 @@
                     <div style="margin-bottom: 15px;">
                         <label>Pilih Fasiliti / Aset:</label><br>
                         <select name="id_fasiliti" required style="width: 100%; padding: 8px;">
-    <option value="">-- Sila Pilih --</option>
-    <c:forEach var="fas" items="${senaraiFasiliti}">
-        <%-- TUKAR 'Aktif' kepada 'AKTIF' --%>
-        <c:if test="${fas.status == 'AKTIF'}">
-            <option value="${fas.id_fasiliti}">${fas.nama_fasiliti} (${fas.lokasi})</option>
-        </c:if>
-    </c:forEach>
-</select>
+                            <option value="">-- Sila Pilih --</option>
+                            <c:forEach var="fas" items="${senaraiFasiliti}">
+                                <c:if test="${fas.status == 'AKTIF'}">
+                                    <option value="${fas.id_fasiliti}">${fas.nama_fasiliti} (${fas.lokasi})</option>
+                                </c:if>
+                            </c:forEach>
+                        </select>
                     </div>
 
                     <div style="margin-bottom: 15px;">
@@ -80,8 +78,8 @@
                     <thead>
                         <tr style="background-color: #f2f2f2;">
                             <th style="padding: 12px; border-bottom: 2px solid #ddd;">Fasiliti</th>
-                            <th style="padding: 12px; border-bottom: 2px solid #ddd;">Tarikh Mula</th>
-                            <th style="padding: 12px; border-bottom: 2px solid #ddd;">Tarikh Tamat</th>
+                            <th style="padding: 12px; border-bottom: 2px solid #ddd;">Tarikh & Masa Mula</th>
+                            <th style="padding: 12px; border-bottom: 2px solid #ddd;">Masa Tamat</th>
                             <th style="padding: 12px; border-bottom: 2px solid #ddd;">Status</th>
                         </tr>
                     </thead>
@@ -96,13 +94,19 @@
                                 <c:forEach var="t" items="${senaraiTempahan}">
                                     <tr style="border-bottom: 1px solid #eee;">
                                         <td style="padding: 12px;">${t.nama_fasiliti}</td>
-                                        <td style="padding: 12px;"><fmt:formatDate value="${t.tarikh_mula}" pattern="dd/MM/yyyy h:mm a" /></td>
-                                        <td style="padding: 12px;"><fmt:formatDate value="${t.tarikh_tamat}" pattern="dd/MM/yyyy h:mm a" /></td>
+                                        
+                                        <td style="padding: 12px;">
+                                            <fmt:formatDate value="${t.tarikh_tempah}" pattern="dd/MM/yyyy" /> 
+                                            <br><small>${t.masa_mula}</small>
+                                        </td>
+                                        
+                                        <td style="padding: 12px;">${t.masa_tamat}</td>
+                                        
                                         <td style="padding: 12px;">
                                             <span style="font-weight: bold; padding: 4px 8px; border-radius: 4px; font-size: 0.9em;
-                                                  background-color: ${t.status_tempahan == 'Diluluskan' ? '#d4edda' : (t.status_tempahan == 'Ditolak' ? '#f8d7da' : '#fff3cd')};
-                                                  color: ${t.status_tempahan == 'Diluluskan' ? '#155724' : (t.status_tempahan == 'Ditolak' ? '#721c24' : '#856404')};">
-                                                ${t.status_tempahan}
+                                                  background-color: ${t.status == 'LULUS' ? '#d4edda' : (t.status == 'TOLAK' ? '#f8d7da' : '#fff3cd')};
+                                                  color: ${t.status == 'LULUS' ? '#155724' : (t.status == 'TOLAK' ? '#721c24' : '#856404')};">
+                                                ${t.status}
                                             </span>
                                         </td>
                                     </tr>
