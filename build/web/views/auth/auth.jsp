@@ -39,14 +39,14 @@
         }
 
         /* ===== FORM SIDE ===== */
-        .form-container {
-            width: 50%;
-            padding: 40px 50px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: transform 0.6s ease, opacity 0.6s ease;
-        }
+       .form-container {
+    width: 50%;
+    padding: 20px 50px; /* Kurangkan padding atas bawah sedikit */
+    display: flex;
+    align-items: flex-start; /* TUKAR dari center ke flex-start */
+    justify-content: center;
+    transition: transform 0.6s ease, opacity 0.6s ease;
+}
 
         .form-container form {
             width: 100%;
@@ -57,14 +57,17 @@
             z-index: 2;
         }
 
-        .sign-up-container {
-            position: absolute;
-            left: 0;
-            opacity: 0;
-            z-index: 1;
-            height: 100%;
-            overflow-y: auto;               /* 🔑 dynamic scroll */
-        }
+.sign-up-container {
+    position: absolute;
+    left: 0;
+    opacity: 0;
+    z-index: 1;
+    height: 100%;
+    width: 50%; /* Pastikan lebar kekal 50% */
+    overflow-y: auto; /* Membolehkan scroll */
+    padding-top: 40px; /* Beri ruang sedikit di atas */
+    padding-bottom: 40px; /* Beri ruang sedikit di bawah */
+}
 
         /* ===== ACTIVE MODE ===== */
         .auth-container.sign-up-mode .sign-in-container {

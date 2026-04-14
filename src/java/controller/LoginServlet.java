@@ -3,6 +3,8 @@ package controller;
 import dao.PenggunaDAO;
 import model.Pengguna;
 import util.DBUtil;
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -13,51 +15,103 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+/**
+ * Handles user authentication (login process).
+ * 
+ * Responsibilities:
+ * - Validate user credentials
+ * - Verify password using BCrypt
+ * - Manage user session
+ * - Redirect authenticated users to dashboard
+ */
 @WebServlet("/LoginServlet")
 public class LoginServlet extends HttpServlet {
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
-        
-        // 1. Ambil data dari form
-        String kp = request.getParameter("nombor_kp");
-        String password = request.getParameter("kata_laluan");
 
-        // 2. Bersihkan No KP (PENTING: Gunakan noKpClean selepas ini)
-        String noKpClean = (kp != null) ? kp.replaceAll("[^0-9]", "") : "";
+    /**
+     * Processes login request (POST).
+     */
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
 
         try (Connection conn = DBUtil.getConnection()) {
-            // 3. Inisialisasi DAO dengan connection
-            PenggunaDAO dao = new PenggunaDAO(conn);
-            
-            // 4. Panggil authenticate menggunakan noKpClean
-            Pengguna user = dao.authenticate(noKpClean, password);
 
-            if (user != null) {
-                // 5. Simpan objek user ke dalam session
-                HttpSession session = request.getSession();
-                session.setAttribute("currentUser", user);
-                
-                // 6. Redirect ke Dashboard
-                response.sendRedirect("DashboardServlet");
-            } else {
-                // Gagal login
-                request.setAttribute("errorMessage", "Log masuk gagal. Sila semak No. KP, Kata Laluan, atau pastikan akaun anda aktif.");
+            /*
+             * =========================
+             * 1. INPUT PROCESSING
+             * =========================
+             */
+
+            String kp = request.getParameter("nombor_kp");
+            String passwordInput = request.getParameter("kata_laluan");
+
+            // Normalize IC number by removing non-numeric characters
+            String noKpClean = (kp != null) ? kp.replaceAll("[^0-9]", "") : "";
+
+            /*
+             * =========================
+             * 2. USER AUTHENTICATION
+             * =========================
+             */
+
+            PenggunaDAO dao = new PenggunaDAO(conn);
+            Pengguna user = dao.findByKP(noKpClean);
+
+            // Validate user existence and password hash
+            boolean isAuthenticated =
+                    user != null && BCrypt.checkpw(passwordInput, user.getKata_laluan());
+
+            if (!isAuthenticated) {
+                request.setAttribute("errorMessage", "No. KP atau Kata Laluan salah.");
                 request.getRequestDispatcher("auth.jsp").forward(request, response);
+                return;
             }
+
+            /*
+             * =========================
+             * 3. ACCOUNT STATUS CHECK
+             * =========================
+             */
+
+            if (user.getStatus() != 1) {
+                request.setAttribute("errorMessage", "Akaun anda belum diaktifkan.");
+                request.getRequestDispatcher("auth.jsp").forward(request, response);
+                return;
+            }
+
+            /*
+             * =========================
+             * 4. SESSION CREATION
+             * =========================
+             */
+
+            HttpSession session = request.getSession();
+            session.setAttribute("currentUser", user);
+
+            // Redirect authenticated user to dashboard
+            response.sendRedirect("DashboardServlet");
+
         } catch (SQLException e) {
+
+            /*
+             * =========================
+             * DATABASE ERROR HANDLING
+             * =========================
+             */
+
             e.printStackTrace();
             request.setAttribute("errorMessage", "Ralat sistem pangkalan data.");
             request.getRequestDispatcher("auth.jsp").forward(request, response);
         }
     }
-    
 
-
-    
+    /**
+     * Redirects GET request to login page.
+     */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Halang akses GET secara terus ke URL ini
+
         response.sendRedirect("auth.jsp");
     }
 }

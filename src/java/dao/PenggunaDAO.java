@@ -80,47 +80,52 @@ public boolean daftarPengguna(Pengguna u) {
     /**
      * Authenticate pengguna (Hanya status 1/Aktif dibenarkan masuk).
      */
-    public Pengguna authenticate(String kp, String password) {
-        Pengguna user = null;
-        String sql = "SELECT p.*, r.nama_peranan, j.nama_jawatan "
-                + "FROM pengguna p "
-                + "JOIN pengguna_peranan pp ON p.id_pengguna = pp.id_pengguna "
-                + "JOIN peranan r ON pp.id_peranan = r.id_peranan "
-                + "LEFT JOIN ajk_jawatan aj ON p.id_pengguna = aj.id_pengguna "
-                + "LEFT JOIN jawatan_ajk j ON aj.id_jawatan = j.id_jawatan "
-                + "WHERE p.nombor_kp = ? AND p.kata_laluan = ? AND p.status = 1 "
-                + "ORDER BY r.id_peranan ASC LIMIT 1";
+/**
+ * Mencari pengguna berdasarkan No KP (Digunakan untuk Login dengan BCrypt)
+ * Mengambil maklumat peranan dan jawatan sekali.
+ */
+public Pengguna findByKP(String kp) {
+    Pengguna user = null;
+    // KEMASKINI: Buang "p.kata_laluan = ?" dari SQL
+    String sql = "SELECT p.*, r.nama_peranan, j.nama_jawatan "
+            + "FROM pengguna p "
+            + "JOIN pengguna_peranan pp ON p.id_pengguna = pp.id_pengguna "
+            + "JOIN peranan r ON pp.id_peranan = r.id_peranan "
+            + "LEFT JOIN ajk_jawatan aj ON p.id_pengguna = aj.id_pengguna "
+            + "LEFT JOIN jawatan_ajk j ON aj.id_jawatan = j.id_jawatan "
+            + "WHERE p.nombor_kp = ? " // Cari guna KP sahaja
+            + "ORDER BY r.id_peranan ASC LIMIT 1";
 
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, kp);
-            ps.setString(2, password);
+    try (PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, kp);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                if (rs.next()) {
-                    user = new Pengguna();
-                    user.setId_pengguna(rs.getInt("id_pengguna"));
-                    user.setNama_penuh(rs.getString("nama_penuh"));
-                    user.setNombor_kp(rs.getString("nombor_kp"));
-                    user.setNombor_telefon(rs.getString("nombor_telefon"));
-                    user.setTarikh_lahir(rs.getDate("tarikh_lahir"));
-                    user.setPekerjaan(rs.getString("pekerjaan"));
-                    user.setPendapatan(rs.getBigDecimal("pendapatan"));
-                    user.setKata_laluan(rs.getString("kata_laluan"));
-                    user.setNama_jalan(rs.getString("nama_jalan"));
-                    user.setNombor_poskod(rs.getString("nombor_poskod"));
-                    user.setBandar(rs.getString("bandar"));
-                    user.setNegeri(rs.getString("negeri"));
-                    user.setStatus(rs.getInt("status"));
-                    user.setLampiran_pengesahan(rs.getString("lampiran_pengesahan"));
-                    user.setNama_peranan(rs.getString("nama_peranan"));
-                    user.setNama_jawatan(rs.getString("nama_jawatan"));
-                }
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                user = new Pengguna();
+                user.setId_pengguna(rs.getInt("id_pengguna"));
+                user.setNama_penuh(rs.getString("nama_penuh"));
+                user.setNombor_kp(rs.getString("nombor_kp"));
+                user.setNombor_telefon(rs.getString("nombor_telefon"));
+                user.setTarikh_lahir(rs.getDate("tarikh_lahir"));
+                user.setPekerjaan(rs.getString("pekerjaan"));
+                user.setPendapatan(rs.getBigDecimal("pendapatan"));
+                // PENTING: Kita ambil hash kata laluan dari DB untuk disemak oleh BCrypt di Servlet
+                user.setKata_laluan(rs.getString("kata_laluan")); 
+                user.setNama_jalan(rs.getString("nama_jalan"));
+                user.setNombor_poskod(rs.getString("nombor_poskod"));
+                user.setBandar(rs.getString("bandar"));
+                user.setNegeri(rs.getString("negeri"));
+                user.setStatus(rs.getInt("status"));
+                user.setLampiran_pengesahan(rs.getString("lampiran_pengesahan"));
+                user.setNama_peranan(rs.getString("nama_peranan"));
+                user.setNama_jawatan(rs.getString("nama_jawatan"));
             }
-        } catch (SQLException e) {
-            e.printStackTrace();
         }
-        return user;
+    } catch (SQLException e) {
+        e.printStackTrace();
     }
+    return user;
+}
 
     public boolean updateProfil(Pengguna u) {
         String sql = "UPDATE pengguna SET nama_penuh=?, nombor_telefon=?, nama_jalan=?, daerah=?, "

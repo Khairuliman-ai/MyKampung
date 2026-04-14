@@ -2,7 +2,8 @@ package controller;
 
 import model.Pengguna;
 import dao.PenggunaDAO;
-import util.DBUtil; // Pastikan import DBUtil anda betul
+import util.DBUtil;
+import org.mindrot.jbcrypt.BCrypt; // 1. IMPORT PENTING
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -26,7 +27,6 @@ public class RegisterServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        // Set encoding untuk elak ralat tulisan/simbol
         request.setCharacterEncoding("UTF-8");
 
         try {
@@ -34,38 +34,34 @@ public class RegisterServlet extends HttpServlet {
             String nama_penuh = request.getParameter("nama_penuh");
             String nombor_kp = request.getParameter("nombor_kp");
             String nombor_telefon = request.getParameter("nombor_telefon");
-            String kata_laluan = request.getParameter("kata_laluan");
+            String kata_laluan_mentah = request.getParameter("kata_laluan"); // Password asal
             String nama_jalan = request.getParameter("nama_jalan");
             String daerah = request.getParameter("daerah");
             String nombor_poskod = request.getParameter("nombor_poskod");
             String bandar = request.getParameter("bandar");
             String negeri = request.getParameter("negeri");
 
-// 2. Proses Muat Naik Fail PDF
+            // 2. PROSES BCRYPT: Tukar password mentah kepada Hash
+            // Kod ini akan menghasilkan string panjang bermula dengan $2a$
+            String hashedPassword = BCrypt.hashpw(kata_laluan_mentah, BCrypt.gensalt());
+
+            // 3. Proses Muat Naik Fail PDF (Kekalkan kod sedia ada)
             Part filePart = request.getPart("bukti_pdf");
             String fileName = "";
-
             if (filePart != null && filePart.getSize() > 0) {
                 fileName = "bukti_" + nombor_kp + "_" + System.currentTimeMillis() + ".pdf";
-
-                // TUKAR: Gunakan path yang sama dengan FileServlet anda
                 String uploadPath = "C:\\Users\\khayx\\OneDrive\\Documents\\SEM5_UMT\\PITA1\\MyKampungData\\lampiranPengguna";
-
                 File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) {
-                    uploadDir.mkdirs();
-                }
-
-                // Simpan fail terus ke folder OneDrive
+                if (!uploadDir.exists()) { uploadDir.mkdirs(); }
                 filePart.write(uploadPath + File.separator + fileName);
             }
 
-            // 3. Set Data ke Model Pengguna
+            // 4. Set Data ke Model Pengguna
             Pengguna p = new Pengguna();
             p.setNama_penuh(nama_penuh);
             p.setNombor_kp(nombor_kp);
             p.setNombor_telefon(nombor_telefon);
-            p.setKata_laluan(kata_laluan);
+            p.setKata_laluan(hashedPassword); // SIMPAN HASH, BUKAN MENTAH
             p.setNama_jalan(nama_jalan);
             p.setDaerah(daerah);
             p.setNombor_poskod(nombor_poskod);
@@ -74,7 +70,7 @@ public class RegisterServlet extends HttpServlet {
             p.setLampiran_pengesahan(fileName);
             p.setStatus(2); // Pending
 
-            // Extract Tarikh Lahir
+            // Extract Tarikh Lahir (Kekalkan kod sedia ada)
             if (nombor_kp != null && nombor_kp.length() >= 6) {
                 try {
                     String datePart = nombor_kp.substring(0, 6);
@@ -85,21 +81,18 @@ public class RegisterServlet extends HttpServlet {
                 }
             }
 
-            // 4. Simpan ke Database
-            // Guna DBUtil untuk dapatkan connection (Pastikan class DBUtil anda wujud)
+            // 5. Simpan ke Database
             try (Connection conn = DBUtil.getConnection()) {
-                PenggunaDAO pDao = new PenggunaDAO(conn); // Pass connection ke constructor
+                PenggunaDAO pDao = new PenggunaDAO(conn);
                 boolean isSuccess = pDao.daftarPengguna(p);
 
                 if (isSuccess) {
                     String msg = "Pendaftaran berjaya dihantar. Sila tunggu pengesahan daripada Ketua Kampung.";
-                    // Redirect ke auth.jsp atau login.jsp mengikut struktur folder anda
                     response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp?success=" + java.net.URLEncoder.encode(msg, "UTF-8"));
                 } else {
                     request.setAttribute("errorMessage", "Pendaftaran gagal. Nombor KP mungkin sudah berdaftar.");
                     request.getRequestDispatcher("/views/auth/auth.jsp").forward(request, response);
                 }
-                
             }
 
         } catch (Exception e) {
