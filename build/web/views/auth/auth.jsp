@@ -207,31 +207,49 @@
     </script>
     
     <!-- ===== LOGIN ===== -->
-    <div class="form-container sign-in-container">
-        <form action="${pageContext.request.contextPath}/login" method="post">
+<div class="form-container sign-in-container">
+    <form action="${pageContext.request.contextPath}/login" method="post">
 
-            <div class="brand-logo">
-                <i class="bi bi-houses-fill"></i>
+        <div class="brand-logo mb-3 text-center">
+            <i class="bi bi-houses-fill" style="font-size: 2rem; color: #6C5DD3;"></i>
+        </div>
+
+        <h4 class="fw-bold text-center">Log Masuk</h4>
+        <p class="text-muted text-center small mb-4">Portal Pengurusan Kampung Danan</p>
+
+        <% if (request.getAttribute("error") != null) { %>
+            <div class="alert alert-danger alert-custom mb-3">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <%= request.getAttribute("error") %>
             </div>
+        <% } %>
+        <label class="form-label small fw-bold text-dark">Nombor Kad Pengenalan:</label>
+        <input type="text" name="nombor_kp" class="form-control mb-3" 
+               placeholder="Contoh: 900502-11-4032" 
+               oninput="formatIC(this)" maxlength="14" required>
 
-            <h4 class="fw-bold text-center">Log Masuk</h4>
-            <p class="text-muted text-center small mb-4">Portal Pengurusan Kampung Danan</p>
+        <div class="position-relative mb-3">
+            <label class="form-label small fw-bold text-dark">Kata Laluan:</label>
+            <input type="password" id="passwordField" name="kata_laluan" 
+                   class="form-control pe-5" 
+                   placeholder="Kata Laluan" required>
+            <span class="position-absolute end-0 top-50 translate-middle-y me-3 cursor-pointer text-muted" 
+                  onclick="togglePassword()" 
+                  style="z-index: 10; cursor: pointer;">
+                <i id="toggleIcon" class="bi bi-eye"></i>
+            </span>
+        </div>
 
-            <% if (request.getAttribute("error") != null) { %>
-                <div class="alert alert-danger alert-custom mb-3">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    <%= request.getAttribute("error") %>
-                </div>
-            <% } %>
+        <div class="d-flex justify-content-between align-items-center mb-4 px-1">
+          
+            <a href="#" class="text-decoration-none small fw-bold" style="color: #6C5DD3;">Lupa Kata Laluan?</a>
+        </div>
 
-            <input type="text" name="nombor_kp" class="form-control" placeholder="Contoh: 900502-11-4032" 
-       oninput="formatIC(this)"
-       maxlength="14" required>
-            <input type="password" name="kata_laluan" class="form-control" placeholder="Kata Laluan" required>
-
-            <button type="submit" class="btn btn-primary w-100 mt-2">Log Masuk</button>
-        </form>
-    </div>
+        <button type="submit" class="btn btn-primary w-100 mt-2" style="background-color: #6C5DD3; border: none;">
+            Log Masuk
+        </button>
+    </form>
+</div>
 
             <!-- ===== Register ===== -->
 <div class="form-container sign-up-container">
@@ -329,6 +347,23 @@
     signInBtn.addEventListener("click", () => {
         container.classList.remove("sign-up-mode");
     });
+</script>
+
+<script>
+function togglePassword() {
+    const passwordField = document.getElementById('passwordField');
+    const toggleIcon = document.getElementById('toggleIcon');
+    
+    if (passwordField.type === 'password') {
+        passwordField.type = 'text';
+        toggleIcon.classList.remove('bi-eye');
+        toggleIcon.classList.add('bi-eye-slash');
+    } else {
+        passwordField.type = 'password';
+        toggleIcon.classList.remove('bi-eye-slash');
+        toggleIcon.classList.add('bi-eye');
+    }
+}
 </script>
 
 </body>
