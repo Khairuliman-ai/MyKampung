@@ -2,8 +2,8 @@ package controller;
 
 import model.Bantuan;
 import dao.BantuanDAO;
-import dao.PendudukDAO;
-import model.Permohonan_Bantuan;
+
+import model.PermohonanBantuan;
 import dao.PermohonanBantuanDAO;
 import model.Pengguna;
 
@@ -15,7 +15,7 @@ import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.*;
-import model.Penduduk;
+
 
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024,
@@ -51,15 +51,15 @@ public class BantuanServlet extends HttpServlet {
             // ================== LIST ==================
             if ("/list".equals(action)) {
                 PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
-                List<Permohonan_Bantuan> list;
+                List<PermohonanBantuan> list;
 
-                if ("Penduduk".equals(user.getJawatan())) {
-                    list = pbDao.getByPenduduk(user.getIdPengguna());
+                if ("Penduduk".equals(user.getNama_jawatan())) {
+                    list = pbDao.getByPenduduk(user.getId_pengguna());
                     request.setAttribute("permohonanList", list);
                     request.getRequestDispatcher("/views/bantuan/jenisBantuan.jsp")
                             .forward(request, response);
 
-                } else if ("JKKK".equals(user.getJawatan())) {
+                } else if ("JKKK".equals(user.getNama_jawatan())) {
                     // --- TAMBAHAN BARU UNTUK JKKK ---
                     // Pastikan anda dah save kod JSP tadi sebagai 'bantuan_jkkk.jsp' di folder Web Content
                     list = pbDao.getAll(); // Atau getByStatus(0) jika ada method tu
@@ -79,9 +79,9 @@ public class BantuanServlet extends HttpServlet {
             else if ("/edit".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
                 PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
-                Permohonan_Bantuan pb = pbDao.getById(id);
+                PermohonanBantuan pb = pbDao.getById(id);
 
-                if (pb != null && pb.getIdPenduduk() == user.getIdPengguna()) {
+                if (pb != null && pb.getId_pengguna() == user.getId_pengguna()) {
                     request.setAttribute("pb", pb);
                     request.getRequestDispatcher("/views/bantuan/bantuanEdit.jsp")
                             .forward(request, response);
@@ -92,16 +92,16 @@ public class BantuanServlet extends HttpServlet {
             else if ("/rasmi".equals(action)) {
 
     // 1. Semak Adakah User Itu Penduduk
-    if (!"Penduduk".equals(user.getJawatan())) {
+    if (!"Penduduk".equals(user.getNama_jawatan())) {
         response.sendRedirect(request.getContextPath() + "/dashboard");
         return;
     }
 
     // 2. Dapatkan Data Penduduk (Untuk dapatkan idPenduduk yang betul)
-    PendudukDAO pendudukDao = new PendudukDAO();
-    Penduduk p = pendudukDao.getByIdPengguna(user.getIdPengguna());
+    
+    
 
-    if (p == null) {
+    if (false) {
         // Jika profil penduduk tak jumpa, logout atau redirect ke profile
         response.sendRedirect(request.getContextPath() + "/logout");
         return;
@@ -109,16 +109,16 @@ public class BantuanServlet extends HttpServlet {
 
     // 3. Tarik Semua Permohonan Penduduk Ini
     PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
-    List<Permohonan_Bantuan> fullList = pbDao.getByPenduduk(p.getIdPenduduk());
+    List<PermohonanBantuan> fullList = pbDao.getByPenduduk(user.getId_pengguna());
 
     // 4. [FILTER PENTING]: Ambil Bantuan Rasmi Sahaja (ID <= 20)
     // Kita buang bantuan ID 21, 22, 23, 24, 999 dari senarai ini
-    List<Permohonan_Bantuan> listRasmi = new ArrayList<>();
+    List<PermohonanBantuan> listRasmi = new ArrayList<>();
 
     if (fullList != null) {
-        for (Permohonan_Bantuan pb : fullList) {
+        for (PermohonanBantuan pb : fullList) {
             // Logik: Bantuan Rasmi ialah ID 1 hingga 20
-            if (pb.getIdBantuan() <= 20) {
+            if (pb.getId_bantuan() <= 20) {
                 listRasmi.add(pb);
             }
         }
@@ -131,16 +131,16 @@ public class BantuanServlet extends HttpServlet {
 } else if ("/komuniti".equals(action)) {
 
     // 1. Semak Adakah User Itu Penduduk
-    if (!"Penduduk".equals(user.getJawatan())) {
+    if (!"Penduduk".equals(user.getNama_jawatan())) {
         response.sendRedirect(request.getContextPath() + "/dashboard");
         return;
     }
 
     // 2. Dapatkan Data Penduduk
-    PendudukDAO pendudukDao = new PendudukDAO();
-    Penduduk p = pendudukDao.getByIdPengguna(user.getIdPengguna());
+    
+    
 
-    if (p == null) {
+    if (false) {
         // Jika profil belum lengkap, redirect ke profile atau logout
         response.sendRedirect(request.getContextPath() + "/logout");
         return;
@@ -148,13 +148,13 @@ public class BantuanServlet extends HttpServlet {
 
     // 3. Tarik Senarai Permohonan (Sejarah)
     PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
-    List<Permohonan_Bantuan> fullList = pbDao.getByPenduduk(p.getIdPenduduk());
+    List<PermohonanBantuan> fullList = pbDao.getByPenduduk(user.getId_pengguna());
 
     // Filter: Asingkan Bantuan Komuniti Sahaja (ID > 20 atau 999)
-    List<Permohonan_Bantuan> listKomuniti = new ArrayList<>();
+    List<PermohonanBantuan> listKomuniti = new ArrayList<>();
     if (fullList != null) {
-        for (Permohonan_Bantuan pb : fullList) {
-            if (pb.getIdBantuan() > 20 || pb.getIdBantuan() == 999) {
+        for (PermohonanBantuan pb : fullList) {
+            if (pb.getId_bantuan() > 20 || pb.getId_bantuan() == 999) {
                 listKomuniti.add(pb);
             }
         }
@@ -167,7 +167,7 @@ public class BantuanServlet extends HttpServlet {
     try {
         // Pastikan anda sudah buat method getBantuanKomuniti() dalam BantuanDAO
         listPilihanBantuan = bantuanDao.getBantuanKomuniti(); 
-    } catch (SQLException e) {
+    } catch (Exception e) {
         e.printStackTrace(); // Log error jika ada masalah database
     }
 
@@ -190,24 +190,24 @@ else if ("/borangDigital.jsp".equals(action)) {
 // ================== DELETE (KEMASKINI) ==================
             else if ("/delete".equals(action)) {
                 // Pastikan hanya PENDUDUK boleh delete (Security Check)
-                if ("Penduduk".equals(user.getJawatan())) {
+                if ("Penduduk".equals(user.getNama_jawatan())) {
                     PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
                     int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
 
                     // LANGKAH 1: Dapatkan info permohonan DAHULU sebelum delete
                     // Tujuannya untuk tahu ID Bantuan (Rasmi atau Komuniti)
-                    Permohonan_Bantuan pb = pbDao.getById(idPermohonan);
+                    PermohonanBantuan pb = pbDao.getById(idPermohonan);
                     
                     String redirectPage = "/bantuan/rasmi"; // Default ke rasmi
 
                     if (pb != null) {
                         // Semak jenis bantuan
-                        if (pb.getIdBantuan() > 20 || pb.getIdBantuan() == 999) {
+                        if (pb.getId_bantuan() > 20 || pb.getId_bantuan() == 999) {
                             redirectPage = "/bantuan/komuniti";
                         }
                         
                         // LANGKAH 2: Delete dari database selepas semakan
-                        pbDao.deleteByIdAndPenduduk(idPermohonan, user.getIdPengguna());
+                        pbDao.deleteByIdAndPenduduk(idPermohonan, user.getId_pengguna());
                     }
 
                     // LANGKAH 3: Redirect ke page yang betul berdasarkan semakan tadi
@@ -219,7 +219,7 @@ else if ("/borangDigital.jsp".equals(action)) {
                 }
             }
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             throw new ServletException(e);
         }
     }
@@ -250,7 +250,7 @@ else if ("/borangDigital.jsp".equals(action)) {
             PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
 
             // ===================== 1. APPLY (PENDUDUK) =====================
-            if ("/apply".equals(action) && "Penduduk".equals(user.getJawatan())) {
+            if ("/apply".equals(action) && "Penduduk".equals(user.getNama_jawatan())) {
 
                 // 1. Handle File Upload
                 Part filePart = request.getPart("dokumenSokongan");
@@ -267,13 +267,13 @@ else if ("/borangDigital.jsp".equals(action)) {
                 String jenisBantuanLain = request.getParameter("jenisBantuanLain"); // Input text khas
                 String keterangan = request.getParameter("keterangan"); // Textarea biasa
 
-                Permohonan_Bantuan pb = new Permohonan_Bantuan();
-                pb.setIdPenduduk(user.getIdPengguna());
-                pb.setDokumen(fileName);
+                PermohonanBantuan pb = new PermohonanBantuan();
+                pb.setId_pengguna(user.getId_pengguna());
+                pb.setDokumen_pemohon(fileName);
 
                 // --- LOGIC PENENTU ID & CATATAN (UPDATED ID 999) ---
                 if ("999".equals(jenisBantuan)) {
-                    pb.setIdBantuan(999); // Set ID 999
+                    pb.setId_bantuan(999); // Set ID 999
 
                     // Format: "LAIN-LAIN: [Nama Bantuan] | [Keterangan]"
                     // Simbol '|' ini PENTING supaya JSP boleh pisahkan nanti
@@ -283,21 +283,21 @@ else if ("/borangDigital.jsp".equals(action)) {
                         catatanSimpan += " | " + keterangan;
                     }
 
-                    pb.setCatatan(catatanSimpan);
+                    pb.setCatatan_pemohon(catatanSimpan);
 
                 } else {
                     // Bantuan Biasa (ID 6 - 20)
-                    pb.setIdBantuan(Integer.parseInt(jenisBantuan));
-                    pb.setCatatan(keterangan); // Simpan keterangan biasa sahaja
+                    pb.setId_bantuan(Integer.parseInt(jenisBantuan));
+                    pb.setCatatan_pemohon(keterangan); // Simpan keterangan biasa sahaja
                 }
                 // ----------------------------------------------------
 
-               pbDao.insert(pb);
+               pbDao.insertPermohonan(pb);
 
 // --- LOGIK REDIRECT PINTAR (UPDATE INI) ---
 // Jika ID Bantuan > 20 atau 999, ia adalah Bantuan Komuniti.
 // Jadi kita hantar user balik ke halaman Komuniti, bukan Rasmi.
-int idBantuanCheck = pb.getIdBantuan();
+int idBantuanCheck = pb.getId_bantuan();
 if (idBantuanCheck > 20 || idBantuanCheck == 999) {
     response.sendRedirect(request.getContextPath() + "/bantuan/komuniti?status=success");
 } else {
@@ -330,7 +330,7 @@ if (idBantuanCheck > 20 || idBantuanCheck == 999) {
             } 
 
 // ===================== 5. UPDATE MY REQUEST (EDIT) =====================
-            else if ("/updateMyRequest".equals(action) && "Penduduk".equals(user.getJawatan())) {
+            else if ("/updateMyRequest".equals(action) && "Penduduk".equals(user.getNama_jawatan())) {
 
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 String oldDokumen = request.getParameter("oldDokumen");
@@ -348,32 +348,32 @@ if (idBantuanCheck > 20 || idBantuanCheck == 999) {
                 String jenisBantuanLain = request.getParameter("jenisBantuanLain");
                 String keterangan = request.getParameter("keterangan");
 
-                Permohonan_Bantuan pb = new Permohonan_Bantuan();
-                pb.setIdPermohonan(idPermohonan);
-                pb.setDokumen(fileName);
+                PermohonanBantuan pb = new PermohonanBantuan();
+                pb.setId_permohonan_bantuan(idPermohonan);
+                pb.setDokumen_pemohon(fileName);
 
                 // --- LOGIC PENENTUAN ID BANTUAN ---
                 if ("999".equals(jenisBantuan)) {
-                    pb.setIdBantuan(999);
+                    pb.setId_bantuan(999);
 
                     String catatanSimpan = "LAIN-LAIN: " + (jenisBantuanLain != null ? jenisBantuanLain : "Lain-lain");
                     if (keterangan != null && !keterangan.trim().isEmpty()) {
                         catatanSimpan += " | " + keterangan;
                     }
-                    pb.setCatatan(catatanSimpan);
+                    pb.setCatatan_pemohon(catatanSimpan);
 
                 } else {
-                    pb.setIdBantuan(Integer.parseInt(jenisBantuan));
-                    pb.setCatatan(keterangan);
+                    pb.setId_bantuan(Integer.parseInt(jenisBantuan));
+                    pb.setCatatan_pemohon(keterangan);
                 }
                 
                 // Simpan ke database
-                pbDao.updateByPenduduk(pb);
+                pbDao.updatePermohonan(pb);
 
                 // --- LOGIK REDIRECT PINTAR (UPDATE DI SINI) ---
                 // Kita semak ID bantuan yang baru dikemaskini.
                 // Jika ID > 20 atau 999, ia adalah kategori Komuniti.
-                int idCheck = pb.getIdBantuan();
+                int idCheck = pb.getId_bantuan();
                 
                 if (idCheck > 20 || idCheck == 999) {
                     // Redirect ke Tab Komuniti
@@ -459,7 +459,7 @@ if (idBantuanCheck > 20 || idBantuanCheck == 999) {
 else if ("/tambahJenisBantuan".equals(action)) {
     
     // Security: Pastikan hanya JKKK atau Ketua Kampung boleh akses
-    String role = user.getJawatan();
+    String role = user.getNama_jawatan();
     if (!"JKKK".equals(role) && !"Ketua Kampung".equals(role)) {
         response.sendRedirect(request.getContextPath() + "/dashboard?error=denied");
         return;
@@ -470,13 +470,13 @@ else if ("/tambahJenisBantuan".equals(action)) {
     if (namaBantuan != null && !namaBantuan.trim().isEmpty()) {
         BantuanDAO bDao = new BantuanDAO();
         Bantuan b = new Bantuan();
-        b.setNamaBantuan(namaBantuan);
+        b.setNama_bantuan(namaBantuan);
         
         try {
             bDao.insertBantuan(b);
             // Redirect balik ke page list dengan success message
             response.sendRedirect(request.getContextPath() + "/bantuan/list?msg=added");
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect(request.getContextPath() + "/bantuan/list?error=db");
         }
@@ -485,7 +485,7 @@ else if ("/tambahJenisBantuan".equals(action)) {
     }
 }
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             throw new ServletException(e);
         }

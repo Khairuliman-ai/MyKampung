@@ -15,6 +15,7 @@ public class Pengguna {
     private String pekerjaan;
     private BigDecimal pendapatan;
     private String lampiran_pengesahan;
+    private String email;
 
     // Alamat
     private String nama_jalan;
@@ -217,5 +218,11 @@ public class Pengguna {
         this.lampiran_pengesahan = lampiran_pengesahan;
     }
     
-    
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
 }

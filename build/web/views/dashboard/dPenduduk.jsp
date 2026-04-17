@@ -5,7 +5,7 @@
 
     // 2. Sekuriti: Jika user cuba akses terus tanpa login
     if (user == null) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp");
         return;
     }
 %>

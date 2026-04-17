@@ -5,7 +5,7 @@
     Pengguna pDetail = (Pengguna) session.getAttribute("currentUser");
 
     if (pDetail == null) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp");
         return;
     }
 %>

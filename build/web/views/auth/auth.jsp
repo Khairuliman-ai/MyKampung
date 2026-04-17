@@ -245,7 +245,7 @@
 
         <div class="d-flex justify-content-between align-items-center mb-4 px-1">
           
-            <a href="#" class="text-decoration-none small fw-bold" style="color: #6C5DD3;">Lupa Kata Laluan?</a>
+            <a href="views/auth/forgot_password.jsp" class="text-decoration-none small fw-bold" style="color: #6C5DD3;">Lupa Kata Laluan?</a>
         </div>
 
         <button type="submit" class="btn btn-primary w-100 mt-2" style="background-color: #6C5DD3; border: none;">
@@ -275,6 +275,11 @@
         <div class="mb-3 text-start">
             <label class="form-label small fw-bold text-dark">Nombor Telefon:</label>
             <input type="text" name="nombor_telefon" class="form-control" placeholder="Contoh: 0123456789" required>
+        </div>
+
+        <div class="mb-3 text-start">
+            <label class="form-label small fw-bold text-dark">Alamat Emel:</label>
+            <input type="email" name="email" class="form-control" placeholder="Contoh: ali@gmail.com" required>
         </div>
 
         <div class="row g-2 text-start">

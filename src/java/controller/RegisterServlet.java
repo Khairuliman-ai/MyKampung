@@ -34,6 +34,7 @@ public class RegisterServlet extends HttpServlet {
             String nama_penuh = request.getParameter("nama_penuh");
             String nombor_kp = request.getParameter("nombor_kp");
             String nombor_telefon = request.getParameter("nombor_telefon");
+            String email = request.getParameter("email");
             String kata_laluan_mentah = request.getParameter("kata_laluan"); // Password asal
             String nama_jalan = request.getParameter("nama_jalan");
             String daerah = request.getParameter("daerah");
@@ -61,6 +62,7 @@ public class RegisterServlet extends HttpServlet {
             p.setNama_penuh(nama_penuh);
             p.setNombor_kp(nombor_kp);
             p.setNombor_telefon(nombor_telefon);
+            p.setEmail(email);
             p.setKata_laluan(hashedPassword); // SIMPAN HASH, BUKAN MENTAH
             p.setNama_jalan(nama_jalan);
             p.setDaerah(daerah);

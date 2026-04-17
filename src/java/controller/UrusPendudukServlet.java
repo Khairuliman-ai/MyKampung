@@ -69,7 +69,7 @@ public class UrusPendudukServlet extends HttpServlet {
                 p.setNombor_telefon(request.getParameter("nomborTelefon"));
                 p.setNama_jalan(request.getParameter("alamat"));
                 
-                penggunaDAO.lantikJKKK(p); 
+             //   penggunaDAO.lantikJKKK(p); 
                 response.sendRedirect(request.getContextPath() + "/ketua/urus?status=lantikSuccess");
             }
 
@@ -85,7 +85,7 @@ public class UrusPendudukServlet extends HttpServlet {
                 p.setNombor_poskod(request.getParameter("nomborPoskod"));
                 p.setNegeri(request.getParameter("negeri"));
 
-                penggunaDAO.updatePengguna(p);
+//                penggunaDAO.updatePengguna(p);
 
                 String redirect = action.contains("ketua") ? "/ketua/urus" : "/penduduk/urus";
                 response.sendRedirect(request.getContextPath() + redirect + "?status=updated");

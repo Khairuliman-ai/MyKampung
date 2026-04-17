@@ -17,17 +17,16 @@ public class PenggunaDAO {
      * Mendaftar pengguna baru (Penduduk) dengan status Pending (2). Menggunakan
      * Transaction untuk insert ke table pengguna & pengguna_peranan.
      */
-public boolean daftarPengguna(Pengguna u) {
+    public boolean daftarPengguna(Pengguna u) throws SQLException {
     boolean success = false;
     String sqlUser = "INSERT INTO pengguna (nama_penuh, nombor_kp, nombor_telefon, kata_laluan, "
             + "nama_jalan, daerah, nombor_poskod, bandar, negeri, tarikh_lahir, "
-            + "lampiran_pengesahan, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+            + "lampiran_pengesahan, status, email) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 
     String sqlRole = "INSERT INTO pengguna_peranan (id_pengguna, id_peranan) VALUES (?, ?)";
 
-    try {
-        // Mulakan Transaction - sangat penting supaya jika ps2 gagal, ps1 tidak akan disimpan
-        conn.setAutoCommit(false);
+    // Mulakan Transaction - sangat penting supaya jika ps2 gagal, ps1 tidak akan disimpan
+    conn.setAutoCommit(false);
 
         try (PreparedStatement ps1 = conn.prepareStatement(sqlUser, Statement.RETURN_GENERATED_KEYS)) {
             ps1.setString(1, u.getNama_penuh());
@@ -42,6 +41,7 @@ public boolean daftarPengguna(Pengguna u) {
             ps1.setDate(10, new java.sql.Date(u.getTarikh_lahir().getTime()));
             ps1.setString(11, u.getLampiran_pengesahan());
             ps1.setInt(12, u.getStatus()); // Nilai 2 (Pending) dari Servlet
+            ps1.setString(13, u.getEmail() != null ? u.getEmail() : u.getNombor_kp() + "@mykampung.com");
 
             int rows = ps1.executeUpdate();
 
@@ -66,14 +66,11 @@ public boolean daftarPengguna(Pengguna u) {
         } catch (SQLException e) {
             // Jika ps1 atau ps2 gagal, batalkan kemasukan data pengguna
             conn.rollback(); 
-            e.printStackTrace();
+            throw e;
         } finally {
             // Sentiasa set semula auto-commit supaya tidak mengganggu method lain
             conn.setAutoCommit(true);
         }
-    } catch (SQLException e) {
-        e.printStackTrace();
-    }
     return success;
 }
 
