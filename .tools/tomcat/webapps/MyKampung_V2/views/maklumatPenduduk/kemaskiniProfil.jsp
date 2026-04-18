@@ -82,6 +82,21 @@
         <i class="fas fa-exclamation-circle text-lg"></i>
         <div><span class="font-bold">Ralat!</span> Berlaku masalah semasa mengemaskini maklumat.</div>
     </div>
+    <% } else if (request.getParameter("status").equals("pass_success")) { %>
+    <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
+        <i class="fas fa-check-circle text-lg"></i>
+        <div><span class="font-bold">Berjaya!</span> Kata laluan telah dikemaskini.</div>
+    </div>
+    <% } else if (request.getParameter("status").equals("pass_error")) { %>
+    <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
+        <i class="fas fa-exclamation-circle text-lg"></i>
+        <div><span class="font-bold">Ralat!</span> Gagal menukar kata laluan.</div>
+    </div>
+    <% } else if (request.getParameter("status").equals("wrong_old_pass")) { %>
+    <div class="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
+        <i class="fas fa-exclamation-triangle text-lg"></i>
+        <div><span class="font-bold">Perhatian!</span> Kata laluan lama yang dimasukkan adalah salah.</div>
+    </div>
     <% } %>
     <% }%>
 
@@ -140,6 +155,11 @@
                                 <label class="block text-xs font-bold text-gray-500 mb-2">No. Telefon</label>
                                 <input type="text" name="nombor_telefon" value="<%= pDetail.getNombor_telefon()%>" required oninput="formatPhoneNumber(this)" 
                                        maxlength="13" placeholder="Contoh: 012-6047 0421" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 mb-2">Alamat Emel</label>
+                                <input type="email" name="email" value="<%= (pDetail.getEmail() != null) ? pDetail.getEmail() : "" %>" required 
+                                       placeholder="Contoh: ali@gmail.com" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
                             </div>
                         </div>
                     </div>
@@ -267,5 +287,49 @@
         </div>
     </div>
 </aside>
+
+<%-- Modal Tukar Kata Laluan --%>
+<div id="changePassModal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center backdrop-blur-sm">
+    <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl transform transition-all relative">
+        <button onclick="hideChangePassModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition">
+            <i class="fas fa-times text-xl"></i>
+        </button>
+        <div class="text-center mb-6">
+            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-500 mx-auto mb-4">
+                <i class="fas fa-shield-alt text-2xl"></i>
+            </div>
+            <h3 class="text-xl font-bold text-gray-800">Tukar Kata Laluan</h3>
+            <p class="text-sm text-gray-500">Sila masukkan kata laluan lama dan cipta yang baharu.</p>
+        </div>
+
+        <form action="<%= request.getContextPath()%>/profil/update?action=changePassword" method="post">
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2">Kata Laluan Lama</label>
+                    <input type="password" name="oldPassword" required
+                           class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#6C5DD3] focus:ring-1 focus:ring-[#6C5DD3] text-sm">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2">Kata Laluan Baharu</label>
+                    <input type="password" name="newPassword" required minlength="6"
+                           class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:border-[#6C5DD3] focus:ring-1 focus:ring-[#6C5DD3] text-sm">
+                </div>
+            </div>
+            <div class="mt-8 flex gap-3">
+                <button type="button" onclick="hideChangePassModal()" class="flex-1 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition">Batal</button>
+                <button type="submit" class="flex-1 py-3 bg-[#6C5DD3] text-white font-bold rounded-xl shadow-lg hover:bg-[#5b4eb8] transition">Kemaskini</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function showChangePassModal() {
+        document.getElementById('changePassModal').classList.remove('hidden');
+    }
+    function hideChangePassModal() {
+        document.getElementById('changePassModal').classList.add('hidden');
+    }
+</script>
 
 <%@ include file="/views/common/footer.jsp" %>

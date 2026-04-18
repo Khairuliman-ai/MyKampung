@@ -35,25 +35,23 @@ public class UpdatePasswordServlet extends HttpServlet {
             ResultSet rs = psCheck.executeQuery();
 
             if (rs.next()) {
-
                 // 2. Hash kata laluan baru guna BCrypt
                 String hashedPw = BCrypt.hashpw(newPassword, BCrypt.gensalt());
 
-                // 3. Kemaskini password dan kosongkan token (Security best practice)
+                // 3. Kemaskini password dan kosongkan token
                 String sqlUpdate = "UPDATE pengguna SET kata_laluan = ?, reset_token = NULL, token_expiry = NULL WHERE email = ?";
                 PreparedStatement psUpdate = conn.prepareStatement(sqlUpdate);
                 psUpdate.setString(1, hashedPw);
                 psUpdate.setString(2, email);
                 
-                int rows = psUpdate.executeUpdate();
-                if (rows > 0) {
+                if (psUpdate.executeUpdate() > 0) {
                     message = "Kata laluan berjaya dikemaskini. Sila log masuk.";
-                    request.setAttribute("notifikasi", message);
-                    request.getRequestDispatcher("views/auth/auth.jsp").forward(request, response);
+                    response.setContentType("application/json");
+                    response.getWriter().print("{\"success\": true, \"message\": \"" + message + "\"}");
                     return;
                 }
             } else {
-                message = "Pautan tidak sah atau telah tamat tempoh.";
+                message = "Kod OTP tidak sah atau telah tamat tempoh.";
             }
 
         } catch (Exception e) {
@@ -61,8 +59,7 @@ public class UpdatePasswordServlet extends HttpServlet {
             message = "Ralat sistem: " + e.getMessage();
         }
 
-        request.setAttribute("notifikasi", message);
-        request.setAttribute("email", email);
-        request.getRequestDispatcher("views/auth/verify_otp.jsp").forward(request, response);
+        response.setContentType("application/json");
+        response.getWriter().print("{\"success\": false, \"message\": \"" + message + "\"}");
     }
 }

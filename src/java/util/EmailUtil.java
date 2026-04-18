@@ -62,7 +62,7 @@ public class EmailUtil {
 
             message.setText("Sila gunakan Kod OTP di bawah untuk menetapkan semula kata laluan anda:\n\n" 
                           + "Kod OTP: " + token + "\n\n"
-                          + "Kod ini akan luput dalam masa 10 minit.");
+                          + "Kod ini akan luput dalam masa 5 minit.");
 
             Transport.send(message);
             System.out.println("Emel berjaya dihantar!");

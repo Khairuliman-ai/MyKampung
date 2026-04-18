@@ -42,6 +42,39 @@ public class ProfileServlet extends HttpServlet {
         
         if (currentUser != null) {
             try (Connection conn = DBUtil.getConnection()) {
+                // --- TUKAR KATA LALUAN ---
+                String action = request.getParameter("action");
+                if ("changePassword".equals(action)) {
+                    String oldPass = request.getParameter("oldPassword");
+                    String newPass = request.getParameter("newPassword");
+                    
+                    PenggunaDAO pDao = new PenggunaDAO(conn);
+                    boolean isOldPassCorrect = false;
+                    try {
+                        isOldPassCorrect = org.mindrot.jbcrypt.BCrypt.checkpw(oldPass, currentUser.getKata_laluan());
+                    } catch (IllegalArgumentException e) {
+                        if (oldPass.equals(currentUser.getKata_laluan())) {
+                            isOldPassCorrect = true;
+                        }
+                    }
+
+                    if (isOldPassCorrect) {
+                        String hashedNew = org.mindrot.jbcrypt.BCrypt.hashpw(newPass, org.mindrot.jbcrypt.BCrypt.gensalt(12));
+                        boolean passSuccess = pDao.updatePassword(currentUser.getId_pengguna(), hashedNew);
+                        if (passSuccess) {
+                            currentUser.setKata_laluan(hashedNew);
+                            session.setAttribute("currentUser", currentUser);
+                            response.sendRedirect(request.getContextPath() + "/profil/view?status=pass_success");
+                        } else {
+                            response.sendRedirect(request.getContextPath() + "/profil/view?status=pass_error");
+                        }
+                    } else {
+                        response.sendRedirect(request.getContextPath() + "/profil/view?status=wrong_old_pass");
+                    }
+                    return;
+                }
+                
+                // --- KEMASKINI PROFIL BIASA ---
                 // A. Ambil data dari form profil.jsp
                 String namaPenuh = request.getParameter("nama_penuh");
                 String noTel = request.getParameter("nombor_telefon");
@@ -49,8 +82,9 @@ public class ProfileServlet extends HttpServlet {
                 String poskod = request.getParameter("nombor_poskod");
                 String bandar = request.getParameter("bandar");
                 String negeri = request.getParameter("negeri");
+                String email = request.getParameter("email");
                 
-                // Data Sosio-Ekonomi (Baru)
+                // Data Sosio-Ekonomi
                 String statusKeluarga = request.getParameter("status_keluarga");
                 String pekerjaan = request.getParameter("pekerjaan");
                 String pendapatanStr = request.getParameter("pendapatan");
@@ -58,6 +92,7 @@ public class ProfileServlet extends HttpServlet {
                 // B. Update Object currentUser
                 currentUser.setNama_penuh(namaPenuh);
                 currentUser.setNombor_telefon(noTel);
+                currentUser.setEmail(email);
                 currentUser.setNama_jalan(jalan);
                 currentUser.setNombor_poskod(poskod);
                 currentUser.setBandar(bandar);
@@ -71,6 +106,7 @@ public class ProfileServlet extends HttpServlet {
 
                 // C. Simpan ke Database
                 PenggunaDAO pDao = new PenggunaDAO(conn);
+                
                 boolean success = pDao.updateProfil(currentUser); // Anda perlu cipta method ini di DAO
                 
                 if (success) {

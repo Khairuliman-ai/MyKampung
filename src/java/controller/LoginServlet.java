@@ -58,12 +58,11 @@ public class LoginServlet extends HttpServlet {
             Pengguna user = dao.findByKP(noKpClean);
 
             // Validate user existence and password hash
-            boolean isAuthenticated =
-                    user != null && BCrypt.checkpw(passwordInput, user.getKata_laluan());
+            boolean isAuthenticated = user != null && BCrypt.checkpw(passwordInput, user.getKata_laluan());
 
             if (!isAuthenticated) {
                 request.setAttribute("errorMessage", "No. KP atau Kata Laluan salah.");
-                request.getRequestDispatcher("auth.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/auth/auth.jsp").forward(request, response);
                 return;
             }
 
@@ -75,7 +74,7 @@ public class LoginServlet extends HttpServlet {
 
             if (user.getStatus() != 1) {
                 request.setAttribute("errorMessage", "Akaun anda belum diaktifkan.");
-                request.getRequestDispatcher("auth.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/auth/auth.jsp").forward(request, response);
                 return;
             }
 
@@ -101,7 +100,7 @@ public class LoginServlet extends HttpServlet {
 
             e.printStackTrace();
             request.setAttribute("errorMessage", "Ralat sistem pangkalan data.");
-            request.getRequestDispatcher("auth.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/auth/auth.jsp").forward(request, response);
         }
     }
 
@@ -112,6 +111,6 @@ public class LoginServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        response.sendRedirect("auth.jsp");
+        response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp");
     }
 }

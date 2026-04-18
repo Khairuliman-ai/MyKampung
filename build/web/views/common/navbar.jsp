@@ -12,6 +12,7 @@
     
     // 2. Guna getNama_peranan() kerana getJawatan() tiada dalam model baru
     String role = userNav.getNama_peranan();
+    String biro = userNav.getNama_jawatan(); // Diambil dari table 'jawatan_ajk'
     
     // 3. Normalize Path & Query String
     String currentPath = request.getRequestURI().toLowerCase();
@@ -65,13 +66,11 @@
                     <span class="font-medium text-sm">Mohon Bantuan</span>
                 </a>
 
-             <a href="${pageContext.request.contextPath}/TempahanServlet" 
-   class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= request.getRequestURI().contains("TempahanServlet") ? activeClass : inactiveClass %>">
-    <div class="w-6 text-center">
-        <i class="fas fa-building <%= request.getRequestURI().contains("TempahanServlet") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
-    </div>
-    <span class="font-medium text-sm">Fasiliti Kampung</span>
-</a>
+                <a href="<%= contextPath %>/fasiliti/list" 
+                   class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 <%= currentPath.contains("/fasiliti/") ? activeClass : inactiveClass %>">
+                    <div class="w-6 text-center"><i class="fas fa-building-circle-check <%= currentPath.contains("/fasiliti/") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i></div>
+                    <span class="font-medium text-sm">Fasiliti Kampung</span>
+                </a>
 
                 <a href="<%= constructionPage %>?menu=aduan" 
                    class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= (isConstruction && query.contains("menu=aduan")) ? activeClass : inactiveClass %>">
@@ -143,6 +142,7 @@
                     <span class="font-medium text-sm">Profil Saya</span>
                 </a>
             
+            <% if ("Setiausaha".equals(biro)) { %>
             <a href="<%= contextPath %>/penduduk/urus" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
                <%= (currentPath.contains("/penduduk/") || (currentPath.contains("urus") && !currentPath.contains("bantuan"))) ? activeClass : inactiveClass %>">
@@ -151,7 +151,9 @@
                 </div>
                 <span class="font-medium text-sm">Pendaftaran & Data</span>
             </a>
+            <% } %>
 
+            <% if ("Biro Kebajikan & Sosial".equals(biro)) { %>
             <a href="<%= contextPath %>/bantuan/list" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
                <%= currentPath.contains("/bantuan/") ? activeClass : inactiveClass %>">
@@ -160,14 +162,17 @@
                 </div>
                 <span class="font-medium text-sm">Semakan Bantuan</span>
             </a>
+            <% } %>
 
-            <a href="<%= constructionPage %>?menu=tempahan" 
-               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= (isConstruction && query.contains("menu=tempahan")) ? activeClass : inactiveClass %>">
+            <% if ("Biro Sukan & Riadah".equals(biro)) { %>
+            <a href="<%= contextPath %>/fasiliti/urus" 
+               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/fasiliti/") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-calendar-check <%= (isConstruction && query.contains("menu=tempahan")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-calendar-check <%= currentPath.contains("/fasiliti/") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Tempahan Fasiliti</span>
+                <span class="font-medium text-sm">Urus Fasiliti</span>
             </a>
+            <% } %>
 
             <a href="<%= constructionPage %>?menu=laporan_aduan" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= (isConstruction && query.contains("menu=laporan_aduan")) ? activeClass : inactiveClass %>">

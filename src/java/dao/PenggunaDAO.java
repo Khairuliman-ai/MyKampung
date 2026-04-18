@@ -108,6 +108,7 @@ public Pengguna findByKP(String kp) {
                 user.setPendapatan(rs.getBigDecimal("pendapatan"));
                 // PENTING: Kita ambil hash kata laluan dari DB untuk disemak oleh BCrypt di Servlet
                 user.setKata_laluan(rs.getString("kata_laluan")); 
+                user.setEmail(rs.getString("email")); // Ambil email dari database
                 user.setNama_jalan(rs.getString("nama_jalan"));
                 user.setNombor_poskod(rs.getString("nombor_poskod"));
                 user.setBandar(rs.getString("bandar"));
@@ -125,22 +126,35 @@ public Pengguna findByKP(String kp) {
 }
 
     public boolean updateProfil(Pengguna u) {
-        String sql = "UPDATE pengguna SET nama_penuh=?, nombor_telefon=?, nama_jalan=?, daerah=?, "
+        String sql = "UPDATE pengguna SET nama_penuh=?, nombor_telefon=?, email=?, nama_jalan=?, daerah=?, "
                 + "nombor_poskod=?, bandar=?, negeri=?, status_keluarga=?, pekerjaan=?, pendapatan=? "
                 + "WHERE id_pengguna=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, u.getNama_penuh());
             ps.setString(2, u.getNombor_telefon());
-            ps.setString(3, u.getNama_jalan());
-            ps.setString(4, u.getDaerah());
-            ps.setString(5, u.getNombor_poskod());
-            ps.setString(6, u.getBandar());
-            ps.setString(7, u.getNegeri());
-            ps.setString(8, u.getStatus_keluarga());
-            ps.setString(9, u.getPekerjaan());
-            ps.setBigDecimal(10, u.getPendapatan());
-            ps.setInt(11, u.getId_pengguna());
+            ps.setString(3, u.getEmail());
+            ps.setString(4, u.getNama_jalan());
+            ps.setString(5, u.getDaerah());
+            ps.setString(6, u.getNombor_poskod());
+            ps.setString(7, u.getBandar());
+            ps.setString(8, u.getNegeri());
+            ps.setString(9, u.getStatus_keluarga());
+            ps.setString(10, u.getPekerjaan());
+            ps.setBigDecimal(11, u.getPendapatan());
+            ps.setInt(12, u.getId_pengguna());
 
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean updatePassword(int idPengguna, String hashedNewPassword) {
+        String sql = "UPDATE pengguna SET kata_laluan=? WHERE id_pengguna=?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, hashedNewPassword);
+            ps.setInt(2, idPengguna);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -196,6 +210,7 @@ public Pengguna findByKP(String kp) {
         p.setNombor_kp(rs.getString("nombor_kp"));
         p.setNama_penuh(rs.getString("nama_penuh"));
         p.setNombor_telefon(rs.getString("nombor_telefon"));
+        p.setEmail(rs.getString("email"));
         p.setNama_jalan(rs.getString("nama_jalan"));
         p.setDaerah(rs.getString("daerah"));
         p.setBandar(rs.getString("bandar"));
@@ -249,5 +264,15 @@ public boolean updateStatus(int idPengguna, int statusBaru) {
         return false;
     }
 }
-    
+
+public int countAll() {
+    String sql = "SELECT COUNT(*) FROM pengguna";
+    try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        if (rs.next()) return rs.getInt(1);
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    return 0;
+}
+
 }

@@ -26,9 +26,9 @@
 
         if(list != null) {
             for(PermohonanBantuan pb : list) {
-                if(pb.getStatus() == 3) {
+                if("MENUNGGU_KETUA".equalsIgnoreCase(pb.getStatus())) {
                     listPending.add(pb);
-                } else if(pb.getStatus() == 1 || pb.getStatus() == 4) {
+                } else if("LULUS".equalsIgnoreCase(pb.getStatus()) || "DITOLAK".equalsIgnoreCase(pb.getStatus())) {
                     listSejarah.add(pb);
                 }
             }
@@ -56,20 +56,20 @@
                     <tbody class="divide-y divide-gray-100">
                         <% if(!listPending.isEmpty()) { 
                             for(PermohonanBantuan pb : listPending) {
-                                String displayDate = (pb.getTarikhMohon() != null) ? sdf.format(pb.getTarikhMohon()) : "-";
-                                String namaBantuan = pb.getNamaBantuan();
-                                if(pb.getIdBantuan() == 6) namaBantuan = "Bantuan Am";
-                                else if(pb.getIdBantuan() == 20) namaBantuan = "Sumbangan IPT";
-                                else if(pb.getIdBantuan() == 999) namaBantuan = "Lain-lain";
+                                String displayDate = (pb.getDibuat_pada() != null) ? sdf.format(pb.getDibuat_pada()) : "-";
+                                String namaBantuan = pb.getNama_bantuan();
+                                if(pb.getId_bantuan() == 6) namaBantuan = "Bantuan Am";
+                                else if(pb.getId_bantuan() == 20) namaBantuan = "Sumbangan IPT";
+                                else if(pb.getId_bantuan() == 999) namaBantuan = "Lain-lain";
                         %>
                         <tr class="hover:bg-orange-50/30 transition-colors">
                             <td class="p-4 text-sm font-medium text-gray-500 whitespace-nowrap"><%= displayDate %></td>
                             <td class="p-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-full bg-purple-100 text-[#6C5DD3] flex items-center justify-center font-bold text-xs">
-                                        <%= (pb.getNamaPemohon() != null) ? pb.getNamaPemohon().substring(0,1) : "U" %>
+                                        <%= (pb.getNama_penuh() != null) ? pb.getNama_penuh().substring(0,1) : "U" %>
                                     </div>
-                                    <span class="text-sm font-bold text-gray-800"><%= (pb.getNamaPemohon() != null) ? pb.getNamaPemohon() : "Unknown" %></span>
+                                    <span class="text-sm font-bold text-gray-800"><%= (pb.getNama_penuh() != null) ? pb.getNama_penuh() : "Unknown" %></span>
                                 </div>
                             </td>
                             <td class="p-4 text-sm text-gray-600"><span class="bg-gray-100 px-2 py-1 rounded text-xs border border-gray-200"><%= namaBantuan %></span></td>
@@ -78,12 +78,12 @@
                                     <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
                                     <div>
                                         <p class="text-xs font-bold text-green-600">Disahkan AJK</p>
-                                        <p class="text-[10px] text-gray-400 italic"><%= (pb.getUlasanAdmin() != null) ? pb.getUlasanAdmin() : "Tiada ulasan" %></p>
+                                        <p class="text-[10px] text-gray-400 italic"><%= (pb.getCatatan_pentadbir() != null) ? pb.getCatatan_pentadbir() : "Tiada ulasan" %></p>
                                     </div>
                                 </div>
                             </td>
                             <td class="p-4">
-                                <% if(pb.getDokumen() != null) { String enc = URLEncoder.encode(pb.getDokumen(), "UTF-8").replace("+", "%20"); %>
+                                <% if(pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
                                     <a href="<%= request.getContextPath() %>/file/<%= enc %>" target="_blank" class="text-red-500 hover:text-red-700 font-bold text-xs flex items-center gap-1">
                                         <i class="fas fa-file-pdf"></i> PDF
                                     </a>
@@ -91,10 +91,10 @@
                             </td>
                             <td class="p-4 text-center">
                                 <div class="flex justify-center gap-2">
-                                    <button onclick="openModal('<%= pb.getIdPermohonan() %>', '<%= namaBantuan %>', 'lulus')" class="w-8 h-8 rounded-full bg-green-100 text-green-600 hover:bg-green-200 flex items-center justify-center transition shadow-sm" title="Sokong">
+                                    <button onclick="openModal('<%= pb.getId_permohonan() %>', '<%= namaBantuan %>', 'lulus')" class="w-8 h-8 rounded-full bg-green-100 text-green-600 hover:bg-green-200 flex items-center justify-center transition shadow-sm" title="Sokong">
                                         <i class="fas fa-check"></i>
                                     </button>
-                                    <button onclick="openModal('<%= pb.getIdPermohonan() %>', '<%= namaBantuan %>', 'tolak')" class="w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition shadow-sm" title="Tolak">
+                                    <button onclick="openModal('<%= pb.getId_permohonan() %>', '<%= namaBantuan %>', 'tolak')" class="w-8 h-8 rounded-full bg-red-100 text-red-600 hover:bg-red-200 flex items-center justify-center transition shadow-sm" title="Tolak">
                                         <i class="fas fa-times"></i>
                                     </button>
                                 </div>
@@ -129,20 +129,20 @@
                     <tbody class="divide-y divide-gray-100">
                         <% if(!listSejarah.isEmpty()) { 
                             for(PermohonanBantuan pb : listSejarah) {
-                                String displayDate = (pb.getTarikhMohon() != null) ? sdf.format(pb.getTarikhMohon()) : "-";
+                                String displayDate = (pb.getDibuat_pada() != null) ? sdf.format(pb.getDibuat_pada()) : "-";
                         %>
                         <tr class="text-gray-500">
                             <td class="p-4 text-sm whitespace-nowrap"><%= displayDate %></td>
-                            <td class="p-4 text-sm font-bold text-gray-700"><%= pb.getNamaPemohon() %></td>
-                            <td class="p-4 text-sm"><%= pb.getNamaBantuan() %></td>
+                            <td class="p-4 text-sm font-bold text-gray-700"><%= pb.getNama_penuh() %></td>
+                            <td class="p-4 text-sm"><%= pb.getNama_bantuan() %></td>
                             <td class="p-4">
-                                <% if(pb.getStatus() == 1) { %> 
+                                <% if("LULUS".equalsIgnoreCase(pb.getStatus())) { %> 
                                     <span class="px-3 py-1 rounded-full bg-green-50 text-green-600 text-xs font-bold w-max flex items-center gap-1"><i class="fas fa-check-circle"></i> Disokong</span>
                                 <% } else { %> 
                                     <span class="px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-bold w-max flex items-center gap-1"><i class="fas fa-times-circle"></i> Ditolak</span>
                                 <% } %>
                             </td>
-                            <td class="p-4 text-sm italic max-w-xs truncate"><%= (pb.getUlasanAdmin() != null) ? pb.getUlasanAdmin() : "-" %></td>
+                            <td class="p-4 text-sm italic max-w-xs truncate"><%= (pb.getCatatan_pentadbir() != null) ? pb.getCatatan_pentadbir() : "-" %></td>
                         </tr>
                         <% } } else { %>
                         <tr><td colspan="5" class="p-8 text-center text-gray-400"><i class="fas fa-archive text-3xl mb-2 block opacity-50"></i>Tiada rekod sejarah.</td></tr>

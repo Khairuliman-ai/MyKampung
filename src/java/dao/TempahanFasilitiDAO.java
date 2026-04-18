@@ -43,8 +43,6 @@ public class TempahanFasilitiDAO {
     // 2. Mendapatkan sejarah tempahan berdasarkan ID pengguna
     public List<TempahanFasiliti> dapatkanSejarahTempahanPenduduk(int idPengguna) {
         List<TempahanFasiliti> senarai = new ArrayList<>();
-        
-        // PEMBETULAN: tarikh_mohon ditukar kepada dibuat_pada
         String sql = "SELECT t.*, f.nama_fasiliti FROM tempahan_fasiliti t " +
                      "JOIN fasiliti f ON t.id_fasiliti = f.id_fasiliti " +
                      "WHERE t.id_pengguna = ? ORDER BY t.dibuat_pada DESC";
@@ -59,17 +57,12 @@ public class TempahanFasilitiDAO {
                     t.setId_tempahan(rs.getInt("id_tempahan"));
                     t.setId_pengguna(rs.getInt("id_pengguna"));
                     t.setId_fasiliti(rs.getInt("id_fasiliti"));
-                    
-                    // PEMBETULAN: Menggunakan nama kolum yang wujud di DB
                     t.setTarikh_tempah(rs.getDate("tarikh_tempah"));
                     t.setMasa_mula(rs.getTime("masa_mula"));
                     t.setMasa_tamat(rs.getTime("masa_tamat"));
                     t.setStatus(rs.getString("status"));
                     t.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
-                    
-                    // Maklumat tambahan dari JOIN
                     t.setNama_fasiliti(rs.getString("nama_fasiliti"));
-                    
                     senarai.add(t);
                 }
             }
@@ -78,5 +71,133 @@ public class TempahanFasilitiDAO {
             e.printStackTrace();
         }
         return senarai;
+    }
+
+    public List<TempahanFasiliti> dapatkanSemuaTempahan() {
+        List<TempahanFasiliti> senarai = new ArrayList<>();
+        String sql = "SELECT t.*, f.nama_fasiliti, p.nama_penuh FROM tempahan_fasiliti t " +
+                     "JOIN fasiliti f ON t.id_fasiliti = f.id_fasiliti " +
+                     "JOIN pengguna p ON t.id_pengguna = p.id_pengguna " +
+                     "ORDER BY t.dibuat_pada DESC";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                TempahanFasiliti t = new TempahanFasiliti();
+                t.setId_tempahan(rs.getInt("id_tempahan"));
+                t.setId_fasiliti(rs.getInt("id_fasiliti"));
+                t.setId_pengguna(rs.getInt("id_pengguna"));
+                t.setTarikh_tempah(rs.getDate("tarikh_tempah"));
+                t.setMasa_mula(rs.getTime("masa_mula"));
+                t.setMasa_tamat(rs.getTime("masa_tamat"));
+                t.setStatus(rs.getString("status"));
+                t.setCatatan_pentadbir(rs.getString("catatan_pentadbir"));
+                t.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
+                t.setNama_fasiliti(rs.getString("nama_fasiliti"));
+                t.setNama_pengguna(rs.getString("nama_penuh"));
+                senarai.add(t);
+            }
+        } catch (SQLException e) {
+            System.out.println("RALAT SQL (dapatkanSemua): " + e.getMessage());
+        }
+        return senarai;
+    }
+
+    public TempahanFasiliti dapatkanTempahanById(int id) {
+        TempahanFasiliti t = null;
+        String sql = "SELECT t.*, f.nama_fasiliti, p.nama_penuh FROM tempahan_fasiliti t " +
+                     "JOIN fasiliti f ON t.id_fasiliti = f.id_fasiliti " +
+                     "JOIN pengguna p ON t.id_pengguna = p.id_pengguna " +
+                     "WHERE t.id_tempahan = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, id);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    t = new TempahanFasiliti();
+                    t.setId_tempahan(rs.getInt("id_tempahan"));
+                    t.setId_fasiliti(rs.getInt("id_fasiliti"));
+                    t.setId_pengguna(rs.getInt("id_pengguna"));
+                    t.setTarikh_tempah(rs.getDate("tarikh_tempah"));
+                    t.setMasa_mula(rs.getTime("masa_mula"));
+                    t.setMasa_tamat(rs.getTime("masa_tamat"));
+                    t.setStatus(rs.getString("status"));
+                    t.setCatatan_pentadbir(rs.getString("catatan_pentadbir"));
+                    t.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
+                    t.setNama_fasiliti(rs.getString("nama_fasiliti"));
+                    t.setNama_pengguna(rs.getString("nama_penuh"));
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("RALAT SQL (getById): " + e.getMessage());
+        }
+        return t;
+    }
+
+    public boolean kemaskiniStatus(int id, String status, String catatan) {
+        String sql = "UPDATE tempahan_fasiliti SET status=?, catatan_pentadbir=?, dikemaskini_pada=NOW() WHERE id_tempahan=?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setString(2, catatan);
+            ps.setInt(3, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("RALAT SQL (kemaskiniStatus): " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean batalTempahan(int idTempahan, int idPengguna) {
+        String sql = "UPDATE tempahan_fasiliti SET status='DIBATAL', dikemaskini_pada=NOW() WHERE id_tempahan=? AND id_pengguna=? AND status='MENUNGGU'";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idTempahan);
+            ps.setInt(2, idPengguna);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            System.out.println("RALAT SQL (batal): " + e.getMessage());
+            return false;
+        }
+    }
+
+    public boolean semakKonflikMasa(int idFasiliti, java.sql.Date tarikh, java.sql.Time mula, java.sql.Time tamat) {
+        String sql = "SELECT COUNT(*) FROM tempahan_fasiliti " +
+                     "WHERE id_fasiliti = ? AND tarikh_tempah = ? " +
+                     "AND status NOT IN ('TOLAK', 'DIBATAL') " +
+                     "AND ((masa_mula < ? AND masa_tamat > ?) " +
+                     "OR (masa_mula < ? AND masa_tamat > ?) " +
+                     "OR (masa_mula >= ? AND masa_tamat <= ?))";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idFasiliti);
+            ps.setDate(2, tarikh);
+            ps.setTime(3, tamat);
+            ps.setTime(4, mula);
+            ps.setTime(5, tamat);
+            ps.setTime(6, mula);
+            ps.setTime(7, mula);
+            ps.setTime(8, tamat);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1) > 0;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("RALAT SQL (konflik): " + e.getMessage());
+        }
+        return false;
+    }
+
+    public int countAll() {
+        String sql = "SELECT COUNT(*) FROM tempahan_fasiliti";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
     }
 }

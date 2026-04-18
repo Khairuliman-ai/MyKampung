@@ -8,6 +8,8 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         * {
@@ -84,10 +86,10 @@
         /* ===== OVERLAY ===== */
         .overlay-container {
             width: 50%;
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: url('<%= request.getContextPath() %>/assets/img/kampung.png') center/cover no-repeat;
             color: #fff;
             display: flex;
-            align-items: center;
+            align-items: flex-end; /* Letak di bahagian bawah gambar supaya tak tutup papan tanda */
             justify-content: center;
             padding: 40px;
             text-align: center;
@@ -98,13 +100,43 @@
             transform: translateX(-100%);
         }
 
+        .overlay-content {
+            background: rgba(0, 0, 0, 0.7); /* Kotak gelap separuh lutsinar */
+            backdrop-filter: blur(5px); /* Efek kaca */
+            padding: 25px 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 380px;
+            margin-bottom: 20px; /* Jarak sikit dari bawah */
+        }
+
         .overlay-content h4 {
             font-weight: 700;
+            margin-bottom: 5px;
         }
 
         .overlay-content p {
             font-size: 0.95rem;
-            opacity: 0.9;
+            font-weight: 500;
+            opacity: 0.95;
+            margin-bottom: 15px;
+        }
+
+        /* ===== TOGGLE OVERLAY PANELS ===== */
+        .overlay-panel-signin {
+            display: none; /* Sembunyi secara default (mod Log Masuk) */
+        }
+        .overlay-panel-signup {
+            display: block; /* Tunjuk secara default (mod Log Masuk) */
+        }
+
+        .auth-container.sign-up-mode .overlay-panel-signup {
+            display: none; /* Sembunyi semasa mod Daftar */
+        }
+        .auth-container.sign-up-mode .overlay-panel-signin {
+            display: block; /* Tunjuk semasa mod Daftar */
         }
 
         /* ===== INPUT ===== */
@@ -211,7 +243,7 @@
     
     <!-- ===== LOGIN ===== -->
 <div class="form-container sign-in-container">
-    <form action="${pageContext.request.contextPath}/login" method="post">
+    <form action="${pageContext.request.contextPath}/LoginServlet" method="post">
 
         <div class="brand-logo mb-3 text-center">
             <i class="bi bi-houses-fill" style="font-size: 2rem; color: #6C5DD3;"></i>
@@ -220,37 +252,58 @@
         <h4 class="fw-bold text-center">Log Masuk</h4>
         <p class="text-muted text-center small mb-4">Portal Pengurusan Kampung Danan</p>
 
+        <%-- Notification Logic via Script at Bottom --%>
         <% if (request.getAttribute("error") != null) { %>
-            <div class="alert alert-danger alert-custom mb-3">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <%= request.getAttribute("error") %>
-            </div>
+            <script>
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ralat',
+                    text: '<%= request.getAttribute("error") %>',
+                    confirmButtonColor: '#6C5DD3'
+                });
+            </script>
+        <% } %>
+        <% if (request.getAttribute("success") != null) { %>
+            <script>
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Berjaya',
+                    text: '<%= request.getAttribute("success") %>',
+                    confirmButtonColor: '#10b981'
+                });
+            </script>
         <% } %>
         <label class="form-label small fw-bold text-dark">Nombor Kad Pengenalan:</label>
         <input type="text" name="nombor_kp" class="form-control mb-3" 
                placeholder="Contoh: 900502-11-4032" 
                oninput="formatIC(this)" maxlength="14" required>
 
-        <div class="position-relative mb-3">
+        <div class="mb-3">
             <label class="form-label small fw-bold text-dark">Kata Laluan:</label>
-            <input type="password" id="passwordField" name="kata_laluan" 
-                   class="form-control pe-5" 
-                   placeholder="Kata Laluan" required>
-            <span class="position-absolute end-0 top-50 translate-middle-y me-3 cursor-pointer text-muted" 
-                  onclick="togglePassword()" 
-                  style="z-index: 10; cursor: pointer;">
-                <i id="toggleIcon" class="bi bi-eye"></i>
-            </span>
+            <div class="position-relative">
+                <input type="password" id="passwordField" name="kata_laluan" 
+                       class="form-control pe-5" 
+                       placeholder="Kata Laluan" required>
+                <span class="position-absolute end-0 top-50 translate-middle-y me-3 cursor-pointer text-muted" 
+                      onclick="togglePassword()" 
+                      style="z-index: 10; cursor: pointer;">
+                    <i id="toggleIcon" class="bi bi-eye"></i>
+                </span>
+            </div>
         </div>
 
         <div class="d-flex justify-content-between align-items-center mb-4 px-1">
           
-            <a href="views/auth/forgot_password.jsp" class="text-decoration-none small fw-bold" style="color: #6C5DD3;">Lupa Kata Laluan?</a>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal" class="text-decoration-none small fw-bold" style="color: #6C5DD3;">Lupa Kata Laluan?</a>
         </div>
 
         <button type="submit" class="btn btn-primary w-100 mt-2" style="background-color: #6C5DD3; border: none;">
             Log Masuk
         </button>
+
+        <div class="text-center mt-3 small">
+            Belum ada akaun? <a href="#" id="linkSignUp" class="fw-bold" style="color: #6C5DD3; text-decoration: none;">Daftar Sekarang</a>
+        </div>
     </form>
 </div>
 
@@ -323,36 +376,357 @@
         <button type="submit" class="btn btn-success w-100 mt-2 shadow-sm py-2" style="background:#10b981; border:none; font-weight: bold;">
             Hantar Pendaftaran <i class="fas fa-paper-plane ms-2"></i>
         </button>
+
+        <div class="text-center mt-3 small">
+            Sudah ada akaun? <a href="#" id="linkSignIn" class="fw-bold" style="color: #10b981; text-decoration: none;">Log Masuk</a>
+        </div>
     </form>
 </div>
 
     <!-- ===== OVERLAY ===== -->
     <div class="overlay-container">
-        <div class="overlay-content">
-            <h4>Sudah ada akaun?</h4>
-            <p>Log masuk untuk teruskan</p>
-            <button class="btn btn-outline-light mt-2" id="signInBtn">Log Masuk</button>
-
-            <hr class="my-4" style="opacity:0.3">
-
-            <h4>Belum ada akaun?</h4>
-            <p>Daftar sebagai penduduk Kampung Danan</p>
-            <button class="btn btn-outline-light mt-2" id="signUpBtn">Daftar Akaun</button>
-        </div>
+        <!-- Sengaja dibiarkan kosong supaya gambar kampung terpapar sepenuhnya tanpa teks penghalang -->
     </div>
 
 </div>
 
-<script>
-    const container = document.getElementById("authContainer");
-    const signUpBtn = document.getElementById("signUpBtn");
-    const signInBtn = document.getElementById("signInBtn");
+<!-- ===== MODAL LUPA KATA LALUAN (MULTI-STEP) ===== -->
+<div class="modal fade" id="forgotPasswordModal" tabindex="-1" aria-labelledby="forgotPasswordModalLabel" aria-hidden="true" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content" style="border-radius: 25px; border: none; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
+            <div class="modal-header border-0 pb-0 px-4 pt-4">
+                <h5 class="modal-title fw-bold" id="forgotPasswordModalLabel" style="color: #6C5DD3;">Set Semula Kata Laluan</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="resetForgotModal()"></button>
+            </div>
+            
+            <div class="modal-body p-4">
+                <!-- Progress Bar -->
+                <div class="d-flex justify-content-between mb-4 px-2">
+                    <div id="dot1" class="step-dot active"></div>
+                    <div id="dot2" class="step-dot"></div>
+                    <div id="dot3" class="step-dot"></div>
+                </div>
 
-    signUpBtn.addEventListener("click", () => {
+                <div id="forgot-alert" class="alert alert-danger d-none small py-2 rounded-3 mb-3"></div>
+
+                <!-- STEP 1: Masukkan Emel & IC -->
+                <div id="step-email" class="forgot-step">
+                    <p class="text-muted small mb-4">Sila masukkan Nombor Kad Pengenalan dan Emel anda untuk pengesahan identiti.</p>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Nombor Kad Pengenalan:</label>
+                        <input type="text" id="forgot-ic-input" class="form-control custom-input" placeholder="Contoh: 900502-11-4032" oninput="formatIC(this)" maxlength="14" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Alamat Emel:</label>
+                        <input type="email" id="forgot-email-input" class="form-control custom-input" placeholder="nama@emel.com" required>
+                    </div>
+                    <button type="button" onclick="handleForgotEmail()" class="btn btn-primary w-100 py-3 mt-2 brand-btn">
+                        Hantar Kod OTP <i class="fas fa-paper-plane ms-2"></i>
+                    </button>
+                </div>
+
+                <!-- STEP 2: Sahkan OTP -->
+                <div id="step-otp" class="forgot-step d-none">
+                    <p class="text-muted small mb-4">Kod OTP telah dihantar ke emel anda. Sila masukkan kod tersebut untuk pengesahan.</p>
+                    <div class="mb-3 text-center">
+                        <label class="form-label small fw-bold text-dark d-block mb-3">Masukkan Kod OTP 6-Digit:</label>
+                        <input type="text" id="forgot-otp-input" class="form-control text-center fw-bold" 
+                               maxlength="6" placeholder="0 0 0 0 0 0" 
+                               style="font-size: 24px; letter-spacing: 8px; border-radius: 15px; background: #f1f5f9; border: 2px solid #e2e8f0;">
+                    </div>
+                    <button type="button" onclick="handleVerifyOTP()" class="btn btn-primary w-100 py-3 mt-2 brand-btn">
+                        Sahkan Kod <i class="fas fa-check-circle ms-2"></i>
+                    </button>
+                    
+                    <div class="text-center mt-3">
+                        <span class="text-muted small">Tidak terima kod?</span>
+                        <button type="button" id="btn-resend" onclick="handleResendOTP()" class="btn btn-link p-0 ms-1 text-decoration-none small fw-bold" style="color: #6C5DD3;">Hantar Semula</button>
+                        <span id="countdown-text" class="text-muted small d-none">(Tunggu <span id="timer">120</span>s)</span>
+                    </div>
+
+                    <button type="button" onclick="showStep(1)" class="btn btn-link w-100 mt-2 text-decoration-none text-muted small">Kembali ke Emel</button>
+                </div>
+
+                <!-- STEP 3: Kata Laluan Baru -->
+                <div id="step-password" class="forgot-step d-none">
+                    <p class="text-muted small mb-4">OTP disahkan! Sila tetapkan kata laluan baru anda sekarang.</p>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Kata Laluan Baru:</label>
+                        <input type="password" id="forgot-new-pass" class="form-control custom-input" placeholder="Masukkan kata laluan baru" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label small fw-bold text-dark">Sahkan Kata Laluan:</label>
+                        <input type="password" id="forgot-confirm-pass" class="form-control custom-input" placeholder="Taip semula kata laluan" required>
+                    </div>
+                    <button type="button" onclick="handleResetPassword()" class="btn btn-success w-100 py-3 mt-2 shadow-sm" style="border-radius: 15px; font-weight: 700; background: #10b981; border: none;">
+                        Kemaskini Kata Laluan <i class="fas fa-shield-alt ms-2"></i>
+                    </button>
+                </div>
+            </div>
+            
+            <div class="modal-footer border-0 pt-0 pb-4 px-4 justify-content-center">
+                <p class="text-muted mb-0" style="font-size: 11px;">Perlukan bantuan? Hubungi pentadbir JKKK Danan.</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .step-dot { width: 30%; height: 6px; background: #e2e8f0; border-radius: 10px; transition: all 0.3s ease; }
+    .step-dot.active { background: #6C5DD3; box-shadow: 0 0 10px rgba(108, 93, 211, 0.3); }
+    .custom-input { background: #f8fafc; border-radius: 15px; padding: 12px 18px; font-size: 0.9rem; border: 1px solid #e2e8f0; }
+    .brand-btn { background-color: #6C5DD3; border: none; border-radius: 15px; font-weight: 700; transition: all 0.3s ease; }
+    .brand-btn:hover { background-color: #5a4db8; transform: translateY(-2px); }
+</style>
+
+<!-- Bootstrap 5 JS Bundle -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    // Variable Global untuk Reset
+    let currentEmail = "";
+    let currentOTP = "";
+
+    function showStep(step) {
+        document.querySelectorAll('.forgot-step').forEach(el => el.classList.add('d-none'));
+        document.querySelectorAll('.step-dot').forEach(el => el.classList.remove('active'));
+        
+        document.getElementById('step-email').classList.add('d-none');
+        document.getElementById('step-otp').classList.add('d-none');
+        document.getElementById('step-password').classList.add('d-none');
+        
+        if(step === 1) {
+            document.getElementById('step-email').classList.remove('d-none');
+            document.getElementById('dot1').classList.add('active');
+        } else if(step === 2) {
+            document.getElementById('step-otp').classList.remove('d-none');
+            document.getElementById('dot1').classList.add('active');
+            document.getElementById('dot2').classList.add('active');
+        } else if(step === 3) {
+            document.getElementById('step-password').classList.remove('d-none');
+            document.getElementById('dot1').classList.add('active');
+            document.getElementById('dot2').classList.add('active');
+            document.getElementById('dot3').classList.add('active');
+        }
+    }
+
+    function resetForgotModal() {
+        showStep(1);
+        document.getElementById('forgot-alert').classList.add('d-none');
+        document.getElementById('forgot-email-input').value = "";
+        document.getElementById('forgot-otp-input').value = "";
+        document.getElementById('forgot-new-pass').value = "";
+        document.getElementById('forgot-confirm-pass').value = "";
+    }
+
+    async function handleForgotEmail() {
+        const email = document.getElementById('forgot-email-input').value;
+        const ic = document.getElementById('forgot-ic-input').value;
+        const alertBox = document.getElementById('forgot-alert');
+        
+        if(!email || !ic) { alertBox.innerText = "Sila masukkan butiran lengkap."; alertBox.classList.remove('d-none'); return; }
+        
+        try {
+            const formData = new URLSearchParams();
+            formData.append('email', email);
+            formData.append('nombor_kp', ic);
+            
+            const response = await fetch('${pageContext.request.contextPath}/ForgotPassServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            });
+            
+            const result = await response.json();
+            if(result.success) {
+                currentEmail = email;
+                alertBox.classList.add('d-none');
+                showStep(2);
+                startCountdown(); // Mula kiraan masa resend
+            } else {
+                alertBox.innerText = result.message;
+                alertBox.classList.remove('d-none');
+            }
+        } catch (e) {
+            alertBox.innerText = "Ralat sistem. Cuba lagi.";
+            alertBox.classList.remove('d-none');
+        }
+    }
+
+    async function handleVerifyOTP() {
+        const otp = document.getElementById('forgot-otp-input').value;
+        const alertBox = document.getElementById('forgot-alert');
+        
+        if(!otp) { alertBox.innerText = "Sila masukkan kod OTP."; alertBox.classList.remove('d-none'); return; }
+        
+        try {
+            const formData = new URLSearchParams();
+            formData.append('email', currentEmail);
+            formData.append('otp', otp);
+            
+            const response = await fetch('${pageContext.request.contextPath}/VerifyOTPServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            });
+            
+            const result = await response.json();
+            if(result.success) {
+                currentOTP = otp;
+                alertBox.classList.add('d-none');
+                showStep(3);
+            } else {
+                alertBox.innerText = result.message;
+                alertBox.classList.remove('d-none');
+            }
+        } catch (e) {
+            alertBox.innerText = "Ralat sistem. Cuba lagi.";
+            alertBox.classList.remove('d-none');
+        }
+    }
+
+    async function handleResetPassword() {
+        const pass = document.getElementById('forgot-new-pass').value;
+        const confirm = document.getElementById('forgot-confirm-pass').value;
+        const alertBox = document.getElementById('forgot-alert');
+        
+        if(!pass || !confirm) { alertBox.innerText = "Sila lengkapkan semua medan."; alertBox.classList.remove('d-none'); return; }
+        if(pass !== confirm) { alertBox.innerText = "Kata laluan tidak sepadan."; alertBox.classList.remove('d-none'); return; }
+        
+        try {
+            const formData = new URLSearchParams();
+            formData.append('email', currentEmail);
+            formData.append('otp', currentOTP);
+            formData.append('newPassword', pass);
+            
+            const response = await fetch('${pageContext.request.contextPath}/UpdatePasswordServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            });
+            
+            const result = await response.json();
+            if(result.success) {
+                alert("Berjaya! Kata laluan anda telah dikemaskini. Sila log masuk semula.");
+                window.location.reload();
+            } else {
+                alertBox.innerText = result.message;
+                alertBox.classList.remove('d-none');
+            }
+        } catch (e) {
+            alertBox.innerText = "Ralat sistem. Cuba lagi.";
+            alertBox.classList.remove('d-none');
+        }
+    }
+
+    // --- LOGIK RESEND OTP ---
+    let resendTimer;
+    function startCountdown() {
+        const btn = document.getElementById('btn-resend');
+        const text = document.getElementById('countdown-text');
+        const timerDisplay = document.getElementById('timer');
+        let timeLeft = 120; // 2 minit
+
+        btn.classList.add('d-none');
+        text.classList.remove('d-none');
+        
+        clearInterval(resendTimer);
+        resendTimer = setInterval(() => {
+            timeLeft--;
+            timerDisplay.innerText = timeLeft;
+            if(timeLeft <= 0) {
+                clearInterval(resendTimer);
+                btn.classList.remove('d-none');
+                text.classList.add('d-none');
+            }
+        }, 1000);
+    }
+
+    async function handleResendOTP() {
+        // Panggil semula handleForgotEmail untuk hantar OTP baru
+        // Kita hantar IC dan Email yang tersimpan
+        const ic = document.getElementById('forgot-ic-input').value;
+        const alertBox = document.getElementById('forgot-alert');
+        
+        try {
+            const formData = new URLSearchParams();
+            formData.append('email', currentEmail);
+            formData.append('nombor_kp', ic);
+            
+            const response = await fetch('${pageContext.request.contextPath}/ForgotPassServlet', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: formData
+            });
+            
+            const result = await response.json();
+            if(result.success) {
+                alertBox.innerText = "Kod baru telah dihantar!";
+                alertBox.classList.remove('d-none', 'alert-danger');
+                alertBox.classList.add('alert-success');
+                startCountdown();
+            } else {
+                alertBox.innerText = result.message;
+                alertBox.classList.remove('d-none', 'alert-success');
+                alertBox.classList.add('alert-danger');
+            }
+        } catch (e) {
+            alertBox.innerText = "Ralat hantar semula.";
+            alertBox.classList.remove('d-none');
+        }
+    }
+
+    const container = document.getElementById("authContainer");
+    
+    // ===== SWEETALERT NOTIFICATIONS =====
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        
+        // 1. Check for Errors (from forward or redirect)
+        let errorMsg = '<%= request.getAttribute("error") != null ? request.getAttribute("error") : (request.getAttribute("errorMessage") != null ? request.getAttribute("errorMessage") : "") %>';
+        if (!errorMsg && urlParams.has('error')) {
+            errorMsg = urlParams.get('error');
+        }
+        if (!errorMsg && urlParams.has('errorMessage')) {
+            errorMsg = urlParams.get('errorMessage');
+        }
+        
+        if (errorMsg && errorMsg !== "null") {
+            Swal.fire({
+                icon: 'error',
+                title: 'Log Masuk Gagal',
+                text: errorMsg,
+                confirmButtonColor: '#6C5DD3',
+                timer: 4000
+            });
+        }
+
+        // 2. Check for Success (from forward or redirect)
+        let successMsg = '<%= request.getAttribute("success") != null ? request.getAttribute("success") : "" %>';
+        if (!successMsg && urlParams.has('success')) {
+            successMsg = urlParams.get('success');
+        }
+        
+        if (successMsg && successMsg !== "null") {
+            Swal.fire({
+                icon: 'success',
+                title: 'Berjaya!',
+                text: successMsg,
+                confirmButtonColor: '#10b981',
+                timer: 6000
+            });
+        }
+    });
+    const linkSignUp = document.getElementById("linkSignUp");
+    const linkSignIn = document.getElementById("linkSignIn");
+
+    linkSignUp.addEventListener("click", (e) => {
+        e.preventDefault();
         container.classList.add("sign-up-mode");
     });
 
-    signInBtn.addEventListener("click", () => {
+    linkSignIn.addEventListener("click", (e) => {
+        e.preventDefault();
         container.classList.remove("sign-up-mode");
     });
 </script>

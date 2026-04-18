@@ -18,9 +18,10 @@
     SimpleDateFormat sdfDisplay = new SimpleDateFormat("dd MMM yyyy");
 
     if (mainList != null) {
-        Collections.sort(mainList, (o1, o2) -> Integer.compare(o2.getIdPermohonan(), o1.getIdPermohonan()));
+        Collections.sort(mainList, (o1, o2) -> Integer.compare(o2.getId_permohonan(), o1.getId_permohonan()));
         for (PermohonanBantuan pb : mainList) {
-            if (pb.getStatus() == 0 || pb.getStatus() == 2 || pb.getStatus() == 3) {
+            String s = pb.getStatus();
+            if (s == null || "BARU".equalsIgnoreCase(s) || "DIKEMBALIKAN".equalsIgnoreCase(s) || "MENUNGGU_KETUA".equalsIgnoreCase(s)) {
                 listProses.add(pb);
             } else {
                 listSejarah.add(pb);
@@ -118,42 +119,42 @@
                     <tbody class="divide-y divide-gray-100">
                         <% if (!listProses.isEmpty()) { 
                             for (PermohonanBantuan pb : listProses) {
-                                String filterDate = (pb.getTarikhMohon() != null) ? sdfFull.format(pb.getTarikhMohon()) : "";
-                                String displayDate = (pb.getTarikhMohon() != null) ? sdfDisplay.format(pb.getTarikhMohon()) : "-";
+                                String filterDate = (pb.getDibuat_pada() != null) ? sdfFull.format(pb.getDibuat_pada()) : "";
+                                String displayDate = (pb.getDibuat_pada() != null) ? sdfDisplay.format(pb.getDibuat_pada()) : "-";
                         %>
                         <tr class="data-row hover:bg-purple-50/50 transition-colors" data-date="<%= filterDate %>" data-status="<%= pb.getStatus() %>">
                             <td class="p-4 text-sm font-medium text-gray-600 whitespace-nowrap"><%= displayDate %></td>
-                            <td class="p-4 text-sm font-bold text-[#6C5DD3] search-col"><%= pb.getNamaBantuan() %></td>
+                            <td class="p-4 text-sm font-bold text-[#6C5DD3] search-col"><%= pb.getNama_bantuan() %></td>
                             <td class="p-4">
-                                <% if (pb.getDokumen() != null) { String enc = URLEncoder.encode(pb.getDokumen(), "UTF-8").replace("+", "%20"); %>
+                                <% if (pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
                                     <a href="<%= request.getContextPath() %>/file/<%= enc %>" target="_blank" class="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-bold hover:bg-gray-200 transition">
                                         <i class="fas fa-file-pdf text-red-500"></i> PDF
                                     </a>
                                 <% } else { %> <span class="text-gray-400">-</span> <% } %>
                             </td>
-                            <td class="p-4 text-sm text-gray-500 search-col max-w-xs truncate"><%= (pb.getCatatan() != null) ? pb.getCatatan() : "-" %></td>
+                            <td class="p-4 text-sm text-gray-500 search-col max-w-xs truncate"><%= (pb.getCatatan_pemohon() != null) ? pb.getCatatan_pemohon() : "-" %></td>
                             <td class="p-4">
-                                <% if (pb.getStatus() == 2) { %> 
+                                <% if ("DIKEMBALIKAN".equalsIgnoreCase(pb.getStatus())) { %> 
                                     <div class="flex flex-col">
-                                        <span class="text-xs text-red-500 font-bold mb-1"><i class="fas fa-exclamation-circle"></i> <%= (pb.getUlasanAdmin() != null) ? pb.getUlasanAdmin() : "Sila kemaskini" %></span>
+                                        <span class="text-xs text-red-500 font-bold mb-1"><i class="fas fa-exclamation-circle"></i> <%= (pb.getCatatan_pentadbir() != null) ? pb.getCatatan_pentadbir() : "Sila kemaskini" %></span>
                                         <span class="px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-bold w-max">Tidak Lengkap</span>
                                     </div>
-                                <% } else if (pb.getStatus() == 3) { %> 
+                                <% } else if ("MENUNGGU_KETUA".equalsIgnoreCase(pb.getStatus())) { %> 
                                     <span class="px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-xs font-bold w-max"><i class="fas fa-check-circle mr-1"></i> Disemak AJK</span> 
                                 <% } else { %>
                                     <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold w-max"><i class="fas fa-sync-alt mr-1"></i> Dalam Proses</span>
                                 <% } %>
                             </td>
                             <td class="p-4 text-center flex justify-center gap-2">
-                                <% if (pb.getStatus() == 2) { %>
-                                    <a href="<%= request.getContextPath() %>/bantuan/edit?id=<%= pb.getIdPermohonan() %>" class="w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 hover:bg-yellow-200 inline-flex items-center justify-center transition" title="Betulkan">
+                                <% if ("DIKEMBALIKAN".equalsIgnoreCase(pb.getStatus())) { %>
+                                    <a href="<%= request.getContextPath() %>/bantuan/edit?id=<%= pb.getId_permohonan() %>" class="w-8 h-8 rounded-full bg-yellow-100 text-yellow-600 hover:bg-yellow-200 inline-flex items-center justify-center transition" title="Betulkan">
                                         <i class="fas fa-pen"></i>
                                     </a>
-                                <% } else if (pb.getStatus() == 0) { %>
-                                    <a href="<%= request.getContextPath() %>/bantuan/edit?id=<%= pb.getIdPermohonan() %>" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-yellow-100 hover:text-yellow-600 inline-flex items-center justify-center transition">
+                                <% } else if ("BARU".equalsIgnoreCase(pb.getStatus())) { %>
+                                    <a href="<%= request.getContextPath() %>/bantuan/edit?id=<%= pb.getId_permohonan() %>" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-yellow-100 hover:text-yellow-600 inline-flex items-center justify-center transition">
                                         <i class="fas fa-pen"></i>
                                     </a>
-                                    <a href="<%= request.getContextPath() %>/bantuan/delete?idPermohonan=<%= pb.getIdPermohonan() %>" 
+                                    <a href="<%= request.getContextPath() %>/bantuan/delete?idPermohonan=<%= pb.getId_permohonan() %>" 
                                        onclick="return confirm('Padam permohonan ini?');"
                                        class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-red-100 hover:text-red-500 inline-flex items-center justify-center transition">
                                         <i class="fas fa-trash-alt"></i>
@@ -195,21 +196,21 @@
                     <tbody class="divide-y divide-gray-100">
                         <% if (!listSejarah.isEmpty()) {
                             for (PermohonanBantuan pb : listSejarah) {
-                                String filterDate = (pb.getTarikhMohon() != null) ? sdfFull.format(pb.getTarikhMohon()) : "";
-                                String displayDate = (pb.getTarikhMohon() != null) ? sdfDisplay.format(pb.getTarikhMohon()) : "-";
+                                String filterDate = (pb.getDibuat_pada() != null) ? sdfFull.format(pb.getDibuat_pada()) : "";
+                                String displayDate = (pb.getDibuat_pada() != null) ? sdfDisplay.format(pb.getDibuat_pada()) : "-";
                         %>
                         <tr class="data-row text-gray-500" data-date="<%= filterDate %>" data-status="<%= pb.getStatus() %>">
                             <td class="p-4 text-sm whitespace-nowrap"><%= displayDate %></td>
-                            <td class="p-4 text-sm font-bold text-gray-700 search-col"><%= pb.getNamaBantuan() %></td>
+                            <td class="p-4 text-sm font-bold text-gray-700 search-col"><%= pb.getNama_bantuan() %></td>
                             <td class="p-4">
-                                <% if (pb.getDokumen() != null) { String enc = URLEncoder.encode(pb.getDokumen(), "UTF-8").replace("+", "%20"); %>
+                                <% if (pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
                                     <a href="<%= request.getContextPath() %>/file/<%= enc %>" target="_blank" class="text-xs font-bold text-blue-500 hover:underline"><i class="fas fa-file-pdf"></i> PDF</a>
                                 <% } else { %> - <% } %>
                             </td>
-                            <td class="p-4 text-sm search-col max-w-xs truncate"><%= (pb.getCatatan() != null) ? pb.getCatatan() : "-" %></td>
-                            <td class="p-4 text-sm max-w-xs truncate"><%= (pb.getUlasanAdmin() != null) ? pb.getUlasanAdmin() : "-" %></td>
+                            <td class="p-4 text-sm search-col max-w-xs truncate"><%= (pb.getCatatan_pemohon() != null) ? pb.getCatatan_pemohon() : "-" %></td>
+                            <td class="p-4 text-sm max-w-xs truncate"><%= (pb.getCatatan_pentadbir() != null) ? pb.getCatatan_pentadbir() : "-" %></td>
                             <td class="p-4">
-                                <% if (pb.getStatus() == 1) { %> 
+                                <% if ("LULUS".equalsIgnoreCase(pb.getStatus())) { %> 
                                     <span class="px-3 py-1 rounded-full bg-green-50 text-green-600 text-xs font-bold flex items-center w-max gap-1"><i class="fas fa-check-circle"></i> Disokong</span>
                                 <% } else { %> 
                                     <span class="px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-bold flex items-center w-max gap-1"><i class="fas fa-times-circle"></i> Ditolak</span>

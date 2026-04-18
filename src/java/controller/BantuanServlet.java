@@ -33,7 +33,7 @@ public class BantuanServlet extends HttpServlet {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
-        Pengguna user = (Pengguna) session.getAttribute("user");
+        Pengguna user = (Pengguna) session.getAttribute("currentUser");
 
         if (user == null) {
             response.sendRedirect(request.getContextPath());
@@ -53,20 +53,19 @@ public class BantuanServlet extends HttpServlet {
                 PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
                 List<PermohonanBantuan> list;
 
-                if ("Penduduk".equals(user.getNama_jawatan())) {
+                if ("Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
                     list = pbDao.getByPenduduk(user.getId_pengguna());
                     request.setAttribute("permohonanList", list);
                     request.getRequestDispatcher("/views/bantuan/jenisBantuan.jsp")
                             .forward(request, response);
 
-                } else if ("JKKK".equals(user.getNama_jawatan())) {
+                } else if ("JKKK".equalsIgnoreCase(user.getNama_peranan()) || "AJK".equalsIgnoreCase(user.getNama_peranan()) || "AJK Kampung".equalsIgnoreCase(user.getNama_peranan())) {
                     // --- TAMBAHAN BARU UNTUK JKKK ---
-                    // Pastikan anda dah save kod JSP tadi sebagai 'bantuan_jkkk.jsp' di folder Web Content
                     list = pbDao.getAll(); // Atau getByStatus(0) jika ada method tu
                     request.setAttribute("permohonanList", list);
-                    request.getRequestDispatcher("/views/bantuan/urusBantuanJKKK.jsp").forward(request, response);
+                    request.getRequestDispatcher("/views/bantuan/urusBantuanAJK.jsp").forward(request, response);
 
-                } else {
+                } else if ("Ketua Kampung".equalsIgnoreCase(user.getNama_peranan())) {
                     // INI UNTUK KETUA KAMPUNG
                     list = pbDao.getAll();
                     request.setAttribute("permohonanList", list);
@@ -74,6 +73,9 @@ public class BantuanServlet extends HttpServlet {
                     // --- TUKAR BARIS INI ---
                     // Tukar dari "/bantuanKetua.jsp" kepada fail baru kita:
                     request.getRequestDispatcher("/views/bantuan/urusBantuanKetua.jsp").forward(request, response);
+                } else {
+                    // Fallback jika peranan tidak dikenali
+                    response.sendRedirect(request.getContextPath() + "/dashboard?error=invalid_role");
                 }
             } // ================== EDIT ==================
             else if ("/edit".equals(action)) {
@@ -92,7 +94,7 @@ public class BantuanServlet extends HttpServlet {
             else if ("/rasmi".equals(action)) {
 
     // 1. Semak Adakah User Itu Penduduk
-    if (!"Penduduk".equals(user.getNama_jawatan())) {
+    if (!"Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
         response.sendRedirect(request.getContextPath() + "/dashboard");
         return;
     }
@@ -131,7 +133,7 @@ public class BantuanServlet extends HttpServlet {
 } else if ("/komuniti".equals(action)) {
 
     // 1. Semak Adakah User Itu Penduduk
-    if (!"Penduduk".equals(user.getNama_jawatan())) {
+    if (!"Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
         response.sendRedirect(request.getContextPath() + "/dashboard");
         return;
     }
@@ -190,7 +192,7 @@ else if ("/borangDigital.jsp".equals(action)) {
 // ================== DELETE (KEMASKINI) ==================
             else if ("/delete".equals(action)) {
                 // Pastikan hanya PENDUDUK boleh delete (Security Check)
-                if ("Penduduk".equals(user.getNama_jawatan())) {
+                if ("Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
                     PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
                     int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
 
@@ -230,7 +232,7 @@ else if ("/borangDigital.jsp".equals(action)) {
             throws ServletException, IOException {
 
         HttpSession session = request.getSession();
-        Pengguna user = (Pengguna) session.getAttribute("user");
+        Pengguna user = (Pengguna) session.getAttribute("currentUser");
 
         // Security Check
         if (user == null) {
@@ -250,7 +252,7 @@ else if ("/borangDigital.jsp".equals(action)) {
             PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
 
             // ===================== 1. APPLY (PENDUDUK) =====================
-            if ("/apply".equals(action) && "Penduduk".equals(user.getNama_jawatan())) {
+            if ("/apply".equals(action) && "Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
 
                 // 1. Handle File Upload
                 Part filePart = request.getPart("dokumenSokongan");
@@ -330,7 +332,7 @@ if (idBantuanCheck > 20 || idBantuanCheck == 999) {
             } 
 
 // ===================== 5. UPDATE MY REQUEST (EDIT) =====================
-            else if ("/updateMyRequest".equals(action) && "Penduduk".equals(user.getNama_jawatan())) {
+            else if ("/updateMyRequest".equals(action) && "Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
 
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 String oldDokumen = request.getParameter("oldDokumen");
@@ -387,7 +389,7 @@ if (idBantuanCheck > 20 || idBantuanCheck == 999) {
 // ===================== 6. JKKK REVIEW (Semakan Dokumen) =====================
             else if ("/reviewJKKK".equals(action)) {
 
-                // 1. Ambil data dari form modal (urusBantuanJKKK.jsp)
+                // 1. Ambil data dari form modal (urusBantuanAJK.jsp)
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 String keputusan = request.getParameter("keputusan"); // Value: "lengkap" atau "tak_lengkap"
                 String ulasanJKKK = request.getParameter("ulasan");   // Value: Apa yang ditaip dalam textarea
@@ -459,8 +461,8 @@ if (idBantuanCheck > 20 || idBantuanCheck == 999) {
 else if ("/tambahJenisBantuan".equals(action)) {
     
     // Security: Pastikan hanya JKKK atau Ketua Kampung boleh akses
-    String role = user.getNama_jawatan();
-    if (!"JKKK".equals(role) && !"Ketua Kampung".equals(role)) {
+    String role = user.getNama_peranan();
+    if (!"JKKK".equalsIgnoreCase(role) && !"Ketua Kampung".equalsIgnoreCase(role) && !"AJK".equalsIgnoreCase(role) && !"AJK Kampung".equalsIgnoreCase(role)) {
         response.sendRedirect(request.getContextPath() + "/dashboard?error=denied");
         return;
     }

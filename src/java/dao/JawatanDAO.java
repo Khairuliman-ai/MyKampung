@@ -3,20 +3,20 @@ package dao;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import model.Jawatan_AJK;
+import model.JawatanAJK;
 import util.DBUtil;
 
 public class JawatanDAO {
 
     // Ambil senarai jawatan (Ketua Kampung, Timbalan, dsb)
-    public List<Jawatan_AJK> getAllJawatan() {
-        List<Jawatan_AJK> senarai = new ArrayList<>();
+    public List<JawatanAJK> getAllJawatan() {
+        List<JawatanAJK> senarai = new ArrayList<>();
         String sql = "SELECT * FROM Jawatan_AJK";
         try (Connection conn = DBUtil.getConnection();
              Statement st = conn.createStatement();
              ResultSet rs = st.executeQuery(sql)) {
             while (rs.next()) {
-                Jawatan_AJK j = new Jawatan_AJK();
+                JawatanAJK j = new JawatanAJK();
                 j.setId_jawatan(rs.getInt("id_jawatan"));
                 j.setNama_jawatan(rs.getString("nama_jawatan"));
                 senarai.add(j);

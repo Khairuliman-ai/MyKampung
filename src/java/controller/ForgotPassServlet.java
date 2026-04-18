@@ -22,25 +22,45 @@ public class ForgotPassServlet extends HttpServlet {
             throws ServletException, IOException {
         
         String emailInput = request.getParameter("email");
-        String message = "Jika emel tersebut wujud dalam sistem, pautan reset telah dihantar. Sila semak peti masuk anda.";
+        String icInput = request.getParameter("nombor_kp");
+        
+        // Bersihkan nombor_kp (buang sempang if any) supaya sepadan dengan DB (12 digit)
+        if (icInput != null) {
+            icInput = icInput.replace("-", "").trim();
+        }
+        
+        String message = "Jika butiran tersebut wujud dalam sistem, kod OTP telah dihantar. Sila semak emel anda.";
 
         try (Connection conn = DBUtil.getConnection()) {
             
-            // 1. Semak sama ada emel wujud dalam pangkalan data
-            String sqlCheck = "SELECT id_pengguna FROM pengguna WHERE email = ?";
+            // 1. Semak sama ada emel DAN nombor_kp wujud dan sepadan
+            String sqlCheck = "SELECT id_pengguna, token_expiry FROM pengguna WHERE email = ? AND nombor_kp = ?";
             PreparedStatement psCheck = conn.prepareStatement(sqlCheck);
             psCheck.setString(1, emailInput);
+            psCheck.setString(2, icInput);
             ResultSet rs = psCheck.executeQuery();
 
             if (rs.next()) {
-                // 2. Jika wujud, jana OTP (6 digit)
+                // 2. Semak Had Resend (2 Minit)
+                // Jika (expiry - 3 minit) > masa sekarang, bermakna belum cukup 2 minit sejak hantaran terakhir
+                Timestamp currentExpiry = rs.getTimestamp("token_expiry");
+                if (currentExpiry != null) {
+                    long lastSentTime = currentExpiry.getTime() - (5 * 60 * 1000);
+                    if (System.currentTimeMillis() < (lastSentTime + (2 * 60 * 1000))) {
+                        response.setContentType("application/json");
+                        response.getWriter().print("{\"success\": false, \"message\": \"Sila tunggu 2 minit sebelum meminta kod baru.\"}");
+                        return;
+                    }
+                }
+
+                // 3. Jana OTP (6 digit)
                 String otp = EmailUtil.generateOTP();
 
-                // 3. Tetapkan waktu tamat (Expiry) - 10 minit dari sekarang
-                long expiryTime = System.currentTimeMillis() + (10 * 60 * 1000);
+                // 4. Tetapkan waktu tamat (Expiry) - 5 minit dari sekarang
+                long expiryTime = System.currentTimeMillis() + (5 * 60 * 1000);
                 Timestamp expiryTimestamp = new Timestamp(expiryTime);
 
-                // 4. Simpan token & expiry ke dalam database
+                // 5. Simpan token & expiry ke dalam database
                 String sqlUpdate = "UPDATE pengguna SET reset_token = ?, token_expiry = ? WHERE email = ?";
                 PreparedStatement psUpdate = conn.prepareStatement(sqlUpdate);
                 psUpdate.setString(1, otp);
@@ -57,9 +77,8 @@ public class ForgotPassServlet extends HttpServlet {
             // Walaupun error, kita tak nak dedahkan ralat DB kepada user
         }
 
-        // 6. Hantar maklum balas kepada pengguna dan redirect ke verify_otp.jsp
-        request.setAttribute("notifikasi", message);
-        request.setAttribute("email", emailInput);
-        request.getRequestDispatcher("views/auth/verify_otp.jsp").forward(request, response);
+        // 6. Hantar maklum balas JSON
+        response.setContentType("application/json");
+        response.getWriter().print("{\"success\": true, \"message\": \"Kod OTP telah dihantar ke emel anda.\", \"email\": \"" + emailInput + "\"}");
     }
 }

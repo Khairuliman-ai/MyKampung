@@ -1,24 +1,25 @@
 package model;
 
-import java.sql.Timestamp;
 import java.sql.Date;
 import java.sql.Time;
+import java.sql.Timestamp;
 
 public class TempahanFasiliti {
     private int id_tempahan;
     private int id_fasiliti;
     private int id_pengguna;
-    private Date tarikh_tempah; // Berdasarkan kolum DATE di DB
-    private Time masa_mula;     // Berdasarkan kolum TIME di DB
-    private Time masa_tamat;    // Berdasarkan kolum TIME di DB
-    private String status;      // DB anda guna 'status', bukan 'status_tempahan'
+    private Date tarikh_tempah;
+    private Time masa_mula;
+    private Time masa_tamat;
+    private String status;
     private String catatan_pentadbir;
     private Timestamp dibuat_pada;
     private Timestamp dikemaskini_pada;
     private Timestamp dipadam_pada;
     
-    // Untuk paparan UI (Join jadual Fasiliti)
+    // Untuk paparan UI (Join jadual Fasiliti & Pengguna)
     private String nama_fasiliti; 
+    private String nama_pengguna;
 
     public TempahanFasiliti() {}
 
@@ -59,4 +60,7 @@ public class TempahanFasiliti {
 
     public String getNama_fasiliti() { return nama_fasiliti; }
     public void setNama_fasiliti(String nama_fasiliti) { this.nama_fasiliti = nama_fasiliti; }
+
+    public String getNama_pengguna() { return nama_pengguna; }
+    public void setNama_pengguna(String nama_pengguna) { this.nama_pengguna = nama_pengguna; }
 }

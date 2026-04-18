@@ -84,10 +84,10 @@
         /* ===== OVERLAY ===== */
         .overlay-container {
             width: 50%;
-            background: linear-gradient(135deg, #10b981, #059669);
+            background: url('<%= request.getContextPath() %>/assets/img/kampung.png') center/cover no-repeat;
             color: #fff;
             display: flex;
-            align-items: center;
+            align-items: flex-end; /* Letak di bahagian bawah gambar supaya tak tutup papan tanda */
             justify-content: center;
             padding: 40px;
             text-align: center;
@@ -98,13 +98,43 @@
             transform: translateX(-100%);
         }
 
+        .overlay-content {
+            background: rgba(0, 0, 0, 0.7); /* Kotak gelap separuh lutsinar */
+            backdrop-filter: blur(5px); /* Efek kaca */
+            padding: 25px 30px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 380px;
+            margin-bottom: 20px; /* Jarak sikit dari bawah */
+        }
+
         .overlay-content h4 {
             font-weight: 700;
+            margin-bottom: 5px;
         }
 
         .overlay-content p {
             font-size: 0.95rem;
-            opacity: 0.9;
+            font-weight: 500;
+            opacity: 0.95;
+            margin-bottom: 15px;
+        }
+
+        /* ===== TOGGLE OVERLAY PANELS ===== */
+        .overlay-panel-signin {
+            display: none; /* Sembunyi secara default (mod Log Masuk) */
+        }
+        .overlay-panel-signup {
+            display: block; /* Tunjuk secara default (mod Log Masuk) */
+        }
+
+        .auth-container.sign-up-mode .overlay-panel-signup {
+            display: none; /* Sembunyi semasa mod Daftar */
+        }
+        .auth-container.sign-up-mode .overlay-panel-signin {
+            display: block; /* Tunjuk semasa mod Daftar */
         }
 
         /* ===== INPUT ===== */
@@ -251,6 +281,10 @@
         <button type="submit" class="btn btn-primary w-100 mt-2" style="background-color: #6C5DD3; border: none;">
             Log Masuk
         </button>
+
+        <div class="text-center mt-3 small">
+            Belum ada akaun? <a href="#" id="linkSignUp" class="fw-bold" style="color: #6C5DD3; text-decoration: none;">Daftar Sekarang</a>
+        </div>
     </form>
 </div>
 
@@ -323,36 +357,32 @@
         <button type="submit" class="btn btn-success w-100 mt-2 shadow-sm py-2" style="background:#10b981; border:none; font-weight: bold;">
             Hantar Pendaftaran <i class="fas fa-paper-plane ms-2"></i>
         </button>
+
+        <div class="text-center mt-3 small">
+            Sudah ada akaun? <a href="#" id="linkSignIn" class="fw-bold" style="color: #10b981; text-decoration: none;">Log Masuk</a>
+        </div>
     </form>
 </div>
 
     <!-- ===== OVERLAY ===== -->
     <div class="overlay-container">
-        <div class="overlay-content">
-            <h4>Sudah ada akaun?</h4>
-            <p>Log masuk untuk teruskan</p>
-            <button class="btn btn-outline-light mt-2" id="signInBtn">Log Masuk</button>
-
-            <hr class="my-4" style="opacity:0.3">
-
-            <h4>Belum ada akaun?</h4>
-            <p>Daftar sebagai penduduk Kampung Danan</p>
-            <button class="btn btn-outline-light mt-2" id="signUpBtn">Daftar Akaun</button>
-        </div>
+        <!-- Sengaja dibiarkan kosong supaya gambar kampung terpapar sepenuhnya tanpa teks penghalang -->
     </div>
 
 </div>
 
 <script>
     const container = document.getElementById("authContainer");
-    const signUpBtn = document.getElementById("signUpBtn");
-    const signInBtn = document.getElementById("signInBtn");
+    const linkSignUp = document.getElementById("linkSignUp");
+    const linkSignIn = document.getElementById("linkSignIn");
 
-    signUpBtn.addEventListener("click", () => {
+    linkSignUp.addEventListener("click", (e) => {
+        e.preventDefault();
         container.classList.add("sign-up-mode");
     });
 
-    signInBtn.addEventListener("click", () => {
+    linkSignIn.addEventListener("click", (e) => {
+        e.preventDefault();
         container.classList.remove("sign-up-mode");
     });
 </script>
