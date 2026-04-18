@@ -1,6 +1,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="model.Fasiliti" %>
 <%@ page import="model.TempahanFasiliti" %>
+<%@ page import="model.FasilitiSlot" %>
 <%@ page import="model.Pengguna" %>
 
 <%@ include file="/views/common/header.jsp" %>
@@ -9,6 +10,7 @@
 <%
     List<Fasiliti> senaraiFasiliti = (List<Fasiliti>) request.getAttribute("senaraiFasiliti");
     List<TempahanFasiliti> senaraiTempahan = (List<TempahanFasiliti>) request.getAttribute("senaraiTempahan");
+    List<FasilitiSlot> senaraiSlot = (List<FasilitiSlot>) request.getAttribute("senaraiSlot");
 %>
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F7F7F9]">
@@ -16,16 +18,22 @@
     <header class="flex justify-between items-center mb-8">
         <div>
             <h2 class="text-2xl font-bold text-gray-800">Pengurusan Fasiliti</h2>
-            <p class="text-gray-500 text-sm">Urus inventori kemudahan kampung dan semak permohonan tempahan.</p>
+            <p class="text-gray-500 text-sm">Urus inventori kemudahan kampung, slot masa, dan semak permohonan tempahan.</p>
         </div>
-        <button onclick="openAddModal()" class="px-6 py-3 bg-brand-purple text-white rounded-2xl font-bold text-sm shadow-lg shadow-indigo-100 flex items-center gap-2 hover:bg-opacity-90 transition-all">
-            <i class="fas fa-plus"></i>
-            Tambah Fasiliti
-        </button>
+        <div class="flex gap-4">
+            <button onclick="openSlotModal()" class="px-6 py-3 bg-white text-brand-purple border border-brand-purple rounded-2xl font-bold text-sm shadow-sm flex items-center gap-2 hover:bg-gray-50 transition-all">
+                <i class="fas fa-clock"></i>
+                Tambah Slot
+            </button>
+            <button onclick="openAddModal()" class="px-6 py-3 bg-brand-purple text-white rounded-2xl font-bold text-sm shadow-lg shadow-indigo-100 flex items-center gap-2 hover:bg-opacity-90 transition-all">
+                <i class="fas fa-plus"></i>
+                Tambah Fasiliti
+            </button>
+        </div>
     </header>
 
     <!-- Stat Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-5">
             <div class="w-14 h-14 bg-indigo-50 text-brand-purple rounded-2xl flex items-center justify-center text-xl">
                 <i class="fas fa-warehouse"></i>
@@ -50,12 +58,22 @@
                 <h3 class="text-2xl font-bold text-gray-800"><%= pendingCount %></h3>
             </div>
         </div>
+        <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-5">
+            <div class="w-14 h-14 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center text-xl">
+                <i class="fas fa-list-check"></i>
+            </div>
+            <div>
+                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Slot Aktif</p>
+                <h3 class="text-2xl font-bold text-gray-800"><%= (senaraiSlot != null) ? senaraiSlot.size() : 0 %></h3>
+            </div>
+        </div>
     </div>
 
     <!-- Tabs -->
     <div class="mb-8 border-b border-gray-200">
         <nav class="flex gap-8">
             <button onclick="switchTab('inventory')" id="tab-inventory" class="pb-4 px-2 text-sm font-bold border-b-2 border-brand-purple text-brand-purple transition-all">Inventori Fasiliti</button>
+            <button onclick="switchTab('slots')" id="tab-slots" class="pb-4 px-2 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition-all">Pengurusan Slot Masa</button>
             <button onclick="switchTab('requests')" id="tab-requests" class="pb-4 px-2 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition-all flex items-center gap-2">
                 Permohonan Tempahan
                 <% if(pendingCount > 0) { %>
@@ -121,6 +139,54 @@
         </div>
     </div>
 
+    <!-- Tab Slots -->
+    <div id="content-slots" class="hidden">
+        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fasiliti</th>
+                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Durasi</th>
+                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Slot Masa</th>
+                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-50">
+                        <% if (senaraiSlot != null && !senaraiSlot.isEmpty()) { 
+                            for (FasilitiSlot s : senaraiSlot) { 
+                                String namaFasiliti = "";
+                                for(Fasiliti f : senaraiFasiliti) if(f.getId_fasiliti() == s.getId_fasiliti()) namaFasiliti = f.getNama_fasiliti();
+                        %>
+                            <tr class="hover:bg-gray-50/50 transition-colors">
+                                <td class="px-8 py-6 text-sm font-bold text-gray-800"><%= namaFasiliti %></td>
+                                <td class="px-8 py-6">
+                                    <span class="px-3 py-1 bg-indigo-50 text-brand-purple rounded-full text-[10px] font-bold uppercase tracking-wider">
+                                        <%= s.getDurasi() %> Jam
+                                    </span>
+                                </td>
+                                <td class="px-8 py-6 text-sm text-gray-500 font-medium">
+                                    <%= s.getMasa_mula() %> - <%= s.getMasa_tamat() %>
+                                </td>
+                                <td class="px-8 py-6">
+                                    <div class="flex justify-center">
+                                        <a href="<%= contextPath %>/fasiliti/deleteSlot?id=<%= s.getId_slot() %>" 
+                                           onclick="return confirm('Padam slot masa ini?')"
+                                           class="w-9 h-9 flex items-center justify-center bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                                            <i class="fas fa-trash text-xs"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        <% } } else { %>
+                            <tr><td colspan="4" class="px-8 py-10 text-center text-gray-400 text-sm italic">Tiada slot masa ditetapkan.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <!-- Tab 2: Booking Requests -->
     <div id="content-requests" class="hidden">
         <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
@@ -131,6 +197,7 @@
                             <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pemohon</th>
                             <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fasiliti</th>
                             <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tarikh & Masa</th>
+                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sebab/Catatan</th>
                             <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
                             <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Tindakan</th>
                         </tr>
@@ -147,6 +214,11 @@
                                 <td class="px-8 py-6">
                                     <p class="text-xs font-bold text-gray-700"><%= t.getTarikh_tempah() %></p>
                                     <p class="text-[10px] text-gray-400"><%= t.getMasa_mula() %> - <%= t.getMasa_tamat() %></p>
+                                </td>
+                                <td class="px-8 py-6">
+                                    <p class="text-[10px] text-gray-500 max-w-[150px] truncate" title="<%= t.getCatatan_pemohon() != null ? t.getCatatan_pemohon() : "-" %>">
+                                        <%= t.getCatatan_pemohon() != null ? t.getCatatan_pemohon() : "-" %>
+                                    </p>
                                 </td>
                                 <td class="px-8 py-6">
                                     <% if ("MENUNGGU".equals(t.getStatus())) { %>
@@ -175,11 +247,60 @@
                                 </td>
                             </tr>
                         <% } } else { %>
-                            <tr><td colspan="5" class="px-8 py-10 text-center text-gray-400 text-sm italic">Tiada permohonan tempahan.</td></tr>
+                            <tr><td colspan="6" class="px-8 py-10 text-center text-gray-400 text-sm italic">Tiada permohonan tempahan.</td></tr>
                         <% } %>
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Tambah Slot Masa -->
+<div id="modalSlot" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-40 transition-opacity backdrop-blur-sm" onclick="closeSlotModal()"></div>
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl p-8 transform transition-all">
+            <header class="flex justify-between items-center mb-8">
+                <h3 class="text-xl font-bold text-gray-800">Tambah Slot Masa</h3>
+                <button onclick="closeSlotModal()" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-gray-50 rounded-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </header>
+
+            <form action="<%= contextPath %>/fasiliti/addSlot" method="post" class="space-y-6">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Pilih Fasiliti</label>
+                    <select name="id_fasiliti" required class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium">
+                        <% for(Fasiliti f : senaraiFasiliti) { %>
+                            <option value="<%= f.getId_fasiliti() %>"><%= f.getNama_fasiliti() %></option>
+                        <% } %>
+                    </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Durasi Slot</label>
+                    <select name="durasi" required class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium">
+                        <option value="1">1 Jam</option>
+                        <option value="2">2 Jam</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Masa Mula</label>
+                        <input type="time" name="masa_mula" required class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium">
+                    </div>
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Masa Tamat</label>
+                        <input type="time" name="masa_tamat" required class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium">
+                    </div>
+                </div>
+
+                <button type="submit" class="w-full py-5 bg-brand-purple text-white rounded-2xl font-bold text-sm shadow-xl shadow-indigo-100 hover:bg-opacity-90 mt-8 transition-all">
+                    Simpan Slot
+                </button>
+            </form>
         </div>
     </div>
 </div>
@@ -237,6 +358,7 @@
         document.getElementById('tab-' + tabId).classList.remove('border-transparent', 'text-gray-400');
 
         document.getElementById('content-inventory').classList.add('hidden');
+        document.getElementById('content-slots').classList.add('hidden');
         document.getElementById('content-requests').classList.add('hidden');
         document.getElementById('content-' + tabId).classList.remove('hidden');
     }
@@ -263,6 +385,14 @@
 
     function closeModal() {
         document.getElementById('modalFasiliti').classList.add('hidden');
+    }
+
+    function openSlotModal() {
+        document.getElementById('modalSlot').classList.remove('hidden');
+    }
+
+    function closeSlotModal() {
+        document.getElementById('modalSlot').classList.add('hidden');
     }
 </script>
 

@@ -1,14 +1,18 @@
 package controller;
 
 import dao.FasilitiDAO;
+import dao.FasilitiSlotDAO;
 import dao.TempahanFasilitiDAO;
 import model.Fasiliti;
+import model.FasilitiSlot;
 import model.Pengguna;
 import model.TempahanFasiliti;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.sql.Date;
 import java.sql.Time;
+import java.util.ArrayList;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -21,6 +25,7 @@ public class FasilitiServlet extends HttpServlet {
 
     private FasilitiDAO fasilitiDAO = new FasilitiDAO();
     private TempahanFasilitiDAO tempahanDAO = new TempahanFasilitiDAO();
+    private FasilitiSlotDAO slotDAO = new FasilitiSlotDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -60,6 +65,12 @@ public class FasilitiServlet extends HttpServlet {
                     } else {
                         response.sendRedirect(request.getContextPath() + "/dashboard?error=access");
                     }
+                    break;
+                case "/getSlots":
+                    handleGetSlots(request, response);
+                    break;
+                case "/deleteSlot":
+                    if (isStaff(user)) handleDeleteSlot(request, response);
                     break;
                 default:
                     response.sendRedirect(request.getContextPath() + "/fasiliti/list");
@@ -102,6 +113,9 @@ public class FasilitiServlet extends HttpServlet {
                 case "/reject":
                     if (isStaff(user)) handleStatusTempahan(request, response, "TOLAK");
                     break;
+                case "/addSlot":
+                    if (isStaff(user)) handleAddSlot(request, response);
+                    break;
                 default:
                     response.sendRedirect(request.getContextPath() + "/fasiliti/list");
                     break;
@@ -129,6 +143,15 @@ public class FasilitiServlet extends HttpServlet {
         
         request.setAttribute("senaraiFasiliti", senaraiFasiliti);
         request.setAttribute("senaraiTempahan", senaraiSemuaTempahan);
+        
+        // Fetch all slots to display in management
+        List<FasilitiSlot> senaraiSlot = new ArrayList<>();
+        for(Fasiliti f : senaraiFasiliti) {
+            senaraiSlot.addAll(slotDAO.getSlotsByFasiliti(f.getId_fasiliti(), 1));
+            senaraiSlot.addAll(slotDAO.getSlotsByFasiliti(f.getId_fasiliti(), 2));
+        }
+        request.setAttribute("senaraiSlot", senaraiSlot);
+        
         request.getRequestDispatcher("/views/fasiliti/urusFasiliti.jsp").forward(request, response);
     }
 
@@ -138,6 +161,7 @@ public class FasilitiServlet extends HttpServlet {
         Date tarikh = Date.valueOf(request.getParameter("tarikh_tempah"));
         Time mula = Time.valueOf(request.getParameter("masa_mula") + ":00");
         Time tamat = Time.valueOf(request.getParameter("masa_tamat") + ":00");
+        String catatanPemohon = request.getParameter("catatan_pemohon");
 
         if (mula.after(tamat) || mula.equals(tamat)) {
             response.sendRedirect(request.getContextPath() + "/fasiliti/list?error=time");
@@ -155,6 +179,7 @@ public class FasilitiServlet extends HttpServlet {
         t.setTarikh_tempah(tarikh);
         t.setMasa_mula(mula);
         t.setMasa_tamat(tamat);
+        t.setCatatan_pemohon(catatanPemohon);
         
         if (tempahanDAO.simpanTempahanBaru(t)) {
             response.sendRedirect(request.getContextPath() + "/fasiliti/list?success=booked");
@@ -226,5 +251,44 @@ public class FasilitiServlet extends HttpServlet {
     private boolean isStaff(Pengguna user) {
         String role = user.getNama_peranan();
         return "AJK Kampung".equalsIgnoreCase(role) || "Ketua Kampung".equalsIgnoreCase(role);
+    }
+
+    private void handleGetSlots(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        int idFasiliti = Integer.parseInt(request.getParameter("idFasiliti"));
+        int durasi = Integer.parseInt(request.getParameter("durasi"));
+        List<FasilitiSlot> slots = slotDAO.getSlotsByFasiliti(idFasiliti, durasi);
+        
+        response.setContentType("application/json");
+        PrintWriter out = response.getWriter();
+        out.print("[");
+        for (int i = 0; i < slots.size(); i++) {
+            FasilitiSlot s = slots.get(i);
+            out.print("{\"id\":" + s.getId_slot() + ",\"mula\":\"" + s.getMasa_mula() + "\",\"tamat\":\"" + s.getMasa_tamat() + "\"}");
+            if (i < slots.size() - 1) out.print(",");
+        }
+        out.print("]");
+    }
+
+    private void handleAddSlot(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        FasilitiSlot s = new FasilitiSlot();
+        s.setId_fasiliti(Integer.parseInt(request.getParameter("id_fasiliti")));
+        s.setMasa_mula(Time.valueOf(request.getParameter("masa_mula") + ":00"));
+        s.setMasa_tamat(Time.valueOf(request.getParameter("masa_tamat") + ":00"));
+        s.setDurasi(Integer.parseInt(request.getParameter("durasi")));
+        
+        if (slotDAO.addSlot(s)) {
+            response.sendRedirect(request.getContextPath() + "/fasiliti/urus?success=slot_added");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/fasiliti/urus?error=slot_failed");
+        }
+    }
+
+    private void handleDeleteSlot(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        int id = Integer.parseInt(request.getParameter("id"));
+        if (slotDAO.deleteSlot(id)) {
+            response.sendRedirect(request.getContextPath() + "/fasiliti/urus?success=slot_deleted");
+        } else {
+            response.sendRedirect(request.getContextPath() + "/fasiliti/urus?error=slot_delete_failed");
+        }
     }
 }

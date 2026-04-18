@@ -185,26 +185,55 @@
                 </button>
             </header>
 
-            <form action="<%= contextPath %>/fasiliti/tempah" method="post" class="space-y-6">
+            <form action="<%= contextPath %>/fasiliti/tempah" method="post" class="space-y-6" id="formTempah">
                 <input type="hidden" name="id_fasiliti" id="modalIdFasiliti">
                 
                 <div class="space-y-2">
                     <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Tarikh Tempahan</label>
-                    <input type="date" name="tarikh_tempah" required 
+                    <input type="date" name="tarikh_tempah" id="tarikh_tempah" required 
                            class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium">
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Tempoh Tempahan</label>
+                    <select name="tempoh_tempahan" id="tempoh_tempahan" onchange="toggleDuration()"
+                            class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium">
+                        <option value="1">1 Jam</option>
+                        <option value="2">2 Jam</option>
+                        <option value="specific">Masa Spesifik</option>
+                    </select>
+                </div>
+
+                <div class="space-y-2" id="slot_container">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Pilih Slot Masa</label>
+                    <select id="slot_select" onchange="applySlot()"
+                            class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium">
+                        <option value="">Sila pilih tarikh & tempoh dahulu...</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4 hidden" id="manual_time_container">
                     <div class="space-y-2">
                         <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Waktu Mula</label>
-                        <input type="time" name="masa_mula" required 
+                        <input type="time" name="masa_mula" id="masa_mula" 
                                class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium">
                     </div>
                     <div class="space-y-2">
                         <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Waktu Tamat</label>
-                        <input type="time" name="masa_tamat" required 
+                        <input type="time" name="masa_tamat" id="masa_tamat" 
                                class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium">
                     </div>
+                </div>
+
+                <!-- Hidden inputs to hold the actual values for form submission when using slots -->
+                <input type="hidden" name="masa_mula_hidden" id="masa_mula_hidden">
+                <input type="hidden" name="masa_tamat_hidden" id="masa_tamat_hidden">
+
+                <div class="space-y-2 hidden" id="catatan_container">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Sebab / Catatan</label>
+                    <textarea name="catatan_pemohon" id="catatan_pemohon" rows="3"
+                              class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium"
+                              placeholder="Nyatakan sebab anda memerlukan tempoh masa yang spesifik..."></textarea>
                 </div>
 
                 <button type="submit" class="w-full py-5 bg-brand-purple text-white rounded-2xl font-bold text-sm shadow-xl shadow-indigo-100 hover:bg-opacity-90 mt-8 transition-all">
@@ -216,6 +245,99 @@
 </div>
 
 <script>
+    function toggleDuration() {
+        const tempoh = document.getElementById('tempoh_tempahan').value;
+        const slotContainer = document.getElementById('slot_container');
+        const manualContainer = document.getElementById('manual_time_container');
+        const catatanContainer = document.getElementById('catatan_container');
+        
+        const masaMula = document.getElementById('masa_mula');
+        const masaTamat = document.getElementById('masa_tamat');
+        const catatanInput = document.getElementById('catatan_pemohon');
+
+        if (tempoh === 'specific') {
+            slotContainer.classList.add('hidden');
+            manualContainer.classList.remove('hidden');
+            catatanContainer.classList.remove('hidden');
+            
+            masaMula.required = true;
+            masaTamat.required = true;
+            catatanInput.required = true;
+            
+            // Reset hidden inputs
+            document.getElementById('masa_mula_hidden').value = "";
+            document.getElementById('masa_tamat_hidden').value = "";
+        } else {
+            slotContainer.classList.remove('hidden');
+            manualContainer.classList.add('hidden');
+            catatanContainer.classList.add('hidden');
+            
+            masaMula.required = false;
+            masaTamat.required = false;
+            catatanInput.required = false;
+            
+            loadSlots();
+        }
+    }
+
+    function loadSlots() {
+        const idFasiliti = document.getElementById('modalIdFasiliti').value;
+        const tempoh = document.getElementById('tempoh_tempahan').value;
+        const slotSelect = document.getElementById('slot_select');
+
+        if (!idFasiliti || tempoh === 'specific') return;
+
+        slotSelect.innerHTML = '<option value="">Memuatkan slot...</option>';
+
+        fetch(`<%= contextPath %>/fasiliti/getSlots?idFasiliti=${idFasiliti}&durasi=${tempoh}`)
+            .then(response => response.json())
+            .then(data => {
+                slotSelect.innerHTML = '<option value="">Pilih Slot Masa</option>';
+                if (data.length === 0) {
+                    slotSelect.innerHTML = '<option value="">Tiada slot ditetapkan oleh admin</option>';
+                } else {
+                    data.forEach(slot => {
+                        const option = document.createElement('option');
+                        option.value = JSON.stringify({mula: slot.mula, tamat: slot.tamat});
+                        option.textContent = `${slot.mula.substring(0,5)} - ${slot.tamat.substring(0,5)}`;
+                        slotSelect.appendChild(option);
+                    });
+                }
+            })
+            .catch(err => {
+                console.error('Error fetching slots:', err);
+                slotSelect.innerHTML = '<option value="">Ralat memuatkan slot</option>';
+            });
+    }
+
+    function applySlot() {
+        const slotVal = document.getElementById('slot_select').value;
+        if (!slotVal) return;
+        
+        const slot = JSON.parse(slotVal);
+        document.getElementById('masa_mula_hidden').value = slot.mula;
+        document.getElementById('masa_tamat_hidden').value = slot.tamat;
+    }
+
+    // Update form submission to use hidden inputs if slots are used
+    document.getElementById('formTempah').onsubmit = function(e) {
+        const tempoh = document.getElementById('tempoh_tempahan').value;
+        if (tempoh !== 'specific') {
+            const mula = document.getElementById('masa_mula_hidden').value;
+            const tamat = document.getElementById('masa_tamat_hidden').value;
+            
+            if (!mula || !tamat) {
+                alert("Sila pilih slot masa!");
+                e.preventDefault();
+                return false;
+            }
+            
+            // Assign hidden values to the actual named inputs before submit
+            document.getElementById('masa_mula').value = mula.substring(0,5);
+            document.getElementById('masa_tamat').value = tamat.substring(0,5);
+        }
+    };
+
     function switchTab(tabId) {
         // Update Tabs UI
         document.querySelectorAll('nav button').forEach(btn => {

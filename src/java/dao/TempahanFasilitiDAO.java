@@ -14,8 +14,8 @@ public class TempahanFasilitiDAO {
     // 1. Menyimpan rekod tempahan baru
     public boolean simpanTempahanBaru(TempahanFasiliti t) {
         // Mengikut struktur gambar DB: tarikh_tempah, masa_mula, masa_tamat, status, dibuat_pada
-        String sql = "INSERT INTO tempahan_fasiliti (id_pengguna, id_fasiliti, tarikh_tempah, masa_mula, masa_tamat, status, dibuat_pada) " +
-                     "VALUES (?, ?, ?, ?, ?, 'MENUNGGU', CURRENT_TIMESTAMP)";
+        String sql = "INSERT INTO tempahan_fasiliti (id_pengguna, id_fasiliti, tarikh_tempah, masa_mula, masa_tamat, status, catatan_pemohon, dibuat_pada) " +
+                     "VALUES (?, ?, ?, ?, ?, 'MENUNGGU', ?, CURRENT_TIMESTAMP)";
         boolean status = false;
         
         try (Connection conn = DBUtil.getConnection();
@@ -28,6 +28,7 @@ public class TempahanFasilitiDAO {
             ps.setDate(3, t.getTarikh_tempah());
             ps.setTime(4, t.getMasa_mula());
             ps.setTime(5, t.getMasa_tamat());
+            ps.setString(6, t.getCatatan_pemohon());
             
             int rowAffected = ps.executeUpdate();
             if (rowAffected > 0) {
@@ -61,6 +62,7 @@ public class TempahanFasilitiDAO {
                     t.setMasa_mula(rs.getTime("masa_mula"));
                     t.setMasa_tamat(rs.getTime("masa_tamat"));
                     t.setStatus(rs.getString("status"));
+                    t.setCatatan_pemohon(rs.getString("catatan_pemohon"));
                     t.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
                     t.setNama_fasiliti(rs.getString("nama_fasiliti"));
                     senarai.add(t);
@@ -91,6 +93,7 @@ public class TempahanFasilitiDAO {
                 t.setMasa_mula(rs.getTime("masa_mula"));
                 t.setMasa_tamat(rs.getTime("masa_tamat"));
                 t.setStatus(rs.getString("status"));
+                t.setCatatan_pemohon(rs.getString("catatan_pemohon"));
                 t.setCatatan_pentadbir(rs.getString("catatan_pentadbir"));
                 t.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
                 t.setNama_fasiliti(rs.getString("nama_fasiliti"));
@@ -122,6 +125,7 @@ public class TempahanFasilitiDAO {
                     t.setMasa_mula(rs.getTime("masa_mula"));
                     t.setMasa_tamat(rs.getTime("masa_tamat"));
                     t.setStatus(rs.getString("status"));
+                    t.setCatatan_pemohon(rs.getString("catatan_pemohon"));
                     t.setCatatan_pentadbir(rs.getString("catatan_pentadbir"));
                     t.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
                     t.setNama_fasiliti(rs.getString("nama_fasiliti"));

@@ -12,6 +12,7 @@ public class TempahanFasiliti {
     private Time masa_mula;
     private Time masa_tamat;
     private String status;
+    private String catatan_pemohon;
     private String catatan_pentadbir;
     private Timestamp dibuat_pada;
     private Timestamp dikemaskini_pada;
@@ -45,6 +46,9 @@ public class TempahanFasiliti {
 
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getCatatan_pemohon() { return catatan_pemohon; }
+    public void setCatatan_pemohon(String catatan_pemohon) { this.catatan_pemohon = catatan_pemohon; }
 
     public String getCatatan_pentadbir() { return catatan_pentadbir; }
     public void setCatatan_pentadbir(String catatan_pentadbir) { this.catatan_pentadbir = catatan_pentadbir; }
