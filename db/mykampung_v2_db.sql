@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 17, 2026 at 02:06 PM
+-- Generation Time: Apr 18, 2026 at 02:15 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -151,6 +151,20 @@ INSERT INTO `fasiliti` (`id_fasiliti`, `nama_fasiliti`, `lokasi`, `status`, `dib
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `fasiliti_slot`
+--
+
+CREATE TABLE `fasiliti_slot` (
+  `id_slot` int(11) NOT NULL,
+  `id_fasiliti` int(11) NOT NULL,
+  `masa_mula` time NOT NULL,
+  `masa_tamat` time NOT NULL,
+  `durasi` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `hebahan`
 --
 
@@ -276,7 +290,7 @@ CREATE TABLE `pengguna` (
 --
 
 INSERT INTO `pengguna` (`id_pengguna`, `nama_penuh`, `nombor_kp`, `nombor_telefon`, `tarikh_lahir`, `kata_laluan`, `status`, `status_keluarga`, `pekerjaan`, `pendapatan`, `nama_jalan`, `daerah`, `nombor_poskod`, `bandar`, `negeri`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`, `lampiran_pengesahan`, `reset_token`, `token_expiry`, `email`) VALUES
-(1, 'Ahmad bin Ali', '800101031234', '012-3456 5353', '1980-01-01', '$2a$12$y7aIVPJJ54wqYDwAcS03q.qKlKLnbLRnww4h99omZQEFMZRkEhRom', 1, 'Bujang', 'Petani', 1000.00, 'Jalan Mawar 1', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-17 11:12:52', NULL, NULL, NULL, NULL, 'khairuliman736@gmail.com'),
+(1, 'Ahmad bin Ali', '800101031234', '012-3456 5353', '1980-01-01', '$2a$10$pcl0DE/lCi37oEUj82CO5e.iqf0nEfOCJ.X8dz19HsJJxq3K/MQ0y', 1, 'Bujang', 'Petani', 1000.00, 'Jalan Mawar 1', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-18 05:42:45', NULL, NULL, NULL, NULL, 'khairuliman736@gmail.com'),
 (2, 'Siti binti Abuya', '850202035566', '011-1101 3816', '1985-02-02', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', '', NULL, 'Jalan Melati 2', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-15 07:34:02', NULL, NULL, NULL, NULL, ''),
 (3, 'Muthu a/l Samy', '900303037788', '014-5678 901', '1990-03-03', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', 'Peniaga', 3000.00, 'Jalan Kenanga', NULL, '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-15 07:34:06', NULL, NULL, NULL, NULL, ''),
 (4, 'Chong Wei Ming', '750404039911', '016-6789012', '1975-04-04', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Berkahwin', 'Kontraktor', 5500.00, 'Jalan Teratai', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-15 07:34:10', NULL, NULL, NULL, NULL, ''),
@@ -290,7 +304,8 @@ INSERT INTO `pengguna` (`id_pengguna`, `nama_penuh`, `nombor_kp`, `nombor_telefo
 (15, 'Muhammad Naim Najmi Bin Hazre', '990404110432', NULL, '1999-04-04', 'hash123', 1, NULL, NULL, NULL, 'Kg Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-05 12:33:29', '2026-04-06 08:51:03', NULL, 'bukti_990404110432_1775392409643.pdf', NULL, NULL, ''),
 (16, 'Muhammad Naim Najmi Bin Hazrew', '990404110431', '012345678', '1999-04-04', 'hash123', 1, NULL, NULL, NULL, 'Kg Danan', 'Selising', '16810', '800101031231', 'Kelantan', '2026-04-06 09:06:30', '2026-04-14 09:16:04', NULL, 'bukti_990404110431_1775466390091.pdf', NULL, NULL, ''),
 (18, 'MUHAMMAD KHAIRUL IMAN BIN ABD KARIM', '040101030440', '01111013816', '2004-01-01', '$2a$10$D0Yd9Rk1AnddKLDA1AFx/Oax/X2fNfFv9zR4cgwU1XaS8tHOI5Jva', 1, NULL, NULL, NULL, 'Lot. 98 Kg Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-14 09:17:11', '2026-04-14 09:17:34', NULL, 'bukti_040101030440_1776158231600.pdf', NULL, NULL, ''),
-(21, 'MUHAMAD AMIR BIN RUSLI', '042304034506', '01111013816', '2005-11-04', '$2a$10$PWjG2khEQHBAx8sDwadOqe1OHEc.ZK0JV5CGmSllfNIGnSYKDeld.', 1, NULL, NULL, NULL, 'Lot. 98 Kg Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-17 04:10:48', '2026-04-17 04:31:44', NULL, 'bukti_042304034506_1776399048381.pdf', NULL, NULL, 'amir123@gmail.com');
+(21, 'MUHAMAD AMIR BIN RUSLI', '042304034506', '01111013816', '2005-11-04', '$2a$10$PWjG2khEQHBAx8sDwadOqe1OHEc.ZK0JV5CGmSllfNIGnSYKDeld.', 1, NULL, NULL, NULL, 'Lot. 98 Kg Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-17 04:10:48', '2026-04-17 04:31:44', NULL, 'bukti_042304034506_1776399048381.pdf', NULL, NULL, 'amir123@gmail.com'),
+(22, 'MUHAMMD AIMAN BIN SAMAD', '010302030441', '01120034344', '2001-03-02', '$2a$10$.l7X.UGDpzKRG47QQ76YbOsKx18VRpxslYVWinUWw6xuY6ucAbqHS', 2, NULL, NULL, NULL, 'Lot 67, Kampung Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-18 05:48:01', '2026-04-18 05:48:01', NULL, 'bukti_010302030441_1776491281745.pdf', NULL, NULL, 'khayxstyle@gmail.com');
 
 -- --------------------------------------------------------
 
@@ -313,7 +328,7 @@ INSERT INTO `pengguna_peranan` (`id_pengguna`, `id_peranan`) VALUES
 (3, 3),
 (4, 4),
 (5, 4),
-(6, 4),
+(6, 3),
 (7, 4),
 (8, 7),
 (9, 3),
@@ -322,7 +337,8 @@ INSERT INTO `pengguna_peranan` (`id_pengguna`, `id_peranan`) VALUES
 (15, 4),
 (16, 4),
 (18, 4),
-(21, 4);
+(21, 4),
+(22, 4);
 
 -- --------------------------------------------------------
 
@@ -401,6 +417,7 @@ CREATE TABLE `tempahan_fasiliti` (
   `masa_mula` time NOT NULL,
   `masa_tamat` time NOT NULL,
   `status` varchar(50) DEFAULT 'MENUNGGU',
+  `catatan_pemohon` text DEFAULT NULL,
   `catatan_pentadbir` varchar(150) DEFAULT NULL,
   `dibuat_pada` timestamp NOT NULL DEFAULT current_timestamp(),
   `dikemaskini_pada` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -411,18 +428,20 @@ CREATE TABLE `tempahan_fasiliti` (
 -- Dumping data for table `tempahan_fasiliti`
 --
 
-INSERT INTO `tempahan_fasiliti` (`id_tempahan`, `id_fasiliti`, `id_pengguna`, `tarikh_tempah`, `masa_mula`, `masa_tamat`, `status`, `catatan_pentadbir`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`) VALUES
-(1, 1, 2, '2023-12-01', '08:00:00', '17:00:00', 'LULUS', NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(2, 3, 6, '2023-12-02', '20:00:00', '22:00:00', 'LULUS', NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(3, 2, 4, '2023-12-05', '15:00:00', '18:00:00', 'MENUNGGU', NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(4, 4, 1, '2023-12-10', '09:00:00', '13:00:00', 'LULUS', NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(5, 5, 8, '2023-12-12', '18:00:00', '21:00:00', 'LULUS', NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(6, 7, 3, '2023-12-15', '17:00:00', '19:00:00', 'MENUNGGU', NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(7, 1, 7, '2023-12-20', '10:00:00', '16:00:00', 'TOLAK', NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(8, 6, 9, '2023-12-22', '20:00:00', '23:00:00', 'LULUS', NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(9, 10, 10, '2023-12-25', '15:00:00', '23:00:00', 'LULUS', NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(10, 8, 5, '2023-12-30', '09:00:00', '12:00:00', 'MENUNGGU', NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(11, 3, 2, '2026-04-14', '08:17:00', '11:17:00', 'MENUNGGU', NULL, '2026-04-14 00:18:05', '2026-04-14 00:18:05', NULL);
+INSERT INTO `tempahan_fasiliti` (`id_tempahan`, `id_fasiliti`, `id_pengguna`, `tarikh_tempah`, `masa_mula`, `masa_tamat`, `status`, `catatan_pemohon`, `catatan_pentadbir`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`) VALUES
+(1, 1, 2, '2023-12-01', '08:00:00', '17:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(2, 3, 6, '2023-12-02', '20:00:00', '22:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(3, 2, 4, '2023-12-05', '15:00:00', '18:00:00', 'MENUNGGU', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(4, 4, 1, '2023-12-10', '09:00:00', '13:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(5, 5, 8, '2023-12-12', '18:00:00', '21:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(6, 7, 3, '2023-12-15', '17:00:00', '19:00:00', 'MENUNGGU', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(7, 1, 7, '2023-12-20', '10:00:00', '16:00:00', 'TOLAK', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(8, 6, 9, '2023-12-22', '20:00:00', '23:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(9, 10, 10, '2023-12-25', '15:00:00', '23:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(10, 8, 5, '2023-12-30', '09:00:00', '12:00:00', 'MENUNGGU', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(11, 3, 2, '2026-04-14', '08:17:00', '11:17:00', 'DIBATAL', NULL, NULL, '2026-04-14 00:18:05', '2026-04-18 07:08:07', NULL),
+(12, 2, 4, '2026-04-18', '00:00:00', '14:19:00', 'LULUS', NULL, NULL, '2026-04-18 03:20:03', '2026-04-18 04:54:45', NULL),
+(13, 6, 2, '2026-04-18', '14:44:00', '14:47:00', 'MENUNGGU', NULL, NULL, '2026-04-18 06:43:22', '2026-04-18 06:43:22', NULL);
 
 --
 -- Indexes for dumped tables
@@ -454,6 +473,13 @@ ALTER TABLE `bantuan`
 --
 ALTER TABLE `fasiliti`
   ADD PRIMARY KEY (`id_fasiliti`);
+
+--
+-- Indexes for table `fasiliti_slot`
+--
+ALTER TABLE `fasiliti_slot`
+  ADD PRIMARY KEY (`id_slot`),
+  ADD KEY `id_fasiliti` (`id_fasiliti`);
 
 --
 -- Indexes for table `hebahan`
@@ -533,6 +559,12 @@ ALTER TABLE `fasiliti`
   MODIFY `id_fasiliti` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
+-- AUTO_INCREMENT for table `fasiliti_slot`
+--
+ALTER TABLE `fasiliti_slot`
+  MODIFY `id_slot` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `hebahan`
 --
 ALTER TABLE `hebahan`
@@ -554,7 +586,7 @@ ALTER TABLE `kategori_aduan`
 -- AUTO_INCREMENT for table `pengguna`
 --
 ALTER TABLE `pengguna`
-  MODIFY `id_pengguna` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
+  MODIFY `id_pengguna` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `peranan`
@@ -572,7 +604,7 @@ ALTER TABLE `permohonan_bantuan`
 -- AUTO_INCREMENT for table `tempahan_fasiliti`
 --
 ALTER TABLE `tempahan_fasiliti`
-  MODIFY `id_tempahan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id_tempahan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- Constraints for dumped tables
@@ -591,6 +623,12 @@ ALTER TABLE `aduan`
 ALTER TABLE `ajk_jawatan`
   ADD CONSTRAINT `ajk_jawatan_ibfk_1` FOREIGN KEY (`id_pengguna`) REFERENCES `pengguna` (`id_pengguna`) ON DELETE CASCADE,
   ADD CONSTRAINT `ajk_jawatan_ibfk_2` FOREIGN KEY (`id_jawatan`) REFERENCES `jawatan_ajk` (`id_jawatan`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `fasiliti_slot`
+--
+ALTER TABLE `fasiliti_slot`
+  ADD CONSTRAINT `fasiliti_slot_ibfk_1` FOREIGN KEY (`id_fasiliti`) REFERENCES `fasiliti` (`id_fasiliti`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `hebahan`
