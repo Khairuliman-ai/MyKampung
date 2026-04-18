@@ -104,6 +104,16 @@ public class ProfileServlet extends HttpServlet {
                     currentUser.setPendapatan(new BigDecimal(pendapatanStr));
                 }
 
+                // Koordinat GPS dari Leaflet map
+                String latStr = request.getParameter("latitude");
+                String lonStr = request.getParameter("longitude");
+                if (latStr != null && !latStr.isEmpty()) {
+                    currentUser.setLatitude(Double.parseDouble(latStr));
+                }
+                if (lonStr != null && !lonStr.isEmpty()) {
+                    currentUser.setLongitude(Double.parseDouble(lonStr));
+                }
+
                 // C. Simpan ke Database
                 PenggunaDAO pDao = new PenggunaDAO(conn);
                 

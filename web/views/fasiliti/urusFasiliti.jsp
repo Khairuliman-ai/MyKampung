@@ -118,7 +118,16 @@
                                 </td>
                                 <td class="px-8 py-6">
                                     <div class="flex justify-center gap-3">
-                                        <button onclick="openEditModal('<%= f.getId_fasiliti() %>', '<%= f.getNama_fasiliti() %>', '<%= f.getLokasi() %>', '<%= f.getStatus() %>')" 
+                                        <% if ("Ketua Kampung".equalsIgnoreCase(role) || "Setiausaha".equals(biro)) {
+                                            if (f.getLatitude() != null && f.getLongitude() != null) { %>
+                                            <a href="https://www.google.com/maps/dir/?api=1&destination=<%= f.getLatitude() %>,<%= f.getLongitude() %>"
+                                               target="_blank"
+                                               class="w-9 h-9 flex items-center justify-center bg-gray-50 text-green-500 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all"
+                                               title="Navigasi GPS">
+                                                <i class="fas fa-route text-xs"></i>
+                                            </a>
+                                        <% } } %>
+                                        <button onclick="openEditModal('<%= f.getId_fasiliti() %>', '<%= f.getNama_fasiliti() %>', '<%= f.getLokasi() %>', '<%= f.getStatus() %>', '<%= f.getLatitude() != null ? f.getLatitude() : "" %>', '<%= f.getLongitude() != null ? f.getLongitude() : "" %>')" 
                                                 class="w-9 h-9 flex items-center justify-center bg-gray-50 text-gray-400 hover:text-brand-purple hover:bg-indigo-50 rounded-xl transition-all">
                                             <i class="fas fa-pen text-xs"></i>
                                         </button>
@@ -340,6 +349,13 @@
                     </select>
                 </div>
 
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Lokasi Pada Peta</label>
+                    <div id="mapFasiliti" style="height: 250px; border-radius: 1rem; z-index: 0;" class="border-2 border-dashed border-gray-100"></div>
+                    <input type="hidden" name="latitude" id="fasilitiLat">
+                    <input type="hidden" name="longitude" id="fasilitiLon">
+                </div>
+
                 <button type="submit" class="w-full py-5 bg-brand-purple text-white rounded-2xl font-bold text-sm shadow-xl shadow-indigo-100 hover:bg-opacity-90 mt-8 transition-all">
                     Simpan Fasiliti
                 </button>
@@ -363,6 +379,37 @@
         document.getElementById('content-' + tabId).classList.remove('hidden');
     }
 
+    function closeSlotModal() {
+        document.getElementById('modalSlot').classList.add('hidden');
+    }
+
+    var fasilitiMap, fasilitiMarker;
+    function initFasilitiMap(lat, lon) {
+        var defaultLat = 6.0289, defaultLon = 102.2935;
+        lat = (lat && lat !== '') ? parseFloat(lat) : defaultLat;
+        lon = (lon && lon !== '') ? parseFloat(lon) : defaultLon;
+        
+        if (fasilitiMap) { fasilitiMap.remove(); }
+        
+        fasilitiMap = L.map('mapFasiliti').setView([lat, lon], 15);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19, attribution: '© OpenStreetMap'
+        }).addTo(fasilitiMap);
+        
+        fasilitiMarker = L.marker([lat, lon], { draggable: true }).addTo(fasilitiMap);
+        
+        function updateF(ll) {
+            document.getElementById('fasilitiLat').value = ll.lat.toFixed(8);
+            document.getElementById('fasilitiLon').value = ll.lng.toFixed(8);
+        }
+        
+        fasilitiMarker.on('dragend', function(e) { updateF(e.target.getLatLng()); });
+        fasilitiMap.on('click', function(e) { fasilitiMarker.setLatLng(e.latlng); updateF(e.latlng); });
+        updateF(fasilitiMarker.getLatLng());
+        
+        setTimeout(function() { fasilitiMap.invalidateSize(); }, 300);
+    }
+
     function openAddModal() {
         document.getElementById('modalTitle').innerText = "Tambah Fasiliti Baru";
         document.getElementById('formFasiliti').action = "<%= contextPath %>/fasiliti/tambah";
@@ -371,9 +418,10 @@
         document.getElementById('fasilitiLokasi').value = "";
         document.getElementById('fasilitiStatus').value = "AKTIF";
         document.getElementById('modalFasiliti').classList.remove('hidden');
+        setTimeout(function(){ initFasilitiMap(); }, 100);
     }
 
-    function openEditModal(id, nama, lokasi, status) {
+    function openEditModal(id, nama, lokasi, status, lat, lon) {
         document.getElementById('modalTitle').innerText = "Kemaskini Fasiliti";
         document.getElementById('formFasiliti').action = "<%= contextPath %>/fasiliti/edit";
         document.getElementById('fasilitiId').value = id;
@@ -381,6 +429,7 @@
         document.getElementById('fasilitiLokasi').value = lokasi;
         document.getElementById('fasilitiStatus').value = status;
         document.getElementById('modalFasiliti').classList.remove('hidden');
+        setTimeout(function(){ initFasilitiMap(lat, lon); }, 100);
     }
 
     function closeModal() {

@@ -13,7 +13,7 @@ public class FasilitiDAO {
 
     public List<Fasiliti> dapatkanSemuaFasiliti() {
         List<Fasiliti> senarai = new ArrayList<>();
-        String sql = "SELECT id_fasiliti, nama_fasiliti, lokasi, status, dibuat_pada, dikemaskini_pada, dipadam_pada " +
+        String sql = "SELECT id_fasiliti, nama_fasiliti, lokasi, status, latitude, longitude, dibuat_pada, dikemaskini_pada, dipadam_pada " +
                      "FROM fasiliti WHERE status = 'AKTIF'";
 
         try (Connection conn = DBUtil.getConnection();
@@ -29,6 +29,12 @@ public class FasilitiDAO {
                 f.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
                 f.setDikemaskini_pada(rs.getTimestamp("dikemaskini_pada"));
                 f.setDipadam_pada(rs.getTimestamp("dipadam_pada"));
+
+                double lat = rs.getDouble("latitude");
+                f.setLatitude(rs.wasNull() ? null : lat);
+                double lon = rs.getDouble("longitude");
+                f.setLongitude(rs.wasNull() ? null : lon);
+
                 senarai.add(f);
             }
         } catch (SQLException e) {
@@ -55,6 +61,11 @@ public class FasilitiDAO {
                     f.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
                     f.setDikemaskini_pada(rs.getTimestamp("dikemaskini_pada"));
                     f.setDipadam_pada(rs.getTimestamp("dipadam_pada"));
+
+                    double lat = rs.getDouble("latitude");
+                    f.setLatitude(rs.wasNull() ? null : lat);
+                    double lon = rs.getDouble("longitude");
+                    f.setLongitude(rs.wasNull() ? null : lon);
                 }
             }
         } catch (SQLException e) {
@@ -64,11 +75,13 @@ public class FasilitiDAO {
     }
 
     public boolean tambahFasiliti(Fasiliti f) {
-        String sql = "INSERT INTO fasiliti (nama_fasiliti, lokasi, status) VALUES (?, ?, 'AKTIF')";
+        String sql = "INSERT INTO fasiliti (nama_fasiliti, lokasi, status, latitude, longitude) VALUES (?, ?, 'AKTIF', ?, ?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, f.getNama_fasiliti());
             ps.setString(2, f.getLokasi());
+            if (f.getLatitude() != null) ps.setDouble(3, f.getLatitude()); else ps.setNull(3, java.sql.Types.DECIMAL);
+            if (f.getLongitude() != null) ps.setDouble(4, f.getLongitude()); else ps.setNull(4, java.sql.Types.DECIMAL);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Ralat pada FasilitiDAO (tambah): " + e.getMessage());
@@ -77,13 +90,15 @@ public class FasilitiDAO {
     }
 
     public boolean kemaskiniFasiliti(Fasiliti f) {
-        String sql = "UPDATE fasiliti SET nama_fasiliti=?, lokasi=?, status=?, dikemaskini_pada=NOW() WHERE id_fasiliti=?";
+        String sql = "UPDATE fasiliti SET nama_fasiliti=?, lokasi=?, status=?, latitude=?, longitude=?, dikemaskini_pada=NOW() WHERE id_fasiliti=?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, f.getNama_fasiliti());
             ps.setString(2, f.getLokasi());
             ps.setString(3, f.getStatus());
-            ps.setInt(4, f.getId_fasiliti());
+            if (f.getLatitude() != null) ps.setDouble(4, f.getLatitude()); else ps.setNull(4, java.sql.Types.DECIMAL);
+            if (f.getLongitude() != null) ps.setDouble(5, f.getLongitude()); else ps.setNull(5, java.sql.Types.DECIMAL);
+            ps.setInt(6, f.getId_fasiliti());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Ralat pada FasilitiDAO (kemaskini): " + e.getMessage());
@@ -118,6 +133,11 @@ public class FasilitiDAO {
                 f.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
                 f.setDikemaskini_pada(rs.getTimestamp("dikemaskini_pada"));
                 f.setDipadam_pada(rs.getTimestamp("dipadam_pada"));
+
+                double lat_ = rs.getDouble("latitude");
+                f.setLatitude(rs.wasNull() ? null : lat_);
+                double lon_ = rs.getDouble("longitude");
+                f.setLongitude(rs.wasNull() ? null : lon_);
                 senarai.add(f);
             }
         } catch (SQLException e) {

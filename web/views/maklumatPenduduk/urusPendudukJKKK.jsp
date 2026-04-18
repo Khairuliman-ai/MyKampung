@@ -136,10 +136,27 @@
                             <td class="p-4 text-sm text-gray-500 max-w-xs truncate search-col"><%= p.getNama_jalan() %></td>
                             <td class="p-4 text-sm text-gray-500"><%= p.getNombor_telefon() %></td>
                             <td class="p-4 text-center">
-                                <button onclick="openEditModal('<%= p.getId_pengguna() %>', '<%= p.getNama_penuh() %>', '<%= p.getNombor_kp() %>', '<%= p.getNombor_telefon() %>', '<%= p.getNama_jalan() %>', '<%= p.getBandar() %>', '<%= p.getNombor_poskod() %>', '<%= p.getNegeri() %>', '<%= p.getKata_laluan() %>')"
-                                        class="text-[#6C5DD3] hover:bg-purple-50 p-2 rounded-lg transition">
-                                    <i class="fas fa-edit"></i>
-                                </button>
+                                <div class="flex justify-center gap-2">
+                                    <button onclick="openEditModal('<%= p.getId_pengguna() %>', '<%= p.getNama_penuh() %>', '<%= p.getNombor_kp() %>', '<%= p.getNombor_telefon() %>', '<%= p.getNama_jalan() %>', '<%= p.getBandar() %>', '<%= p.getNombor_poskod() %>', '<%= p.getNegeri() %>', '<%= p.getKata_laluan() %>')"
+                                            class="text-[#6C5DD3] hover:bg-purple-50 p-2 rounded-lg transition" title="Kemaskini">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    
+                                    <%-- Navigate Button for Admin --%>
+                                    <% if ("Ketua Kampung".equalsIgnoreCase(role) || "Setiausaha".equals(biro)) {
+                                        if (p.getLatitude() != null && p.getLongitude() != null) { %>
+                                        <a href="https://www.google.com/maps/dir/?api=1&destination=<%= p.getLatitude() %>,<%= p.getLongitude() %>"
+                                           target="_blank"
+                                           class="text-green-500 hover:bg-green-50 p-2 rounded-lg transition"
+                                           title="Navigasi ke lokasi">
+                                            <i class="fas fa-route"></i>
+                                        </a>
+                                    <% } else { %>
+                                        <span class="text-gray-300 p-2 cursor-not-allowed" title="Koordinat belum ditetapkan">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </span>
+                                    <% } } %>
+                                </div>
                             </td>
                         </tr>
                         <% } } else { %>

@@ -117,6 +117,11 @@ public Pengguna findByKP(String kp) {
                 user.setLampiran_pengesahan(rs.getString("lampiran_pengesahan"));
                 user.setNama_peranan(rs.getString("nama_peranan"));
                 user.setNama_jawatan(rs.getString("nama_jawatan"));
+
+                double lat = rs.getDouble("latitude");
+                user.setLatitude(rs.wasNull() ? null : lat);
+                double lon = rs.getDouble("longitude");
+                user.setLongitude(rs.wasNull() ? null : lon);
             }
         }
     } catch (SQLException e) {
@@ -127,8 +132,8 @@ public Pengguna findByKP(String kp) {
 
     public boolean updateProfil(Pengguna u) {
         String sql = "UPDATE pengguna SET nama_penuh=?, nombor_telefon=?, email=?, nama_jalan=?, daerah=?, "
-                + "nombor_poskod=?, bandar=?, negeri=?, status_keluarga=?, pekerjaan=?, pendapatan=? "
-                + "WHERE id_pengguna=?";
+                + "nombor_poskod=?, bandar=?, negeri=?, status_keluarga=?, pekerjaan=?, pendapatan=?, "
+                + "latitude=?, longitude=? WHERE id_pengguna=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, u.getNama_penuh());
             ps.setString(2, u.getNombor_telefon());
@@ -141,7 +146,9 @@ public Pengguna findByKP(String kp) {
             ps.setString(9, u.getStatus_keluarga());
             ps.setString(10, u.getPekerjaan());
             ps.setBigDecimal(11, u.getPendapatan());
-            ps.setInt(12, u.getId_pengguna());
+            if (u.getLatitude() != null) ps.setDouble(12, u.getLatitude()); else ps.setNull(12, java.sql.Types.DECIMAL);
+            if (u.getLongitude() != null) ps.setDouble(13, u.getLongitude()); else ps.setNull(13, java.sql.Types.DECIMAL);
+            ps.setInt(14, u.getId_pengguna());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -224,6 +231,11 @@ public Pengguna findByKP(String kp) {
             p.setNama_jawatan(rs.getString("nama_jawatan"));
         } catch (SQLException e) {
         }
+
+        double lat = rs.getDouble("latitude");
+        p.setLatitude(rs.wasNull() ? null : lat);
+        double lon = rs.getDouble("longitude");
+        p.setLongitude(rs.wasNull() ? null : lon);
 
         return p;
     }

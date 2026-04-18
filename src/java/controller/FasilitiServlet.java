@@ -203,6 +203,11 @@ public class FasilitiServlet extends HttpServlet {
         Fasiliti f = new Fasiliti();
         f.setNama_fasiliti(request.getParameter("nama"));
         f.setLokasi(request.getParameter("lokasi"));
+
+        String latStr = request.getParameter("latitude");
+        String lonStr = request.getParameter("longitude");
+        if (latStr != null && !latStr.isEmpty()) f.setLatitude(Double.parseDouble(latStr));
+        if (lonStr != null && !lonStr.isEmpty()) f.setLongitude(Double.parseDouble(lonStr));
         
         if (fasilitiDAO.tambahFasiliti(f)) {
             response.sendRedirect(request.getContextPath() + "/fasiliti/urus?success=added");
@@ -218,6 +223,11 @@ public class FasilitiServlet extends HttpServlet {
         f.setNama_fasiliti(request.getParameter("nama"));
         f.setLokasi(request.getParameter("lokasi"));
         f.setStatus(request.getParameter("status"));
+
+        String latStr_ = request.getParameter("latitude");
+        String lonStr_ = request.getParameter("longitude");
+        if (latStr_ != null && !latStr_.isEmpty()) f.setLatitude(Double.parseDouble(latStr_));
+        if (lonStr_ != null && !lonStr_.isEmpty()) f.setLongitude(Double.parseDouble(lonStr_));
         
         if (fasilitiDAO.kemaskiniFasiliti(f)) {
             response.sendRedirect(request.getContextPath() + "/fasiliti/urus?success=updated");

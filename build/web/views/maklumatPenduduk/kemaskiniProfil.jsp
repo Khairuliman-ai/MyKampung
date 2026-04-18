@@ -230,6 +230,22 @@
                         </div>
                     </div>
 
+                    <%-- Bahagian 4: Lokasi Rumah (Peta) --%>
+                    <div class="mb-8">
+                        <h4 class="text-sm font-bold text-[#6C5DD3] uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">
+                            4. Lokasi Rumah (Klik/Seret Penanda)
+                        </h4>
+                        <div id="mapProfil" style="height: 350px; border-radius: 1rem; z-index: 0;" class="border-2 border-dashed border-gray-200"></div>
+                        <input type="hidden" name="latitude" id="latInput"
+                               value="<%= (pDetail.getLatitude() != null) ? pDetail.getLatitude() : "" %>">
+                        <input type="hidden" name="longitude" id="lonInput"
+                               value="<%= (pDetail.getLongitude() != null) ? pDetail.getLongitude() : "" %>">
+                        <p class="text-xs text-gray-400 mt-2">
+                            <i class="fas fa-info-circle"></i>
+                            Klik pada peta atau seret penanda untuk menentukan lokasi rumah anda.
+                        </p>
+                    </div>
+
                     <div class="pt-4">
                         <button type="submit" class="w-full bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-purple-200 transition-all flex justify-center items-center gap-2">
                             <i class="fas fa-save"></i> Simpan Perubahan
@@ -330,6 +346,45 @@
     function hideChangePassModal() {
         document.getElementById('changePassModal').classList.add('hidden');
     }
+</script>
+
+<script>
+(function() {
+    var defaultLat = 6.0289, defaultLon = 102.2935;
+    var latElement = document.getElementById('latInput');
+    var lonElement = document.getElementById('lonInput');
+    if(!latElement || !lonElement) return;
+
+    var lat = latElement.value;
+    var lon = lonElement.value;
+    var hasCoords = (lat !== '' && lon !== '');
+    var initLat = hasCoords ? parseFloat(lat) : defaultLat;
+    var initLon = hasCoords ? parseFloat(lon) : defaultLon;
+
+    var map = L.map('mapProfil').setView([initLat, initLon], hasCoords ? 17 : 14);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+    }).addTo(map);
+
+    var marker = L.marker([initLat, initLon], { draggable: true }).addTo(map);
+
+    function updateInputs(latlng) {
+        document.getElementById('latInput').value = latlng.lat.toFixed(8);
+        document.getElementById('lonInput').value = latlng.lng.toFixed(8);
+    }
+
+    marker.on('dragend', function(e) { updateInputs(e.target.getLatLng()); });
+    map.on('click', function(e) {
+        marker.setLatLng(e.latlng);
+        updateInputs(e.latlng);
+    });
+
+    if (hasCoords) updateInputs(marker.getLatLng());
+
+    // Fix Leaflet rendering
+    setTimeout(function() { map.invalidateSize(); }, 300);
+})();
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>

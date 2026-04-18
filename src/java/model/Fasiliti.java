@@ -7,6 +7,8 @@ public class Fasiliti {
     private String nama_fasiliti;
     private String lokasi;
     private String status;
+    private Double latitude;
+    private Double longitude;
     private Timestamp dibuat_pada;
     private Timestamp dikemaskini_pada;
     private Timestamp dipadam_pada;
@@ -70,4 +72,20 @@ public class Fasiliti {
     public void setDipadam_pada(Timestamp dipadam_pada) {
         this.dipadam_pada = dipadam_pada;
     }
-}
+
+    public Double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(Double latitude) {
+        this.latitude = latitude;
+    }
+
+    public Double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(Double longitude) {
+        this.longitude = longitude;
+    }
+}
