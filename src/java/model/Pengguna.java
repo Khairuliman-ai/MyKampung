@@ -37,6 +37,7 @@ public class Pengguna {
     // Variable Tambahan (Untuk Logik Dashboard/Role)
     private String nama_peranan; // Diambil dari table 'peranan'
     private String nama_jawatan; // Diambil dari table 'jawatan_ajk' (khusus untuk AJK)
+    private int id_jawatan;      // ID Jawatan khusus untuk AJK
 
     // --- HELPER METHODS ---
     public String getAlamatLengkap() {
@@ -244,5 +245,13 @@ public class Pengguna {
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
+    }
+
+    public int getId_jawatan() {
+        return id_jawatan;
+    }
+
+    public void setId_jawatan(int id_jawatan) {
+        this.id_jawatan = id_jawatan;
     }
 }

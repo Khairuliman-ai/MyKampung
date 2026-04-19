@@ -7,8 +7,11 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 import dao.PenggunaDAO;
+import dao.ActivityLogDAO;
 import model.Pengguna;
+import model.ActivityLog;
 import util.DBUtil;
+import java.util.List;
 
 @WebServlet(urlPatterns = {"/profil/view", "/profil/update"})
 public class ProfileServlet extends HttpServlet {
@@ -23,6 +26,13 @@ public class ProfileServlet extends HttpServlet {
         Pengguna user = (Pengguna) session.getAttribute("currentUser");
 
         if (user != null) {
+            try (Connection conn = DBUtil.getConnection()) {
+                ActivityLogDAO logDAO = new ActivityLogDAO(conn);
+                List<ActivityLog> logs = logDAO.getLogsByResidentId(user.getId_pengguna());
+                request.setAttribute("activityLogs", logs);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             // Dalam DB v2, maklumat profil sudah ada dalam objek user di session.
             // Kita cuma perlu forward ke JSP yang betul.
             request.getRequestDispatcher("/views/maklumatPenduduk/kemaskiniProfil.jsp").forward(request, response);

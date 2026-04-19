@@ -20,13 +20,27 @@
     </div>
 
     <% if (request.getParameter("status") != null) { %>
-        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
-            <i class="fas fa-check-circle text-lg"></i>
-            <div>
-                <span class="font-bold">Berjaya!</span> Operasi telah dilaksanakan.
+        <% if (request.getParameter("status").equals("updated")) { %>
+            <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded-r-xl shadow-sm animate-fade-in flex items-center gap-3">
+                <i class="fas fa-check-circle"></i>
+                <p class="text-sm font-bold">Profil berjaya dikemaskini!</p>
             </div>
-            <button onclick="this.parentElement.remove()" class="ml-auto text-green-500 hover:text-green-700"><i class="fas fa-times"></i></button>
-        </div>
+        <% } else if (request.getParameter("status").equals("lantikSuccess")) { %>
+            <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 rounded-r-xl shadow-sm flex items-center gap-3">
+                <i class="fas fa-user-shield"></i>
+                <p class="text-sm font-bold">AJK Baharu berjaya dilantik!</p>
+            </div>
+        <% } else if (request.getParameter("status").equals("dropSuccess")) { %>
+            <div class="bg-orange-50 border-l-4 border-orange-500 text-orange-700 p-4 mb-6 rounded-r-xl shadow-sm flex items-center gap-3">
+                <i class="fas fa-user-minus"></i>
+                <p class="text-sm font-bold">Jawatan telah digugurkan.</p>
+            </div>
+        <% } else if (request.getParameter("status").equals("error")) { %>
+            <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-r-xl shadow-sm flex items-center gap-3">
+                <i class="fas fa-exclamation-circle"></i>
+                <p class="text-sm font-bold">Ralat berlaku. Sila cuba lagi.</p>
+            </div>
+        <% } %>
     <% } %>
 
     <div class="mb-6 border-b border-gray-200">
@@ -56,7 +70,6 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <% 
-                        // Sesuai dengan request.setAttribute("listAJK", listAJK) di Servlet
                         List<Pengguna> listJKKK = (List<Pengguna>) request.getAttribute("listAJK");
                         if (listJKKK != null && !listJKKK.isEmpty()) {
                             for (Pengguna p : listJKKK) { 
@@ -70,13 +83,37 @@
                             </td>
                             <td class="p-4 text-sm text-gray-600 font-mono"><%= p.getNombor_kp() %></td>
                             <td class="p-4 text-sm text-gray-500"><%= p.getNombor_telefon() %></td>
-                            <td class="p-4 text-center">
-                                <button onclick="openEditModal('<%= p.getId_pengguna() %>', '<%= p.getNama_penuh() %>', '<%= p.getNombor_kp() %>', '<%= p.getNombor_telefon() %>', '<%= p.getNama_jalan() %>', '<%= p.getBandar() %>', '<%= p.getNombor_poskod() %>', '<%= p.getNegeri() %>', '<%= p.getKata_laluan() %>')"
-                                        class="bg-purple-50 text-[#6C5DD3] hover:bg-[#6C5DD3] hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">
-                                    <i class="fas fa-edit"></i> Edit
-                                </button>
+                            <td class="p-4">
+                                <div class="flex items-center justify-center gap-2">
+                                    <% if (p.getLatitude() != null && p.getLongitude() != null) { %>
+                                        <button onclick="viewLocation('<%= p.getNama_penuh() %>', <%= p.getLatitude() %>, <%= p.getLongitude() %>)"
+                                                class="bg-blue-50 text-blue-600 hover:bg-blue-600 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition" title="Lihat Lokasi">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </button>
+                                        <a href="https://www.google.com/maps/dir/?api=1&destination=<%= p.getLatitude() %>,<%= p.getLongitude() %>"
+                                           target="_blank"
+                                           class="bg-green-50 text-green-600 hover:bg-green-600 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition"
+                                           title="Navigasi (Google Maps)">
+                                            <i class="fas fa-route"></i>
+                                        </a>
+                                    <% } %>
+                                    
+                                    <% 
+                                        String tarikh = (p.getTarikh_lahir() != null) ? new java.text.SimpleDateFormat("yyyy-MM-dd").format(p.getTarikh_lahir()) : "";
+                                    %>
+                                    <button onclick="openEditModal('<%= p.getId_pengguna() %>', '<%= p.getNama_penuh() %>', '<%= p.getNombor_kp() %>', '<%= p.getNombor_telefon() %>', '<%= p.getNama_jalan() %>', '<%= p.getBandar() %>', '<%= p.getNombor_poskod() %>', '<%= p.getNegeri() %>', '<%= tarikh %>', '<%= p.getStatus_keluarga() %>')"
+                                            class="bg-purple-50 text-[#6C5DD3] hover:bg-[#6C5DD3] hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                                        <i class="fas fa-edit"></i> Edit
+                                    </button>
+                                    <form action="<%= request.getContextPath() %>/ketua/gugurkan" method="post" onsubmit="return confirm('Adakah anda pasti untuk menggugurkan jawatan ini?')">
+                                        <input type="hidden" name="idPengguna" value="<%= p.getId_pengguna() %>">
+                                        <input type="hidden" name="idJawatan" value="<%= p.getId_jawatan() %>">
+                                        <button type="submit" class="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition" title="Gugurkan Jawatan">
+                                            <i class="fas fa-user-minus"></i>
+                                        </button>
+                                    </form>
+                                </div>
                             </td>
-                        </tr>
                         <% } } else { %>
                         <tr><td colspan="4" class="p-8 text-center text-gray-400"><i class="fas fa-user-slash text-3xl mb-2 block opacity-50"></i>Tiada ahli AJK dilantik.</td></tr>
                         <% } %>
@@ -119,10 +156,28 @@
                             <td class="p-4 text-sm text-gray-500 max-w-xs truncate search-col"><%= p.getNama_jalan() %></td>
                             <td class="p-4 text-sm text-gray-500"><%= p.getNombor_telefon() %></td>
                             <td class="p-4 text-center">
-                                <button onclick="openEditModal('<%= p.getId_pengguna() %>', '<%= p.getNama_penuh() %>', '<%= p.getNombor_kp() %>', '<%= p.getNombor_telefon() %>', '<%= p.getNama_jalan() %>', '<%= p.getBandar() %>', '<%= p.getNombor_poskod() %>', '<%= p.getNegeri() %>', '<%= p.getKata_laluan() %>')"
-                                        class="text-gray-400 hover:text-[#6C5DD3] transition">
-                                    <i class="fas fa-pencil-alt"></i>
-                                </button>
+                                <div class="flex justify-center gap-2">
+                                    <% if (p.getLatitude() != null && p.getLongitude() != null) { %>
+                                        <button onclick="viewLocation('<%= p.getNama_penuh() %>', <%= p.getLatitude() %>, <%= p.getLongitude() %>)"
+                                                class="text-blue-500 hover:text-blue-700 transition" title="Lihat Lokasi">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </button>
+                                        <a href="https://www.google.com/maps/dir/?api=1&destination=<%= p.getLatitude() %>,<%= p.getLongitude() %>"
+                                           target="_blank"
+                                           class="text-green-500 hover:text-green-700 transition"
+                                           title="Navigasi (Google Maps)">
+                                            <i class="fas fa-route"></i>
+                                        </a>
+                                    <% } %>
+                                    
+                                    <% 
+                                        String tarikhPenduduk = (p.getTarikh_lahir() != null) ? new java.text.SimpleDateFormat("yyyy-MM-dd").format(p.getTarikh_lahir()) : "";
+                                    %>
+                                    <button onclick="openEditModal('<%= p.getId_pengguna() %>', '<%= p.getNama_penuh() %>', '<%= p.getNombor_kp() %>', '<%= p.getNombor_telefon() %>', '<%= p.getNama_jalan() %>', '<%= p.getBandar() %>', '<%= p.getNombor_poskod() %>', '<%= p.getNegeri() %>', '<%= tarikhPenduduk %>', '<%= p.getStatus_keluarga() %>')"
+                                            class="text-gray-400 hover:text-[#6C5DD3] transition">
+                                        <i class="fas fa-pencil-alt"></i>
+                                    </button>
+                                </div>
                             </td>
                         </tr>
                         <% } } else { %>
@@ -161,38 +216,69 @@
 </aside>
 
 <div id="modalLantik" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalLantik')"></div>
-    <div class="flex min-h-full items-center justify-center p-4">
-        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:w-full sm:max-w-lg">
-            <div class="bg-[#6C5DD3] px-6 py-4">
-                <h3 class="font-bold text-white flex items-center gap-2"><i class="fas fa-user-plus"></i> Lantik AJK Baru</h3>
+    <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onclick="closeModal('modalLantik')"></div>
+    <div class="relative min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+            <div class="bg-[#6C5DD3] p-6 text-white flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-bold">Lantik AJK Baharu</h3>
+                    <p class="text-xs opacity-80">Pilih penduduk dan jawatan yang tersedia.</p>
+                </div>
+                <button onclick="closeModal('modalLantik')" class="text-white hover:rotate-90 transition-transform duration-300">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
             </div>
+            
             <form action="<%= request.getContextPath() %>/ketua/lantik" method="post" class="p-6 space-y-4">
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Nama Penuh</label>
-                    <input type="text" name="namaLengkap" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">1. Pilih Penduduk</label>
+                    <select name="idPengguna" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm font-medium">
+                        <option value="">-- Pilih Penduduk --</option>
+                        <% 
+                            List<Pengguna> listPendudukSelection = (List<Pengguna>) request.getAttribute("listPenduduk");
+                            if (listPendudukSelection != null) {
+                                for (Pengguna pp : listPendudukSelection) {
+                        %>
+                            <option value="<%= pp.getId_pengguna() %>"><%= pp.getNama_penuh() %> (<%= pp.getNombor_kp() %>)</option>
+                        <% 
+                                }
+                            }
+                        %>
+                    </select>
                 </div>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">No. KP</label>
-                        <input type="text" name="nomborKP" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">No. Telefon</label>
-                        <input type="text" name="nomborTelefon" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                    </div>
-                </div>
+
                 <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Alamat Ringkas</label>
-                    <input type="text" name="alamat" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">2. Pilih Jawatan</label>
+                    <select name="idJawatan" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm font-medium">
+                        <option value="">-- Pilih Jawatan --</option>
+                        <% 
+                            List<Pengguna> listJawatanSelection = (List<Pengguna>) request.getAttribute("listJawatan");
+                            if (listJawatanSelection != null) {
+                                for (Pengguna j : listJawatanSelection) {
+                                    boolean isOccupied = (j.getId_pengguna() > 0);
+                        %>
+                            <option value="<%= j.getStatus() %>" <%= isOccupied ? "disabled" : "" %>>
+                                <%= j.getNama_jawatan() %> <%= isOccupied ? "(Penuh: " + j.getNama_penuh() + ")" : "" %>
+                            </option>
+                        <% 
+                                }
+                            }
+                        %>
+                    </select>
+                    <p class="text-[10px] text-gray-400 mt-2">
+                        <i class="fas fa-info-circle"></i> Jawatan yang mempunyai pemegang perlu digugurkan terlebih dahulu.
+                    </p>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-1">Kata Laluan Sementara</label>
-                    <input type="text" name="kataLaluan" value="jkkk123" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                </div>
-                <div class="flex flex-row-reverse gap-2 pt-4">
-                    <button type="submit" class="bg-[#6C5DD3] text-white px-6 py-2 rounded-xl font-bold text-sm">Lantik</button>
-                    <button type="button" onclick="closeModal('modalLantik')" class="text-gray-500 px-6 py-2">Batal</button>
+
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeModal('modalLantik')" 
+                            class="flex-1 px-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition">
+                        Batal
+                    </button>
+                    <button type="submit" 
+                            class="flex-1 px-6 py-3 bg-[#6C5DD3] text-white font-bold rounded-xl shadow-lg shadow-purple-200 hover:bg-[#5b4eb8] transition">
+                        Lantik Sekarang
+                    </button>
                 </div>
             </form>
         </div>
@@ -211,19 +297,31 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-500 mb-1">Nama Penuh</label>
-                        <input type="text" name="namaLengkap" id="editNama" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                        <input type="text" id="editNama" readonly class="w-full px-4 py-2 rounded-xl bg-gray-100 border-none text-gray-500 text-sm cursor-not-allowed">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 mb-1">No. KP</label>
-                        <input type="text" name="nomborKP" id="editKP" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                        <input type="text" id="editKP" readonly class="w-full px-4 py-2 rounded-xl bg-gray-100 border-none text-gray-500 text-sm cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Tarikh Lahir</label>
+                        <input type="text" id="editTarikhLahir" readonly class="w-full px-4 py-2 rounded-xl bg-gray-100 border-none text-gray-500 text-sm cursor-not-allowed">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Status Keluarga</label>
+                        <select name="statusKeluarga" id="editStatusKeluarga" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                            <option value="Bujang">Bujang</option>
+                            <option value="Berkahwin">Berkahwin</option>
+                            <option value="Ibu Tunggal">Ibu Tunggal</option>
+                            <option value="Duda">Duda</option>
+                        </select>
+                    </div>
+                    <div class="md:col-span-2 border-t border-gray-100 my-2 pt-4">
+                        <h4 class="text-sm font-bold text-gray-700">Maklumat Boleh Dikemaskini</h4>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 mb-1">No. Telefon</label>
                         <input type="text" name="nomborTelefon" id="editTel" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 mb-1">Kata Laluan</label>
-                        <input type="text" name="kataLaluan" id="editPass" required class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
                     </div>
                     <div class="md:col-span-2">
                         <label class="block text-xs font-bold text-gray-500 mb-1">Jalan / No. Rumah</label>
@@ -237,6 +335,10 @@
                         <label class="block text-xs font-bold text-gray-500 mb-1">Bandar</label>
                         <input type="text" name="bandar" id="editBandar" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
                     </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-1">Negeri</label>
+                        <input type="text" name="negeri" id="editNegeri" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                    </div>
                 </div>
                 <div class="flex flex-row-reverse gap-2 pt-6">
                     <button type="submit" class="bg-[#6C5DD3] text-white px-6 py-2 rounded-xl font-bold text-sm">Simpan</button>
@@ -247,7 +349,59 @@
     </div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<%-- Modal View Location (Map) --%>
+<div id="modalLocation" class="fixed inset-0 z-[60] hidden" role="dialog" aria-modal="true">
+    <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onclick="closeModal('modalLocation')"></div>
+    <div class="relative min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all">
+            <div class="bg-[#6C5DD3] p-6 text-white flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-bold" id="locationTitle">Lokasi Kediaman</h3>
+                    <p class="text-xs opacity-80">Koordinat GPS penduduk.</p>
+                </div>
+                <button onclick="closeModal('modalLocation')" class="text-white hover:rotate-90 transition-transform duration-300">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-4">
+                <div id="mapView" style="height: 450px; border-radius: 1.5rem;" class="border border-gray-200"></div>
+            </div>
+            <div class="p-6 bg-gray-50 flex justify-end">
+                <button onclick="closeModal('modalLocation')" class="px-8 py-3 bg-[#6C5DD3] text-white font-bold rounded-xl shadow-lg hover:bg-[#5b4eb8] transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    let viewMap;
+    let viewMarker;
+
+    function viewLocation(nama, lat, lon) {
+        document.getElementById('locationTitle').innerText = "Lokasi: " + nama;
+        openModal('modalLocation');
+        
+        setTimeout(() => {
+            if (!viewMap) {
+                viewMap = L.map('mapView').setView([lat, lon], 17);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(viewMap);
+                viewMarker = L.marker([lat, lon]).addTo(viewMap);
+            } else {
+                viewMap.setView([lat, lon], 17);
+                viewMarker.setLatLng([lat, lon]);
+            }
+            viewMap.invalidateSize();
+        }, 300);
+    }
+
     function switchTab(tabName) {
         document.querySelectorAll('nav button').forEach(btn => {
             btn.classList.remove('border-[#6C5DD3]', 'text-[#6C5DD3]');
@@ -263,7 +417,7 @@
     function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
     function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
 
-    function openEditModal(id, nama, kp, tel, jalan, bandar, poskod, negeri, pass) {
+    function openEditModal(id, nama, kp, tel, jalan, bandar, poskod, negeri, tarikh, statusKeluarga) {
         document.getElementById('editId').value = id;
         document.getElementById('editNama').value = nama;
         document.getElementById('editKP').value = kp;
@@ -271,7 +425,9 @@
         document.getElementById('editJalan').value = jalan;
         document.getElementById('editBandar').value = (bandar === 'null' || bandar === '-') ? '' : bandar;
         document.getElementById('editPoskod').value = (poskod === 'null' || poskod === '-') ? '' : poskod;
-        document.getElementById('editPass').value = (pass === 'null') ? '' : pass;
+        document.getElementById('editNegeri').value = (negeri === 'null' || negeri === '-') ? '' : negeri;
+        document.getElementById('editTarikhLahir').value = (tarikh === 'null' || tarikh === '-') ? '' : tarikh;
+        document.getElementById('editStatusKeluarga').value = (statusKeluarga === 'null' || statusKeluarga === '-') ? 'Bujang' : statusKeluarga;
         openModal('modalEdit');
     }
 

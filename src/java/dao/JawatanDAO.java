@@ -8,39 +8,91 @@ import util.DBUtil;
 
 public class JawatanDAO {
 
-    // Ambil senarai jawatan (Ketua Kampung, Timbalan, dsb)
-    public List<JawatanAJK> getAllJawatan() {
-        List<JawatanAJK> senarai = new ArrayList<>();
-        String sql = "SELECT * FROM Jawatan_AJK";
+    // Ambil senarai semua jawatan berserta pemegang (jika ada)
+    public List<model.Pengguna> getJawatanHolders() {
+        List<model.Pengguna> senarai = new ArrayList<>();
+        String sql = "SELECT j.id_jawatan, j.nama_jawatan, p.id_pengguna, p.nama_penuh " +
+                     "FROM jawatan_ajk j " +
+                     "LEFT JOIN ajk_jawatan aj ON j.id_jawatan = aj.id_jawatan " +
+                     "LEFT JOIN pengguna p ON aj.id_pengguna = p.id_pengguna";
         try (Connection conn = DBUtil.getConnection();
-             Statement st = conn.createStatement();
-             ResultSet rs = st.executeQuery(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                JawatanAJK j = new JawatanAJK();
-                j.setId_jawatan(rs.getInt("id_jawatan"));
-                j.setNama_jawatan(rs.getString("nama_jawatan"));
-                senarai.add(j);
+                model.Pengguna p = new model.Pengguna();
+                p.setId_pengguna(rs.getInt("id_pengguna"));
+                p.setNama_penuh(rs.getString("nama_penuh")); // Holder name
+                p.setNama_jawatan(rs.getString("nama_jawatan")); // Title name
+                // We reuse id_pengguna as a flag; if 0, jawatan is vacant
+                // But it's better to store id_jawatan somewhere
+                p.setStatus(rs.getInt("id_jawatan")); // Store jawatan ID in status temporarily for UI
+                senarai.add(p);
             }
         } catch (SQLException e) { e.printStackTrace(); }
         return senarai;
     }
 
-    // Lantik Pengguna sebagai AJK (INSERT ke AJK_Jawatan)
+    // Lantik Pengguna (Lantik: Update Peranan + Insert AJK_Jawatan)
     public boolean lantikAJK(int id_pengguna, int id_jawatan) {
-        String sql = "INSERT INTO AJK_Jawatan (id_pengguna, id_jawatan) VALUES (?, ?)";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, id_pengguna);
-            ps.setInt(2, id_jawatan);
-            return ps.executeUpdate() > 0;
+        String sqlInsert = "INSERT INTO ajk_jawatan (id_pengguna, id_jawatan) VALUES (?, ?)";
+        String sqlUpdateRole = "UPDATE pengguna_peranan SET id_peranan = 3 WHERE id_pengguna = ?";
+        
+        try (Connection conn = DBUtil.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement ps1 = conn.prepareStatement(sqlInsert);
+                 PreparedStatement ps2 = conn.prepareStatement(sqlUpdateRole)) {
+                
+                ps1.setInt(1, id_pengguna);
+                ps1.setInt(2, id_jawatan);
+                ps1.executeUpdate();
+                
+                ps2.setInt(1, id_pengguna);
+                ps2.executeUpdate();
+                
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+                return false;
+            }
+        } catch (SQLException e) { e.printStackTrace(); return false; }
+    }
+
+    // Gugurkan Jawatan (Delete from AJK_Jawatan + Revert Role to Penduduk ID 4)
+    public boolean gugurkanJawatan(int id_pengguna, int id_jawatan) {
+        String sqlDelete = "DELETE FROM ajk_jawatan WHERE id_pengguna = ? AND id_jawatan = ?";
+        String sqlUpdateRole = "UPDATE pengguna_peranan SET id_peranan = 4 WHERE id_pengguna = ?";
+        
+        try (Connection conn = DBUtil.getConnection()) {
+            conn.setAutoCommit(false);
+            try (PreparedStatement ps1 = conn.prepareStatement(sqlDelete);
+                 PreparedStatement ps2 = conn.prepareStatement(sqlUpdateRole)) {
+                
+                ps1.setInt(1, id_pengguna);
+                ps1.setInt(2, id_jawatan);
+                ps1.executeUpdate();
+                
+                // Check if user still has other AJK roles before reverting to Penduduk
+                // (Optional: for now we assume 1 jawatan per person)
+                ps2.setInt(1, id_pengguna);
+                ps2.executeUpdate();
+                
+                conn.commit();
+                return true;
+            } catch (SQLException e) {
+                conn.rollback();
+                e.printStackTrace();
+                return false;
+            }
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 
     // Ambil maklumat jawatan yang dipegang oleh seseorang
     public String getNamaJawatanPengguna(int id_pengguna) {
         String jawatan = "Penduduk Biasa";
-        String sql = "SELECT j.nama_jawatan FROM Jawatan_AJK j " +
-                     "JOIN AJK_Jawatan aj ON j.id_jawatan = aj.id_jawatan " +
+        String sql = "SELECT j.nama_jawatan FROM jawatan_ajk j " +
+                     "JOIN ajk_jawatan aj ON j.id_jawatan = aj.id_jawatan " +
                      "WHERE aj.id_pengguna = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -52,4 +104,4 @@ public class JawatanDAO {
         } catch (SQLException e) { e.printStackTrace(); }
         return jawatan;
     }
-}
+}

@@ -1,4 +1,4 @@
-<%@ page import="model.Pengguna" %>
+<%@ page import="model.Pengguna, model.ActivityLog, java.util.List" %>
 <%
     // 1. Dapatkan objek user dari session (Variabel 'user' biasanya sudah ada dari navbar.jsp)
     // Jika tiada, kita ambil semula untuk kepastian.
@@ -254,6 +254,46 @@
 
                 </div>
             </form>
+
+            <%-- Bahagian: Sejarah Aktiviti Profil (Audit Trail) --%>
+            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 mt-8">
+                <h4 class="text-sm font-bold text-[#6C5DD3] uppercase tracking-wider mb-6 border-b border-gray-100 pb-2 flex items-center gap-2">
+                    <i class="fas fa-history"></i> Sejarah Aktiviti Profil
+                </h4>
+                
+                <%
+                    List<ActivityLog> logs = (List<ActivityLog>) request.getAttribute("activityLogs");
+                    if (logs != null && !logs.isEmpty()) {
+                %>
+                <div class="space-y-4">
+                    <% for (ActivityLog log : logs) { %>
+                    <div class="flex gap-4 p-4 rounded-2xl bg-gray-50 border border-gray-100 transition-hover hover:shadow-md">
+                        <div class="w-10 h-10 rounded-full bg-purple-100 flex-shrink-0 flex items-center justify-center text-purple-600">
+                            <i class="fas fa-user-edit text-sm"></i>
+                        </div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-start mb-1">
+                                <p class="text-sm font-bold text-gray-800">
+                                    Admin (<%= log.getAdminName() %>)
+                                </p>
+                                <span class="text-[10px] font-bold text-gray-400 uppercase tracking-tight bg-white px-2 py-0.5 rounded-full border border-gray-100">
+                                    <%= new java.text.SimpleDateFormat("dd MMM yyyy, h:mm a").format(log.getDibuat_pada()) %>
+                                </span>
+                            </div>
+                            <p class="text-xs text-gray-600 leading-relaxed"><%= log.getKeterangan_tindakan() %></p>
+                        </div>
+                    </div>
+                    <% } %>
+                </div>
+                <% } else { %>
+                <div class="text-center py-12">
+                    <div class="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center text-gray-300 mx-auto mb-4">
+                        <i class="fas fa-clipboard-list text-2xl"></i>
+                    </div>
+                    <p class="text-gray-400 text-sm">Tiada rekod aktiviti dijumpai.</p>
+                </div>
+                <% } %>
+            </div>
         </div>
     </div>
 </div> 

@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 18, 2026 at 02:15 PM
+-- Generation Time: Apr 19, 2026 at 02:49 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -129,24 +129,26 @@ CREATE TABLE `fasiliti` (
   `status` varchar(50) DEFAULT 'AKTIF',
   `dibuat_pada` timestamp NOT NULL DEFAULT current_timestamp(),
   `dikemaskini_pada` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `dipadam_pada` timestamp NULL DEFAULT NULL
+  `dipadam_pada` timestamp NULL DEFAULT NULL,
+  `latitude` decimal(10,8) DEFAULT NULL,
+  `longitude` decimal(11,8) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `fasiliti`
 --
 
-INSERT INTO `fasiliti` (`id_fasiliti`, `nama_fasiliti`, `lokasi`, `status`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`) VALUES
-(1, 'Dewan Orang Ramai', 'Pusat Kampung', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(2, 'Padang Bola Sepak', 'Jalan Bunga Raya', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(3, 'Gelanggang Futsal', 'Taman Belia', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(4, 'Balai Raya', 'Jalan Masjid', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(5, 'Surau Al-Taqwa', 'Jalan Kenanga', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(6, 'Bilik Mesyuarat JKKK', 'Kompleks Penghulu', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(7, 'Gelanggang Sepak Takraw', 'Jalan Mawar', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(8, 'Pusat Internet Desa', 'Sebelah Balai Raya', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(9, 'Taman Permainan Kanak-kanak', 'Jalan Dahlia', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(10, 'Tapak Pasar Malam', 'Dataran Kampung', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL);
+INSERT INTO `fasiliti` (`id_fasiliti`, `nama_fasiliti`, `lokasi`, `status`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`, `latitude`, `longitude`) VALUES
+(1, 'Dewan Orang Ramai', 'Pusat Kampung', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL, NULL),
+(2, 'Padang Bola Sepak', 'Jalan Bunga Raya', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL, NULL),
+(3, 'Gelanggang Futsal', 'Taman Belia', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL, NULL),
+(4, 'Balai Raya', 'Jalan Masjid', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL, NULL),
+(5, 'Surau Al-Taqwa', 'Jalan Kenanga', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL, NULL),
+(6, 'Bilik Mesyuarat JKKK', 'Kompleks Penghulu', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL, NULL),
+(7, 'Gelanggang Sepak Takraw', 'Jalan Mawar', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL, NULL),
+(8, 'Pusat Internet Desa', 'Sebelah Balai Raya', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL, NULL),
+(9, 'Taman Permainan Kanak-kanak', 'Jalan Dahlia', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL, NULL),
+(10, 'Tapak Pasar Malam', 'Dataran Kampung', 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -257,6 +259,21 @@ INSERT INTO `kategori_aduan` (`id_kategori_aduan`, `nama_kategori`, `contoh_taju
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `log_aktiviti`
+--
+
+CREATE TABLE `log_aktiviti` (
+  `id_log` int(11) NOT NULL,
+  `id_pengguna` int(11) NOT NULL,
+  `id_admin` int(11) NOT NULL,
+  `jenis_tindakan` varchar(50) NOT NULL,
+  `keterangan_tindakan` text DEFAULT NULL,
+  `dibuat_pada` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `pengguna`
 --
 
@@ -282,30 +299,32 @@ CREATE TABLE `pengguna` (
   `lampiran_pengesahan` varchar(255) DEFAULT NULL,
   `reset_token` varchar(100) DEFAULT NULL,
   `token_expiry` datetime DEFAULT NULL,
-  `email` varchar(100) NOT NULL
+  `email` varchar(100) NOT NULL,
+  `latitude` decimal(10,8) DEFAULT NULL,
+  `longitude` decimal(11,8) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `pengguna`
 --
 
-INSERT INTO `pengguna` (`id_pengguna`, `nama_penuh`, `nombor_kp`, `nombor_telefon`, `tarikh_lahir`, `kata_laluan`, `status`, `status_keluarga`, `pekerjaan`, `pendapatan`, `nama_jalan`, `daerah`, `nombor_poskod`, `bandar`, `negeri`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`, `lampiran_pengesahan`, `reset_token`, `token_expiry`, `email`) VALUES
-(1, 'Ahmad bin Ali', '800101031234', '012-3456 5353', '1980-01-01', '$2a$10$pcl0DE/lCi37oEUj82CO5e.iqf0nEfOCJ.X8dz19HsJJxq3K/MQ0y', 1, 'Bujang', 'Petani', 1000.00, 'Jalan Mawar 1', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-18 05:42:45', NULL, NULL, NULL, NULL, 'khairuliman736@gmail.com'),
-(2, 'Siti binti Abuya', '850202035566', '011-1101 3816', '1985-02-02', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', '', NULL, 'Jalan Melati 2', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-15 07:34:02', NULL, NULL, NULL, NULL, ''),
-(3, 'Muthu a/l Samy', '900303037788', '014-5678 901', '1990-03-03', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', 'Peniaga', 3000.00, 'Jalan Kenanga', NULL, '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-15 07:34:06', NULL, NULL, NULL, NULL, ''),
-(4, 'Chong Wei Ming', '750404039911', '016-6789012', '1975-04-04', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Berkahwin', 'Kontraktor', 5500.00, 'Jalan Teratai', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-15 07:34:10', NULL, NULL, NULL, NULL, ''),
-(5, 'Aminah binti Hassan', '650505032233', '017-7890123', '1965-05-05', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Ibu Tunggal', 'Pesara', 1200.00, 'Jalan Orkid', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-15 07:34:15', NULL, NULL, NULL, NULL, ''),
-(6, 'Kamal bin Mustafa', '950606034455', '011-8901234', '1995-06-06', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', 'Jurutera', 4000.00, 'Jalan Mawar 2', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-15 07:34:23', NULL, NULL, NULL, NULL, ''),
-(7, 'Nurul binti Hisham', '880707036677', '018-9012345', '1988-07-07', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Berkahwin', 'Suri Rumah', 0.00, 'Jalan Dahlia', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-15 07:34:26', NULL, NULL, NULL, NULL, ''),
-(8, 'Razak bin Osman', '700808038899', '019-0123456', '1970-08-08', 'hash123', 1, 'Berkahwin', 'Petani', 1800.00, 'Jalan Raya Kampung', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-06 08:51:03', NULL, NULL, NULL, NULL, ''),
-(9, 'Fatimah binti Zainal', '920909031122', '012-1234567', '1992-09-09', 'hash123', 1, 'Bujang', 'Kerani Kewangan', 2200.00, 'Jalan Kenanga 2', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-06 08:51:03', NULL, NULL, NULL, NULL, ''),
-(10, 'Hafiz bin Johan', '821010033344', '013-2345678', '1982-10-10', 'hash123', 0, 'Berkahwin', 'Pemandu Lori', 2800.00, 'Jalan Orkid 3', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-17 03:30:10', NULL, NULL, NULL, NULL, ''),
-(11, 'Iman Bin Khairul', '040101030441', NULL, '2004-01-01', 'Abdkarim', 1, NULL, NULL, NULL, 'Kg Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-01 07:11:10', '2026-04-06 08:51:03', NULL, 'bukti_040101030441_1775027470599.pdf', NULL, NULL, ''),
-(15, 'Muhammad Naim Najmi Bin Hazre', '990404110432', NULL, '1999-04-04', 'hash123', 1, NULL, NULL, NULL, 'Kg Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-05 12:33:29', '2026-04-06 08:51:03', NULL, 'bukti_990404110432_1775392409643.pdf', NULL, NULL, ''),
-(16, 'Muhammad Naim Najmi Bin Hazrew', '990404110431', '012345678', '1999-04-04', 'hash123', 1, NULL, NULL, NULL, 'Kg Danan', 'Selising', '16810', '800101031231', 'Kelantan', '2026-04-06 09:06:30', '2026-04-14 09:16:04', NULL, 'bukti_990404110431_1775466390091.pdf', NULL, NULL, ''),
-(18, 'MUHAMMAD KHAIRUL IMAN BIN ABD KARIM', '040101030440', '01111013816', '2004-01-01', '$2a$10$D0Yd9Rk1AnddKLDA1AFx/Oax/X2fNfFv9zR4cgwU1XaS8tHOI5Jva', 1, NULL, NULL, NULL, 'Lot. 98 Kg Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-14 09:17:11', '2026-04-14 09:17:34', NULL, 'bukti_040101030440_1776158231600.pdf', NULL, NULL, ''),
-(21, 'MUHAMAD AMIR BIN RUSLI', '042304034506', '01111013816', '2005-11-04', '$2a$10$PWjG2khEQHBAx8sDwadOqe1OHEc.ZK0JV5CGmSllfNIGnSYKDeld.', 1, NULL, NULL, NULL, 'Lot. 98 Kg Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-17 04:10:48', '2026-04-17 04:31:44', NULL, 'bukti_042304034506_1776399048381.pdf', NULL, NULL, 'amir123@gmail.com'),
-(22, 'MUHAMMD AIMAN BIN SAMAD', '010302030441', '01120034344', '2001-03-02', '$2a$10$.l7X.UGDpzKRG47QQ76YbOsKx18VRpxslYVWinUWw6xuY6ucAbqHS', 2, NULL, NULL, NULL, 'Lot 67, Kampung Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-18 05:48:01', '2026-04-18 05:48:01', NULL, 'bukti_010302030441_1776491281745.pdf', NULL, NULL, 'khayxstyle@gmail.com');
+INSERT INTO `pengguna` (`id_pengguna`, `nama_penuh`, `nombor_kp`, `nombor_telefon`, `tarikh_lahir`, `kata_laluan`, `status`, `status_keluarga`, `pekerjaan`, `pendapatan`, `nama_jalan`, `daerah`, `nombor_poskod`, `bandar`, `negeri`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`, `lampiran_pengesahan`, `reset_token`, `token_expiry`, `email`, `latitude`, `longitude`) VALUES
+(1, 'Ahmad bin Ali', '800101031234', '012-3456 5353', '1980-01-01', '$2a$10$pcl0DE/lCi37oEUj82CO5e.iqf0nEfOCJ.X8dz19HsJJxq3K/MQ0y', 1, 'Bujang', 'Petani', 1000.00, 'Jalan Mawar 1', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-18 05:42:45', NULL, NULL, NULL, NULL, 'khairuliman736@gmail.com', NULL, NULL),
+(2, 'Siti binti Abuya', '850202035566', '011-1101 3816', '1985-02-02', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', '', NULL, 'Jalan Melati 2', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-15 07:34:02', NULL, NULL, NULL, NULL, '', NULL, NULL),
+(3, 'Muthu a/l Samy', '900303037788', '014-5678 901', '1990-03-03', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', 'Peniaga', 3000.00, 'Jalan Kenanga', NULL, '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-15 07:34:06', NULL, NULL, NULL, NULL, '', NULL, NULL),
+(4, 'Chong Wei Ming', '750404039911', '016-6789 011', '1975-04-04', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', '', NULL, 'Jalan Teratai', NULL, '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-19 11:12:04', NULL, NULL, NULL, NULL, 'khayxstyle@gmail.com', NULL, NULL),
+(5, 'Aminah binti Hassan', '650505032233', '017-7890123', '1965-05-05', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Ibu Tunggal', 'Pesara', 1200.00, 'Jalan Orkid', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-15 07:34:15', NULL, NULL, NULL, NULL, '', NULL, NULL),
+(6, 'Kamal bin Mustafa', '950606034455', '011-8901234', '1995-06-06', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', 'Jurutera', 4000.00, 'Jalan Mawar 2', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-15 07:34:23', NULL, NULL, NULL, NULL, '', NULL, NULL),
+(7, 'Nurul binti Hisham', '880707036677', '018-9012345', '1988-07-07', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Berkahwin', 'Suri Rumah', 0.00, 'Jalan Dahlia', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-15 07:34:26', NULL, NULL, NULL, NULL, '', NULL, NULL),
+(8, 'Razak bin Osman', '700808038899', '019-0123456', '1970-08-08', 'hash123', 1, 'Berkahwin', 'Petani', 1800.00, 'Jalan Raya Kampung', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-06 08:51:03', NULL, NULL, NULL, NULL, '', NULL, NULL),
+(9, 'Fatimah binti Zainal', '920909031122', '012-1234567', '1992-09-09', 'hash123', 1, 'Bujang', 'Kerani Kewangan', 2200.00, 'Jalan Kenanga 2', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-06 08:51:03', NULL, NULL, NULL, NULL, '', NULL, NULL),
+(10, 'Hafiz bin Johan', '821010033344', '013-2345678', '1982-10-10', 'hash123', 0, 'Berkahwin', 'Pemandu Lori', 2800.00, 'Jalan Orkid 3', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-17 03:30:10', NULL, NULL, NULL, NULL, '', NULL, NULL),
+(11, 'Iman Bin Khairul', '040101030441', NULL, '2004-01-01', 'Abdkarim', 1, NULL, NULL, NULL, 'Kg Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-01 07:11:10', '2026-04-06 08:51:03', NULL, 'bukti_040101030441_1775027470599.pdf', NULL, NULL, '', NULL, NULL),
+(15, 'Muhammad Naim Najmi Bin Hazre', '990404110432', NULL, '1999-04-04', 'hash123', 1, NULL, NULL, NULL, 'Kg Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-05 12:33:29', '2026-04-06 08:51:03', NULL, 'bukti_990404110432_1775392409643.pdf', NULL, NULL, '', NULL, NULL),
+(16, 'Muhammad Naim Najmi Bin Hazrew', '990404110431', '012345678', '1999-04-04', 'hash123', 1, NULL, NULL, NULL, 'Kg Danan', 'Selising', '16810', '800101031231', 'Kelantan', '2026-04-06 09:06:30', '2026-04-14 09:16:04', NULL, 'bukti_990404110431_1775466390091.pdf', NULL, NULL, '', NULL, NULL),
+(18, 'MUHAMMAD KHAIRUL IMAN BIN ABD KARIM', '040101030440', '01111013816', '2004-01-01', '$2a$10$D0Yd9Rk1AnddKLDA1AFx/Oax/X2fNfFv9zR4cgwU1XaS8tHOI5Jva', 1, NULL, NULL, NULL, 'Lot. 98 Kg Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-14 09:17:11', '2026-04-14 09:17:34', NULL, 'bukti_040101030440_1776158231600.pdf', NULL, NULL, '', NULL, NULL),
+(21, 'MUHAMAD AMIR BIN RUSLI', '042304034506', '01111013816', '2005-11-04', '$2a$10$PWjG2khEQHBAx8sDwadOqe1OHEc.ZK0JV5CGmSllfNIGnSYKDeld.', 1, NULL, NULL, NULL, 'Lot. 98 Kg Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-17 04:10:48', '2026-04-17 04:31:44', NULL, 'bukti_042304034506_1776399048381.pdf', NULL, NULL, 'amir123@gmail.com', NULL, NULL),
+(22, 'MUHAMMD AIMAN BIN SAMAD', '010302030441', '01120034344', '2001-03-02', '$2a$10$.l7X.UGDpzKRG47QQ76YbOsKx18VRpxslYVWinUWw6xuY6ucAbqHS', 2, NULL, NULL, NULL, 'Lot 67, Kampung Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-18 05:48:01', '2026-04-18 05:48:01', NULL, 'bukti_010302030441_1776491281745.pdf', NULL, NULL, 'khayxstyle@gmail.com', NULL, NULL);
 
 -- --------------------------------------------------------
 
@@ -501,6 +520,14 @@ ALTER TABLE `kategori_aduan`
   ADD PRIMARY KEY (`id_kategori_aduan`);
 
 --
+-- Indexes for table `log_aktiviti`
+--
+ALTER TABLE `log_aktiviti`
+  ADD PRIMARY KEY (`id_log`),
+  ADD KEY `log_ibfk_pengguna` (`id_pengguna`),
+  ADD KEY `log_ibfk_admin` (`id_admin`);
+
+--
 -- Indexes for table `pengguna`
 --
 ALTER TABLE `pengguna`
@@ -583,6 +610,12 @@ ALTER TABLE `kategori_aduan`
   MODIFY `id_kategori_aduan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
 
 --
+-- AUTO_INCREMENT for table `log_aktiviti`
+--
+ALTER TABLE `log_aktiviti`
+  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `pengguna`
 --
 ALTER TABLE `pengguna`
@@ -635,6 +668,13 @@ ALTER TABLE `fasiliti_slot`
 --
 ALTER TABLE `hebahan`
   ADD CONSTRAINT `hebahan_ibfk_1` FOREIGN KEY (`id_pengguna`) REFERENCES `pengguna` (`id_pengguna`);
+
+--
+-- Constraints for table `log_aktiviti`
+--
+ALTER TABLE `log_aktiviti`
+  ADD CONSTRAINT `log_ibfk_admin` FOREIGN KEY (`id_admin`) REFERENCES `pengguna` (`id_pengguna`),
+  ADD CONSTRAINT `log_ibfk_pengguna` FOREIGN KEY (`id_pengguna`) REFERENCES `pengguna` (`id_pengguna`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `pengguna_peranan`

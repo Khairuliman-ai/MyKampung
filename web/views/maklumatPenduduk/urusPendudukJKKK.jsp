@@ -79,6 +79,20 @@
 </td>
                             <td class="p-4 text-center">
                                 <div class="flex justify-center gap-2">
+                                    <% if (p.getLatitude() != null && p.getLongitude() != null) { %>
+                                        <button onclick="viewLocation('<%= p.getNama_penuh() %>', <%= p.getLatitude() %>, <%= p.getLongitude() %>)"
+                                                class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition"
+                                                title="Lihat Lokasi">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </button>
+                                        <a href="https://www.google.com/maps/dir/?api=1&destination=<%= p.getLatitude() %>,<%= p.getLongitude() %>"
+                                           target="_blank"
+                                           class="text-green-500 hover:bg-green-50 p-2 rounded-lg transition"
+                                           title="Navigasi (Google Maps)">
+                                            <i class="fas fa-route"></i>
+                                        </a>
+                                    <% } %>
+
                                     <form action="<%= request.getContextPath() %>/penduduk/approve" method="post">
                                         <input type="hidden" name="idPengguna" value="<%= p.getId_pengguna() %>">
                                         <button type="submit" class="bg-green-100 text-green-600 hover:bg-green-200 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition">
@@ -137,25 +151,32 @@
                             <td class="p-4 text-sm text-gray-500"><%= p.getNombor_telefon() %></td>
                             <td class="p-4 text-center">
                                 <div class="flex justify-center gap-2">
-                                    <button onclick="openEditModal('<%= p.getId_pengguna() %>', '<%= p.getNama_penuh() %>', '<%= p.getNombor_kp() %>', '<%= p.getNombor_telefon() %>', '<%= p.getNama_jalan() %>', '<%= p.getBandar() %>', '<%= p.getNombor_poskod() %>', '<%= p.getNegeri() %>', '<%= p.getKata_laluan() %>')"
-                                            class="text-[#6C5DD3] hover:bg-purple-50 p-2 rounded-lg transition" title="Kemaskini">
+                                    <% 
+                                        String tarikh = (p.getTarikh_lahir() != null) ? new java.text.SimpleDateFormat("yyyy-MM-dd").format(p.getTarikh_lahir()) : "";
+                                    %>
+                                    <button onclick="openEditModal('<%= p.getId_pengguna() %>', '<%= p.getNama_penuh() %>', '<%= p.getNombor_kp() %>', '<%= p.getNombor_telefon() %>', '<%= p.getNama_jalan() %>', '<%= p.getBandar() %>', '<%= p.getNombor_poskod() %>', '<%= p.getNegeri() %>', '<%= tarikh %>', '<%= p.getStatus_keluarga() %>')"
+                                             class="text-[#6C5DD3] hover:bg-purple-50 p-2 rounded-lg transition" title="Kemaskini">
                                         <i class="fas fa-edit"></i>
                                     </button>
                                     
-                                    <%-- Navigate Button for Admin --%>
-                                    <% if ("Ketua Kampung".equalsIgnoreCase(role) || "Setiausaha".equals(biro)) {
-                                        if (p.getLatitude() != null && p.getLongitude() != null) { %>
+                                    <%-- View Location Modal Button --%>
+                                    <% if (p.getLatitude() != null && p.getLongitude() != null) { %>
+                                        <button onclick="viewLocation('<%= p.getNama_penuh() %>', <%= p.getLatitude() %>, <%= p.getLongitude() %>)"
+                                                class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition"
+                                                title="Lihat Lokasi">
+                                            <i class="fas fa-map-marker-alt"></i>
+                                        </button>
                                         <a href="https://www.google.com/maps/dir/?api=1&destination=<%= p.getLatitude() %>,<%= p.getLongitude() %>"
                                            target="_blank"
                                            class="text-green-500 hover:bg-green-50 p-2 rounded-lg transition"
-                                           title="Navigasi ke lokasi">
+                                           title="Navigasi (Google Maps)">
                                             <i class="fas fa-route"></i>
                                         </a>
                                     <% } else { %>
                                         <span class="text-gray-300 p-2 cursor-not-allowed" title="Koordinat belum ditetapkan">
                                             <i class="fas fa-map-marker-alt"></i>
                                         </span>
-                                    <% } } %>
+                                    <% } %>
                                 </div>
                             </td>
                         </tr>
@@ -221,23 +242,34 @@
                             <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 mb-1">Nama Penuh</label>
-                                    <input type="text" name="namaLengkap" id="editNama" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm" required>
+                                    <input type="text" id="editNama" readonly class="w-full px-4 py-2 rounded-xl bg-gray-100 border-none text-gray-500 text-sm cursor-not-allowed">
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 mb-1">No. Kad Pengenalan</label>
-                                    <input type="text" name="nomborKP" id="editKP" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm" required>
+                                    <input type="text" id="editKP" readonly class="w-full px-4 py-2 rounded-xl bg-gray-100 border-none text-gray-500 text-sm cursor-not-allowed">
                                 </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 mb-1">Tarikh Lahir</label>
+                                    <input type="text" id="editTarikhLahir" readonly class="w-full px-4 py-2 rounded-xl bg-gray-100 border-none text-gray-500 text-sm cursor-not-allowed">
+                                </div>
+                                <div>
+                                    <label class="block text-xs font-bold text-gray-500 mb-1">Status Keluarga</label>
+                                    <select name="statusKeluarga" id="editStatusKeluarga" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                                        <option value="Bujang">Bujang</option>
+                                        <option value="Berkahwin">Berkahwin</option>
+                                        <option value="Ibu Tunggal">Ibu Tunggal</option>
+                                        <option value="Duda">Duda</option>
+                                    </select>
+                                </div>
+
+                                <div class="md:col-span-2 border-t border-gray-100 my-2 pt-4">
+                                    <h4 class="text-sm font-bold text-gray-700">Maklumat Boleh Dikemaskini</h4>
+                                </div>
+
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 mb-1">No. Telefon</label>
                                     <input type="text" name="nomborTelefon" id="editTel" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm" required>
                                 </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 mb-1">Kata Laluan</label>
-                                    <input type="text" name="kataLaluan" id="editPass" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm" required>
-                                </div>
-
-                                <div class="md:col-span-2 border-t border-gray-100 my-2"></div>
-                                <h4 class="md:col-span-2 text-sm font-bold text-gray-700">Alamat Kediaman</h4>
 
                                 <div class="md:col-span-2">
                                     <label class="block text-xs font-bold text-gray-500 mb-1">Nama Jalan / No. Rumah</label>
@@ -253,16 +285,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-xs font-bold text-gray-500 mb-1">Negeri</label>
-                                    <div class="relative">
-                                        <select name="negeri" id="editNegeri" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm appearance-none">
-                                            <option value="Kelantan">Kelantan</option>
-                                            <option value="Terengganu">Terengganu</option>
-                                            <option value="Pahang">Pahang</option>
-                                        </select>
-                                        <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
-                                            <i class="fas fa-chevron-down text-xs"></i>
-                                        </div>
-                                    </div>
+                                    <input type="text" name="negeri" id="editNegeri" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
                                 </div>
                             </div>
                         </div>
@@ -277,7 +300,63 @@
     </div>
 </div>
 
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+<%-- Modal View Location (Map) --%>
+<div id="modalLocation" class="fixed inset-0 z-[60] hidden" role="dialog" aria-modal="true">
+    <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onclick="closeModal('modalLocation')"></div>
+    <div class="relative min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all">
+            <div class="bg-[#6C5DD3] p-6 text-white flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-bold" id="locationTitle">Lokasi Kediaman</h3>
+                    <p class="text-xs opacity-80">Koordinat GPS penduduk.</p>
+                </div>
+                <button onclick="closeModal('modalLocation')" class="text-white hover:rotate-90 transition-transform duration-300">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            <div class="p-4">
+                <div id="mapView" style="height: 450px; border-radius: 1.5rem;" class="border border-gray-200"></div>
+            </div>
+            <div class="p-6 bg-gray-50 flex justify-end">
+                <button onclick="closeModal('modalLocation')" class="px-8 py-3 bg-[#6C5DD3] text-white font-bold rounded-xl shadow-lg hover:bg-[#5b4eb8] transition">
+                    Tutup
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    let viewMap;
+    let viewMarker;
+
+    function viewLocation(nama, lat, lon) {
+        document.getElementById('locationTitle').innerText = "Lokasi: " + nama;
+        openModal('modalLocation');
+        
+        setTimeout(() => {
+            if (!viewMap) {
+                viewMap = L.map('mapView').setView([lat, lon], 17);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19,
+                    attribution: '© OpenStreetMap'
+                }).addTo(viewMap);
+                viewMarker = L.marker([lat, lon]).addTo(viewMap);
+            } else {
+                viewMap.setView([lat, lon], 17);
+                viewMarker.setLatLng([lat, lon]);
+            }
+            viewMap.invalidateSize();
+        }, 300);
+    }
+
+    function openModal(modalId) {
+        document.getElementById(modalId).classList.remove('hidden');
+    }
+
     function switchTab(tabName) {
         document.querySelectorAll('nav button').forEach(btn => {
             btn.classList.remove('border-[#6C5DD3]', 'text-[#6C5DD3]');
@@ -301,7 +380,7 @@
         });
     });
 
-    function openEditModal(id, nama, kp, tel, jalan, bandar, poskod, negeri, pass) {
+    function openEditModal(id, nama, kp, tel, jalan, bandar, poskod, negeri, tarikh, statusKeluarga) {
         document.getElementById('editId').value = id;
         document.getElementById('editNama').value = nama;
         document.getElementById('editKP').value = kp;
@@ -309,8 +388,9 @@
         document.getElementById('editJalan').value = jalan;
         document.getElementById('editBandar').value = (bandar === 'null' || bandar === '-' || bandar === '') ? '' : bandar;
         document.getElementById('editPoskod').value = (poskod === 'null' || poskod === '-' || poskod === '') ? '' : poskod;
-        document.getElementById('editNegeri').value = (negeri === 'null' || negeri === '-' || negeri === '') ? 'Kelantan' : negeri;
-        document.getElementById('editPass').value = pass;
+        document.getElementById('editNegeri').value = (negeri === 'null' || negeri === '-' || negeri === '') ? '' : negeri;
+        document.getElementById('editTarikhLahir').value = (tarikh === 'null' || tarikh === '-') ? '' : tarikh;
+        document.getElementById('editStatusKeluarga').value = (statusKeluarga === 'null' || statusKeluarga === '-') ? 'Bujang' : statusKeluarga;
         
         document.getElementById('modalEdit').classList.remove('hidden');
     }
