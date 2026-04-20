@@ -62,6 +62,7 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-purple-50 border-b border-purple-100">
+                            <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider w-16">No.</th>
                             <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Nama Penuh</th>
                             <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">No. Kad Pengenalan</th>
                             <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">No. Telefon</th>
@@ -72,9 +73,11 @@
                         <% 
                         List<Pengguna> listJKKK = (List<Pengguna>) request.getAttribute("listAJK");
                         if (listJKKK != null && !listJKKK.isEmpty()) {
+                            int countAJK = 1;
                             for (Pengguna p : listJKKK) { 
                         %>
                         <tr class="hover:bg-purple-50/30 transition">
+                            <td class="p-4 text-sm text-gray-500 font-medium"><%= countAJK++ %></td>
                             <td class="p-4 text-sm font-bold text-gray-800 flex items-center gap-3">
                                 <div class="w-8 h-8 rounded-full bg-purple-100 text-[#6C5DD3] flex items-center justify-center text-xs font-bold">
                                     <%= (p.getNama_penuh() != null) ? p.getNama_penuh().substring(0,1).toUpperCase() : "U" %>
@@ -115,7 +118,7 @@
                                 </div>
                             </td>
                         <% } } else { %>
-                        <tr><td colspan="4" class="p-8 text-center text-gray-400"><i class="fas fa-user-slash text-3xl mb-2 block opacity-50"></i>Tiada ahli AJK dilantik.</td></tr>
+                        <tr><td colspan="5" class="p-8 text-center text-gray-400"><i class="fas fa-user-slash text-3xl mb-2 block opacity-50"></i>Tiada ahli AJK dilantik.</td></tr>
                         <% } %>
                     </tbody>
                 </table>
@@ -137,6 +140,7 @@
                 <table class="w-full text-left border-collapse" id="tablePenduduk">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-16">No.</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Nama Penuh</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">No. Kad Pengenalan</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Alamat</th>
@@ -148,9 +152,11 @@
                         <% 
                         List<Pengguna> listPenduduk = (List<Pengguna>) request.getAttribute("listPenduduk");
                         if (listPenduduk != null && !listPenduduk.isEmpty()) {
+                            int countPenduduk = 1;
                             for (Pengguna p : listPenduduk) { 
                         %>
                         <tr class="hover:bg-gray-50/50 transition">
+                            <td class="p-4 text-sm text-gray-500 font-medium"><%= countPenduduk++ %></td>
                             <td class="p-4 text-sm font-bold text-gray-800 search-col"><%= p.getNama_penuh() %></td>
                             <td class="p-4 text-sm text-gray-600 search-col"><%= p.getNombor_kp() %></td>
                             <td class="p-4 text-sm text-gray-500 max-w-xs truncate search-col"><%= p.getNama_jalan() %></td>
@@ -181,7 +187,7 @@
                             </td>
                         </tr>
                         <% } } else { %>
-                        <tr><td colspan="5" class="p-8 text-center text-gray-400"><i class="fas fa-users-slash text-3xl mb-2 block opacity-50"></i>Tiada data penduduk.</td></tr>
+                        <tr><td colspan="6" class="p-8 text-center text-gray-400"><i class="fas fa-users-slash text-3xl mb-2 block opacity-50"></i>Tiada data penduduk.</td></tr>
                         <% } %>
                     </tbody>
                 </table>

@@ -50,6 +50,7 @@
                 <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-16">No.</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Nama Penuh</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">No. Kad Pengenalan</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Alamat</th>
@@ -60,8 +61,10 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <% if (pendingList != null && !pendingList.isEmpty()) {
+                            int countPending = 1;
                             for (Pengguna p : pendingList) { %>
                         <tr class="hover:bg-gray-50/50 transition">
+                            <td class="p-4 text-sm text-gray-500 font-medium"><%= countPending++ %></td>
                             <td class="p-4 text-sm font-bold text-gray-800"><%= p.getNama_penuh() %></td>
                             <td class="p-4 text-sm text-gray-600">
                                 <span class="bg-gray-100 px-2 py-1 rounded text-xs font-mono"><%= p.getNombor_kp() %></span>
@@ -109,7 +112,7 @@
                             </td>
                         </tr>
                         <% } } else { %>
-                        <tr><td colspan="5" class="p-8 text-center text-gray-400"><i class="fas fa-inbox text-3xl mb-2 block opacity-50"></i>Tiada permohonan baharu.</td></tr>
+                        <tr><td colspan="7" class="p-8 text-center text-gray-400"><i class="fas fa-inbox text-3xl mb-2 block opacity-50"></i>Tiada permohonan baharu.</td></tr>
                         <% } %>
                     </tbody>
                 </table>
@@ -131,6 +134,7 @@
                 <table class="w-full text-left border-collapse" id="tableActive">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-16">No.</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Nama Penuh</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">No. Kad Pengenalan</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Alamat</th>
@@ -142,9 +146,11 @@
                         <% 
                         List<Pengguna> activeList = (List<Pengguna>) request.getAttribute("activeList");
                         if (activeList != null && !activeList.isEmpty()) {
+                            int countActive = 1;
                             for (Pengguna p : activeList) { 
                         %>
                         <tr class="hover:bg-gray-50/50 transition">
+                            <td class="p-4 text-sm text-gray-500 font-medium"><%= countActive++ %></td>
                             <td class="p-4 text-sm font-bold text-gray-800 search-col"><%= p.getNama_penuh() %></td>
                             <td class="p-4 text-sm text-gray-600 search-col"><%= p.getNombor_kp() %></td>
                             <td class="p-4 text-sm text-gray-500 max-w-xs truncate search-col"><%= p.getNama_jalan() %></td>
@@ -181,7 +187,7 @@
                             </td>
                         </tr>
                         <% } } else { %>
-                        <tr><td colspan="5" class="p-8 text-center text-gray-400"><i class="fas fa-users-slash text-3xl mb-2 block opacity-50"></i>Tiada data penduduk aktif.</td></tr>
+                        <tr><td colspan="6" class="p-8 text-center text-gray-400"><i class="fas fa-users-slash text-3xl mb-2 block opacity-50"></i>Tiada data penduduk aktif.</td></tr>
                         <% } %>
                     </tbody>
                 </table>

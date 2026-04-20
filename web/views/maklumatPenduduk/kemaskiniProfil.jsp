@@ -50,58 +50,66 @@
         <script>
             function formatIC(input) {
                 let val = input.value.replace(/\D/g, '');
-                if (val.length > 12) { val = val.substring(0, 12); }
+                if (val.length > 12) {
+                    val = val.substring(0, 12);
+                }
                 let formatted = "";
-                if (val.length > 0) { formatted += val.substring(0, 6); }
-                if (val.length > 6) { formatted += '-' + val.substring(6, 8); }
-                if (val.length > 8) { formatted += '-' + val.substring(8, 12); }
+                if (val.length > 0) {
+                    formatted += val.substring(0, 6);
+                }
+                if (val.length > 6) {
+                    formatted += '-' + val.substring(6, 8);
+                }
+                if (val.length > 8) {
+                    formatted += '-' + val.substring(8, 12);
+                }
                 input.value = formatted;
             }
         </script>
 
         <%-- Mesej Maklum Balas --%>
         <% if (request.getParameter("status") != null) { %>
-            <% if (request.getParameter("status").equals("success")) { %>
-            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
-                <i class="fas fa-check-circle text-lg"></i>
-                <div><span class="font-bold">Berjaya!</span> Maklumat anda telah dikemaskini.</div>
-            </div>
-            <% } else if (request.getParameter("status").equals("error")) { %>
-            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
-                <i class="fas fa-exclamation-circle text-lg"></i>
-                <div><span class="font-bold">Ralat!</span> Berlaku masalah semasa mengemaskini maklumat.</div>
-            </div>
-            <% } else if (request.getParameter("status").equals("pass_success")) { %>
-            <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
-                <i class="fas fa-check-circle text-lg"></i>
-                <div><span class="font-bold">Berjaya!</span> Kata laluan telah dikemaskini.</div>
-            </div>
-            <% } else if (request.getParameter("status").equals("pass_error")) { %>
-            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
-                <i class="fas fa-exclamation-circle text-lg"></i>
-                <div><span class="font-bold">Ralat!</span> Gagal menukar kata laluan.</div>
-            </div>
-            <% } else if (request.getParameter("status").equals("wrong_old_pass")) { %>
-            <div class="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
-                <i class="fas fa-exclamation-triangle text-lg"></i>
-                <div><span class="font-bold">Perhatian!</span> Kata laluan lama yang dimasukkan adalah salah.</div>
-            </div>
-            <% } %>
+        <% if (request.getParameter("status").equals("success")) { %>
+        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
+            <i class="fas fa-check-circle text-lg"></i>
+            <div><span class="font-bold">Berjaya!</span> Maklumat anda telah dikemaskini.</div>
+        </div>
+        <% } else if (request.getParameter("status").equals("error")) { %>
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
+            <i class="fas fa-exclamation-circle text-lg"></i>
+            <div><span class="font-bold">Ralat!</span> Berlaku masalah semasa mengemaskini maklumat.</div>
+        </div>
+        <% } else if (request.getParameter("status").equals("pass_success")) { %>
+        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
+            <i class="fas fa-check-circle text-lg"></i>
+            <div><span class="font-bold">Berjaya!</span> Kata laluan telah dikemaskini.</div>
+        </div>
+        <% } else if (request.getParameter("status").equals("pass_error")) { %>
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
+            <i class="fas fa-exclamation-circle text-lg"></i>
+            <div><span class="font-bold">Ralat!</span> Gagal menukar kata laluan.</div>
+        </div>
+        <% } else if (request.getParameter("status").equals("wrong_old_pass")) { %>
+        <div class="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
+            <i class="fas fa-exclamation-triangle text-lg"></i>
+            <div><span class="font-bold">Perhatian!</span> Kata laluan lama yang dimasukkan adalah salah.</div>
+        </div>
+        <% } %>
         <% }%>
 
         <form action="<%= request.getContextPath()%>/profil/update" method="post" enctype="multipart/form-data" class="w-full">
-            
+
             <%-- Bahagian Foto Profil (Expandable) --%>
             <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 mb-8 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
                 <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8]"></div>
-                
+
                 <div class="relative group">
                     <div class="w-32 h-32 rounded-full p-1 border-4 border-[#6C5DD3] bg-white flex items-center justify-center text-4xl font-bold text-[#6C5DD3] shadow-lg overflow-hidden transition-transform group-hover:scale-105">
-                        <% if (pDetail.getFoto_profil() != null && !pDetail.getFoto_profil().isEmpty() && !pDetail.getFoto_profil().equals("default_avatar.png")) { %>
-                            <img id="previewFoto" src="<%= request.getContextPath() %>/file/profil/<%= pDetail.getFoto_profil() %>" class="w-full h-full object-cover">
-                        <% } else { %>
-                            <img id="previewFoto" src="https://ui-avatars.com/api/?name=<%= pDetail.getNama_penuh()%>&background=6C5DD3&color=fff&size=128" class="w-full h-full object-cover">
-                        <% } %>
+                        <% if (pDetail.getFoto_profil() != null && !pDetail.getFoto_profil().isEmpty() && !pDetail.getFoto_profil().equals("default_avatar.png")) {%>
+                        <img id="previewFoto" src="<%= request.getContextPath()%>/file/profil/<%= pDetail.getFoto_profil()%>" class="w-full h-full object-cover">
+                        <% } else {%>
+                        <img id="previewFoto" src="https://ui-avatars.com/api/?name=<%= pDetail.getNama_penuh()%>&background=6C5DD3&color=fff&size=128" class="w-full h-full object-cover">
+                        <% }%>
                     </div>
                     <label for="fotoInput" class="absolute bottom-1 right-1 w-10 h-10 bg-[#6C5DD3] text-white rounded-full flex items-center justify-center cursor-pointer border-4 border-white shadow-md hover:bg-[#5b4eb8] transition-all">
                         <i class="fas fa-camera text-sm"></i>
@@ -131,12 +139,12 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-500 mb-2">No. Kad Pengenalan</label>
-                            <% 
+                            <%
                                 String icRaw = pDetail.getNombor_kp();
-                                String icFormatted = (icRaw != null && icRaw.length() == 12) ? 
-                                    icRaw.substring(0, 6) + "-" + icRaw.substring(6, 8) + "-" + icRaw.substring(8, 12) : icRaw;
+                                String icFormatted = (icRaw != null && icRaw.length() == 12)
+                                        ? icRaw.substring(0, 6) + "-" + icRaw.substring(6, 8) + "-" + icRaw.substring(8, 12) : icRaw;
                             %>
-                            <input type="text" value="<%= icFormatted %>" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-400 text-sm cursor-not-allowed font-medium">
+                            <input type="text" value="<%= icFormatted%>" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-400 text-sm cursor-not-allowed font-medium">
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-500 mb-2">No. Telefon</label>
@@ -144,7 +152,7 @@
                         </div>
                         <div class="md:col-span-2">
                             <label class="block text-xs font-bold text-gray-500 mb-2">Alamat Emel</label>
-                            <input type="email" name="email" value="<%= (pDetail.getEmail() != null) ? pDetail.getEmail() : "" %>" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
+                            <input type="email" name="email" value="<%= (pDetail.getEmail() != null) ? pDetail.getEmail() : ""%>" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
                         </div>
                     </div>
                 </div>
@@ -155,14 +163,33 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <div class="md:col-span-3">
                             <label class="block text-xs font-bold text-gray-500 mb-2">Nama Jalan / No. Rumah</label>
-                            <input type="text" name="nama_jalan" value="<%= pDetail.getNama_jalan()%>" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium cursor-not-allowed">
+                            <%-- Tambah name="nama_jalan" --%>
+                            <input type="text" 
+       name="nama_jalan" 
+       value="<%= pDetail.getNama_jalan()%>" 
+       class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
                         </div>
-                        <div><label class="block text-xs font-bold text-gray-500 mb-2">Daerah</label>
-                        <input type="text" value="<%= (pDetail.getDaerah() != null) ? pDetail.getDaerah() : "Selising"%>" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium"></div>
-                        <div><label class="block text-xs font-bold text-gray-500 mb-2">Poskod</label>
-                        <input type="text" value="<%= (pDetail.getNombor_poskod() != null) ? pDetail.getNombor_poskod() : "16810"%>" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium"></div>
-                        <div><label class="block text-xs font-bold text-gray-500 mb-2">Bandar</label>
-                        <input type="text" value="<%= (pDetail.getBandar() != null) ? pDetail.getBandar() : "Pasir Puteh"%>" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium"></div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-2">Daerah</label>
+                            <%-- Tambah name="daerah" --%>
+                            <input type="text" name="daerah" value="<%= (pDetail.getDaerah() != null) ? pDetail.getDaerah() : "Selising"%>" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-2">Poskod</label>
+                            <%-- Tambah name="nombor_poskod" --%>
+                            <input type="text" name="nombor_poskod" value="<%= (pDetail.getNombor_poskod() != null) ? pDetail.getNombor_poskod() : "16810"%>" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-2">Bandar</label>
+                            <%-- Tambah name="bandar" --%>
+                            <input type="text" name="bandar" value="<%= (pDetail.getBandar() != null) ? pDetail.getBandar() : "Pasir Puteh"%>" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium">
+                        </div>
+                        <%-- Tambahan: Negeri jika perlu --%>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-2">Negeri</label>
+                            <%-- Tambah name="negeri" --%>
+                            <input type="text" name="negeri" value="<%= (pDetail.getNegeri() != null) ? pDetail.getNegeri() : "Kelantan"%>" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium">
+                        </div>
                     </div>
                 </div>
 
@@ -194,8 +221,8 @@
                 <div>
                     <h4 class="text-sm font-bold text-[#6C5DD3] uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">4. Lokasi Rumah</h4>
                     <div id="mapProfil" style="height: 350px; border-radius: 1rem; z-index: 0;" class="border-2 border-dashed border-gray-200"></div>
-                    <input type="hidden" name="latitude" id="latInput" value="<%= (pDetail.getLatitude() != null) ? pDetail.getLatitude() : "" %>">
-                    <input type="hidden" name="longitude" id="lonInput" value="<%= (pDetail.getLongitude() != null) ? pDetail.getLongitude() : "" %>">
+                    <input type="hidden" name="latitude" id="latInput" value="<%= (pDetail.getLatitude() != null) ? pDetail.getLatitude() : ""%>">
+                    <input type="hidden" name="longitude" id="lonInput" value="<%= (pDetail.getLongitude() != null) ? pDetail.getLongitude() : ""%>">
                 </div>
 
                 <div class="pt-4">
@@ -222,9 +249,14 @@
                 <p class="text-xs font-bold text-gray-400 uppercase mb-2">Kelengkapan Data</p>
                 <%
                     int progress = 0;
-                    if (pDetail.getPekerjaan() != null && !pDetail.getPekerjaan().isEmpty()) progress += 33;
-                    if (pDetail.getPendapatan() != null) progress += 33;
-                    if (pDetail.getStatus_keluarga() != null && !pDetail.getStatus_keluarga().isEmpty()) progress += 34;
+                    if (pDetail.getPekerjaan() != null && !pDetail.getPekerjaan().isEmpty()) {
+                        progress += 33;
+                    }
+                    if (pDetail.getPendapatan() != null) {
+                        progress += 33;
+                    }
+                    if (pDetail.getStatus_keluarga() != null && !pDetail.getStatus_keluarga().isEmpty())
+                        progress += 34;
                 %>
                 <div class="relative pt-1">
                     <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-purple-200">
@@ -259,16 +291,16 @@
                 <div class="p-3 rounded-xl bg-gray-50 border border-gray-100">
                     <div class="flex justify-between items-start mb-1">
                         <span class="text-[10px] font-bold text-[#6C5DD3]">Admin</span>
-                        <span class="text-[9px] text-gray-400"><%= new java.text.SimpleDateFormat("dd/MM/yy").format(log.getDibuat_pada()) %></span>
+                        <span class="text-[9px] text-gray-400"><%= new java.text.SimpleDateFormat("dd/MM/yy").format(log.getDibuat_pada())%></span>
                     </div>
-                    <p class="text-[11px] text-gray-600 leading-tight mb-1"><%= log.getKeterangan_tindakan() %></p>
+                    <p class="text-[11px] text-gray-600 leading-tight mb-1"><%= log.getKeterangan_tindakan()%></p>
                 </div>
                 <%      }
-                    } else { %>
+                } else { %>
                 <div class="text-center py-6 bg-gray-50 rounded-xl border border-dashed border-gray-200">
                     <p class="text-[10px] text-gray-400 italic">Tiada rekod aktiviti.</p>
                 </div>
-                <% } %>
+                <% }%>
             </div>
         </div>
     </aside>
@@ -276,10 +308,19 @@
 </div>
 
 <style>
-    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e2e2e2; border-radius: 10px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6C5DD3; }
+    .custom-scrollbar::-webkit-scrollbar {
+        width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+        background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+        background: #e2e2e2;
+        border-radius: 10px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+        background: #6C5DD3;
+    }
 </style>
 
 <%-- Modal Tukar Kata Laluan --%>
@@ -304,34 +345,48 @@
     function previewImage(input) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
-            reader.onload = function(e) { document.getElementById('previewFoto').src = e.target.result; };
+            reader.onload = function (e) {
+                document.getElementById('previewFoto').src = e.target.result;
+            };
             reader.readAsDataURL(input.files[0]);
         }
     }
-    function showChangePassModal() { document.getElementById('changePassModal').classList.remove('hidden'); }
-    function hideChangePassModal() { document.getElementById('changePassModal').classList.add('hidden'); }
+    function showChangePassModal() {
+        document.getElementById('changePassModal').classList.remove('hidden');
+    }
+    function hideChangePassModal() {
+        document.getElementById('changePassModal').classList.add('hidden');
+    }
 
-    (function() {
+    (function () {
         var defaultLat = 6.0289, defaultLon = 102.2935;
         var latElement = document.getElementById('latInput');
         var lonElement = document.getElementById('lonInput');
-        if(!latElement || !lonElement) return;
+        if (!latElement || !lonElement)
+            return;
 
         var initLat = latElement.value ? parseFloat(latElement.value) : defaultLat;
         var initLon = lonElement.value ? parseFloat(lonElement.value) : defaultLon;
 
         var map = L.map('mapProfil').setView([initLat, initLon], latElement.value ? 17 : 14);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
-        var marker = L.marker([initLat, initLon], { draggable: true }).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '© OpenStreetMap'}).addTo(map);
+        var marker = L.marker([initLat, initLon], {draggable: true}).addTo(map);
 
         function updateInputs(latlng) {
             document.getElementById('latInput').value = latlng.lat.toFixed(8);
             document.getElementById('lonInput').value = latlng.lng.toFixed(8);
         }
 
-        marker.on('dragend', function(e) { updateInputs(e.target.getLatLng()); });
-        map.on('click', function(e) { marker.setLatLng(e.latlng); updateInputs(e.latlng); });
-        setTimeout(function() { map.invalidateSize(); }, 300);
+        marker.on('dragend', function (e) {
+            updateInputs(e.target.getLatLng());
+        });
+        map.on('click', function (e) {
+            marker.setLatLng(e.latlng);
+            updateInputs(e.latlng);
+        });
+        setTimeout(function () {
+            map.invalidateSize();
+        }, 300);
     })();
 </script>
 

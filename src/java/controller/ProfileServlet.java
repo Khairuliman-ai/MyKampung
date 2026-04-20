@@ -12,12 +12,15 @@ import model.Pengguna;
 import model.ActivityLog;
 import util.DBUtil;
 import java.util.List;
+import javax.servlet.annotation.MultipartConfig;
+import java.io.File;
+import javax.servlet.http.Part;
 
 @WebServlet(urlPatterns = {"/profil/view", "/profil/update"})
-@javax.servlet.annotation.MultipartConfig(
-    fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
-    maxFileSize = 1024 * 1024 * 10,      // 10 MB
-    maxRequestSize = 1024 * 1024 * 15    // 15 MB
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024 * 2, // 2MB
+    maxFileSize = 1024 * 1024 * 10,      // 10MB
+    maxRequestSize = 1024 * 1024 * 50    // 50MB
 )
 public class ProfileServlet extends HttpServlet {
 
@@ -46,6 +49,7 @@ public class ProfileServlet extends HttpServlet {
         }
     }
 
+    // 2. Method doPost: Untuk proses simpan kemaskini profil
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
@@ -97,36 +101,12 @@ public class ProfileServlet extends HttpServlet {
                 String bandar = request.getParameter("bandar");
                 String negeri = request.getParameter("negeri");
                 String email = request.getParameter("email");
+                String daerah = request.getParameter("daerah");
+                
+                // Data Sosio-Ekonomi
                 String statusKeluarga = request.getParameter("status_keluarga");
                 String pekerjaan = request.getParameter("pekerjaan");
                 String pendapatanStr = request.getParameter("pendapatan");
-                String latStr = request.getParameter("latitude");
-                String lonStr = request.getParameter("longitude");
-
-                // --- PROSES MUAT NAIK GAMBAR ---
-                try {
-                    Part filePart = request.getPart("foto_profil");
-                    if (filePart != null && filePart.getSize() > 0) {
-                        String contentDisp = filePart.getHeader("content-disposition");
-                        String fileName = "";
-                        for (String token : contentDisp.split(";")) {
-                            if (token.trim().startsWith("filename")) {
-                                fileName = token.substring(token.indexOf("=") + 2, token.length() - 1);
-                            }
-                        }
-                        
-                        if (!fileName.isEmpty()) {
-                            String newFileName = System.currentTimeMillis() + "_" + fileName;
-                            String uploadPath = getServletContext().getRealPath("/") + "file/profil";
-                            java.io.File uploadDir = new java.io.File(uploadPath);
-                            if (!uploadDir.exists()) uploadDir.mkdirs();
-                            filePart.write(uploadPath + java.io.File.separator + newFileName);
-                            currentUser.setFoto_profil(newFileName);
-                        }
-                    }
-                } catch (Exception e) {
-                    System.out.println("No file uploaded or error: " + e.getMessage());
-                }
 
                 // B. Update Object currentUser
                 currentUser.setNama_penuh(namaPenuh);
@@ -136,6 +116,7 @@ public class ProfileServlet extends HttpServlet {
                 currentUser.setNombor_poskod(poskod);
                 currentUser.setBandar(bandar);
                 currentUser.setNegeri(negeri);
+                currentUser.setDaerah(daerah);
                 currentUser.setStatus_keluarga(statusKeluarga);
                 currentUser.setPekerjaan(pekerjaan);
                 
@@ -143,6 +124,9 @@ public class ProfileServlet extends HttpServlet {
                     currentUser.setPendapatan(new BigDecimal(pendapatanStr));
                 }
 
+                // Koordinat GPS dari Leaflet map
+                String latStr = request.getParameter("latitude");
+                String lonStr = request.getParameter("longitude");
                 if (latStr != null && !latStr.isEmpty()) {
                     currentUser.setLatitude(Double.parseDouble(latStr));
                 }
@@ -150,11 +134,26 @@ public class ProfileServlet extends HttpServlet {
                     currentUser.setLongitude(Double.parseDouble(lonStr));
                 }
 
+                // --- PROSES MUAT NAIK FOTO PROFIL ---
+                Part filePart = request.getPart("foto_profil");
+                if (filePart != null && filePart.getSize() > 0) {
+                    String fileName = "profil_" + currentUser.getId_pengguna() + "_" + System.currentTimeMillis() + ".jpg";
+                    String uploadPath = "C:\\Users\\khayx\\OneDrive\\Documents\\SEM5_UMT\\PITA1\\MyKampungData\\fotoProfil";
+                    File uploadDir = new File(uploadPath);
+                    if (!uploadDir.exists()) { uploadDir.mkdirs(); }
+                    filePart.write(uploadPath + File.separator + fileName);
+                    
+                    // Set nama file baru ke model
+                    currentUser.setFoto_profil(fileName);
+                }
+
                 // C. Simpan ke Database
                 PenggunaDAO pDao = new PenggunaDAO(conn);
-                boolean success = pDao.updateProfil(currentUser);
+                
+                boolean success = pDao.updateProfil(currentUser); // Anda perlu cipta method ini di DAO
                 
                 if (success) {
+                    // Update session dengan data baru
                     session.setAttribute("currentUser", currentUser);
                     response.sendRedirect(request.getContextPath() + "/profil/view?status=success");
                 } else {

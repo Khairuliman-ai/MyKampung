@@ -39,6 +39,8 @@ public class FileServlet extends HttpServlet {
             subFolder = "lampiranPengguna";
         } else if ("bantuan".equals(type)) {
             subFolder = "lampiranBantuan";
+        } else if ("profil".equals(type)) {
+            subFolder = "fotoProfil";
         } else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
