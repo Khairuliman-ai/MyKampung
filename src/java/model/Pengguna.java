@@ -16,6 +16,7 @@ public class Pengguna {
     private BigDecimal pendapatan;
     private String lampiran_pengesahan;
     private String email;
+    private String foto_profil;
 
     // Alamat
     private String nama_jalan;
@@ -253,5 +254,13 @@ public class Pengguna {
 
     public void setId_jawatan(int id_jawatan) {
         this.id_jawatan = id_jawatan;
+    }
+
+    public String getFoto_profil() {
+        return foto_profil;
+    }
+
+    public void setFoto_profil(String foto_profil) {
+        this.foto_profil = foto_profil;
     }
 }

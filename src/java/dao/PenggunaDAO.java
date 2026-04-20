@@ -134,7 +134,7 @@ public class PenggunaDAO {
     public boolean updateProfil(Pengguna u) {
         String sql = "UPDATE pengguna SET nama_penuh=?, nombor_telefon=?, email=?, nama_jalan=?, daerah=?, "
                 + "nombor_poskod=?, bandar=?, negeri=?, status_keluarga=?, pekerjaan=?, pendapatan=?, "
-                + "latitude=?, longitude=? WHERE id_pengguna=?";
+                + "latitude=?, longitude=?, foto_profil=? WHERE id_pengguna=?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, u.getNama_penuh());
             ps.setString(2, u.getNombor_telefon());
@@ -149,7 +149,8 @@ public class PenggunaDAO {
             ps.setBigDecimal(11, u.getPendapatan());
             if (u.getLatitude() != null) ps.setDouble(12, u.getLatitude()); else ps.setNull(12, java.sql.Types.DECIMAL);
             if (u.getLongitude() != null) ps.setDouble(13, u.getLongitude()); else ps.setNull(13, java.sql.Types.DECIMAL);
-            ps.setInt(14, u.getId_pengguna());
+            ps.setString(14, u.getFoto_profil());
+            ps.setInt(15, u.getId_pengguna());
 
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -241,6 +242,7 @@ public class PenggunaDAO {
         p.setPekerjaan(rs.getString("pekerjaan"));
         p.setPendapatan(rs.getBigDecimal("pendapatan"));
         p.setEmail(rs.getString("email"));
+        p.setFoto_profil(rs.getString("foto_profil"));
         p.setNama_jalan(rs.getString("nama_jalan"));
         p.setDaerah(rs.getString("daerah"));
         p.setBandar(rs.getString("bandar"));

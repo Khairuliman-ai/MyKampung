@@ -14,6 +14,11 @@ import util.DBUtil;
 import java.util.List;
 
 @WebServlet(urlPatterns = {"/profil/view", "/profil/update"})
+@javax.servlet.annotation.MultipartConfig(
+    fileSizeThreshold = 1024 * 1024 * 1, // 1 MB
+    maxFileSize = 1024 * 1024 * 10,      // 10 MB
+    maxRequestSize = 1024 * 1024 * 15    // 15 MB
+)
 public class ProfileServlet extends HttpServlet {
 
     // 1. Method doGet: Untuk paparkan halaman profil
@@ -41,7 +46,6 @@ public class ProfileServlet extends HttpServlet {
         }
     }
 
-    // 2. Method doPost: Untuk proses simpan kemaskini profil
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
@@ -93,11 +97,36 @@ public class ProfileServlet extends HttpServlet {
                 String bandar = request.getParameter("bandar");
                 String negeri = request.getParameter("negeri");
                 String email = request.getParameter("email");
-                
-                // Data Sosio-Ekonomi
                 String statusKeluarga = request.getParameter("status_keluarga");
                 String pekerjaan = request.getParameter("pekerjaan");
                 String pendapatanStr = request.getParameter("pendapatan");
+                String latStr = request.getParameter("latitude");
+                String lonStr = request.getParameter("longitude");
+
+                // --- PROSES MUAT NAIK GAMBAR ---
+                try {
+                    Part filePart = request.getPart("foto_profil");
+                    if (filePart != null && filePart.getSize() > 0) {
+                        String contentDisp = filePart.getHeader("content-disposition");
+                        String fileName = "";
+                        for (String token : contentDisp.split(";")) {
+                            if (token.trim().startsWith("filename")) {
+                                fileName = token.substring(token.indexOf("=") + 2, token.length() - 1);
+                            }
+                        }
+                        
+                        if (!fileName.isEmpty()) {
+                            String newFileName = System.currentTimeMillis() + "_" + fileName;
+                            String uploadPath = getServletContext().getRealPath("/") + "file/profil";
+                            java.io.File uploadDir = new java.io.File(uploadPath);
+                            if (!uploadDir.exists()) uploadDir.mkdirs();
+                            filePart.write(uploadPath + java.io.File.separator + newFileName);
+                            currentUser.setFoto_profil(newFileName);
+                        }
+                    }
+                } catch (Exception e) {
+                    System.out.println("No file uploaded or error: " + e.getMessage());
+                }
 
                 // B. Update Object currentUser
                 currentUser.setNama_penuh(namaPenuh);
@@ -114,9 +143,6 @@ public class ProfileServlet extends HttpServlet {
                     currentUser.setPendapatan(new BigDecimal(pendapatanStr));
                 }
 
-                // Koordinat GPS dari Leaflet map
-                String latStr = request.getParameter("latitude");
-                String lonStr = request.getParameter("longitude");
                 if (latStr != null && !latStr.isEmpty()) {
                     currentUser.setLatitude(Double.parseDouble(latStr));
                 }
@@ -126,11 +152,9 @@ public class ProfileServlet extends HttpServlet {
 
                 // C. Simpan ke Database
                 PenggunaDAO pDao = new PenggunaDAO(conn);
-                
-                boolean success = pDao.updateProfil(currentUser); // Anda perlu cipta method ini di DAO
+                boolean success = pDao.updateProfil(currentUser);
                 
                 if (success) {
-                    // Update session dengan data baru
                     session.setAttribute("currentUser", currentUser);
                     response.sendRedirect(request.getContextPath() + "/profil/view?status=success");
                 } else {
