@@ -3,10 +3,20 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="model.PermohonanBantuan" %>
+<%@ page import="model.Pengguna" %>
 <%@ page import="java.net.URLEncoder" %>
 
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
+
+<%
+    // 1. Dapatkan objek user dari session
+    Pengguna user = (Pengguna) session.getAttribute("currentUser");
+    if (user == null) {
+        response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp");
+        return;
+    }
+%>
 
 <%
     // 1. ASINGKAN DATA KEPADA BARU & SEJARAH
@@ -193,6 +203,75 @@
     </div>
 
 </div> 
+
+    <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
+        
+        <div class="flex justify-between items-start mb-8">
+            <h3 class="font-bold text-lg text-gray-800">Statistik Semasa</h3>
+            <span class="text-[10px] bg-purple-50 text-[#6C5DD3] px-2 py-1 rounded-lg font-bold">AJK MODE</span>
+        </div>
+
+        <div class="space-y-4 mb-10">
+            <div class="bg-gray-50 p-4 rounded-2xl flex items-center justify-between border border-gray-100">
+                <div>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Menunggu Semakan</p>
+                    <h4 class="font-bold text-xl text-gray-800"><%= listBaru.size() %></h4>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-orange-100 text-orange-500 flex items-center justify-center shadow-sm">
+                    <i class="fas fa-clock"></i>
+                </div>
+            </div>
+            
+            <div class="bg-gray-50 p-4 rounded-2xl flex items-center justify-between border border-gray-100">
+                <div>
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Telah Disemak</p>
+                    <h4 class="font-bold text-xl text-gray-800"><%= listSejarah.size() %></h4>
+                </div>
+                <div class="w-10 h-10 rounded-xl bg-green-100 text-green-500 flex items-center justify-center shadow-sm">
+                    <i class="fas fa-check-double"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="mb-10">
+            <h3 class="font-bold text-sm text-gray-800 mb-4 uppercase tracking-widest">Langkah Pengesahan</h3>
+            <div class="space-y-6 relative">
+                <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-gray-100"></div>
+                
+                <div class="relative pl-10">
+                    <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-[#6C5DD3] flex items-center justify-center font-bold text-xs border-2 border-[#6C5DD3] z-10">1</div>
+                    <h4 class="font-bold text-xs text-gray-800 uppercase">Semak Dokumen</h4>
+                    <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Klik butang PDF untuk memastikan semua dokumen yang dimuat naik adalah sah dan jelas.</p>
+                </div>
+
+                <div class="relative pl-10">
+                    <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-gray-400 flex items-center justify-center font-bold text-xs border-2 border-gray-100 z-10">2</div>
+                    <h4 class="font-bold text-xs text-gray-800 uppercase">Beri Keputusan</h4>
+                    <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Pilih 'Lengkap' untuk hantar ke Ketua Kampung atau 'Hantar Semula' jika ada pembetulan.</p>
+                </div>
+
+                <div class="relative pl-10">
+                    <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-gray-400 flex items-center justify-center font-bold text-xs border-2 border-gray-100 z-10">3</div>
+                    <h4 class="font-bold text-xs text-gray-800 uppercase">Pantau Status</h4>
+                    <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Lihat ruangan 'Sejarah Tindakan' untuk mengetahui keputusan akhir daripada Ketua Kampung.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-auto">
+            <div class="bg-gradient-to-br from-[#6C5DD3] to-[#8E82EF] rounded-3xl p-6 text-white relative overflow-hidden shadow-lg shadow-purple-100">
+                <div class="relative z-10">
+                    <h4 class="font-bold text-sm mb-2">Bantuan Tambahan?</h4>
+                    <p class="text-[10px] text-purple-100 leading-relaxed mb-4">Hubungi Setiausaha jika terdapat ralat pada sistem atau data pemohon.</p>
+                    <a href="tel:0123456789" class="inline-flex items-center gap-2 text-xs font-bold bg-white/20 hover:bg-white/30 px-3 py-2 rounded-xl transition backdrop-blur-md">
+                        <i class="fas fa-phone-alt"></i> Hubungi Sekarang
+                    </a>
+                </div>
+                <i class="fas fa-question-circle absolute -right-4 -bottom-4 text-6xl opacity-10 rotate-12"></i>
+            </div>
+        </div>
+
+    </aside>
 
 <div id="modalTindakan" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalTindakan')"></div>

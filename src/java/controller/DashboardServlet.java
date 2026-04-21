@@ -57,7 +57,7 @@ public class DashboardServlet extends HttpServlet {
             if ("Setiausaha".equals(biro)) {
                 request.getRequestDispatcher("views/dashboard/dJKKK.jsp").forward(request, response);
             } else if ("Biro Kebajikan & Sosial".equals(biro)) {
-                request.getRequestDispatcher("views/dashboard/dKebajikan.jsp").forward(request, response);
+                request.getRequestDispatcher("views/dashboard/biroKebajikanDashboard.jsp").forward(request, response);
             } else if ("Biro Sukan & Riadah".equals(biro)) {
                 request.getRequestDispatcher("views/dashboard/biroSukanDashboard.jsp").forward(request, response);
             } else if ("Biro Agama & Da'wah".equals(biro)) {
