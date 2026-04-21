@@ -79,17 +79,34 @@
                         <div class="w-14 h-14 bg-brand-purple bg-opacity-10 text-brand-purple rounded-2xl flex items-center justify-center text-xl">
                             <i class="fas fa-building"></i>
                         </div>
-                        <span class="bg-green-100 text-green-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">Aktif</span>
+                        <div class="flex flex-col items-end gap-2">
+                            <% if (f.isOccupied()) { %>
+                                <span class="bg-orange-100 text-orange-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider animate-pulse">
+                                    <i class="fas fa-user-clock mr-1"></i> Sedang Digunakan
+                                </span>
+                            <% } else { %>
+                                <span class="bg-green-100 text-green-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
+                                    Tersedia
+                                </span>
+                            <% } %>
+                        </div>
                     </div>
                     <h3 class="text-xl font-bold text-gray-800 mb-2"><%= f.getNama_fasiliti() %></h3>
                     <div class="flex items-center gap-2 text-gray-400 text-sm mb-8">
                         <i class="fas fa-location-dot"></i>
                         <span><%= f.getLokasi() %></span>
                     </div>
-                    <button onclick="openBookingModal('<%= f.getId_fasiliti() %>', '<%= f.getNama_fasiliti() %>')" 
-                            class="w-full py-4 bg-brand-purple text-white rounded-2xl font-bold text-sm shadow-lg shadow-indigo-100 hover:bg-opacity-90 transition-all">
-                        Tempah Sekarang
-                    </button>
+                    <div class="flex flex-col gap-3">
+                        <button onclick="openBookingModal('<%= f.getId_fasiliti() %>', '<%= f.getNama_fasiliti() %>')" 
+                                <%= f.isOccupied() ? "disabled title='Fasiliti sedang digunakan'" : "" %>
+                                class="w-full py-4 <%= f.isOccupied() ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-brand-purple text-white shadow-lg shadow-indigo-100 hover:bg-opacity-90" %> rounded-2xl font-bold text-sm transition-all">
+                            <%= f.isOccupied() ? "Tidak Tersedia" : "Tempah Sekarang" %>
+                        </button>
+                        <button onclick="openDetailsModal('<%= f.getId_fasiliti() %>', '<%= f.getNama_fasiliti() %>', '<%= f.getLokasi() %>', '<%= f.getLatitude() %>', '<%= f.getLongitude() %>', <%= f.isOccupied() %>)"
+                                class="w-full py-3 bg-white text-gray-500 border border-gray-100 rounded-2xl font-bold text-xs hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
+                            <i class="fas fa-info-circle"></i> Lihat Butiran
+                        </button>
+                    </div>
                 </div>
             <% } } else { %>
                 <div class="col-span-full py-20 text-center bg-white rounded-[2.5rem] border border-dashed border-gray-300">
@@ -190,7 +207,7 @@
                 
                 <div class="space-y-2">
                     <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Tarikh Tempahan</label>
-                    <input type="date" name="tarikh_tempah" id="tarikh_tempah" required 
+                    <input type="date" name="tarikh_tempah" id="tarikh_tempah" required onchange="loadSlots()"
                            class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium">
                 </div>
 
@@ -244,6 +261,44 @@
     </div>
 </div>
 
+<!-- Modal Butiran Fasiliti -->
+<div id="modalButiran" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-40 transition-opacity backdrop-blur-sm" onclick="closeDetailsModal()"></div>
+    <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
+        <div class="relative transform overflow-hidden rounded-[2.5rem] bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg p-8">
+            <header class="flex justify-between items-start mb-6">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800" id="detNama">Nama Fasiliti</h3>
+                    <p class="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                        <i class="fas fa-location-dot"></i> <span id="detLokasi">Lokasi</span>
+                    </p>
+                </div>
+                <button onclick="closeDetailsModal()" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-gray-50 rounded-xl transition-colors">
+                    <i class="fas fa-times"></i>
+                </button>
+            </header>
+
+            <div class="space-y-6">
+                <div class="bg-gray-50 rounded-3xl p-6 border border-gray-100">
+                    <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-3">Status Semasa</h4>
+                    <div id="detStatusBadge"></div>
+                </div>
+
+                <div class="space-y-3">
+                    <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Lokasi Peta</h4>
+                    <div id="mapDetails" style="height: 250px; border-radius: 1.5rem; z-index: 0;" class="border-2 border-dashed border-gray-100 bg-gray-50"></div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button id="detBtnNav" class="flex-1 py-4 bg-green-500 text-white rounded-2xl font-bold text-sm shadow-lg shadow-green-100 hover:bg-green-600 transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-route"></i> Navigasi Google Maps
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     function toggleDuration() {
         const tempoh = document.getElementById('tempoh_tempahan').value;
@@ -283,18 +338,23 @@
     function loadSlots() {
         const idFasiliti = document.getElementById('modalIdFasiliti').value;
         const tempoh = document.getElementById('tempoh_tempahan').value;
+        const tarikh = document.getElementById('tarikh_tempah').value;
         const slotSelect = document.getElementById('slot_select');
 
         if (!idFasiliti || tempoh === 'specific') return;
+        if (!tarikh) {
+            slotSelect.innerHTML = '<option value="">Sila pilih tarikh dahulu...</option>';
+            return;
+        }
 
         slotSelect.innerHTML = '<option value="">Memuatkan slot...</option>';
 
-        fetch(`<%= contextPath %>/fasiliti/getSlots?idFasiliti=${idFasiliti}&durasi=${tempoh}`)
+        fetch(`<%= contextPath %>/fasiliti/getSlots?idFasiliti=${idFasiliti}&durasi=${tempoh}&tarikh=${tarikh}`)
             .then(response => response.json())
             .then(data => {
                 slotSelect.innerHTML = '<option value="">Pilih Slot Masa</option>';
                 if (data.length === 0) {
-                    slotSelect.innerHTML = '<option value="">Tiada slot ditetapkan oleh admin</option>';
+                    slotSelect.innerHTML = '<option value="">Tiada slot tersedia untuk tarikh ini</option>';
                 } else {
                     data.forEach(slot => {
                         const option = document.createElement('option');
@@ -358,6 +418,74 @@
         document.getElementById('modalFasilitiName').innerText = "Tempahan untuk: " + name;
         document.getElementById('modalTempah').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+    }
+
+    var detailsMap, detailsMarker;
+    function openDetailsModal(id, name, lokasi, lat, lon, occupied) {
+        document.getElementById('detNama').innerText = name;
+        document.getElementById('detLokasi').innerText = lokasi;
+        
+        const badgeCont = document.getElementById('detStatusBadge');
+        if (occupied) {
+            badgeCont.innerHTML = `
+                <div class="flex items-center gap-3 text-orange-600">
+                    <div class="w-10 h-10 bg-orange-100 rounded-xl flex items-center justify-center text-lg">
+                        <i class="fas fa-user-clock"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm">Sedang Digunakan</p>
+                        <p class="text-[10px] text-orange-400">Fasiliti ini sedang mempunyai tempahan aktif.</p>
+                    </div>
+                </div>
+            `;
+        } else {
+            badgeCont.innerHTML = `
+                <div class="flex items-center gap-3 text-green-600">
+                    <div class="w-10 h-10 bg-green-100 rounded-xl flex items-center justify-center text-lg">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm">Tersedia</p>
+                        <p class="text-[10px] text-green-400">Anda boleh menempah fasiliti ini sekarang.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        const navBtn = document.getElementById('detBtnNav');
+        if (lat && lat !== 'null' && lon && lon !== 'null') {
+            navBtn.onclick = () => window.open(`https://www.google.com/maps/dir/?api=1&destination=${lat},${lon}`, '_blank');
+            navBtn.classList.remove('hidden');
+        } else {
+            navBtn.classList.add('hidden');
+        }
+
+        document.getElementById('modalButiran').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        // Init Map
+        setTimeout(() => {
+            if (detailsMap) detailsMap.remove();
+            if (lat && lat !== 'null' && lon && lon !== 'null') {
+                detailsMap = L.map('mapDetails').setView([lat, lon], 16);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19, attribution: '© OpenStreetMap'
+                }).addTo(detailsMap);
+                detailsMarker = L.marker([lat, lon]).addTo(detailsMap);
+            } else {
+                document.getElementById('mapDetails').innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
+                        <i class="fas fa-map-marked-alt text-3xl opacity-20"></i>
+                        <p class="text-[10px] font-bold uppercase tracking-widest">Tiada Koordinat GPS</p>
+                    </div>
+                `;
+            }
+        }, 300);
+    }
+
+    function closeDetailsModal() {
+        document.getElementById('modalButiran').classList.add('hidden');
+        document.body.style.overflow = 'auto';
     }
 
     function closeModal() {

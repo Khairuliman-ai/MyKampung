@@ -69,9 +69,6 @@ public class FasilitiServlet extends HttpServlet {
                 case "/getSlots":
                     handleGetSlots(request, response);
                     break;
-                case "/deleteSlot":
-                    if (isStaff(user)) handleDeleteSlot(request, response);
-                    break;
                 default:
                     response.sendRedirect(request.getContextPath() + "/fasiliti/list");
                     break;
@@ -113,9 +110,6 @@ public class FasilitiServlet extends HttpServlet {
                 case "/reject":
                     if (isStaff(user)) handleStatusTempahan(request, response, "TOLAK");
                     break;
-                case "/addSlot":
-                    if (isStaff(user)) handleAddSlot(request, response);
-                    break;
                 default:
                     response.sendRedirect(request.getContextPath() + "/fasiliti/list");
                     break;
@@ -143,14 +137,6 @@ public class FasilitiServlet extends HttpServlet {
         
         request.setAttribute("senaraiFasiliti", senaraiFasiliti);
         request.setAttribute("senaraiTempahan", senaraiSemuaTempahan);
-        
-        // Fetch all slots to display in management
-        List<FasilitiSlot> senaraiSlot = new ArrayList<>();
-        for(Fasiliti f : senaraiFasiliti) {
-            senaraiSlot.addAll(slotDAO.getSlotsByFasiliti(f.getId_fasiliti(), 1));
-            senaraiSlot.addAll(slotDAO.getSlotsByFasiliti(f.getId_fasiliti(), 2));
-        }
-        request.setAttribute("senaraiSlot", senaraiSlot);
         
         request.getRequestDispatcher("/views/fasiliti/urusFasiliti.jsp").forward(request, response);
     }
@@ -266,39 +252,42 @@ public class FasilitiServlet extends HttpServlet {
     private void handleGetSlots(HttpServletRequest request, HttpServletResponse response) throws IOException {
         int idFasiliti = Integer.parseInt(request.getParameter("idFasiliti"));
         int durasi = Integer.parseInt(request.getParameter("durasi"));
-        List<FasilitiSlot> slots = slotDAO.getSlotsByFasiliti(idFasiliti, durasi);
+        String tarikhStr = request.getParameter("tarikh");
+        
+        if (tarikhStr == null || tarikhStr.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+        
+        Date tarikh = Date.valueOf(tarikhStr);
+        List<FasilitiSlot> slots = new ArrayList<>();
+        
+        // Generate Virtual Slots (08:00 to 22:00)
+        int startHour = 8;
+        int endHour = 22;
+        
+        for (int h = startHour; h <= endHour - durasi; h += durasi) {
+            Time mula = Time.valueOf(String.format("%02d:00:00", h));
+            Time tamat = Time.valueOf(String.format("%02d:00:00", h + durasi));
+            
+            // Semak jika slot ini bertindih dengan tempahan sedia ada yang LULUS atau MENUNGGU
+            if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, mula, tamat)) {
+                FasilitiSlot s = new FasilitiSlot();
+                s.setMasa_mula(mula);
+                s.setMasa_tamat(tamat);
+                slots.add(s);
+            }
+        }
         
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
         out.print("[");
         for (int i = 0; i < slots.size(); i++) {
             FasilitiSlot s = slots.get(i);
-            out.print("{\"id\":" + s.getId_slot() + ",\"mula\":\"" + s.getMasa_mula() + "\",\"tamat\":\"" + s.getMasa_tamat() + "\"}");
+            out.print("{\"mula\":\"" + s.getMasa_mula() + "\",\"tamat\":\"" + s.getMasa_tamat() + "\"}");
             if (i < slots.size() - 1) out.print(",");
         }
         out.print("]");
     }
 
-    private void handleAddSlot(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        FasilitiSlot s = new FasilitiSlot();
-        s.setId_fasiliti(Integer.parseInt(request.getParameter("id_fasiliti")));
-        s.setMasa_mula(Time.valueOf(request.getParameter("masa_mula") + ":00"));
-        s.setMasa_tamat(Time.valueOf(request.getParameter("masa_tamat") + ":00"));
-        s.setDurasi(Integer.parseInt(request.getParameter("durasi")));
-        
-        if (slotDAO.addSlot(s)) {
-            response.sendRedirect(request.getContextPath() + "/fasiliti/urus?success=slot_added");
-        } else {
-            response.sendRedirect(request.getContextPath() + "/fasiliti/urus?error=slot_failed");
-        }
-    }
-
-    private void handleDeleteSlot(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int id = Integer.parseInt(request.getParameter("id"));
-        if (slotDAO.deleteSlot(id)) {
-            response.sendRedirect(request.getContextPath() + "/fasiliti/urus?success=slot_deleted");
-        } else {
-            response.sendRedirect(request.getContextPath() + "/fasiliti/urus?error=slot_delete_failed");
-        }
-    }
 }

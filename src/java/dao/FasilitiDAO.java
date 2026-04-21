@@ -13,8 +13,13 @@ public class FasilitiDAO {
 
     public List<Fasiliti> dapatkanSemuaFasiliti() {
         List<Fasiliti> senarai = new ArrayList<>();
-        String sql = "SELECT id_fasiliti, nama_fasiliti, lokasi, status, latitude, longitude, dibuat_pada, dikemaskini_pada, dipadam_pada " +
-                     "FROM fasiliti WHERE status = 'AKTIF'";
+        String sql = "SELECT f.*, " +
+                     "(SELECT COUNT(*) FROM tempahan_fasiliti t " +
+                     " WHERE t.id_fasiliti = f.id_fasiliti " +
+                     " AND t.tarikh_tempah = CURRENT_DATE() " +
+                     " AND t.status = 'LULUS' " +
+                     " AND CURRENT_TIME() BETWEEN t.masa_mula AND t.masa_tamat) as occupancy_count " +
+                     "FROM fasiliti f WHERE f.status = 'AKTIF'";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -35,6 +40,7 @@ public class FasilitiDAO {
                 double lon = rs.getDouble("longitude");
                 f.setLongitude(rs.wasNull() ? null : lon);
 
+                f.setOccupied(rs.getInt("occupancy_count") > 0);
                 senarai.add(f);
             }
         } catch (SQLException e) {
@@ -120,7 +126,13 @@ public class FasilitiDAO {
 
     public List<Fasiliti> dapatkanSemuaTermasukTidakAktif() {
         List<Fasiliti> senarai = new ArrayList<>();
-        String sql = "SELECT * FROM fasiliti ORDER BY status DESC, nama_fasiliti";
+        String sql = "SELECT f.*, " +
+                     "(SELECT COUNT(*) FROM tempahan_fasiliti t " +
+                     " WHERE t.id_fasiliti = f.id_fasiliti " +
+                     " AND t.tarikh_tempah = CURRENT_DATE() " +
+                     " AND t.status = 'LULUS' " +
+                     " AND CURRENT_TIME() BETWEEN t.masa_mula AND t.masa_tamat) as occupancy_count " +
+                     "FROM fasiliti f ORDER BY f.status DESC, f.nama_fasiliti";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -138,6 +150,7 @@ public class FasilitiDAO {
                 f.setLatitude(rs.wasNull() ? null : lat_);
                 double lon_ = rs.getDouble("longitude");
                 f.setLongitude(rs.wasNull() ? null : lon_);
+                f.setOccupied(rs.getInt("occupancy_count") > 0);
                 senarai.add(f);
             }
         } catch (SQLException e) {

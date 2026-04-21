@@ -12,11 +12,19 @@ public class Fasiliti {
     private Timestamp dibuat_pada;
     private Timestamp dikemaskini_pada;
     private Timestamp dipadam_pada;
+    private boolean occupied;
 
     // --- Constructor Kosong ---
     public Fasiliti() {}
 
     // --- Getters and Setters ---
+    public boolean isOccupied() {
+        return occupied;
+    }
+
+    public void setOccupied(boolean occupied) {
+        this.occupied = occupied;
+    }
     public int getId_fasiliti() {
         return id_fasiliti;
     }
