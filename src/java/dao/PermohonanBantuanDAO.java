@@ -87,7 +87,7 @@ public class PermohonanBantuanDAO {
     }
 
     public boolean updatePermohonan(PermohonanBantuan pb) {
-        String sql = "UPDATE permohonan_bantuan SET id_bantuan = ?, catatan_pemohon = ?, dokumen_pemohon = ?, dikemaskini_pada = NOW() WHERE id_permohonan = ? AND id_pengguna = ?";
+        String sql = "UPDATE permohonan_bantuan SET id_bantuan = ?, catatan_pemohon = ?, dokumen_pemohon = ?, status = 'BARU', dikemaskini_pada = NOW() WHERE id_permohonan = ? AND id_pengguna = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, pb.getId_bantuan());

@@ -219,8 +219,14 @@ else if ("/borangDigital.jsp".equals(action)) {
 
                     if (pb != null) {
                         // Semak jenis bantuan
-                        if (pb.getId_bantuan() > 20 || pb.getId_bantuan() == 999) {
+                        if (pb.getId_bantuan() == 999) {
                             redirectPage = "/bantuan/komuniti";
+                        } else {
+                            BantuanDAO bDao = new BantuanDAO();
+                            Bantuan bDetails = bDao.getBantuanById(pb.getId_bantuan());
+                            if (bDetails != null && !"RASMI".equalsIgnoreCase(bDetails.getJenis_bantuan())) {
+                                redirectPage = "/bantuan/komuniti";
+                            }
                         }
                         
                         // LANGKAH 2: Delete dari database selepas semakan
@@ -382,6 +388,7 @@ else if ("/borangDigital.jsp".equals(action)) {
 
                 PermohonanBantuan pb = new PermohonanBantuan();
                 pb.setId_permohonan_bantuan(idPermohonan);
+                pb.setId_pengguna(user.getId_pengguna());
                 pb.setDokumen_pemohon(fileName);
 
                 // --- LOGIC PENENTUAN ID BANTUAN ---
@@ -403,16 +410,16 @@ else if ("/borangDigital.jsp".equals(action)) {
                 pbDao.updatePermohonan(pb);
 
                 // --- LOGIK REDIRECT PINTAR (UPDATE DI SINI) ---
-                // Kita semak ID bantuan yang baru dikemaskini.
-                // Jika ID > 20 atau 999, ia adalah kategori Komuniti.
-                int idCheck = pb.getId_bantuan();
-                
-                if (idCheck > 20 || idCheck == 999) {
-                    // Redirect ke Tab Komuniti
+                BantuanDAO bDao = new BantuanDAO();
+                if (pb.getId_bantuan() == 999) {
                     response.sendRedirect(request.getContextPath() + "/bantuan/komuniti?status=updated");
                 } else {
-                    // Redirect ke Tab Rasmi
-                    response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?status=updated");
+                    Bantuan bDetails = bDao.getBantuanById(pb.getId_bantuan());
+                    if (bDetails != null && "RASMI".equalsIgnoreCase(bDetails.getJenis_bantuan())) {
+                        response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?status=updated");
+                    } else {
+                        response.sendRedirect(request.getContextPath() + "/bantuan/komuniti?status=updated");
+                    }
                 }
             }
 

@@ -30,7 +30,7 @@
                 boolean isLain = false;
 
                 if (pb != null) {
-                    isLain = (pb.getIdBantuan() == 999);
+                    isLain = (pb.getId_bantuan() == 999);
                     String rawCatatan = (pb.getCatatan() != null) ? pb.getCatatan() : "";
 
                     if (isLain) {
@@ -51,8 +51,8 @@
             
             <form action="<%= request.getContextPath() %>/bantuan/updateMyRequest" method="post" enctype="multipart/form-data">
                 
-                <input type="hidden" name="idPermohonan" value="<%= pb.getIdPermohonan() %>">
-                <input type="hidden" name="oldDokumen" value="<%= pb.getDokumen() %>">
+                <input type="hidden" name="idPermohonan" value="<%= pb.getId_permohonan() %>">
+                <input type="hidden" name="oldDokumen" value="<%= pb.getDokumen_pemohon() %>">
 
                 <div class="mb-6">
                     <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Jenis Bantuan</label>
@@ -60,21 +60,21 @@
                         <select name="jenisBantuan" id="jenisBantuan" required onchange="toggleLainBantuan()"
                                 class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm appearance-none font-bold">
                             <option value="" disabled>-- Sila Pilih --</option>
-                            <option value="6" <%= pb.getIdBantuan() == 6 ? "selected" : "" %>>BANTUAN AM</option>
-                            <option value="7" <%= pb.getIdBantuan() == 7 ? "selected" : "" %>>BANTUAN HARI RAYA</option>
-                            <option value="8" <%= pb.getIdBantuan() == 8 ? "selected" : "" %>>BANTUAN KEPADA GHARIMIN</option>
-                            <option value="9" <%= pb.getIdBantuan() == 9 ? "selected" : "" %>>BANTUAN MELANJUT PELAJARAN KE IPT</option>
-                            <option value="10" <%= pb.getIdBantuan() == 10 ? "selected" : "" %>>BANTUAN PEMBANGUNAN ASNAF</option>
-                            <option value="11" <%= pb.getIdBantuan() == 11 ? "selected" : "" %>>BANTUAN PEMULIHAN RUMAH KEDIAMAN</option>
-                            <option value="12" <%= pb.getIdBantuan() == 12 ? "selected" : "" %>>BANTUAN RAWATAN PERUBATAN</option>
-                            <option value="13" <%= pb.getIdBantuan() == 13 ? "selected" : "" %>>BANTUAN SEWA RUMAH</option>
-                            <option value="14" <%= pb.getIdBantuan() == 14 ? "selected" : "" %>>BANTUAN TETAP BULANAN</option>
-                            <option value="15" <%= pb.getIdBantuan() == 15 ? "selected" : "" %>>BIASISWA PENDIDIKAN DALAM NEGARA (BPDN)</option>
-                            <option value="16" <%= pb.getIdBantuan() == 16 ? "selected" : "" %>>BIASISWA PENDIDIKAN LUAR NEGARA (BPLN)</option>
-                            <option value="17" <%= pb.getIdBantuan() == 17 ? "selected" : "" %>>BIASISWA PROFESIONAL PERAKAUNAN (BPP)</option>
-                            <option value="18" <%= pb.getIdBantuan() == 18 ? "selected" : "" %>>PROG. BIASISWA SULTAN ISMAIL PETRA (BSIP)</option>
-                            <option value="19" <%= pb.getIdBantuan() == 19 ? "selected" : "" %>>PROGRAM DERMASISWA SULTAN ISMAIL PETRA (DSIP)</option>
-                            <option value="20" <%= pb.getIdBantuan() == 20 ? "selected" : "" %>>SUMBANGAN IPT - FISABILILLAH</option>
+                            <option value="6" <%= pb.getId_bantuan() == 6 ? "selected" : "" %>>BANTUAN AM</option>
+                            <option value="7" <%= pb.getId_bantuan() == 7 ? "selected" : "" %>>BANTUAN HARI RAYA</option>
+                            <option value="8" <%= pb.getId_bantuan() == 8 ? "selected" : "" %>>BANTUAN KEPADA GHARIMIN</option>
+                            <option value="9" <%= pb.getId_bantuan() == 9 ? "selected" : "" %>>BANTUAN MELANJUT PELAJARAN KE IPT</option>
+                            <option value="10" <%= pb.getId_bantuan() == 10 ? "selected" : "" %>>BANTUAN PEMBANGUNAN ASNAF</option>
+                            <option value="11" <%= pb.getId_bantuan() == 11 ? "selected" : "" %>>BANTUAN PEMULIHAN RUMAH KEDIAMAN</option>
+                            <option value="12" <%= pb.getId_bantuan() == 12 ? "selected" : "" %>>BANTUAN RAWATAN PERUBATAN</option>
+                            <option value="13" <%= pb.getId_bantuan() == 13 ? "selected" : "" %>>BANTUAN SEWA RUMAH</option>
+                            <option value="14" <%= pb.getId_bantuan() == 14 ? "selected" : "" %>>BANTUAN TETAP BULANAN</option>
+                            <option value="15" <%= pb.getId_bantuan() == 15 ? "selected" : "" %>>BIASISWA PENDIDIKAN DALAM NEGARA (BPDN)</option>
+                            <option value="16" <%= pb.getId_bantuan() == 16 ? "selected" : "" %>>BIASISWA PENDIDIKAN LUAR NEGARA (BPLN)</option>
+                            <option value="17" <%= pb.getId_bantuan() == 17 ? "selected" : "" %>>BIASISWA PROFESIONAL PERAKAUNAN (BPP)</option>
+                            <option value="18" <%= pb.getId_bantuan() == 18 ? "selected" : "" %>>PROG. BIASISWA SULTAN ISMAIL PETRA (BSIP)</option>
+                            <option value="19" <%= pb.getId_bantuan() == 19 ? "selected" : "" %>>PROGRAM DERMASISWA SULTAN ISMAIL PETRA (DSIP)</option>
+                            <option value="20" <%= pb.getId_bantuan() == 20 ? "selected" : "" %>>SUMBANGAN IPT - FISABILILLAH</option>
                             <option value="999" <%= isLain ? "selected" : "" %>>LAIN-LAIN</option>
                         </select>
                         <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
@@ -104,7 +104,7 @@
                         </div>
                         <div class="flex-1 min-w-0">
                             <p class="text-xs text-gray-500 uppercase font-bold">Fail Semasa</p>
-                            <p class="text-sm font-bold text-gray-800 truncate"><%= pb.getDokumen() %></p>
+                            <p class="text-sm font-bold text-gray-800 truncate"><%= pb.getDokumen_pemohon() %></p>
                         </div>
                     </div>
 

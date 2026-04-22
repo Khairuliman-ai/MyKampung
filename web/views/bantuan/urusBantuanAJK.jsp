@@ -126,7 +126,7 @@
                                 <div class="flex justify-center gap-2">
                                     <button onclick="openActionModal('<%= pb.getId_permohonan() %>', '<%= namaBantuanDisplay %>', 'tak_lengkap')" 
                                             class="flex items-center gap-1 px-3 py-1.5 rounded-lg border border-red-200 text-red-500 hover:bg-red-50 text-xs font-bold transition">
-                                        <i class="fas fa-reply"></i> Hantar Semula
+                                        <i class="fas fa-reply"></i> Kembalikan Borang
                                     </button>
                                     <button onclick="openActionModal('<%= pb.getId_permohonan() %>', '<%= namaBantuanDisplay %>', 'lengkap')" 
                                             class="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-green-500 hover:bg-green-600 text-white text-xs font-bold shadow-sm transition">
@@ -507,7 +507,7 @@
             document.getElementById('radioLengkap').checked = true;
             viewLengkap.classList.remove('hidden');
             btnSubmit.classList.add('bg-green-600', 'hover:bg-green-700');
-            btnSubmit.innerText = "Hantar ke Ketua";
+            btnSubmit.innerText = "Hantar";
             ulasanBox.required = false;
         } else {
             document.getElementById('radioTakLengkap').checked = true;
