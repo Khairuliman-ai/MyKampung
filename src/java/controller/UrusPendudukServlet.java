@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 
 @WebServlet(name = "UrusPendudukServlet", urlPatterns = {
     "/penduduk/urus", "/penduduk/approve", "/penduduk/reject", "/penduduk/update",
-    "/ketua/urus", "/ketua/lantik", "/ketua/update", "/ketua/gugurkan"
+    "/ketua/urus", "/ketua/lantik", "/ketua/update", "/ketua/gugurkan", "/ketua/tambahJawatan"
 })
 public class UrusPendudukServlet extends HttpServlet {
 
@@ -90,6 +90,18 @@ public class UrusPendudukServlet extends HttpServlet {
                 
                 if (success) {
                     response.sendRedirect(request.getContextPath() + "/ketua/urus?status=dropSuccess");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/ketua/urus?status=error");
+                }
+            }
+            
+            // 3. LOGIC TAMBAH JAWATAN BARU
+            else if ("/ketua/tambahJawatan".equals(action)) {
+                String namaJawatan = request.getParameter("namaJawatan");
+                boolean success = jawatanDAO.tambahJawatan(namaJawatan);
+                
+                if (success) {
+                    response.sendRedirect(request.getContextPath() + "/ketua/urus?status=tambahJawatanSuccess");
                 } else {
                     response.sendRedirect(request.getContextPath() + "/ketua/urus?status=error");
                 }

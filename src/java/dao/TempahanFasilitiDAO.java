@@ -15,7 +15,7 @@ public class TempahanFasilitiDAO {
     public boolean simpanTempahanBaru(TempahanFasiliti t) {
         // Mengikut struktur gambar DB: tarikh_tempah, masa_mula, masa_tamat, status, dibuat_pada
         String sql = "INSERT INTO tempahan_fasiliti (id_pengguna, id_fasiliti, tarikh_tempah, masa_mula, masa_tamat, status, catatan_pemohon, dibuat_pada) " +
-                     "VALUES (?, ?, ?, ?, ?, 'MENUNGGU', ?, CURRENT_TIMESTAMP)";
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)";
         boolean status = false;
         
         try (Connection conn = DBUtil.getConnection();
@@ -28,7 +28,8 @@ public class TempahanFasilitiDAO {
             ps.setDate(3, t.getTarikh_tempah());
             ps.setTime(4, t.getMasa_mula());
             ps.setTime(5, t.getMasa_tamat());
-            ps.setString(6, t.getCatatan_pemohon());
+            ps.setString(6, t.getStatus());
+            ps.setString(7, t.getCatatan_pemohon());
             
             int rowAffected = ps.executeUpdate();
             if (rowAffected > 0) {
@@ -156,7 +157,10 @@ public class TempahanFasilitiDAO {
     }
 
     public boolean batalTempahan(int idTempahan, int idPengguna) {
-        String sql = "UPDATE tempahan_fasiliti SET status='DIBATAL', dikemaskini_pada=NOW() WHERE id_tempahan=? AND id_pengguna=? AND status='MENUNGGU'";
+        String sql = "UPDATE tempahan_fasiliti SET status='DIBATAL', dikemaskini_pada=NOW() " +
+                     "WHERE id_tempahan=? AND id_pengguna=? " +
+                     "AND status IN ('MENUNGGU', 'LULUS') " +
+                     "AND (tarikh_tempah > CURRENT_DATE OR (tarikh_tempah = CURRENT_DATE AND masa_tamat > CURRENT_TIME))";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idTempahan);

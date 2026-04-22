@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 22, 2026 at 01:32 AM
+-- Generation Time: Apr 22, 2026 at 12:43 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -74,15 +74,12 @@ CREATE TABLE `ajk_jawatan` (
 
 INSERT INTO `ajk_jawatan` (`id_pengguna`, `id_jawatan`) VALUES
 (1, 1),
-(2, 4),
 (3, 3),
-(4, 10),
 (5, 9),
 (6, 8),
 (7, 5),
-(8, 7),
 (10, 6),
-(22, 2);
+(21, 11);
 
 -- --------------------------------------------------------
 
@@ -93,6 +90,7 @@ INSERT INTO `ajk_jawatan` (`id_pengguna`, `id_jawatan`) VALUES
 CREATE TABLE `bantuan` (
   `id_bantuan` int(11) NOT NULL,
   `nama_bantuan` varchar(100) NOT NULL,
+  `jenis_bantuan` varchar(20) DEFAULT 'KOMUNITI',
   `peruntukan` decimal(15,2) NOT NULL,
   `status` varchar(20) DEFAULT 'AKTIF',
   `dibuat_pada` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -104,17 +102,27 @@ CREATE TABLE `bantuan` (
 -- Dumping data for table `bantuan`
 --
 
-INSERT INTO `bantuan` (`id_bantuan`, `nama_bantuan`, `peruntukan`, `status`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`) VALUES
-(1, 'Bantuan Sara Hidup Kampung', 15000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(2, 'Khairat Kematian', 5000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(3, 'Bantuan Bencana Alam (Banjir)', 20000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(4, 'Bantuan Ibu Tunggal', 8000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(5, 'Bantuan Awal Persekolahan', 10000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(6, 'Bantuan Baja Pertanian', 6000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(7, 'Pembaikan Rumah Daif', 50000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(8, 'Bantuan Kerusi Roda OKU', 3000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(9, 'Bantuan Peniaga Kecil', 12000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(10, 'Dana Kecemerlangan Pelajar', 4000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL);
+INSERT INTO `bantuan` (`id_bantuan`, `nama_bantuan`, `jenis_bantuan`, `peruntukan`, `status`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`) VALUES
+(1, 'Bantuan Sara Hidup Kampung', 'KOMUNITI', 15000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(2, 'Khairat Kematian', 'KOMUNITI', 5000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(3, 'Bantuan Bencana Alam (Banjir)', 'KOMUNITI', 20000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(4, 'Bantuan Ibu Tunggal', 'KOMUNITI', 8000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(5, 'Bantuan Awal Persekolahan', 'KOMUNITI', 10000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(6, 'Bantuan Baja Pertanian', 'KOMUNITI', 6000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(7, 'Pembaikan Rumah Daif', 'KOMUNITI', 50000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(8, 'Bantuan Kerusi Roda OKU', 'KOMUNITI', 3000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(9, 'Bantuan Peniaga Kecil', 'KOMUNITI', 12000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(10, 'Dana Kecemerlangan Pelajar', 'KOMUNITI', 4000.00, 'AKTIF', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(11, 'BANTUAN PEMULIHAN RUMAH KEDIAMAN', 'RASMI', 0.00, 'AKTIF', '2026-04-22 10:42:49', '2026-04-22 10:42:49', NULL),
+(12, 'BANTUAN RAWATAN PERUBATAN', 'RASMI', 0.00, 'AKTIF', '2026-04-22 10:42:49', '2026-04-22 10:42:49', NULL),
+(13, 'BANTUAN SEWA RUMAH', 'RASMI', 0.00, 'AKTIF', '2026-04-22 10:42:49', '2026-04-22 10:42:49', NULL),
+(14, 'BANTUAN TETAP BULANAN', 'RASMI', 0.00, 'AKTIF', '2026-04-22 10:42:49', '2026-04-22 10:42:49', NULL),
+(15, 'BIASISWA PENDIDIKAN DALAM NEGARA (BPDN)', 'RASMI', 0.00, 'AKTIF', '2026-04-22 10:42:49', '2026-04-22 10:42:49', NULL),
+(16, 'BIASISWA PENDIDIKAN LUAR NEGARA (BPLN)', 'RASMI', 0.00, 'AKTIF', '2026-04-22 10:42:49', '2026-04-22 10:42:49', NULL),
+(17, 'BIASISWA PROFESIONAL PERAKAUNAN (BPP)', 'RASMI', 0.00, 'AKTIF', '2026-04-22 10:42:49', '2026-04-22 10:42:49', NULL),
+(18, 'PROG. BIASISWA SULTAN ISMAIL PETRA (BSIP)', 'RASMI', 0.00, 'AKTIF', '2026-04-22 10:42:49', '2026-04-22 10:42:49', NULL),
+(19, 'PROGRAM DERMASISWA SULTAN ISMAIL PETRA (DSIP)', 'RASMI', 0.00, 'AKTIF', '2026-04-22 10:42:49', '2026-04-22 10:42:49', NULL),
+(20, 'SUMBANGAN IPT - FISABILILLAH', 'RASMI', 0.00, 'AKTIF', '2026-04-22 10:42:49', '2026-04-22 10:42:49', NULL);
 
 -- --------------------------------------------------------
 
@@ -237,7 +245,8 @@ INSERT INTO `jawatan_ajk` (`id_jawatan`, `nama_jawatan`) VALUES
 (7, 'Biro Agama & Da\'wah'),
 (8, 'Biro Sukan & Riadah'),
 (9, 'Biro Kebajikan & Sosial'),
-(10, 'Biro Ekonomi & Usahawan');
+(10, 'Biro Ekonomi & Usahawan'),
+(11, 'Biro Test1');
 
 -- --------------------------------------------------------
 
@@ -296,7 +305,8 @@ INSERT INTO `log_aktiviti` (`id_log`, `id_pengguna`, `id_admin`, `jenis_tindakan
 (3, 2, 1, 'KEMASKINI_PROFIL', 'Admin mengemaskini: Status Keluarga (Bujang -> Berkahwin). ', '2026-04-19 13:16:54'),
 (4, 2, 3, 'KEMASKINI_PROFIL', 'Admin mengemaskini: Status Keluarga (Berkahwin -> Ibu Tunggal). ', '2026-04-19 13:19:18'),
 (5, 3, 1, 'KEMASKINI_PROFIL', 'Admin mengemaskini: Status Keluarga (Bujang -> Berkahwin). ', '2026-04-19 13:21:52'),
-(6, 3, 1, 'KEMASKINI_PROFIL', 'Admin mengemaskini: Status Keluarga (Berkahwin -> Duda). ', '2026-04-20 12:22:13');
+(6, 3, 1, 'KEMASKINI_PROFIL', 'Admin mengemaskini: Status Keluarga (Berkahwin -> Duda). ', '2026-04-20 12:22:13'),
+(7, 2, 3, 'KEMASKINI_PROFIL', 'Admin mengemaskini: Alamat (Bandar: - -> Pasir Puteh; Poskod: - -> 16810; Negeri: - -> Kelantan; ). ', '2026-04-22 09:21:47');
 
 -- --------------------------------------------------------
 
@@ -337,10 +347,10 @@ CREATE TABLE `pengguna` (
 --
 
 INSERT INTO `pengguna` (`id_pengguna`, `nama_penuh`, `nombor_kp`, `nombor_telefon`, `tarikh_lahir`, `kata_laluan`, `status`, `status_keluarga`, `pekerjaan`, `pendapatan`, `nama_jalan`, `daerah`, `nombor_poskod`, `bandar`, `negeri`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`, `lampiran_pengesahan`, `reset_token`, `token_expiry`, `email`, `latitude`, `longitude`, `foto_profil`) VALUES
-(1, 'Ahmad bin Ali', '800101031234', '012-3456 5353', '1980-01-01', '$2a$12$VzrmByH4d1t2mScp4Rucm.IJDzqpuzWxYcW2DnDxcAQwfJlwWaFFO', 1, 'Bujang', 'CEO', 1200.09, 'Jalan Mawar 11', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-20 12:51:12', NULL, NULL, NULL, NULL, 'khairuliman736@gmail.com', 6.03112933, 102.29697188, 'profil_1_1776689472341.jpg'),
-(2, 'Siti binti Abuyal', '850202035566', '011-1101 3816', '1985-02-02', '$2a$12$NUn7qK.c4bD4scgC8fG7/ucy.iqtBLxkoqIR7.b1s0nXhM88UNPa6', 1, 'Bujang', 'Petani', 1000.00, 'Jalan Melati 2', 'Selising', NULL, NULL, NULL, '2026-03-13 19:52:27', '2026-04-20 05:39:19', NULL, NULL, NULL, NULL, 'siti@gmail.com', 6.03130217, 102.29371122, '1776663246827_gambar formal.jpeg'),
-(3, 'Muthu a/l Samy', '900303037788', '014-5678 901', '1990-03-03', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Duda', 'Peniaga', 3999.99, 'Jalan Kenanga', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-20 12:22:13', NULL, NULL, NULL, NULL, 's71383@ocean.umt.edu.my', 6.03130217, 102.29371122, 'default_avatar.png'),
-(4, 'Chong Wei Ming', '750404039911', '016-6789 011', '1975-04-04', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', '', NULL, 'Jalan Teratai', NULL, '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-19 13:56:08', NULL, NULL, NULL, NULL, 'khayxstyle@gmail.com', 6.03130217, 102.29371122, 'default_avatar.png'),
+(1, 'Ahmad bin Ali', '800101031234', '012-3456 5353', '1980-01-01', '$2a$10$4REPQtKXDeP/GXdC2d06SuFynGXcEkMfbsfRUQZ09L7itoiobVi/C', 1, 'Bujang', 'CEO', 1200.09, 'Jalan Mawar 11', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-22 04:45:55', NULL, NULL, NULL, NULL, 'khairuliman736@gmail.com', 6.03112933, 102.29697188, 'profil_1_1776689472341.jpg'),
+(2, 'Siti binti Abuyal', '850202035566', '011-1101 3816', '1985-02-02', '$2a$12$NUn7qK.c4bD4scgC8fG7/ucy.iqtBLxkoqIR7.b1s0nXhM88UNPa6', 1, 'Bujang', 'Petani', 1000.00, 'Jalan Melati 2', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-22 10:23:31', NULL, NULL, NULL, NULL, 'siti@gmail.com', 6.03130217, 102.29371122, 'profil_2_1776853411947.jpg'),
+(3, 'Muthu a/l Samy', '900303037788', '014-5678 901', '1990-03-03', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', 'Peniaga', 3999.99, 'Jalan Kenanga', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-22 09:19:04', NULL, NULL, NULL, NULL, 's71383@ocean.umt.edu.my', 6.03130217, 102.29371122, 'profil_3_1776849544878.jpg'),
+(4, 'Chong Wei Ming', '750404039911', '016-6789 011', '1975-04-04', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', 'Guru', 3000.01, 'Jalan Teratai', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-22 09:18:08', NULL, NULL, NULL, NULL, 'khayxstyle@gmail.com', 6.03130217, 102.29371122, 'profil_4_1776823920113.jpg'),
 (5, 'Aminah binti Hassan', '650505032233', '017-7890123', '1965-05-05', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Ibu Tunggal', 'Pesara', 1200.00, 'Jalan Orkid', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-19 13:56:08', NULL, NULL, NULL, NULL, '', 6.03130217, 102.29371122, 'default_avatar.png'),
 (6, 'Kamal bin Mustafa', '950606034455', '011-8901234', '1995-06-06', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', 'Jurutera', 4000.00, 'Jalan Mawar 2', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-19 13:56:08', NULL, NULL, NULL, NULL, '', 6.03130217, 102.29371122, 'default_avatar.png'),
 (7, 'Nurul binti Hisham', '880707036677', '018-9012345', '1988-07-07', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Berkahwin', 'Suri Rumah', 0.00, 'Jalan Dahlia', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-19 13:56:08', NULL, NULL, NULL, NULL, '', 6.03130217, 102.29371122, 'default_avatar.png'),
@@ -378,14 +388,14 @@ INSERT INTO `pengguna_peranan` (`id_pengguna`, `id_peranan`) VALUES
 (5, 3),
 (6, 3),
 (7, 4),
-(8, 7),
+(8, 4),
 (9, 4),
 (10, 4),
 (11, 4),
 (15, 4),
 (16, 4),
 (18, 4),
-(21, 4),
+(21, 3),
 (22, 3),
 (23, 4);
 
@@ -450,7 +460,9 @@ INSERT INTO `permohonan_bantuan` (`id_permohonan`, `id_pengguna`, `id_bantuan`, 
 (7, 5, 7, 'DITOLAK', 'Atap zink bocor teruk.', NULL, NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
 (8, 6, 10, 'DILULUSKAN', 'Adik dapat 5A SPM.', NULL, NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
 (9, 9, 1, 'BARU', 'Kos sara hidup meningkat.', NULL, NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(10, 3, 9, 'DITOLAK', 'Mohon tambah gerai.', NULL, NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL);
+(10, 3, 9, 'DITOLAK', 'Mohon tambah gerai.', NULL, NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(11, 2, 1, 'BARU', NULL, NULL, NULL, NULL, '2026-04-22 10:17:39', '2026-04-22 10:17:39', NULL),
+(12, 2, 2, 'BARU', NULL, NULL, NULL, NULL, '2026-04-22 10:29:15', '2026-04-22 10:29:15', NULL);
 
 -- --------------------------------------------------------
 
@@ -491,7 +503,13 @@ INSERT INTO `tempahan_fasiliti` (`id_tempahan`, `id_fasiliti`, `id_pengguna`, `t
 (10, 8, 5, '2023-12-30', '09:00:00', '12:00:00', 'MENUNGGU', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL),
 (11, 3, 2, '2026-04-14', '08:17:00', '11:17:00', 'DIBATAL', NULL, NULL, '2026-04-14 00:18:05', '2026-04-18 07:08:07', NULL, NULL),
 (12, 2, 4, '2026-04-18', '00:00:00', '14:19:00', 'LULUS', NULL, NULL, '2026-04-18 03:20:03', '2026-04-18 04:54:45', NULL, NULL),
-(13, 6, 2, '2026-04-18', '14:44:00', '14:47:00', 'MENUNGGU', NULL, NULL, '2026-04-18 06:43:22', '2026-04-18 06:43:22', NULL, NULL);
+(13, 6, 2, '2026-04-18', '14:44:00', '14:47:00', 'MENUNGGU', NULL, NULL, '2026-04-18 06:43:22', '2026-04-18 06:43:22', NULL, NULL),
+(14, 1, 4, '2026-04-22', '10:00:00', '12:00:00', 'MENUNGGU', '', NULL, '2026-04-22 00:44:40', '2026-04-22 00:44:40', NULL, NULL),
+(15, 1, 4, '2026-04-22', '12:00:00', '14:00:00', 'MENUNGGU', '', NULL, '2026-04-22 00:53:45', '2026-04-22 00:53:45', NULL, NULL),
+(16, 2, 4, '2026-04-22', '20:00:00', '22:00:00', 'MENUNGGU', '', NULL, '2026-04-22 01:23:15', '2026-04-22 01:23:15', NULL, NULL),
+(17, 3, 4, '2026-04-22', '18:00:00', '20:00:00', 'DIBATAL', '', NULL, '2026-04-22 08:57:00', '2026-04-22 09:05:41', NULL, NULL),
+(18, 3, 2, '2026-04-22', '18:00:00', '20:00:00', 'LULUS', '', NULL, '2026-04-22 09:06:06', '2026-04-22 09:06:06', NULL, NULL),
+(19, 1, 4, '2026-04-23', '08:00:00', '22:00:00', 'TOLAK', 'Majlish Kawin', NULL, '2026-04-22 09:10:20', '2026-04-22 09:14:26', NULL, 'tidak memenuhi kretiria');
 
 --
 -- Indexes for dumped tables
@@ -614,7 +632,7 @@ ALTER TABLE `aduan`
 -- AUTO_INCREMENT for table `bantuan`
 --
 ALTER TABLE `bantuan`
-  MODIFY `id_bantuan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_bantuan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `fasiliti`
@@ -644,7 +662,7 @@ ALTER TABLE `hebahan`
 -- AUTO_INCREMENT for table `jawatan_ajk`
 --
 ALTER TABLE `jawatan_ajk`
-  MODIFY `id_jawatan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_jawatan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
 -- AUTO_INCREMENT for table `kategori_aduan`
@@ -656,7 +674,7 @@ ALTER TABLE `kategori_aduan`
 -- AUTO_INCREMENT for table `log_aktiviti`
 --
 ALTER TABLE `log_aktiviti`
-  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
 
 --
 -- AUTO_INCREMENT for table `pengguna`
@@ -674,13 +692,13 @@ ALTER TABLE `peranan`
 -- AUTO_INCREMENT for table `permohonan_bantuan`
 --
 ALTER TABLE `permohonan_bantuan`
-  MODIFY `id_permohonan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id_permohonan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT for table `tempahan_fasiliti`
 --
 ALTER TABLE `tempahan_fasiliti`
-  MODIFY `id_tempahan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id_tempahan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- Constraints for dumped tables

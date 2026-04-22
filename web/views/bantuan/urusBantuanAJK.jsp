@@ -3,6 +3,7 @@
 <%@ page import="java.util.ArrayList" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="model.PermohonanBantuan" %>
+<%@ page import="model.Bantuan" %>
 <%@ page import="model.Pengguna" %>
 <%@ page import="java.net.URLEncoder" %>
 
@@ -21,6 +22,7 @@
 <%
     // 1. ASINGKAN DATA KEPADA BARU & SEJARAH
     List<PermohonanBantuan> allList = (List<PermohonanBantuan>) request.getAttribute("permohonanList");
+    List<Bantuan> senaraiBantuan = (List<Bantuan>) request.getAttribute("senaraiBantuan");
     List<PermohonanBantuan> listBaru = new ArrayList<>();
     List<PermohonanBantuan> listSejarah = new ArrayList<>();
     
@@ -39,23 +41,37 @@
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth h-full bg-[#F7F7F9]">
 
-    <div class="flex justify-between items-center mb-8">
-        <div>
-            <h2 class="text-2xl font-bold text-gray-800">Semakan Permohonan AJK</h2>
-            <p class="text-gray-500 text-sm">Uruskan permohonan baharu dan semak sejarah tindakan.</p>
-        </div>
-        <div>
-            <button onclick="openModal('modalTambahBantuan')" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-md shadow-purple-200 flex items-center gap-2">
-                <i class="fas fa-plus-circle"></i> Jenis Bantuan Baru
-            </button>
-        </div>
+    <div class="mb-8">
+        <h2 class="text-2xl font-bold text-gray-800">Semakan Permohonan AJK</h2>
+        <p class="text-gray-500 text-sm">Uruskan permohonan baharu, semak sejarah, dan urus jenis bantuan.</p>
     </div>
 
-    <div class="mb-10">
-        <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
-            <div class="w-2 h-6 bg-[#6C5DD3] rounded-full"></div>
-            Permohonan Baharu <span class="bg-purple-100 text-[#6C5DD3] text-xs px-2 py-1 rounded-lg ml-2"><%= listBaru.size() %></span>
-        </h3>
+    <div class="mb-8 border-b border-gray-200">
+        <nav class="flex gap-8" aria-label="Tabs">
+            <button onclick="switchTab('baru')" id="tab-baru" 
+                    class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-[#6C5DD3] text-[#6C5DD3]">
+                <i class="fas fa-clipboard-list"></i> Permohonan Baharu
+                <% if (!listBaru.isEmpty()) { %>
+                    <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><%= listBaru.size() %></span>
+                <% } %>
+            </button>
+            <button onclick="switchTab('sejarah')" id="tab-sejarah" 
+                    class="py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center gap-2 transition-colors">
+                <i class="fas fa-history"></i> Sejarah Tindakan
+            </button>
+            <button onclick="switchTab('jenis')" id="tab-jenis" 
+                    class="py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center gap-2 transition-colors">
+                <i class="fas fa-cog"></i> Pengurusan Jenis Bantuan
+            </button>
+        </nav>
+    </div>
+
+    <div id="content-baru" class="block">
+        <div class="mb-10">
+            <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+                <div class="w-2 h-6 bg-[#6C5DD3] rounded-full"></div>
+                Senarai Permohonan Baharu
+            </h3>
 
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
@@ -101,7 +117,7 @@
                             </td>
                             <td class="p-4">
                                 <% if (pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
-                                    <a href="<%= request.getContextPath() %>/file/<%= enc %>" target="_blank" class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-xs font-bold text-gray-600 transition">
+                                    <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-xs font-bold text-gray-600 transition">
                                         <i class="fas fa-file-pdf text-red-500"></i> PDF
                                     </a>
                                 <% } else { %> <span class="text-gray-400">-</span> <% } %>
@@ -135,12 +151,14 @@
             </div>
         </div>
     </div>
+</div>
 
-    <div>
-        <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
-            <div class="w-2 h-6 bg-gray-400 rounded-full"></div>
-            Sejarah Tindakan <span class="bg-gray-100 text-gray-500 text-xs px-2 py-1 rounded-lg ml-2"><%= listSejarah.size() %></span>
-        </h3>
+<div id="content-sejarah" class="hidden">
+        <div class="mb-10">
+            <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+                <div class="w-2 h-6 bg-gray-400 rounded-full"></div>
+                Sejarah Tindakan <span class="bg-gray-100 text-gray-500 text-xs px-2 py-1 rounded-lg ml-2"><%= listSejarah.size() %></span>
+            </h3>
 
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
@@ -166,7 +184,7 @@
                             <td class="p-4 text-sm text-gray-600"><%= (pb.getNama_bantuan() != null) ? pb.getNama_bantuan() : "Lain-lain" %></td>
                             <td class="p-4">
                                 <% if (pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
-                                    <a href="<%= request.getContextPath() %>/file/<%= enc %>" target="_blank" class="text-blue-500 hover:text-blue-700 text-xs font-bold underline">Lihat PDF</a>
+                                    <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" class="text-blue-500 hover:text-blue-700 text-xs font-bold underline">Lihat PDF</a>
                                 <% } else { %> - <% } %>
                             </td>
                             <td class="p-4 text-sm text-gray-500 max-w-xs truncate" title="<%= pb.getCatatan_pemohon() %>">
@@ -196,13 +214,72 @@
                         <% } } else { %>
                         <tr><td colspan="6" class="p-8 text-center text-gray-400 text-sm italic">Tiada sejarah rekod.</td></tr>
                         <% } %>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="content-jenis" class="hidden">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="font-bold text-lg text-gray-800 flex items-center gap-2">
+                <div class="w-2 h-6 bg-blue-500 rounded-full"></div>
+                Senarai Konfigurasi Bantuan
+            </h3>
+            <button onclick="openModal('modalTambahBantuan')" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-4 py-2 rounded-xl font-bold text-xs transition shadow-md flex items-center gap-2">
+                <i class="fas fa-plus-circle"></i> Tambah Bantuan Baru
+            </button>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-blue-50 border-b border-blue-100">
+                            <th class="p-4 text-xs font-bold text-blue-600 uppercase tracking-wider">Nama Bantuan</th>
+                            <th class="p-4 text-xs font-bold text-blue-600 uppercase tracking-wider">Kategori</th>
+                            <th class="p-4 text-xs font-bold text-blue-600 uppercase tracking-wider">Peruntukan</th>
+                            <th class="p-4 text-xs font-bold text-blue-600 uppercase tracking-wider text-center">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <% if (senaraiBantuan != null && !senaraiBantuan.isEmpty()) { 
+                            for (Bantuan b : senaraiBantuan) {
+                        %>
+                        <tr class="hover:bg-blue-50/30 transition">
+                            <td class="p-4 text-sm font-bold text-gray-800"><%= b.getNama_bantuan() %></td>
+                            <td class="p-4">
+                                <span class="px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider <%= "RASMI".equalsIgnoreCase(b.getJenis_bantuan()) ? "bg-red-100 text-red-600" : "bg-green-100 text-green-600" %>">
+                                    <%= b.getJenis_bantuan() %>
+                                </span>
+                            </td>
+                            <td class="p-4 text-sm text-gray-600 font-medium">
+                                <%= b.getJumlahBantuanFormatted() %>
+                            </td>
+                            <td class="p-4 text-center">
+                                <div class="flex justify-center gap-2">
+                                    <button onclick="openEditBantuanModal('<%= b.getId_bantuan() %>', '<%= b.getNama_bantuan() %>', '<%= b.getJenis_bantuan() %>', '<%= b.getJumlah_bantuan() %>')" 
+                                            class="p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-600 transition">
+                                        <i class="fas fa-edit"></i>
+                                    </button>
+                                    <form action="<%= request.getContextPath() %>/bantuan/padamJenisBantuan" method="post" onsubmit="return confirm('Adakah anda pasti mahu memadam jenis bantuan ini?')" style="display:inline;">
+                                        <input type="hidden" name="id" value="<%= b.getId_bantuan() %>">
+                                        <button type="submit" class="p-2 rounded-lg bg-gray-100 text-gray-600 hover:bg-red-100 hover:text-red-600 transition">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </td>
+                        </tr>
+                        <% } } else { %>
+                        <tr><td colspan="4" class="p-8 text-center text-gray-400 text-sm">Tiada jenis bantuan ditemui.</td></tr>
+                        <% } %>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-
-</div> 
+</div>
 
     <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
         
@@ -323,11 +400,24 @@
                 <div class="bg-white px-6 py-6">
                     <div class="bg-purple-50 text-[#6C5DD3] p-4 rounded-xl text-xs flex gap-3 items-start mb-6 border border-purple-100">
                         <i class="fas fa-lightbulb text-lg mt-0.5"></i>
-                        <p>Bantuan baharu ini akan disenaraikan secara automatik dalam menu "Bantuan Komuniti".</p>
+                        <p>Bantuan baharu ini akan disenaraikan secara automatik dalam menu pemilihan bantuan penduduk.</p>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nama Bantuan</label>
-                        <input type="text" name="namaBantuanBaru" placeholder="Contoh: SUMBANGAN RAMADHAN" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#6C5DD3] focus:border-transparent font-bold text-gray-800 shadow-sm">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nama Bantuan</label>
+                            <input type="text" name="namaBantuan" placeholder="Contoh: SUMBANGAN RAMADHAN" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#6C5DD3] focus:border-transparent font-bold text-gray-800 shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Kategori</label>
+                            <select name="jenisBantuan" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 font-bold">
+                                <option value="KOMUNITI">KOMUNITI (Tabung Kampung)</option>
+                                <option value="RASMI">RASMI (Pihak Berkuasa/Kerajaan)</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Peruntukan (RM)</label>
+                            <input type="number" step="0.01" name="peruntukan" placeholder="0.00" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#6C5DD3] font-bold text-gray-800">
+                        </div>
                     </div>
                 </div>
                 <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse gap-2">
@@ -339,7 +429,65 @@
     </div>
 </div>
 
+<div id="modalEditBantuan" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalEditBantuan')"></div>
+    <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
+        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+            <div class="bg-[#6C5DD3] px-4 py-4 sm:px-6 flex justify-between items-center">
+                <h3 class="text-base font-bold leading-6 text-white flex items-center gap-2"><i class="fas fa-edit"></i> Kemaskini Jenis Bantuan</h3>
+                <button class="text-white hover:text-gray-200" onclick="closeModal('modalEditBantuan')"><i class="fas fa-times"></i></button>
+            </div>
+            <form action="<%= request.getContextPath() %>/bantuan/kemaskiniJenisBantuan" method="post">
+                <input type="hidden" name="idBantuan" id="editIdBantuan">
+                <div class="bg-white px-6 py-6">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Nama Bantuan</label>
+                            <input type="text" name="namaBantuan" id="editNamaBantuan" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#6C5DD3] font-bold text-gray-800 shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Kategori</label>
+                            <select name="jenisBantuan" id="editJenisBantuan" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 font-bold">
+                                <option value="KOMUNITI">KOMUNITI</option>
+                                <option value="RASMI">RASMI</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Peruntukan (RM)</label>
+                            <input type="number" step="0.01" name="peruntukan" id="editPeruntukan" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 focus:ring-2 focus:ring-[#6C5DD3] font-bold text-gray-800">
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse gap-2">
+                    <button type="submit" class="w-full inline-flex justify-center rounded-xl bg-[#6C5DD3] px-4 py-2.5 text-sm font-bold text-white shadow-sm hover:bg-[#5b4eb8] sm:w-auto transition">Simpan Perubahan</button>
+                    <button type="button" class="mt-3 w-full inline-flex justify-center rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm font-bold text-gray-700 shadow-sm hover:bg-gray-50 sm:mt-0 sm:w-auto transition" onclick="closeModal('modalEditBantuan')">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
+    function switchTab(tabName) {
+        // Reset Tabs Style
+        document.querySelectorAll('nav button').forEach(btn => {
+            btn.classList.remove('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');
+            btn.classList.add('border-transparent', 'text-gray-500', 'font-medium');
+        });
+
+        // Active Tab Style
+        const activeTab = document.getElementById('tab-' + tabName);
+        activeTab.classList.add('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');
+        activeTab.classList.remove('border-transparent', 'text-gray-500', 'font-medium');
+
+        // Toggle Content
+        document.getElementById('content-baru').classList.add('hidden');
+        document.getElementById('content-sejarah').classList.add('hidden');
+        document.getElementById('content-jenis').classList.add('hidden');
+        
+        document.getElementById('content-' + tabName).classList.remove('hidden');
+    }
+
     function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
     function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
     
@@ -369,6 +517,14 @@
             ulasanBox.required = true; 
         }
         openModal('modalTindakan');
+    }
+
+    function openEditBantuanModal(id, nama, jenis, peruntukan) {
+        document.getElementById('editIdBantuan').value = id;
+        document.getElementById('editNamaBantuan').value = nama;
+        document.getElementById('editJenisBantuan').value = jenis;
+        document.getElementById('editPeruntukan').value = peruntukan;
+        openModal('modalEditBantuan');
     }
 </script>
 

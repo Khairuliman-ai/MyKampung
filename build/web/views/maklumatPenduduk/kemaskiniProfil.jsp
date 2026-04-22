@@ -280,7 +280,7 @@
 
         <div class="mt-8">
             <h3 class="font-bold text-sm text-gray-800 mb-4 flex items-center gap-2 uppercase">
-                <i class="fas fa-history text-[#6C5DD3]"></i> Sejarah Aktiviti
+                <i class="fas fa-history text-[#6C5DD3]"></i> Sejarah Log Aktiviti Pentadbir
             </h3>
             <div class="space-y-3">
                 <%

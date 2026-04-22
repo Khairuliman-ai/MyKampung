@@ -201,11 +201,19 @@ public class FasilitiServlet extends HttpServlet {
         t.setCatatan_pemohon(catatanPemohon);
         
         // 3. Determine Initial Status
-        Fasiliti f = fasilitiDAO.dapatkanFasilitiById(idFasiliti);
-        if (f.isRequiresApproval()) {
+        String tempoh = request.getParameter("tempoh_tempahan");
+        if ("2".equals(tempoh)) {
+            t.setStatus("LULUS");
+        } else if ("FullDay".equals(tempoh) || "HalfDay".equals(tempoh)) {
             t.setStatus("MENUNGGU");
         } else {
-            t.setStatus("LULUS");
+            // Fallback to facility default
+            Fasiliti f = fasilitiDAO.dapatkanFasilitiById(idFasiliti);
+            if (f.isRequiresApproval()) {
+                t.setStatus("MENUNGGU");
+            } else {
+                t.setStatus("LULUS");
+            }
         }
         
         if (tempahanDAO.simpanTempahanBaru(t)) {
@@ -312,7 +320,6 @@ public class FasilitiServlet extends HttpServlet {
 
         try {
             int idFasiliti = Integer.parseInt(idFasilitiStr);
-            int durasi = Integer.parseInt(durasiStr);
             
             java.sql.Date tarikh;
             try {

@@ -104,4 +104,16 @@ public class JawatanDAO {
         } catch (SQLException e) { e.printStackTrace(); }
         return jawatan;
     }
-}
+
+    public boolean tambahJawatan(String namaJawatan) {
+        String sql = "INSERT INTO jawatan_ajk (nama_jawatan) VALUES (?)";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, namaJawatan);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+}

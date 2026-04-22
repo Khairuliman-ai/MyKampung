@@ -12,7 +12,10 @@
             <h2 class="text-2xl font-bold text-gray-800">Pusat Kawalan</h2>
             <p class="text-gray-500 text-sm">Urus tadbir organisasi AJK dan penduduk kampung.</p>
         </div>
-        <div>
+        <div class="flex gap-2">
+            <button onclick="openModal('modalTambahJawatan')" class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-sm flex items-center gap-2">
+                <i class="fas fa-briefcase"></i> Tambah Jawatan
+            </button>
             <button onclick="openModal('modalLantik')" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-md shadow-purple-200 flex items-center gap-2">
                 <i class="fas fa-user-shield"></i> Lantik AJK
             </button>
@@ -29,6 +32,11 @@
             <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 rounded-r-xl shadow-sm flex items-center gap-3">
                 <i class="fas fa-user-shield"></i>
                 <p class="text-sm font-bold">AJK Baharu berjaya dilantik!</p>
+            </div>
+        <% } else if (request.getParameter("status").equals("tambahJawatanSuccess")) { %>
+            <div class="bg-indigo-50 border-l-4 border-indigo-500 text-indigo-700 p-4 mb-6 rounded-r-xl shadow-sm flex items-center gap-3">
+                <i class="fas fa-briefcase"></i>
+                <p class="text-sm font-bold">Jawatan baharu berjaya ditambah ke dalam sistem!</p>
             </div>
         <% } else if (request.getParameter("status").equals("dropSuccess")) { %>
             <div class="bg-orange-50 border-l-4 border-orange-500 text-orange-700 p-4 mb-6 rounded-r-xl shadow-sm flex items-center gap-3">
@@ -284,6 +292,43 @@
                     <button type="submit" 
                             class="flex-1 px-6 py-3 bg-[#6C5DD3] text-white font-bold rounded-xl shadow-lg shadow-purple-200 hover:bg-[#5b4eb8] transition">
                         Lantik Sekarang
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Tambah Jawatan Baru -->
+<div id="modalTambahJawatan" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+    <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onclick="closeModal('modalTambahJawatan')"></div>
+    <div class="relative min-h-screen flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
+            <div class="bg-indigo-600 p-6 text-white flex justify-between items-center">
+                <div>
+                    <h3 class="text-xl font-bold">Tambah Jawatan Baru</h3>
+                    <p class="text-xs opacity-80">Masukkan nama jawatan untuk senarai AJK.</p>
+                </div>
+                <button onclick="closeModal('modalTambahJawatan')" class="text-white hover:rotate-90 transition-transform duration-300">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+            
+            <form action="<%= request.getContextPath() %>/ketua/tambahJawatan" method="post" class="p-6 space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Nama Jawatan</label>
+                    <input type="text" name="namaJawatan" required placeholder="Contoh: Biro Kebudayaan" 
+                           class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-indigo-500 text-sm font-medium">
+                </div>
+
+                <div class="pt-4 flex gap-3">
+                    <button type="button" onclick="closeModal('modalTambahJawatan')" 
+                            class="flex-1 px-6 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition">
+                        Batal
+                    </button>
+                    <button type="submit" 
+                            class="flex-1 px-6 py-3 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-100 hover:bg-indigo-700 transition">
+                        Tambah Sekarang
                     </button>
                 </div>
             </form>

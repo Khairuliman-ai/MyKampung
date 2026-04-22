@@ -13,7 +13,7 @@
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
 
-<div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth h-full bg-[#FBFAFF]">
+<div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth h-full bg-[#FBFAFF] min-w-0">
 
     <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
@@ -129,7 +129,7 @@
     </div>
 </div>
 
-<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
+<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col flex-shrink-0 p-8 overflow-y-auto h-full">
     <div class="flex justify-between items-start mb-8">
         <h3 class="font-bold text-lg text-gray-800">Rekod Tempahan</h3>
         <button class="text-[#6C5DD3] text-xs font-bold hover:underline">Lihat Semua</button>

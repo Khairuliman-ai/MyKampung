@@ -72,11 +72,13 @@ public class PermohonanBantuanDAO {
     }
     
     public boolean insertPermohonan(PermohonanBantuan pb) {
-        String sql = "INSERT INTO permohonan_bantuan (id_pengguna, id_bantuan, dibuat_pada, status) VALUES (?, ?, NOW(), 'BARU')";
+        String sql = "INSERT INTO permohonan_bantuan (id_pengguna, id_bantuan, catatan_pemohon, dokumen_pemohon, dibuat_pada, status) VALUES (?, ?, ?, ?, NOW(), 'BARU')";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, pb.getId_pengguna());
             ps.setInt(2, pb.getId_bantuan());
+            ps.setString(3, pb.getCatatan_pemohon());
+            ps.setString(4, pb.getDokumen_pemohon());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -85,12 +87,14 @@ public class PermohonanBantuanDAO {
     }
 
     public boolean updatePermohonan(PermohonanBantuan pb) {
-        String sql = "UPDATE permohonan_bantuan SET id_bantuan = ?, dikemaskini_pada = NOW() WHERE id_permohonan = ? AND id_pengguna = ?";
+        String sql = "UPDATE permohonan_bantuan SET id_bantuan = ?, catatan_pemohon = ?, dokumen_pemohon = ?, dikemaskini_pada = NOW() WHERE id_permohonan = ? AND id_pengguna = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, pb.getId_bantuan());
-            ps.setInt(2, pb.getId_permohonan_bantuan());
-            ps.setInt(3, pb.getId_pengguna());
+            ps.setString(2, pb.getCatatan_pemohon());
+            ps.setString(3, pb.getDokumen_pemohon());
+            ps.setInt(4, pb.getId_permohonan_bantuan());
+            ps.setInt(5, pb.getId_pengguna());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

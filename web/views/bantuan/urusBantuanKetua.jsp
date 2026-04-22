@@ -35,9 +35,26 @@
         }
     %>
 
-    <div class="mb-8">
+    <div class="mb-8 border-b border-gray-200">
+        <nav class="flex gap-8" aria-label="Tabs">
+            <button onclick="switchTab('pending')" id="tab-pending" 
+                    class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-[#6C5DD3] text-[#6C5DD3]">
+                <i class="fas fa-hourglass-half"></i> Menunggu Tindakan
+                <% if (listPending != null && !listPending.isEmpty()) { %>
+                    <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><%= listPending.size() %></span>
+                <% } %>
+            </button>
+            <button onclick="switchTab('sejarah')" id="tab-sejarah" 
+                    class="py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center gap-2 transition-colors">
+                <i class="fas fa-history"></i> Sejarah Keputusan
+            </button>
+        </nav>
+    </div>
+
+    <div id="content-pending" class="block">
         <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
-            <i class="fas fa-hourglass-half text-orange-500"></i> Menunggu Tindakan
+            <div class="w-2 h-6 bg-orange-500 rounded-full"></div>
+            Senarai Permohonan Menunggu Tindakan
         </h3>
         
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
@@ -84,7 +101,7 @@
                             </td>
                             <td class="p-4">
                                 <% if(pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
-                                    <a href="<%= request.getContextPath() %>/file/<%= enc %>" target="_blank" class="text-red-500 hover:text-red-700 font-bold text-xs flex items-center gap-1">
+                                    <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" class="text-red-500 hover:text-red-700 font-bold text-xs flex items-center gap-1">
                                         <i class="fas fa-file-pdf"></i> PDF
                                     </a>
                                 <% } else { %> - <% } %>
@@ -105,13 +122,14 @@
                         <% } %>
                     </tbody>
                 </table>
-            </div>
         </div>
     </div>
+</div>
 
-    <div class="mb-10">
+<div id="content-sejarah" class="hidden">
         <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
-            <i class="fas fa-history text-gray-400"></i> Sejarah Keputusan
+            <div class="w-2 h-6 bg-gray-400 rounded-full"></div>
+            Rekod Sejarah Keputusan
         </h3>
         
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
@@ -122,6 +140,7 @@
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Tarikh</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Pemohon</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Jenis Bantuan</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Dokumen</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Keputusan</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Catatan</th>
                         </tr>
@@ -135,6 +154,11 @@
                             <td class="p-4 text-sm whitespace-nowrap"><%= displayDate %></td>
                             <td class="p-4 text-sm font-bold text-gray-700"><%= pb.getNama_penuh() %></td>
                             <td class="p-4 text-sm"><%= pb.getNama_bantuan() %></td>
+                            <td class="p-4">
+                                <% if(pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
+                                    <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" class="text-blue-500 hover:text-blue-700 text-xs font-bold underline">Lihat PDF</a>
+                                <% } else { %> - <% } %>
+                            </td>
                             <td class="p-4">
                                 <% if("LULUS".equalsIgnoreCase(pb.getStatus())) { %> 
                                     <span class="px-3 py-1 rounded-full bg-green-50 text-green-600 text-xs font-bold w-max flex items-center gap-1"><i class="fas fa-check-circle"></i> Disokong</span>
@@ -152,9 +176,9 @@
             </div>
         </div>
     </div>
+</div>
 
-</div> 
-<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
+<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col flex-shrink-0 p-8 overflow-y-auto h-full">
     <div class="flex justify-between items-start mb-8">
         <h3 class="font-bold text-lg text-gray-800">Statistik Semasa</h3>
     </div>
@@ -229,7 +253,7 @@
                     <div class="mt-4 pt-4 border-t border-gray-100">
                         <label class="block text-xs font-bold text-gray-500 mb-2">Muat Naik Dokumen Sokongan (Pilihan)</label>
                         <input type="file" name="dokumenBalas" accept="application/pdf"
-                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-[#6C5DD3] hover:file:bg-purple-100">
+                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-[#6C5DD3] hover:file:bg-purple-100" required>
                     </div>
 
                 </div>
@@ -243,6 +267,25 @@
 </div>
 
 <script>
+    function switchTab(tabName) {
+        // Reset Tabs Style
+        document.querySelectorAll('nav button').forEach(btn => {
+            btn.classList.remove('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');
+            btn.classList.add('border-transparent', 'text-gray-500', 'font-medium');
+        });
+
+        // Active Tab Style
+        const activeTab = document.getElementById('tab-' + tabName);
+        activeTab.classList.add('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');
+        activeTab.classList.remove('border-transparent', 'text-gray-500', 'font-medium');
+
+        // Toggle Content
+        document.getElementById('content-pending').classList.add('hidden');
+        document.getElementById('content-sejarah').classList.add('hidden');
+        
+        document.getElementById('content-' + tabName).classList.remove('hidden');
+    }
+
     function openModal(id, namaBantuan, jenisKeputusan) {
         document.getElementById('modalId').value = id;
         document.getElementById('modalKeputusanValue').value = jenisKeputusan;

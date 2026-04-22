@@ -24,15 +24,20 @@ public class FileServlet extends HttpServlet {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-
         String[] parts = pathInfo.split("/");
-        if (parts.length < 3) {
+        String type = "";
+        String filename = "";
+
+        if (parts.length >= 3) {
+            type = parts[1];      // "bantuan", "pengguna", "profil"
+            filename = parts[2];  // "fail.pdf"
+        } else if (parts.length == 2) {
+            type = "bantuan";     // Default ke bantuan jika hanya ada nama fail
+            filename = parts[1];
+        } else {
             response.sendError(HttpServletResponse.SC_NOT_FOUND);
             return;
         }
-
-        String type = parts[1];      // "pengguna"
-        String filename = parts[2];  // "bukti_xxx.pdf"
 
         String subFolder = "";
         if ("pengguna".equals(type)) {
@@ -42,8 +47,10 @@ public class FileServlet extends HttpServlet {
         } else if ("profil".equals(type)) {
             subFolder = "fotoProfil";
         } else {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return;
+            // Jika 'type' bukan kategori yang dikenali, mungkin ia sebenarnya adalah nama fail
+            // Cuba cari dalam lampiranBantuan sebagai fallback
+            subFolder = "lampiranBantuan";
+            filename = type; 
         }
 
         File file = new File(BASE_PATH + subFolder, filename);

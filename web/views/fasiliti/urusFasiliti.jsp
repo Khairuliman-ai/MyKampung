@@ -7,8 +7,7 @@
     List<TempahanFasiliti> senaraiTempahan = (List<TempahanFasiliti>) request.getAttribute("senaraiTempahan");
 %>
 
-<div class="flex flex-1 h-full overflow-hidden">
-    <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F7F7F9]">
+<div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F7F7F9] min-w-0">
     <!-- Header -->
     <header class="flex justify-between items-center mb-8">
         <div>
@@ -147,6 +146,7 @@
                             <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pemohon</th>
                             <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fasiliti</th>
                             <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tarikh & Masa</th>
+                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sebab Tempahan</th>
                             <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Tindakan</th>
                         </tr>
                     </thead>
@@ -166,6 +166,11 @@
                                     <p class="text-xs font-bold text-gray-700"><%= t.getTarikh_tempah() %></p>
                                     <p class="text-[10px] text-gray-400"><%= t.getMasa_mula() %> - <%= t.getMasa_tamat() %></p>
                                 </td>
+                                <td class="px-8 py-6">
+                                    <p class="text-[10px] text-gray-500 italic max-w-[200px]">
+                                        <%= (t.getCatatan_pemohon() != null && !t.getCatatan_pemohon().isEmpty()) ? t.getCatatan_pemohon() : "-" %>
+                                    </p>
+                                </td>
                                 <td class="px-8 py-6 text-center">
                                     <div class="flex justify-center gap-2">
                                         <form action="<%= contextPath %>/fasiliti/approve" method="post" class="inline">
@@ -177,7 +182,7 @@
                                 </td>
                             </tr>
                         <% } } if(!hasPending) { %>
-                            <tr><td colspan="4" class="px-8 py-10 text-center text-gray-400 text-sm italic">Tiada permohonan menunggu kelulusan.</td></tr>
+                            <tr><td colspan="5" class="px-8 py-10 text-center text-gray-400 text-sm italic">Tiada permohonan menunggu kelulusan.</td></tr>
                         <% } } %>
                     </tbody>
                 </table>
@@ -275,9 +280,10 @@
             </div>
         </div>
     </div>
-
+</div>
+    
     <!-- Right Aside Bar (Admin) -->
-    <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full custom-scrollbar shrink-0">
+    <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full custom-scrollbar flex-shrink-0">
         <div class="flex justify-between items-start mb-8">
             <h3 class="font-bold text-lg text-gray-800">Garis Panduan</h3>
         </div>
@@ -324,15 +330,6 @@
             <button class="w-full bg-white border border-gray-200 text-gray-700 py-3 rounded-xl text-xs font-bold hover:bg-gray-100 transition shadow-sm">Hubungi Teknikal</button>
         </div>
     </aside>
-
-    <style>
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6C5DD3; }
-    </style>
-</div>
-</div>
 
 
 <!-- Modal: Tambah/Edit Fasiliti -->

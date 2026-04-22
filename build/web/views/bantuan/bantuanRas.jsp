@@ -5,6 +5,7 @@
 <%@ page import="java.util.Comparator" %>
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="model.PermohonanBantuan" %>
+<%@ page import="model.Bantuan" %>
 <%@ page import="java.net.URLEncoder" %>
 
 <%@ include file="/views/common/header.jsp" %>
@@ -12,6 +13,7 @@
 
 <%
     List<PermohonanBantuan> mainList = (List<PermohonanBantuan>) request.getAttribute("permohonanList");
+    List<Bantuan> senaraiJenis = (List<Bantuan>) request.getAttribute("senaraiJenisBantuan");
     List<PermohonanBantuan> listProses = new ArrayList<>();
     List<PermohonanBantuan> listSejarah = new ArrayList<>();
     SimpleDateFormat sdfFull = new SimpleDateFormat("yyyy-MM-dd");
@@ -20,8 +22,8 @@
     if (mainList != null) {
         Collections.sort(mainList, (o1, o2) -> Integer.compare(o2.getId_permohonan(), o1.getId_permohonan()));
         for (PermohonanBantuan pb : mainList) {
-            String s = pb.getStatus();
-            if (s == null || "BARU".equalsIgnoreCase(s) || "DIKEMBALIKAN".equalsIgnoreCase(s) || "MENUNGGU_KETUA".equalsIgnoreCase(s)) {
+            String s = (pb.getStatus() != null) ? pb.getStatus().trim().toUpperCase() : "BARU";
+            if (s.equals("BARU") || s.equals("DIKEMBALIKAN") || s.equals("MENUNGGU_KETUA")) {
                 listProses.add(pb);
             } else {
                 listSejarah.add(pb);
@@ -31,6 +33,18 @@
 %>
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth h-full bg-[#F7F7F9]">
+
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Rekod Bantuan Rasmi</h2>
+            <p class="text-gray-500 text-sm">Pantau status permohonan bantuan kerajaan dan sokongan penghulu.</p>
+        </div>
+        <div>
+            <button onclick="openModal('modalMohon')" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-md shadow-purple-200 flex items-center gap-2">
+                <i class="fas fa-plus"></i> Mohon Baru
+            </button>
+        </div>
+    </div>
 
     <% if (request.getParameter("status") != null) { %>
     <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
@@ -52,55 +66,26 @@
     </div>
     <% } %>
 
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4">
-        <div>
-            <h2 class="text-2xl font-bold text-gray-800">Rekod Bantuan Rasmi</h2>
-            <p class="text-gray-500 text-sm">Pantau status permohonan bantuan kerajaan dan sokongan penghulu.</p>
-        </div>
-        <div>
-            <button onclick="openModal('modalMohon')" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-md shadow-purple-200 flex items-center gap-2">
-                <i class="fas fa-plus"></i> Mohon Baru
+    <div class="mb-8 border-b border-gray-200">
+        <nav class="flex gap-8" aria-label="Tabs">
+            <button onclick="switchTab('proses')" id="tab-proses" 
+                    class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-[#6C5DD3] text-[#6C5DD3]">
+                <i class="fas fa-sync-alt"></i> Sedang Diproses
+                <% if (!listProses.isEmpty()) { %>
+                    <span class="bg-[#6C5DD3] text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><%= listProses.size() %></span>
+                <% } %>
             </button>
-        </div>
+            <button onclick="switchTab('sejarah')" id="tab-sejarah" 
+                    class="py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center gap-2 transition-colors">
+                <i class="fas fa-history"></i> Sejarah Terdahulu
+            </button>
+        </nav>
     </div>
 
-    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div>
-                <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Carian Pantas</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
-                    <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Nama bantuan, keterangan..." 
-                           class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm transition-all">
-                </div>
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Tarikh Mohon</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="far fa-calendar-alt"></i></span>
-                    <input type="date" id="dateFilter" onchange="filterData()"
-                           class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm transition-all">
-                </div>
-            </div>
-             <div>
-                <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Status Sejarah</label>
-                <div class="relative">
-                    <select id="statusFilter" onchange="filterData()" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm appearance-none">
-                        <option value="all">Semua Status</option>
-                        <option value="1">Lulus (Disokong)</option>
-                        <option value="2">Ditolak</option>
-                    </select>
-                    <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
-                        <i class="fas fa-chevron-down text-xs"></i>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="mb-8">
+    <div id="content-proses" class="block">
         <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
-            <i class="fas fa-hourglass-half text-blue-500"></i> Sedang Diproses
+            <div class="w-2 h-6 bg-blue-500 rounded-full"></div>
+            Permohonan Sedang Diproses
         </h3>
         
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
@@ -127,7 +112,7 @@
                             <td class="p-4 text-sm font-bold text-[#6C5DD3] search-col"><%= pb.getNama_bantuan() %></td>
                             <td class="p-4">
                                 <% if (pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
-                                    <a href="<%= request.getContextPath() %>/file/<%= enc %>" target="_blank" class="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-bold hover:bg-gray-200 transition">
+                                    <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" class="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-bold hover:bg-gray-200 transition">
                                         <i class="fas fa-file-pdf text-red-500"></i> PDF
                                     </a>
                                 <% } else { %> <span class="text-gray-400">-</span> <% } %>
@@ -169,13 +154,44 @@
                         <% } %>
                     </tbody>
                 </table>
-            </div>
         </div>
     </div>
+</div>
 
-    <div class="mb-10">
+<div id="content-sejarah" class="hidden">
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Carian Pantas</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
+                        <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Nama bantuan, keterangan..." 
+                               class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm transition-all">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Tarikh Mohon</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="far fa-calendar-alt"></i></span>
+                        <input type="date" id="dateFilter" onchange="filterData()"
+                               class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm transition-all">
+                    </div>
+                </div>
+                 <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Status Sejarah</label>
+                    <div class="relative">
+                        <select id="statusFilter" onchange="filterData()" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm appearance-none">
+                            <option value="all">Semua Status</option>
+                            <option value="1">Lulus (Disokong)</option>
+                            <option value="2">Ditolak</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
         <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
-            <i class="fas fa-history text-gray-400"></i> Sejarah Terdahulu
+            <div class="w-2 h-6 bg-gray-400 rounded-full"></div>
+            Rekod Sejarah Terdahulu
         </h3>
         
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
@@ -204,7 +220,7 @@
                             <td class="p-4 text-sm font-bold text-gray-700 search-col"><%= pb.getNama_bantuan() %></td>
                             <td class="p-4">
                                 <% if (pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
-                                    <a href="<%= request.getContextPath() %>/file/<%= enc %>" target="_blank" class="text-xs font-bold text-blue-500 hover:underline"><i class="fas fa-file-pdf"></i> PDF</a>
+                                    <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" class="text-xs font-bold text-blue-500 hover:underline"><i class="fas fa-file-pdf"></i> PDF</a>
                                 <% } else { %> - <% } %>
                             </td>
                             <td class="p-4 text-sm search-col max-w-xs truncate"><%= (pb.getCatatan_pemohon() != null) ? pb.getCatatan_pemohon() : "-" %></td>
@@ -219,7 +235,7 @@
                             <td class="p-4">
                                 <% if (pb.getDokumen_pentadbir() != null && !pb.getDokumen_pentadbir().isEmpty()) { 
                                     String enc = URLEncoder.encode(pb.getDokumen_pentadbir(), "UTF-8").replace("+", "%20"); %>
-                                    <a href="<%= request.getContextPath() %>/file/<%= enc %>" target="_blank" class="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-600 rounded-lg text-xs font-bold hover:bg-green-100 transition">
+                                    <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" class="inline-flex items-center gap-1 px-3 py-1 bg-green-50 text-green-600 rounded-lg text-xs font-bold hover:bg-green-100 transition">
                                         <i class="fas fa-download"></i> PDF
                                     </a>
                                 <% } else { %> - <% } %>
@@ -234,9 +250,8 @@
             </div>
         </div>
     </div>
-
-</div> 
-<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
+</div>
+<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col flex-shrink-0 p-8 overflow-y-auto h-full">
     <div class="flex justify-between items-start mb-8">
         <h3 class="font-bold text-lg text-gray-800">Info Penting</h3>
     </div>
@@ -301,21 +316,9 @@
                                             <select name="jenisBantuan" id="jenisBantuan" required onchange="toggleLainBantuan()"
                                                     class="w-full px-4 py-2.5 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-xs font-medium appearance-none">
                                                 <option value="" disabled selected>-- Sila Pilih --</option>
-                                                <option value="6">BANTUAN AM</option>
-                                                <option value="7">BANTUAN HARI RAYA</option>
-                                                <option value="8">BANTUAN KEPADA GHARIMIN</option>
-                                                <option value="9">BANTUAN MELANJUT PELAJARAN KE IPT</option>
-                                                <option value="10">BANTUAN PEMBANGUNAN ASNAF</option>
-                                                <option value="11">BANTUAN PEMULIHAN RUMAH KEDIAMAN</option>
-                                                <option value="12">BANTUAN RAWATAN PERUBATAN</option>
-                                                <option value="13">BANTUAN SEWA RUMAH</option>
-                                                <option value="14">BANTUAN TETAP BULANAN</option>
-                                                <option value="15">BIASISWA PENDIDIKAN DALAM NEGARA (BPDN)</option>
-                                                <option value="16">BIASISWA PENDIDIKAN LUAR NEGARA (BPLN)</option>
-                                                <option value="17">BIASISWA PROFESIONAL PERAKAUNAN (BPP)</option>
-                                                <option value="18">PROG. BIASISWA SULTAN ISMAIL PETRA (BSIP)</option>
-                                                <option value="19">PROGRAM DERMASISWA SULTAN ISMAIL PETRA (DSIP)</option>
-                                                <option value="20">SUMBANGAN IPT - FISABILILLAH</option>
+                                                <% if (senaraiJenis != null) { for (Bantuan b : senaraiJenis) { %>
+                                                    <option value="<%= b.getId_bantuan() %>"><%= b.getNama_bantuan() %></option>
+                                                <% } } %>
                                                 <option value="999">LAIN-LAIN</option>
                                             </select>
                                             <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
@@ -356,6 +359,25 @@
 </div>
 
 <script>
+    function switchTab(tabName) {
+        // Reset Tabs Style
+        document.querySelectorAll('nav button').forEach(btn => {
+            btn.classList.remove('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');
+            btn.classList.add('border-transparent', 'text-gray-500', 'font-medium');
+        });
+
+        // Active Tab Style
+        const activeTab = document.getElementById('tab-' + tabName);
+        activeTab.classList.add('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');
+        activeTab.classList.remove('border-transparent', 'text-gray-500', 'font-medium');
+
+        // Toggle Content
+        document.getElementById('content-proses').classList.add('hidden');
+        document.getElementById('content-sejarah').classList.add('hidden');
+        
+        document.getElementById('content-' + tabName).classList.remove('hidden');
+    }
+
     // Modal Logic
     function openModal(modalId) {
         document.getElementById(modalId).classList.remove('hidden');

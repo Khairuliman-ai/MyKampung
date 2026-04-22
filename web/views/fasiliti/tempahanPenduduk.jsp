@@ -3,6 +3,9 @@
 <%@ page import="model.TempahanFasiliti" %>
 <%@ page import="model.ActivityLog" %>
 <%@ page import="model.Pengguna" %>
+<%@ page import="java.time.LocalDate" %>
+<%@ page import="java.time.LocalTime" %>
+<%@ page import="java.time.ZoneId" %>
 
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
@@ -12,8 +15,7 @@
     List<TempahanFasiliti> senaraiTempahan = (List<TempahanFasiliti>) request.getAttribute("senaraiTempahan");
 %>
 
-<div class="flex flex-1 h-full overflow-hidden">
-    <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F7F7F9]">
+<div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F7F7F9] min-w-0">
     <!-- Header -->
     <header class="flex justify-between items-center mb-8">
         <div>
@@ -138,8 +140,16 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-50">
-                        <% if (senaraiTempahan != null && !senaraiTempahan.isEmpty()) { 
-                            for (TempahanFasiliti t : senaraiTempahan) { %>
+                        <% 
+                            LocalDate today = LocalDate.now(ZoneId.of("Asia/Kuala_Lumpur"));
+                            LocalTime nowTime = LocalTime.now(ZoneId.of("Asia/Kuala_Lumpur"));
+                            
+                            if (senaraiTempahan != null && !senaraiTempahan.isEmpty()) { 
+                            for (TempahanFasiliti t : senaraiTempahan) { 
+                                LocalDate bookingDate = t.getTarikh_tempah().toLocalDate();
+                                LocalTime endTime = t.getMasa_tamat().toLocalTime();
+                                boolean isFuture = bookingDate.isAfter(today) || (bookingDate.isEqual(today) && endTime.isAfter(nowTime));
+                        %>
                             <tr class="hover:bg-gray-50/50 transition-colors">
                                 <td class="px-8 py-6">
                                     <div class="flex items-center gap-4">
@@ -175,7 +185,7 @@
                                     <% } %>
                                 </td>
                                 <td class="px-8 py-6">
-                                    <% if ("MENUNGGU".equals(t.getStatus())) { %>
+                                    <% if (isFuture && ("MENUNGGU".equals(t.getStatus()) || "LULUS".equals(t.getStatus()))) { %>
                                         <a href="<%= contextPath %>/fasiliti/batal?id=<%= t.getId_tempahan() %>" 
                                            onclick="return confirm('Adakah anda pasti mahu membatalkan tempahan ini?')"
                                            class="text-xs font-bold text-red-400 hover:text-red-600 transition-colors">Batal Tempahan</a>
@@ -192,64 +202,63 @@
             </div>
         </div>
     </div>
-
-    <!-- Right Aside Bar (Resident) -->
-    <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full custom-scrollbar shrink-0">
-        <div class="flex justify-between items-start mb-8">
-            <h3 class="font-bold text-lg text-gray-800">Info Penting</h3>
-        </div>
-
-        <div class="space-y-8">
-            <!-- Rule 1 -->
-            <div class="flex gap-4">
-                <div class="w-10 h-10 rounded-full bg-purple-50 text-brand-purple flex-shrink-0 flex items-center justify-center font-bold text-lg">
-                    <i class="fas fa-calendar-check"></i>
-                </div>
-                <div>
-                    <h4 class="font-bold text-sm text-gray-800">Had Tempahan</h4>
-                    <p class="text-xs text-gray-500 mt-1 leading-relaxed">Setiap penduduk hanya dibenarkan mempunyai maksimum <strong>2 tempahan aktif</strong> pada satu-satu masa.</p>
-                </div>
-            </div>
-
-            <!-- Rule 2 -->
-            <div class="flex gap-4">
-                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex-shrink-0 flex items-center justify-center font-bold text-lg">
-                    <i class="fas fa-user-shield"></i>
-                </div>
-                <div>
-                    <h4 class="font-bold text-sm text-gray-800">Kelulusan Manual</h4>
-                    <p class="text-xs text-gray-500 mt-1 leading-relaxed">Fasiliti seperti <strong>Dewan</strong> memerlukan kelulusan AJK. Sila semak status secara berkala.</p>
-                </div>
-            </div>
-            
-            <!-- Rule 3 -->
-            <div class="flex gap-4">
-                <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 flex-shrink-0 flex items-center justify-center font-bold text-lg">
-                    <i class="fas fa-clock"></i>
-                </div>
-                <div>
-                    <h4 class="font-bold text-sm text-gray-800">Slot Masa</h4>
-                    <p class="text-xs text-gray-500 mt-1 leading-relaxed">Sila pastikan anda hadir mengikut slot yang ditempah. Slot yang telah tamat tidak boleh diubah.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Contact Box -->
-        <div class="mt-auto bg-gray-50 rounded-2xl p-6 border border-gray-100">
-            <h4 class="font-bold text-gray-700 mb-2 text-sm">Masalah Tempahan?</h4>
-            <p class="text-xs text-gray-500 mb-4">Hubungi Biro Sukan & Riadah jika anda mempunyai masalah teknikal atau ingin membatalkan tempahan saat akhir.</p>
-            <button class="w-full bg-white border border-gray-200 text-gray-700 py-3 rounded-xl text-xs font-bold hover:bg-gray-100 transition shadow-sm">Hubungi Biro Sukan</button>
-        </div>
-    </aside>
-
+</div>
+    
     <style>
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
         .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6C5DD3; }
     </style>
-</div>
-</div>
+
+<!-- Right Aside Bar (Resident) -->
+<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full custom-scrollbar flex-shrink-0">
+    <div class="flex justify-between items-start mb-8">
+        <h3 class="font-bold text-lg text-gray-800">Info Penting</h3>
+    </div>
+
+    <div class="space-y-8">
+        <!-- Rule 1 -->
+        <div class="flex gap-4">
+            <div class="w-10 h-10 rounded-full bg-purple-50 text-brand-purple flex-shrink-0 flex items-center justify-center font-bold text-lg">
+                <i class="fas fa-calendar-check"></i>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm text-gray-800">Had Tempahan</h4>
+                <p class="text-xs text-gray-500 mt-1 leading-relaxed">Setiap penduduk hanya dibenarkan mempunyai maksimum <strong>2 tempahan aktif</strong> pada satu-satu masa.</p>
+            </div>
+        </div>
+
+        <!-- Rule 2 -->
+        <div class="flex gap-4">
+            <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex-shrink-0 flex items-center justify-center font-bold text-lg">
+                <i class="fas fa-user-shield"></i>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm text-gray-800">Kelulusan Manual</h4>
+                <p class="text-xs text-gray-500 mt-1 leading-relaxed">Fasiliti seperti <strong>Dewan</strong> memerlukan kelulusan AJK. Sila semak status secara berkala.</p>
+            </div>
+        </div>
+        
+        <!-- Rule 3 -->
+        <div class="flex gap-4">
+            <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 flex-shrink-0 flex items-center justify-center font-bold text-lg">
+                <i class="fas fa-clock"></i>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm text-gray-800">Slot Masa</h4>
+                <p class="text-xs text-gray-500 mt-1 leading-relaxed">Sila pastikan anda hadir mengikut slot yang ditempah. Slot yang telah tamat tidak boleh diubah.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Contact Box -->
+    <div class="mt-auto bg-gray-50 rounded-2xl p-6 border border-gray-100">
+        <h4 class="font-bold text-gray-700 mb-2 text-sm">Masalah Tempahan?</h4>
+        <p class="text-xs text-gray-500 mb-4">Hubungi Biro Sukan & Riadah jika anda mempunyai masalah teknikal atau ingin membatalkan tempahan saat akhir.</p>
+        <button class="w-full bg-white border border-gray-200 text-gray-700 py-3 rounded-xl text-xs font-bold hover:bg-gray-100 transition shadow-sm">Hubungi Biro Sukan</button>
+    </div>
+</aside>
 
 <!-- Modal Tempahan -->
 <div id="modalTempah" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
@@ -314,7 +323,7 @@
                     <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Sebab / Catatan</label>
                     <textarea name="catatan_pemohon" id="catatan_pemohon" rows="3"
                               class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium"
-                              placeholder="Nyatakan sebab anda memerlukan tempoh masa yang spesifik..."></textarea>
+                              placeholder="Nyatakan sebab tempahan (Wajib untuk Seharian Penuh / Separuh Hari)..."></textarea>
                 </div>
 
                 <button type="submit" class="w-full py-5 bg-brand-purple text-white rounded-2xl font-bold text-sm shadow-xl shadow-indigo-100 hover:bg-opacity-90 mt-8 transition-all">

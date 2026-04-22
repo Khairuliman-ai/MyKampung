@@ -22,8 +22,8 @@
     if (mainList != null) {
         Collections.sort(mainList, (o1, o2) -> Integer.compare(o2.getId_permohonan(), o1.getId_permohonan()));
         for (PermohonanBantuan pb : mainList) {
-            String s = pb.getStatus();
-            if (s == null || "BARU".equalsIgnoreCase(s) || "DIKEMBALIKAN".equalsIgnoreCase(s) || "MENUNGGU_KETUA".equalsIgnoreCase(s)) {
+            String s = (pb.getStatus() != null) ? pb.getStatus().trim().toUpperCase() : "BARU";
+            if (s.equals("BARU") || s.equals("DIKEMBALIKAN") || s.equals("MENUNGGU_KETUA")) {
                 listProses.add(pb);
             } else {
                 listSejarah.add(pb);
@@ -66,30 +66,26 @@
         </div>
     </div>
 
-    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Carian Pantas</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
-                    <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Nama bantuan, keterangan..." 
-                           class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm transition-all">
-                </div>
-            </div>
-            <div>
-                <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Tarikh Mohon</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="far fa-calendar-alt"></i></span>
-                    <input type="date" id="dateFilter" onchange="filterData()"
-                           class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm transition-all">
-                </div>
-            </div>
-        </div>
+    <div class="mb-8 border-b border-gray-200">
+        <nav class="flex gap-8" aria-label="Tabs">
+            <button onclick="switchTab('proses')" id="tab-proses" 
+                    class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-[#6C5DD3] text-[#6C5DD3]">
+                <i class="fas fa-sync-alt"></i> Sedang Diproses
+                <% if (!listProses.isEmpty()) { %>
+                    <span class="bg-[#6C5DD3] text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><%= listProses.size() %></span>
+                <% } %>
+            </button>
+            <button onclick="switchTab('sejarah')" id="tab-sejarah" 
+                    class="py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center gap-2 transition-colors">
+                <i class="fas fa-history"></i> Sejarah Terdahulu
+            </button>
+        </nav>
     </div>
 
-    <div class="mb-8">
+    <div id="content-proses" class="block">
         <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
-            <i class="fas fa-hourglass-half text-blue-500"></i> Sedang Diproses
+            <div class="w-2 h-6 bg-blue-500 rounded-full"></div>
+            Permohonan Sedang Diproses
         </h3>
         
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
@@ -133,7 +129,7 @@
 
                             <td class="p-4">
                                 <% if (pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
-                                    <a href="<%= request.getContextPath() %>/file/<%= enc %>" target="_blank" class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-bold hover:bg-gray-200 transition border border-gray-200">
+                                    <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg text-xs font-bold hover:bg-gray-200 transition border border-gray-200">
                                         <i class="fas fa-eye"></i> Lihat
                                     </a>
                                 <% } else { %> <span class="text-gray-400 text-xs">-</span> <% } %>
@@ -186,13 +182,34 @@
                         <% } %>
                     </tbody>
                 </table>
-            </div>
         </div>
     </div>
+</div>
 
-    <div class="mb-10">
+<div id="content-sejarah" class="hidden">
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Carian Pantas</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
+                        <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Nama bantuan, keterangan..." 
+                               class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm transition-all">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Tarikh Mohon</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="far fa-calendar-alt"></i></span>
+                        <input type="date" id="dateFilter" onchange="filterData()"
+                               class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm transition-all">
+                    </div>
+                </div>
+            </div>
+        </div>
         <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
-            <i class="fas fa-history text-gray-400"></i> Sejarah Terdahulu
+            <div class="w-2 h-6 bg-gray-400 rounded-full"></div>
+            Rekod Sejarah Terdahulu
         </h3>
         
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
@@ -223,7 +240,7 @@
                             
                             <td class="p-4">
                                 <% if (pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
-                                    <a href="<%= request.getContextPath() %>/file/<%= enc %>" target="_blank" class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 text-gray-600 rounded-lg text-xs font-bold hover:bg-gray-100 transition border border-gray-200">
+                                    <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" class="inline-flex items-center gap-2 px-3 py-1.5 bg-gray-50 text-gray-600 rounded-lg text-xs font-bold hover:bg-gray-100 transition border border-gray-200">
                                         <i class="fas fa-eye"></i> Lihat
                                     </a>
                                 <% } else { %> <span class="text-gray-400 text-xs">-</span> <% } %>
@@ -261,10 +278,9 @@
             </div>
         </div>
     </div>
+</div>
 
-</div> 
-
-<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
+<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col flex-shrink-0 p-8 overflow-y-auto h-full">
     <div class="flex justify-between items-start mb-10">
         <h3 class="font-bold text-lg text-gray-800">Langkah Permohonan</h3>
     </div>
@@ -318,8 +334,11 @@
                         <h3 class="text-lg font-semibold leading-6 text-gray-900">Pilih Borang Bantuan</h3>
                         <div class="mt-2 space-y-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
                             <% if (senaraiJenis != null) { for (Bantuan b : senaraiJenis) { %>
-                                <a href="borangDigital.jsp?id=<%= b.getId_bantuan() %>&nama=<%= URLEncoder.encode(b.getNama_bantuan(), "UTF-8") %>" class="flex items-center justify-between w-full p-4 bg-gray-50 hover:bg-purple-50 rounded-xl border border-transparent hover:border-purple-200 group transition">
-                                    <span class="font-bold text-gray-700 group-hover:text-[#6C5DD3] text-sm"><%= b.getNama_bantuan() %></span>
+                                <a href="borangDigital.jsp?id=<%= b.getId_bantuan() %>&nama=<%= URLEncoder.encode(b.getNama_bantuan(), "UTF-8") %>" class="flex items-center justify-between w-full p-4 bg-gray-50 hover:bg-purple-50 rounded-xl border border-transparent hover:border-purple-200 group transition text-left">
+                                    <div class="flex flex-col">
+                                        <span class="font-bold text-gray-700 group-hover:text-[#6C5DD3] text-sm"><%= b.getNama_bantuan() %></span>
+                                        <span class="text-[10px] text-gray-400">Peruntukan: <%= b.getJumlahBantuanFormatted() %></span>
+                                    </div>
                                     <i class="fas fa-chevron-right text-gray-300 group-hover:text-[#6C5DD3]"></i>
                                 </a>
                             <% } } %>
@@ -364,7 +383,7 @@
                                 <select name="jenisBantuan" id="jenisBantuanSubmit" required onchange="toggleLainBantuan()" class="w-full px-4 py-2.5 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm appearance-none">
                                     <option value="" disabled selected>-- Pilih Kategori --</option>
                                     <% if (senaraiJenis != null) { for (Bantuan b : senaraiJenis) { %>
-                                        <option value="<%= b.getId_bantuan() %>"><%= b.getNama_bantuan() %></option>
+                                        <option value="<%= b.getId_bantuan() %>"><%= b.getNama_bantuan() %> (<%= b.getJumlahBantuanFormatted() %>)</option>
                                     <% } } %>
                                 </select>
                                 <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500"><i class="fas fa-chevron-down text-xs"></i></div>
@@ -394,6 +413,25 @@
 </div>
 
 <script>
+    function switchTab(tabName) {
+        // Reset Tabs Style
+        document.querySelectorAll('nav button').forEach(btn => {
+            btn.classList.remove('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');
+            btn.classList.add('border-transparent', 'text-gray-500', 'font-medium');
+        });
+
+        // Active Tab Style
+        const activeTab = document.getElementById('tab-' + tabName);
+        activeTab.classList.add('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');
+        activeTab.classList.remove('border-transparent', 'text-gray-500', 'font-medium');
+
+        // Toggle Content
+        document.getElementById('content-proses').classList.add('hidden');
+        document.getElementById('content-sejarah').classList.add('hidden');
+        
+        document.getElementById('content-' + tabName).classList.remove('hidden');
+    }
+
     // 1. OPEN TEXT MODAL LOGIC
     function openTextModal(title, text) {
         document.getElementById('modalTextTitle').innerText = title;
