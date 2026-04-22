@@ -1,6 +1,7 @@
 <%@ page import="java.util.List" %>
 <%@ page import="model.Fasiliti" %>
 <%@ page import="model.TempahanFasiliti" %>
+<%@ page import="model.ActivityLog" %>
 <%@ page import="model.Pengguna" %>
 
 <%@ include file="/views/common/header.jsp" %>
@@ -11,7 +12,8 @@
     List<TempahanFasiliti> senaraiTempahan = (List<TempahanFasiliti>) request.getAttribute("senaraiTempahan");
 %>
 
-<div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F7F7F9]">
+<div class="flex flex-1 h-full overflow-hidden">
+    <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F7F7F9]">
     <!-- Header -->
     <header class="flex justify-between items-center mb-8">
         <div>
@@ -89,6 +91,11 @@
                                     Tersedia
                                 </span>
                             <% } %>
+                            <% if (f.isRequiresApproval()) { %>
+                                <span class="bg-blue-50 text-brand-purple text-[9px] font-bold px-2 py-0.5 rounded border border-indigo-100 mt-1">
+                                    <i class="fas fa-shield-halved mr-1"></i> Perlu Kelulusan
+                                </span>
+                            <% } %>
                         </div>
                     </div>
                     <h3 class="text-xl font-bold text-gray-800 mb-2"><%= f.getNama_fasiliti() %></h3>
@@ -97,7 +104,7 @@
                         <span><%= f.getLokasi() %></span>
                     </div>
                     <div class="flex flex-col gap-3">
-                        <button onclick="openBookingModal('<%= f.getId_fasiliti() %>', '<%= f.getNama_fasiliti() %>')" 
+                        <button onclick="openBookingModal('<%= f.getId_fasiliti() %>', '<%= f.getNama_fasiliti() %>', <%= f.isRequiresApproval() %>)" 
                                 <%= f.isOccupied() ? "disabled title='Fasiliti sedang digunakan'" : "" %>
                                 class="w-full py-4 <%= f.isOccupied() ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-brand-purple text-white shadow-lg shadow-indigo-100 hover:bg-opacity-90" %> rounded-2xl font-bold text-sm transition-all">
                             <%= f.isOccupied() ? "Tidak Tersedia" : "Tempah Sekarang" %>
@@ -185,6 +192,63 @@
             </div>
         </div>
     </div>
+
+    <!-- Right Aside Bar (Resident) -->
+    <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full custom-scrollbar shrink-0">
+        <div class="flex justify-between items-start mb-8">
+            <h3 class="font-bold text-lg text-gray-800">Info Penting</h3>
+        </div>
+
+        <div class="space-y-8">
+            <!-- Rule 1 -->
+            <div class="flex gap-4">
+                <div class="w-10 h-10 rounded-full bg-purple-50 text-brand-purple flex-shrink-0 flex items-center justify-center font-bold text-lg">
+                    <i class="fas fa-calendar-check"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm text-gray-800">Had Tempahan</h4>
+                    <p class="text-xs text-gray-500 mt-1 leading-relaxed">Setiap penduduk hanya dibenarkan mempunyai maksimum <strong>2 tempahan aktif</strong> pada satu-satu masa.</p>
+                </div>
+            </div>
+
+            <!-- Rule 2 -->
+            <div class="flex gap-4">
+                <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex-shrink-0 flex items-center justify-center font-bold text-lg">
+                    <i class="fas fa-user-shield"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm text-gray-800">Kelulusan Manual</h4>
+                    <p class="text-xs text-gray-500 mt-1 leading-relaxed">Fasiliti seperti <strong>Dewan</strong> memerlukan kelulusan AJK. Sila semak status secara berkala.</p>
+                </div>
+            </div>
+            
+            <!-- Rule 3 -->
+            <div class="flex gap-4">
+                <div class="w-10 h-10 rounded-full bg-orange-50 text-orange-600 flex-shrink-0 flex items-center justify-center font-bold text-lg">
+                    <i class="fas fa-clock"></i>
+                </div>
+                <div>
+                    <h4 class="font-bold text-sm text-gray-800">Slot Masa</h4>
+                    <p class="text-xs text-gray-500 mt-1 leading-relaxed">Sila pastikan anda hadir mengikut slot yang ditempah. Slot yang telah tamat tidak boleh diubah.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contact Box -->
+        <div class="mt-auto bg-gray-50 rounded-2xl p-6 border border-gray-100">
+            <h4 class="font-bold text-gray-700 mb-2 text-sm">Masalah Tempahan?</h4>
+            <p class="text-xs text-gray-500 mb-4">Hubungi Biro Sukan & Riadah jika anda mempunyai masalah teknikal atau ingin membatalkan tempahan saat akhir.</p>
+            <button class="w-full bg-white border border-gray-200 text-gray-700 py-3 rounded-xl text-xs font-bold hover:bg-gray-100 transition shadow-sm">Hubungi Biro Sukan</button>
+        </div>
+    </aside>
+
+    <style>
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6C5DD3; }
+    </style>
+</div>
 </div>
 
 <!-- Modal Tempahan -->
@@ -303,35 +367,30 @@
     function toggleDuration() {
         const tempoh = document.getElementById('tempoh_tempahan').value;
         const slotContainer = document.getElementById('slot_container');
-        const manualContainer = document.getElementById('manual_time_container');
         const catatanContainer = document.getElementById('catatan_container');
         
-        const masaMula = document.getElementById('masa_mula');
-        const masaTamat = document.getElementById('masa_tamat');
+        // Hidden inputs
+        const mulaHidden = document.getElementById('masa_mula_hidden');
+        const tamatHidden = document.getElementById('masa_tamat_hidden');
         const catatanInput = document.getElementById('catatan_pemohon');
 
-        if (tempoh === 'specific') {
-            slotContainer.classList.add('hidden');
-            manualContainer.classList.remove('hidden');
-            catatanContainer.classList.remove('hidden');
-            
-            masaMula.required = true;
-            masaTamat.required = true;
-            catatanInput.required = true;
-            
-            // Reset hidden inputs
-            document.getElementById('masa_mula_hidden').value = "";
-            document.getElementById('masa_tamat_hidden').value = "";
-        } else {
+        // Reset
+        mulaHidden.value = "";
+        tamatHidden.value = "";
+        catatanInput.value = "";
+
+        if (tempoh === '2') {
+            // Show Slot Picker, Hide Sebab
             slotContainer.classList.remove('hidden');
-            manualContainer.classList.add('hidden');
             catatanContainer.classList.add('hidden');
-            
-            masaMula.required = false;
-            masaTamat.required = false;
             catatanInput.required = false;
-            
             loadSlots();
+        } else if (tempoh === 'HalfDay' || tempoh === 'FullDay') {
+            // Hide Slot Picker, Show Sebab
+            slotContainer.classList.add('hidden');
+            catatanContainer.classList.remove('hidden');
+            catatanInput.required = true;
+            loadSlots(); // Still call to verify availability and set hidden values
         }
     }
 
@@ -341,32 +400,69 @@
         const tarikh = document.getElementById('tarikh_tempah').value;
         const slotSelect = document.getElementById('slot_select');
 
-        if (!idFasiliti || tempoh === 'specific') return;
-        if (!tarikh) {
-            slotSelect.innerHTML = '<option value="">Sila pilih tarikh dahulu...</option>';
+        console.log('DEBUG loadSlots:', {idFasiliti, tempoh, tarikh});
+
+        if (!idFasiliti || !tarikh) {
+            console.log('Aborting loadSlots: missing id or date');
             return;
         }
 
-        slotSelect.innerHTML = '<option value="">Memuatkan slot...</option>';
+        const url = '<%= contextPath %>/fasiliti/getSlots?idFasiliti=' + encodeURIComponent(idFasiliti) + '&durasi=' + encodeURIComponent(tempoh) + '&tarikh=' + encodeURIComponent(tarikh);
+        console.log('Fetching slots from:', url);
 
-        fetch(`<%= contextPath %>/fasiliti/getSlots?idFasiliti=${idFasiliti}&durasi=${tempoh}&tarikh=${tarikh}`)
-            .then(response => response.json())
+        fetch(url)
+            .then(async response => {
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error('Server error response:', errorText);
+                    try {
+                        const errorJson = JSON.parse(errorText);
+                        throw new Error(errorJson.error || ('HTTP ' + response.status + ': ' + response.statusText));
+                    } catch(e) {
+                        throw new Error(errorText || ('HTTP ' + response.status + ': ' + response.statusText));
+                    }
+                }
+                return response.json();
+            })
             .then(data => {
-                slotSelect.innerHTML = '<option value="">Pilih Slot Masa</option>';
-                if (data.length === 0) {
-                    slotSelect.innerHTML = '<option value="">Tiada slot tersedia untuk tarikh ini</option>';
-                } else {
-                    data.forEach(slot => {
-                        const option = document.createElement('option');
-                        option.value = JSON.stringify({mula: slot.mula, tamat: slot.tamat});
-                        option.textContent = `${slot.mula.substring(0,5)} - ${slot.tamat.substring(0,5)}`;
-                        slotSelect.appendChild(option);
-                    });
+                console.log('Slots received:', data);
+                if (tempoh === '2') {
+                    slotSelect.innerHTML = '<option value="">Pilih Slot Masa</option>';
+                    if (data.length === 0) {
+                        slotSelect.innerHTML = '<option value="">Tiada slot tersedia untuk tarikh ini</option>';
+                    } else {
+                        data.forEach(slot => {
+                            const option = document.createElement('option');
+                            option.value = JSON.stringify({mula: slot.mula, tamat: slot.tamat});
+                            
+                            let text = slot.mula.substring(0,5) + ' - ' + slot.tamat.substring(0,5);
+                            if (slot.isPast) {
+                                option.disabled = true;
+                                text += ' (Tamat)';
+                                option.style.color = '#9CA3AF'; // Gray text
+                            }
+                            
+                            option.textContent = text;
+                            slotSelect.appendChild(option);
+                        });
+                    }
+                } else if (tempoh === 'HalfDay' || tempoh === 'FullDay') {
+                    if (data.length > 0) {
+                        // Slot available, set hidden fields automatically
+                        document.getElementById('masa_mula_hidden').value = data[0].mula;
+                        document.getElementById('masa_tamat_hidden').value = data[0].tamat;
+                    } else {
+                        alert("Fasiliti ini sudah ditempah untuk tempoh tersebut pada tarikh yang dipilih.");
+                        // Reset selection
+                        document.getElementById('tarikh_tempah').value = "";
+                    }
                 }
             })
             .catch(err => {
-                console.error('Error fetching slots:', err);
-                slotSelect.innerHTML = '<option value="">Ralat memuatkan slot</option>';
+                console.error('Fetch error:', err);
+                if (tempoh === '2') {
+                    slotSelect.innerHTML = '<option value="">Ralat: ' + err.message + '</option>';
+                }
             });
     }
 
@@ -413,11 +509,49 @@
         document.getElementById('content-' + tabId).classList.remove('hidden');
     }
 
-    function openBookingModal(id, name) {
+    function openBookingModal(id, name, requiresApproval) {
+        console.log('Opening modal for id:', id);
         document.getElementById('modalIdFasiliti').value = id;
         document.getElementById('modalFasilitiName').innerText = "Tempahan untuk: " + name;
+        
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('tarikh_tempah').min = today;
+        
+        const tempohSelect = document.getElementById('tempoh_tempahan');
+        tempohSelect.innerHTML = '';
+        
+        if (requiresApproval) {
+            // Options for facilities that need approval (e.g. Hall)
+            const optHalf = document.createElement('option');
+            optHalf.value = 'HalfDay';
+            optHalf.textContent = 'Separuh Hari (08:00 - 14:00)';
+            
+            const optFull = document.createElement('option');
+            optFull.value = 'FullDay';
+            optFull.textContent = 'Seharian Penuh (08:00 - 22:00)';
+            
+            tempohSelect.appendChild(optHalf);
+            tempohSelect.appendChild(optFull);
+        } else {
+            // Options for auto-approval facilities (e.g. Futsal)
+            const opt2 = document.createElement('option');
+            opt2.value = '2';
+            opt2.textContent = 'Slot 2 Jam (8 pagi - 12 malam)';
+            
+            const optFull = document.createElement('option');
+            optFull.value = 'FullDay';
+            optFull.textContent = 'Seharian Penuh (08:00 - 22:00)';
+            
+            tempohSelect.appendChild(opt2);
+            tempohSelect.appendChild(optFull);
+        }
+
         document.getElementById('modalTempah').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
+        
+        // Trigger toggleDuration and loadSlots to refresh UI
+        toggleDuration();
     }
 
     var detailsMap, detailsMarker;
@@ -492,6 +626,33 @@
         document.getElementById('modalTempah').classList.add('hidden');
         document.body.style.overflow = 'auto';
     }
+
+    // Alert Handling
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const success = urlParams.get('success');
+        const error = urlParams.get('error');
+
+        if (success === 'booked') {
+            Swal.fire('Berjaya!', 'Tempahan anda telah direkodkan.', 'success');
+        } else if (success === 'pending_approval') {
+            Swal.fire('Permohonan Dihantar!', 'Fasiliti ini memerlukan kelulusan. Sila semak status tempahan anda secara berkala.', 'info');
+        } else if (success === 'cancelled') {
+            Swal.fire('Dibatalkan!', 'Tempahan telah dibatalkan.', 'success');
+        }
+
+        if (error === 'blackout') {
+            Swal.fire('Gagal!', 'Tarikh ini telah disekat untuk penyelenggaraan atau kegunaan khas.', 'error');
+        } else if (error === 'quota') {
+            Swal.fire('Had Maksimum!', 'Anda telah mencapai had maksimum 2 tempahan aktif untuk fasiliti ini.', 'warning');
+        } else if (error === 'conflict') {
+            Swal.fire('Konflik Masa!', 'Masa yang dipilih telah ditempah oleh orang lain.', 'error');
+        } else if (error === 'time') {
+            Swal.fire('Ralat Masa!', 'Masa tamat mestilah selepas masa mula.', 'error');
+        } else if (error === 'db') {
+            Swal.fire('Ralat!', 'Gagal memproses tempahan. Sila cuba lagi.', 'error');
+        }
+    });
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>

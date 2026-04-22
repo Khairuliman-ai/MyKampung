@@ -2,11 +2,16 @@ package controller;
 
 import dao.FasilitiDAO;
 import dao.FasilitiSlotDAO;
+import dao.FasilitiSekatanDAO;
 import dao.TempahanFasilitiDAO;
 import model.Fasiliti;
 import model.FasilitiSlot;
 import model.Pengguna;
 import model.TempahanFasiliti;
+import model.ActivityLog;
+import dao.ActivityLogDAO;
+import util.DBUtil;
+import java.sql.Connection;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -14,6 +19,8 @@ import java.sql.Date;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
+import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -26,6 +33,7 @@ public class FasilitiServlet extends HttpServlet {
     private FasilitiDAO fasilitiDAO = new FasilitiDAO();
     private TempahanFasilitiDAO tempahanDAO = new TempahanFasilitiDAO();
     private FasilitiSlotDAO slotDAO = new FasilitiSlotDAO();
+    private FasilitiSekatanDAO sekatanDAO = new FasilitiSekatanDAO();
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -42,6 +50,9 @@ public class FasilitiServlet extends HttpServlet {
         String action = request.getPathInfo();
         if (action == null || action.equals("/")) {
             action = "/list";
+        } else {
+            // Trim trailing slashes and normalize
+            action = action.replaceAll("/$", "");
         }
 
         try {
@@ -125,8 +136,18 @@ public class FasilitiServlet extends HttpServlet {
         List<Fasiliti> senaraiFasiliti = fasilitiDAO.dapatkanSemuaFasiliti();
         List<TempahanFasiliti> senaraiTempahan = tempahanDAO.dapatkanSejarahTempahanPenduduk(user.getId_pengguna());
         
+        // Fetch activity logs for aside bar
+        List<ActivityLog> logs = new ArrayList<>();
+        try (Connection conn = DBUtil.getConnection()) {
+            ActivityLogDAO logDAO = new ActivityLogDAO(conn);
+            logs = logDAO.getLogsByResidentId(user.getId_pengguna());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        
         request.setAttribute("senaraiFasiliti", senaraiFasiliti);
         request.setAttribute("senaraiTempahan", senaraiTempahan);
+        request.setAttribute("activityLogs", logs);
         request.getRequestDispatcher("/views/fasiliti/tempahanPenduduk.jsp").forward(request, response);
     }
 
@@ -144,10 +165,22 @@ public class FasilitiServlet extends HttpServlet {
     private void handleTempah(HttpServletRequest request, HttpServletResponse response, Pengguna user)
             throws IOException {
         int idFasiliti = Integer.parseInt(request.getParameter("id_fasiliti"));
-        Date tarikh = Date.valueOf(request.getParameter("tarikh_tempah"));
+        java.sql.Date tarikh = java.sql.Date.valueOf(request.getParameter("tarikh_tempah"));
         Time mula = Time.valueOf(request.getParameter("masa_mula") + ":00");
         Time tamat = Time.valueOf(request.getParameter("masa_tamat") + ":00");
         String catatanPemohon = request.getParameter("catatan_pemohon");
+
+        // 1. Check Blackout Dates
+        if (sekatanDAO.checkKetersediaanTarikh(idFasiliti, tarikh)) {
+            response.sendRedirect(request.getContextPath() + "/fasiliti/list?error=blackout");
+            return;
+        }
+
+        // 2. Check User Quota (Max 2 active bookings per facility)
+        if (tempahanDAO.checkUserQuotaActive(user.getId_pengguna(), idFasiliti) >= 2) {
+            response.sendRedirect(request.getContextPath() + "/fasiliti/list?error=quota");
+            return;
+        }
 
         if (mula.after(tamat) || mula.equals(tamat)) {
             response.sendRedirect(request.getContextPath() + "/fasiliti/list?error=time");
@@ -167,8 +200,17 @@ public class FasilitiServlet extends HttpServlet {
         t.setMasa_tamat(tamat);
         t.setCatatan_pemohon(catatanPemohon);
         
+        // 3. Determine Initial Status
+        Fasiliti f = fasilitiDAO.dapatkanFasilitiById(idFasiliti);
+        if (f.isRequiresApproval()) {
+            t.setStatus("MENUNGGU");
+        } else {
+            t.setStatus("LULUS");
+        }
+        
         if (tempahanDAO.simpanTempahanBaru(t)) {
-            response.sendRedirect(request.getContextPath() + "/fasiliti/list?success=booked");
+            String msg = t.getStatus().equals("LULUS") ? "booked" : "pending_approval";
+            response.sendRedirect(request.getContextPath() + "/fasiliti/list?success=" + msg);
         } else {
             response.sendRedirect(request.getContextPath() + "/fasiliti/list?error=db");
         }
@@ -195,6 +237,9 @@ public class FasilitiServlet extends HttpServlet {
         if (latStr != null && !latStr.isEmpty()) f.setLatitude(Double.parseDouble(latStr));
         if (lonStr != null && !lonStr.isEmpty()) f.setLongitude(Double.parseDouble(lonStr));
         
+        String reqApp = request.getParameter("requires_approval");
+        f.setRequiresApproval("1".equals(reqApp));
+        
         if (fasilitiDAO.tambahFasiliti(f)) {
             response.sendRedirect(request.getContextPath() + "/fasiliti/urus?success=added");
         } else {
@@ -214,6 +259,9 @@ public class FasilitiServlet extends HttpServlet {
         String lonStr_ = request.getParameter("longitude");
         if (latStr_ != null && !latStr_.isEmpty()) f.setLatitude(Double.parseDouble(latStr_));
         if (lonStr_ != null && !lonStr_.isEmpty()) f.setLongitude(Double.parseDouble(lonStr_));
+        
+        String reqAppEdit = request.getParameter("requires_approval");
+        f.setRequiresApproval("1".equals(reqAppEdit));
         
         if (fasilitiDAO.kemaskiniFasiliti(f)) {
             response.sendRedirect(request.getContextPath() + "/fasiliti/urus?success=updated");
@@ -235,9 +283,9 @@ public class FasilitiServlet extends HttpServlet {
     private void handleStatusTempahan(HttpServletRequest request, HttpServletResponse response, String status)
             throws IOException {
         int id = Integer.parseInt(request.getParameter("idTempahan"));
-        String catatan = request.getParameter("catatan");
+        String catatan = request.getParameter("catatan"); // This will be the reason for rejection
         
-        if (tempahanDAO.kemaskiniStatus(id, status, catatan)) {
+        if (tempahanDAO.updateStatusTempahan(id, status, catatan)) {
             response.sendRedirect(request.getContextPath() + "/fasiliti/urus?success=status_updated");
         } else {
             response.sendRedirect(request.getContextPath() + "/fasiliti/urus?error=status_failed");
@@ -250,44 +298,114 @@ public class FasilitiServlet extends HttpServlet {
     }
 
     private void handleGetSlots(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        int idFasiliti = Integer.parseInt(request.getParameter("idFasiliti"));
-        int durasi = Integer.parseInt(request.getParameter("durasi"));
+        String idFasilitiStr = request.getParameter("idFasiliti");
+        String durasiStr = request.getParameter("durasi");
         String tarikhStr = request.getParameter("tarikh");
         
-        if (tarikhStr == null || tarikhStr.isEmpty()) {
+        System.out.println("DEBUG: getSlots called with id=" + idFasilitiStr + ", durasi=" + durasiStr + ", tarikh=" + tarikhStr);
+
+        if (idFasilitiStr == null || durasiStr == null || tarikhStr == null || tarikhStr.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            System.out.println("DEBUG: Missing parameters");
             return;
         }
-        
-        Date tarikh = Date.valueOf(tarikhStr);
-        List<FasilitiSlot> slots = new ArrayList<>();
-        
-        // Generate Virtual Slots (08:00 to 22:00)
-        int startHour = 8;
-        int endHour = 22;
-        
-        for (int h = startHour; h <= endHour - durasi; h += durasi) {
-            Time mula = Time.valueOf(String.format("%02d:00:00", h));
-            Time tamat = Time.valueOf(String.format("%02d:00:00", h + durasi));
+
+        try {
+            int idFasiliti = Integer.parseInt(idFasilitiStr);
+            int durasi = Integer.parseInt(durasiStr);
             
-            // Semak jika slot ini bertindih dengan tempahan sedia ada yang LULUS atau MENUNGGU
-            if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, mula, tamat)) {
-                FasilitiSlot s = new FasilitiSlot();
-                s.setMasa_mula(mula);
-                s.setMasa_tamat(tamat);
-                slots.add(s);
+            java.sql.Date tarikh;
+            try {
+                tarikh = java.sql.Date.valueOf(tarikhStr);
+            } catch (Exception e) {
+                try {
+                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                    java.util.Date parsedDate = sdf.parse(tarikhStr);
+                    tarikh = new java.sql.Date(parsedDate.getTime());
+                } catch (ParseException e2) {
+                    throw new Exception("Format tarikh tidak sah: " + tarikhStr);
+                }
+            }
+            System.out.println("DEBUG: Parsed date: " + tarikh);
+
+            List<FasilitiSlot> slots = new ArrayList<>();
+            
+            if ("2".equals(durasiStr)) {
+                // Slot 2 Jam: 08:00 - 00:00 (Every 2 hours)
+                int[][] windows = {
+                    {8, 10}, {10, 12}, {12, 14}, {14, 16}, 
+                    {16, 18}, {18, 20}, {20, 22}, {22, 24}
+                };
+                for (int[] win : windows) {
+                    String startStr = String.format("%02d:00:00", win[0]);
+                    String endStr = win[1] == 24 ? "23:59:59" : String.format("%02d:00:00", win[1]);
+                    
+                    Time mula = Time.valueOf(startStr);
+                    Time tamat = Time.valueOf(endStr);
+                    if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, mula, tamat)) {
+                        FasilitiSlot s = new FasilitiSlot();
+                        s.setMasa_mula(mula);
+                        s.setMasa_tamat(tamat);
+                        slots.add(s);
+                    }
+                }
+            } else if ("HalfDay".equals(durasiStr)) {
+                Time mula = Time.valueOf("08:00:00");
+                Time tamat = Time.valueOf("14:00:00");
+                if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, mula, tamat)) {
+                    FasilitiSlot s = new FasilitiSlot();
+                    s.setMasa_mula(mula);
+                    s.setMasa_tamat(tamat);
+                    slots.add(s);
+                }
+            } else if ("FullDay".equals(durasiStr)) {
+                Time mula = Time.valueOf("08:00:00");
+                Time tamat = Time.valueOf("22:00:00");
+                if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, mula, tamat)) {
+                    FasilitiSlot s = new FasilitiSlot();
+                    s.setMasa_mula(mula);
+                    s.setMasa_tamat(tamat);
+                    slots.add(s);
+                }
+            }
+            
+            System.out.println("DEBUG: Found " + slots.size() + " available slots");
+
+            long nowMillis = System.currentTimeMillis();
+            java.time.LocalDate todayLD = java.time.LocalDate.now(java.time.ZoneId.of("Asia/Kuala_Lumpur"));
+            java.time.LocalTime nowLT = java.time.LocalTime.now(java.time.ZoneId.of("Asia/Kuala_Lumpur"));
+            java.time.LocalDate requestedLD = tarikh.toLocalDate();
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter out = response.getWriter();
+            out.print("[");
+            for (int i = 0; i < slots.size(); i++) {
+                FasilitiSlot s = slots.get(i);
+                java.time.LocalTime slotMulaLT = s.getMasa_mula().toLocalTime();
+                
+                boolean isPast = requestedLD.equals(todayLD) && slotMulaLT.isBefore(nowLT);
+                
+                out.print("{");
+                out.print("\"mula\":\"" + s.getMasa_mula() + "\",");
+                out.print("\"tamat\":\"" + s.getMasa_tamat() + "\",");
+                out.print("\"isPast\":" + isPast);
+                out.print("}");
+                
+                if (i < slots.size() - 1) out.print(",");
+            }
+            out.print("]");
+            out.flush();
+        } catch (Exception e) {
+            System.out.println("DEBUG ERROR in handleGetSlots: " + e.toString());
+            e.printStackTrace();
+            if (!response.isCommitted()) {
+                response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                response.setContentType("application/json");
+                String msg = (e.getMessage() != null) ? e.getMessage() : e.toString();
+                response.getWriter().write("{\"error\":\"" + msg.replace("\"", "\\\"") + "\"}");
             }
         }
-        
-        response.setContentType("application/json");
-        PrintWriter out = response.getWriter();
-        out.print("[");
-        for (int i = 0; i < slots.size(); i++) {
-            FasilitiSlot s = slots.get(i);
-            out.print("{\"mula\":\"" + s.getMasa_mula() + "\",\"tamat\":\"" + s.getMasa_tamat() + "\"}");
-            if (i < slots.size() - 1) out.print(",");
-        }
-        out.print("]");
     }
 
 }

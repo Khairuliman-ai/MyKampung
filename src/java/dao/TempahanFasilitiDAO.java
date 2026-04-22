@@ -65,6 +65,7 @@ public class TempahanFasilitiDAO {
                     t.setCatatan_pemohon(rs.getString("catatan_pemohon"));
                     t.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
                     t.setNama_fasiliti(rs.getString("nama_fasiliti"));
+                    t.setAlasanPenolakan(rs.getString("alasan_penolakan"));
                     senarai.add(t);
                 }
             }
@@ -98,6 +99,7 @@ public class TempahanFasilitiDAO {
                 t.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
                 t.setNama_fasiliti(rs.getString("nama_fasiliti"));
                 t.setNama_pengguna(rs.getString("nama_penuh"));
+                t.setAlasanPenolakan(rs.getString("alasan_penolakan"));
                 senarai.add(t);
             }
         } catch (SQLException e) {
@@ -130,6 +132,7 @@ public class TempahanFasilitiDAO {
                     t.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
                     t.setNama_fasiliti(rs.getString("nama_fasiliti"));
                     t.setNama_pengguna(rs.getString("nama_penuh"));
+                    t.setAlasanPenolakan(rs.getString("alasan_penolakan"));
                 }
             }
         } catch (SQLException e) {
@@ -203,5 +206,37 @@ public class TempahanFasilitiDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public int checkUserQuotaActive(int idPengguna, int idFasiliti) {
+        String sql = "SELECT COUNT(*) FROM tempahan_fasiliti " +
+                     "WHERE id_pengguna = ? AND id_fasiliti = ? " +
+                     "AND status IN ('MENUNGGU', 'LULUS') " +
+                     "AND (tarikh_tempah > CURRENT_DATE OR (tarikh_tempah = CURRENT_DATE AND masa_tamat > CURRENT_TIME))";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idPengguna);
+            ps.setInt(2, idFasiliti);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    public boolean updateStatusTempahan(int id, String status, String alasan) {
+        String sql = "UPDATE tempahan_fasiliti SET status=?, alasan_penolakan=?, dikemaskini_pada=NOW() WHERE id_tempahan=?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            ps.setString(2, alasan);
+            ps.setInt(3, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

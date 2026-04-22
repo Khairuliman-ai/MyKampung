@@ -13,11 +13,19 @@ public class Fasiliti {
     private Timestamp dikemaskini_pada;
     private Timestamp dipadam_pada;
     private boolean occupied;
+    private boolean requiresApproval;
 
     // --- Constructor Kosong ---
     public Fasiliti() {}
 
     // --- Getters and Setters ---
+    public boolean isRequiresApproval() {
+        return requiresApproval;
+    }
+
+    public void setRequiresApproval(boolean requiresApproval) {
+        this.requiresApproval = requiresApproval;
+    }
     public boolean isOccupied() {
         return occupied;
     }

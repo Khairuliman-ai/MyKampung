@@ -18,7 +18,8 @@ public class FasilitiDAO {
                      " WHERE t.id_fasiliti = f.id_fasiliti " +
                      " AND t.tarikh_tempah = CURRENT_DATE() " +
                      " AND t.status = 'LULUS' " +
-                     " AND CURRENT_TIME() BETWEEN t.masa_mula AND t.masa_tamat) as occupancy_count " +
+                     " AND CURRENT_TIME() BETWEEN t.masa_mula AND t.masa_tamat) as occupancy_count, " +
+                     "f.requires_approval " +
                      "FROM fasiliti f WHERE f.status = 'AKTIF'";
 
         try (Connection conn = DBUtil.getConnection();
@@ -41,6 +42,7 @@ public class FasilitiDAO {
                 f.setLongitude(rs.wasNull() ? null : lon);
 
                 f.setOccupied(rs.getInt("occupancy_count") > 0);
+                f.setRequiresApproval(rs.getBoolean("requires_approval"));
                 senarai.add(f);
             }
         } catch (SQLException e) {
@@ -72,6 +74,7 @@ public class FasilitiDAO {
                     f.setLatitude(rs.wasNull() ? null : lat);
                     double lon = rs.getDouble("longitude");
                     f.setLongitude(rs.wasNull() ? null : lon);
+                    f.setRequiresApproval(rs.getBoolean("requires_approval"));
                 }
             }
         } catch (SQLException e) {
@@ -81,13 +84,14 @@ public class FasilitiDAO {
     }
 
     public boolean tambahFasiliti(Fasiliti f) {
-        String sql = "INSERT INTO fasiliti (nama_fasiliti, lokasi, status, latitude, longitude) VALUES (?, ?, 'AKTIF', ?, ?)";
+        String sql = "INSERT INTO fasiliti (nama_fasiliti, lokasi, status, latitude, longitude, requires_approval) VALUES (?, ?, 'AKTIF', ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, f.getNama_fasiliti());
             ps.setString(2, f.getLokasi());
             if (f.getLatitude() != null) ps.setDouble(3, f.getLatitude()); else ps.setNull(3, java.sql.Types.DECIMAL);
             if (f.getLongitude() != null) ps.setDouble(4, f.getLongitude()); else ps.setNull(4, java.sql.Types.DECIMAL);
+            ps.setBoolean(5, f.isRequiresApproval());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Ralat pada FasilitiDAO (tambah): " + e.getMessage());
@@ -96,7 +100,7 @@ public class FasilitiDAO {
     }
 
     public boolean kemaskiniFasiliti(Fasiliti f) {
-        String sql = "UPDATE fasiliti SET nama_fasiliti=?, lokasi=?, status=?, latitude=?, longitude=?, dikemaskini_pada=NOW() WHERE id_fasiliti=?";
+        String sql = "UPDATE fasiliti SET nama_fasiliti=?, lokasi=?, status=?, latitude=?, longitude=?, requires_approval=?, dikemaskini_pada=NOW() WHERE id_fasiliti=?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, f.getNama_fasiliti());
@@ -104,7 +108,8 @@ public class FasilitiDAO {
             ps.setString(3, f.getStatus());
             if (f.getLatitude() != null) ps.setDouble(4, f.getLatitude()); else ps.setNull(4, java.sql.Types.DECIMAL);
             if (f.getLongitude() != null) ps.setDouble(5, f.getLongitude()); else ps.setNull(5, java.sql.Types.DECIMAL);
-            ps.setInt(6, f.getId_fasiliti());
+            ps.setBoolean(6, f.isRequiresApproval());
+            ps.setInt(7, f.getId_fasiliti());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Ralat pada FasilitiDAO (kemaskini): " + e.getMessage());
@@ -131,7 +136,8 @@ public class FasilitiDAO {
                      " WHERE t.id_fasiliti = f.id_fasiliti " +
                      " AND t.tarikh_tempah = CURRENT_DATE() " +
                      " AND t.status = 'LULUS' " +
-                     " AND CURRENT_TIME() BETWEEN t.masa_mula AND t.masa_tamat) as occupancy_count " +
+                     " AND CURRENT_TIME() BETWEEN t.masa_mula AND t.masa_tamat) as occupancy_count, " +
+                     "f.requires_approval " +
                      "FROM fasiliti f ORDER BY f.status DESC, f.nama_fasiliti";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -151,6 +157,7 @@ public class FasilitiDAO {
                 double lon_ = rs.getDouble("longitude");
                 f.setLongitude(rs.wasNull() ? null : lon_);
                 f.setOccupied(rs.getInt("occupancy_count") > 0);
+                f.setRequiresApproval(rs.getBoolean("requires_approval"));
                 senarai.add(f);
             }
         } catch (SQLException e) {

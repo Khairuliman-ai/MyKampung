@@ -14,6 +14,7 @@ public class TempahanFasiliti {
     private String status;
     private String catatan_pemohon;
     private String catatan_pentadbir;
+    private String alasanPenolakan;
     private Timestamp dibuat_pada;
     private Timestamp dikemaskini_pada;
     private Timestamp dipadam_pada;
@@ -52,6 +53,9 @@ public class TempahanFasiliti {
 
     public String getCatatan_pentadbir() { return catatan_pentadbir; }
     public void setCatatan_pentadbir(String catatan_pentadbir) { this.catatan_pentadbir = catatan_pentadbir; }
+
+    public String getAlasanPenolakan() { return alasanPenolakan; }
+    public void setAlasanPenolakan(String alasanPenolakan) { this.alasanPenolakan = alasanPenolakan; }
 
     public Timestamp getDibuat_pada() { return dibuat_pada; }
     public void setDibuat_pada(Timestamp dibuat_pada) { this.dibuat_pada = dibuat_pada; }

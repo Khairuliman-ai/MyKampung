@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 21, 2026 at 02:08 PM
+-- Generation Time: Apr 22, 2026 at 01:32 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -131,25 +131,39 @@ CREATE TABLE `fasiliti` (
   `dikemaskini_pada` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `dipadam_pada` timestamp NULL DEFAULT NULL,
   `latitude` decimal(10,8) DEFAULT NULL,
-  `longitude` decimal(11,8) DEFAULT NULL
+  `longitude` decimal(11,8) DEFAULT NULL,
+  `requires_approval` tinyint(1) DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `fasiliti`
 --
 
-INSERT INTO `fasiliti` (`id_fasiliti`, `nama_fasiliti`, `lokasi`, `status`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`, `latitude`, `longitude`) VALUES
-(1, 'Dewan Orang Ramai', 'Pusat Kampung', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000),
-(2, 'Padang Bola Sepak', 'Jalan Bunga Raya', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000),
-(3, 'Gelanggang Futsal', 'Taman Belia', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000),
-(4, 'Balai Raya', 'Jalan Masjid', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000),
-(5, 'Surau Al-Taqwa', 'Jalan Kenanga', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000),
-(6, 'Bilik Mesyuarat JKKK', 'Kompleks Penghulu', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000),
-(7, 'Gelanggang Sepak Takraw', 'Jalan Mawar', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000),
-(8, 'Pusat Internet Desa', 'Sebelah Balai Raya', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000),
-(9, 'Taman Permainan Kanak-kanak', 'Jalan Dahlia', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000),
-(10, 'Tapak Pasar Malam', 'Dataran Kampung', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000),
-(11, 'Dewan Test1', 'Jalan 30', 'AKTIF', '2026-04-20 02:30:40', '2026-04-20 02:30:40', NULL, 6.02890000, 102.29350000);
+INSERT INTO `fasiliti` (`id_fasiliti`, `nama_fasiliti`, `lokasi`, `status`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`, `latitude`, `longitude`, `requires_approval`) VALUES
+(1, 'Dewan Orang Ramai', 'Pusat Kampung', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000, 0),
+(2, 'Padang Bola Sepak', 'Jalan Bunga Raya', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000, 0),
+(3, 'Gelanggang Futsal', 'Taman Belia', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000, 0),
+(4, 'Balai Raya', 'Jalan Masjid', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000, 0),
+(5, 'Surau Al-Taqwa', 'Jalan Kenanga', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000, 0),
+(6, 'Bilik Mesyuarat JKKK', 'Kompleks Penghulu', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000, 0),
+(7, 'Gelanggang Sepak Takraw', 'Jalan Mawar', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000, 0),
+(8, 'Pusat Internet Desa', 'Sebelah Balai Raya', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000, 0),
+(9, 'Taman Permainan Kanak-kanak', 'Jalan Dahlia', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000, 0),
+(10, 'Tapak Pasar Malam', 'Dataran Kampung', 'AKTIF', '2026-03-13 19:52:27', '2026-04-21 12:06:53', NULL, 6.02890000, 102.29350000, 0),
+(11, 'Dewan Test1', 'Jalan 30', 'AKTIF', '2026-04-20 02:30:40', '2026-04-20 02:30:40', NULL, 6.02890000, 102.29350000, 0);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `fasiliti_sekatan`
+--
+
+CREATE TABLE `fasiliti_sekatan` (
+  `id_Sekatan` int(11) NOT NULL,
+  `id_fasiliti` int(11) DEFAULT NULL,
+  `tarikh` date DEFAULT NULL,
+  `sebab` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -456,27 +470,28 @@ CREATE TABLE `tempahan_fasiliti` (
   `catatan_pentadbir` varchar(150) DEFAULT NULL,
   `dibuat_pada` timestamp NOT NULL DEFAULT current_timestamp(),
   `dikemaskini_pada` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
-  `dipadam_pada` timestamp NULL DEFAULT NULL
+  `dipadam_pada` timestamp NULL DEFAULT NULL,
+  `alasan_penolakan` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `tempahan_fasiliti`
 --
 
-INSERT INTO `tempahan_fasiliti` (`id_tempahan`, `id_fasiliti`, `id_pengguna`, `tarikh_tempah`, `masa_mula`, `masa_tamat`, `status`, `catatan_pemohon`, `catatan_pentadbir`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`) VALUES
-(1, 1, 2, '2023-12-01', '08:00:00', '17:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(2, 3, 6, '2023-12-02', '20:00:00', '22:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(3, 2, 4, '2023-12-05', '15:00:00', '18:00:00', 'MENUNGGU', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(4, 4, 1, '2023-12-10', '09:00:00', '13:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(5, 5, 8, '2023-12-12', '18:00:00', '21:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(6, 7, 3, '2023-12-15', '17:00:00', '19:00:00', 'MENUNGGU', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(7, 1, 7, '2023-12-20', '10:00:00', '16:00:00', 'TOLAK', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(8, 6, 9, '2023-12-22', '20:00:00', '23:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(9, 10, 10, '2023-12-25', '15:00:00', '23:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(10, 8, 5, '2023-12-30', '09:00:00', '12:00:00', 'MENUNGGU', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(11, 3, 2, '2026-04-14', '08:17:00', '11:17:00', 'DIBATAL', NULL, NULL, '2026-04-14 00:18:05', '2026-04-18 07:08:07', NULL),
-(12, 2, 4, '2026-04-18', '00:00:00', '14:19:00', 'LULUS', NULL, NULL, '2026-04-18 03:20:03', '2026-04-18 04:54:45', NULL),
-(13, 6, 2, '2026-04-18', '14:44:00', '14:47:00', 'MENUNGGU', NULL, NULL, '2026-04-18 06:43:22', '2026-04-18 06:43:22', NULL);
+INSERT INTO `tempahan_fasiliti` (`id_tempahan`, `id_fasiliti`, `id_pengguna`, `tarikh_tempah`, `masa_mula`, `masa_tamat`, `status`, `catatan_pemohon`, `catatan_pentadbir`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`, `alasan_penolakan`) VALUES
+(1, 1, 2, '2023-12-01', '08:00:00', '17:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL),
+(2, 3, 6, '2023-12-02', '20:00:00', '22:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL),
+(3, 2, 4, '2023-12-05', '15:00:00', '18:00:00', 'MENUNGGU', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL),
+(4, 4, 1, '2023-12-10', '09:00:00', '13:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL),
+(5, 5, 8, '2023-12-12', '18:00:00', '21:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL),
+(6, 7, 3, '2023-12-15', '17:00:00', '19:00:00', 'MENUNGGU', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL),
+(7, 1, 7, '2023-12-20', '10:00:00', '16:00:00', 'TOLAK', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL),
+(8, 6, 9, '2023-12-22', '20:00:00', '23:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL),
+(9, 10, 10, '2023-12-25', '15:00:00', '23:00:00', 'LULUS', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL),
+(10, 8, 5, '2023-12-30', '09:00:00', '12:00:00', 'MENUNGGU', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL, NULL),
+(11, 3, 2, '2026-04-14', '08:17:00', '11:17:00', 'DIBATAL', NULL, NULL, '2026-04-14 00:18:05', '2026-04-18 07:08:07', NULL, NULL),
+(12, 2, 4, '2026-04-18', '00:00:00', '14:19:00', 'LULUS', NULL, NULL, '2026-04-18 03:20:03', '2026-04-18 04:54:45', NULL, NULL),
+(13, 6, 2, '2026-04-18', '14:44:00', '14:47:00', 'MENUNGGU', NULL, NULL, '2026-04-18 06:43:22', '2026-04-18 06:43:22', NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -508,6 +523,12 @@ ALTER TABLE `bantuan`
 --
 ALTER TABLE `fasiliti`
   ADD PRIMARY KEY (`id_fasiliti`);
+
+--
+-- Indexes for table `fasiliti_sekatan`
+--
+ALTER TABLE `fasiliti_sekatan`
+  ADD PRIMARY KEY (`id_Sekatan`);
 
 --
 -- Indexes for table `fasiliti_slot`
@@ -602,6 +623,12 @@ ALTER TABLE `fasiliti`
   MODIFY `id_fasiliti` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
 
 --
+-- AUTO_INCREMENT for table `fasiliti_sekatan`
+--
+ALTER TABLE `fasiliti_sekatan`
+  MODIFY `id_Sekatan` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `fasiliti_slot`
 --
 ALTER TABLE `fasiliti_slot`
@@ -672,6 +699,12 @@ ALTER TABLE `aduan`
 ALTER TABLE `ajk_jawatan`
   ADD CONSTRAINT `ajk_jawatan_ibfk_1` FOREIGN KEY (`id_pengguna`) REFERENCES `pengguna` (`id_pengguna`) ON DELETE CASCADE,
   ADD CONSTRAINT `ajk_jawatan_ibfk_2` FOREIGN KEY (`id_jawatan`) REFERENCES `jawatan_ajk` (`id_jawatan`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `fasiliti_sekatan`
+--
+ALTER TABLE `fasiliti_sekatan`
+  ADD CONSTRAINT `fasiliti_sekatan_ibfk_1` FOREIGN KEY (`id_Sekatan`) REFERENCES `fasiliti` (`id_fasiliti`);
 
 --
 -- Constraints for table `fasiliti_slot`
