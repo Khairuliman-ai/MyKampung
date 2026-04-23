@@ -41,7 +41,7 @@
         <% } else if (request.getParameter("status").equals("dropSuccess")) { %>
             <div class="bg-orange-50 border-l-4 border-orange-500 text-orange-700 p-4 mb-6 rounded-r-xl shadow-sm flex items-center gap-3">
                 <i class="fas fa-user-minus"></i>
-                <p class="text-sm font-bold">Jawatan telah digugurkan.</p>
+                <p class="text-sm font-bold">Tindakan telah dibuat.</p>
             </div>
         <% } else if (request.getParameter("status").equals("error")) { %>
             <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded-r-xl shadow-sm flex items-center gap-3">
@@ -72,6 +72,7 @@
                         <tr class="bg-purple-50 border-b border-purple-100">
                             <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider w-16">No.</th>
                             <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Nama Penuh</th>
+                            <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Jawatan</th>
                             <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">No. Kad Pengenalan</th>
                             <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">No. Telefon</th>
                             <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider text-center">Tindakan</th>
@@ -91,6 +92,11 @@
                                     <%= (p.getNama_penuh() != null) ? p.getNama_penuh().substring(0,1).toUpperCase() : "U" %>
                                 </div>
                                 <%= p.getNama_penuh() %>
+                            </td>
+                            <td class="p-4">
+                                <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-[10px] font-bold uppercase border border-blue-100">
+                                    <%= (p.getNama_jawatan() != null) ? p.getNama_jawatan() : "Tiada Jawatan" %>
+                                </span>
                             </td>
                             <td class="p-4 text-sm text-gray-600 font-mono"><%= p.getNombor_kp() %></td>
                             <td class="p-4 text-sm text-gray-500"><%= p.getNombor_telefon() %></td>
@@ -116,7 +122,7 @@
                                             class="bg-purple-50 text-[#6C5DD3] hover:bg-[#6C5DD3] hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition">
                                         <i class="fas fa-edit"></i> Edit
                                     </button>
-                                    <form action="<%= request.getContextPath() %>/ketua/gugurkan" method="post" onsubmit="return confirm('Adakah anda pasti untuk menggugurkan jawatan ini?')">
+                                    <form action="<%= request.getContextPath() %>/ketua/gugurkan" method="post" onsubmit="return confirm('Adakah anda pasti untuk menggugurkan Jawatan Ahli AJK ini?')">
                                         <input type="hidden" name="idPengguna" value="<%= p.getId_pengguna() %>">
                                         <input type="hidden" name="idJawatan" value="<%= p.getId_jawatan() %>">
                                         <button type="submit" class="bg-red-50 text-red-500 hover:bg-red-500 hover:text-white px-3 py-1.5 rounded-lg text-xs font-bold transition" title="Gugurkan Jawatan">
@@ -126,7 +132,7 @@
                                 </div>
                             </td>
                         <% } } else { %>
-                        <tr><td colspan="5" class="p-8 text-center text-gray-400"><i class="fas fa-user-slash text-3xl mb-2 block opacity-50"></i>Tiada ahli AJK dilantik.</td></tr>
+                        <tr><td colspan="6" class="p-8 text-center text-gray-400"><i class="fas fa-user-slash text-3xl mb-2 block opacity-50"></i>Tiada ahli AJK dilantik.</td></tr>
                         <% } %>
                     </tbody>
                 </table>

@@ -19,11 +19,11 @@
     <%
         // Logic Pengasingan Data
         List<PermohonanBantuan> list = (List<PermohonanBantuan>) request.getAttribute("permohonanList");
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        SimpleDateFormat sdfFull = new SimpleDateFormat("yyyy-MM-dd");
         List<PermohonanBantuan> listPending = new ArrayList<>(); // Status 3 (Dari JKKK)
         List<PermohonanBantuan> listSejarah = new ArrayList<>(); // Status 1 (Lulus) atau 4 (Tolak)
         
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
-
         if(list != null) {
             for(PermohonanBantuan pb : list) {
                 if("MENUNGGU_KETUA".equalsIgnoreCase(pb.getStatus())) {
@@ -54,9 +54,30 @@
     <div id="content-pending" class="block">
         <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
             <div class="w-2 h-6 bg-orange-500 rounded-full"></div>
-            Senarai Permohonan Menunggu Tindakan
+            Senarai Permohonan
         </h3>
         
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Carian Pantas</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
+                        <input type="text" id="searchPending" onkeyup="filterData('pending')" placeholder="Nama pemohon, jenis bantuan..." 
+                               class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-orange-500 text-gray-800 text-sm transition-all">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Tarikh Mohon</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="far fa-calendar-alt"></i></span>
+                        <input type="date" id="datePending" onchange="filterData('pending')"
+                               class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-orange-500 text-gray-800 text-sm transition-all">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -71,25 +92,26 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        <% if(!listPending.isEmpty()) { 
+                         <% if(!listPending.isEmpty()) { 
                             for(PermohonanBantuan pb : listPending) {
                                 String displayDate = (pb.getDibuat_pada() != null) ? sdf.format(pb.getDibuat_pada()) : "-";
+                                String dateFilter = (pb.getDibuat_pada() != null) ? sdfFull.format(pb.getDibuat_pada()) : "";
                                 String namaBantuan = pb.getNama_bantuan();
                                 if(pb.getId_bantuan() == 6) namaBantuan = "Bantuan Am";
                                 else if(pb.getId_bantuan() == 20) namaBantuan = "Sumbangan IPT";
                                 else if(pb.getId_bantuan() == 999) namaBantuan = "Lain-lain";
                         %>
-                        <tr class="hover:bg-orange-50/30 transition-colors">
+                        <tr class="hover:bg-orange-50/30 transition-colors data-row-pending" data-date="<%= dateFilter %>">
                             <td class="p-4 text-sm font-medium text-gray-500 whitespace-nowrap"><%= displayDate %></td>
                             <td class="p-4">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 rounded-full bg-purple-100 text-[#6C5DD3] flex items-center justify-center font-bold text-xs">
                                         <%= (pb.getNama_penuh() != null) ? pb.getNama_penuh().substring(0,1) : "U" %>
                                     </div>
-                                    <span class="text-sm font-bold text-gray-800"><%= (pb.getNama_penuh() != null) ? pb.getNama_penuh() : "Unknown" %></span>
+                                    <span class="text-sm font-bold text-gray-800 search-col"><%= (pb.getNama_penuh() != null) ? pb.getNama_penuh() : "Unknown" %></span>
                                 </div>
                             </td>
-                            <td class="p-4 text-sm text-gray-600"><span class="bg-gray-100 px-2 py-1 rounded text-xs border border-gray-200"><%= namaBantuan %></span></td>
+                            <td class="p-4 text-sm text-gray-600"><span class="bg-gray-100 px-2 py-1 rounded text-xs border border-gray-200 search-col"><%= namaBantuan %></span></td>
                             <td class="p-4">
                                 <div class="flex items-start gap-2">
                                     <i class="fas fa-check-circle text-green-500 mt-0.5"></i>
@@ -129,9 +151,30 @@
 <div id="content-sejarah" class="hidden">
         <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
             <div class="w-2 h-6 bg-gray-400 rounded-full"></div>
-            Rekod Sejarah Keputusan
+            Rekod Sejarah Keputusan <span class="bg-gray-100 text-gray-400 text-xs px-2 py-1 rounded-lg ml-2 font-normal"><%= listSejarah.size() %></span>
         </h3>
         
+        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Carian Pantas</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
+                        <input type="text" id="searchHistory" onkeyup="filterData('history')" placeholder="Nama pemohon, jenis bantuan..." 
+                               class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-gray-400 text-gray-800 text-sm transition-all">
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Tarikh Keputusan</label>
+                    <div class="relative">
+                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="far fa-calendar-alt"></i></span>
+                        <input type="date" id="dateHistory" onchange="filterData('history')"
+                               class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-gray-400 text-gray-800 text-sm transition-all">
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -146,14 +189,15 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        <% if(!listSejarah.isEmpty()) { 
+                         <% if(!listSejarah.isEmpty()) { 
                             for(PermohonanBantuan pb : listSejarah) {
                                 String displayDate = (pb.getDibuat_pada() != null) ? sdf.format(pb.getDibuat_pada()) : "-";
+                                String dateFilter = (pb.getDibuat_pada() != null) ? sdfFull.format(pb.getDibuat_pada()) : "";
                         %>
-                        <tr class="text-gray-500">
+                        <tr class="text-gray-500 data-row-history" data-date="<%= dateFilter %>">
                             <td class="p-4 text-sm whitespace-nowrap"><%= displayDate %></td>
-                            <td class="p-4 text-sm font-bold text-gray-700"><%= pb.getNama_penuh() %></td>
-                            <td class="p-4 text-sm"><%= pb.getNama_bantuan() %></td>
+                            <td class="p-4 text-sm font-bold text-gray-700 search-col"><%= pb.getNama_penuh() %></td>
+                            <td class="p-4 text-sm search-col"><%= pb.getNama_bantuan() %></td>
                             <td class="p-4">
                                 <% if(pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
                                     <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" class="text-blue-500 hover:text-blue-700 text-xs font-bold underline">Lihat PDF</a>
@@ -259,7 +303,7 @@
                 </div>
                 <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 gap-2">
                     <button type="submit" id="btnSubmit" class="inline-flex w-full justify-center rounded-xl px-3 py-2 text-sm font-semibold text-white shadow-sm sm:ml-3 sm:w-auto transition">Sahkan</button>
-                    <button type="button" class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto" onclick="closeModal('modalKeputusan')">Batal</button>
+                    <button type="button" class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-5 sm:mt-0 sm:w-auto" onclick="closeModal('modalKeputusan')">Batal</button>
                 </div>
             </form>
         </div>
@@ -320,6 +364,30 @@
 
     function closeModal(modalId) {
         document.getElementById(modalId).classList.add('hidden');
+    }
+
+    // Filter Logic
+    function filterData(type) {
+        const searchInput = (type === 'pending') ? document.getElementById("searchPending") : document.getElementById("searchHistory");
+        const dateInput = (type === 'pending') ? document.getElementById("datePending") : document.getElementById("dateHistory");
+        const rows = document.querySelectorAll(type === 'pending' ? ".data-row-pending" : ".data-row-history");
+        
+        const searchVal = searchInput.value.toLowerCase();
+        const dateVal = dateInput.value;
+
+        rows.forEach(row => {
+            const rowDate = row.getAttribute("data-date");
+            let textContent = "";
+            row.querySelectorAll(".search-col").forEach(col => {
+                textContent += col.innerText.toLowerCase() + " ";
+            });
+
+            let showRow = true;
+            if (dateVal !== "" && rowDate !== dateVal) showRow = false;
+            if (searchVal !== "" && !textContent.includes(searchVal)) showRow = false;
+
+            row.style.display = showRow ? "" : "none";
+        });
     }
 </script>
 

@@ -27,6 +27,7 @@
     List<PermohonanBantuan> listSejarah = new ArrayList<>();
     
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+    SimpleDateFormat sdfFull = new SimpleDateFormat("yyyy-MM-dd");
 
     if (allList != null) {
         for (PermohonanBantuan pb : allList) {
@@ -73,9 +74,30 @@
                 Senarai Permohonan Baharu
             </h3>
 
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Carian Pantas</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
+                            <input type="text" id="searchBaru" onkeyup="filterData('baru')" placeholder="Nama pemohon, jenis bantuan, keterangan..." 
+                                   class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm transition-all">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Tarikh Mohon</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="far fa-calendar-alt"></i></span>
+                            <input type="date" id="dateBaru" onchange="filterData('baru')"
+                                   class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm transition-all">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+                <table class="w-full text-left border-collapse" id="tableBaru">
                     <thead>
                         <tr class="bg-purple-50 border-b border-purple-100">
                             <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">No. Rujukan</th>
@@ -92,8 +114,9 @@
                             for (PermohonanBantuan pb : listBaru) {
                                 String namaBantuanDisplay = (pb.getNama_bantuan() != null) ? pb.getNama_bantuan() : "Lain-lain (" + pb.getId_bantuan() + ")";
                                 String dateDisplay = (pb.getDibuat_pada() != null) ? sdf.format(pb.getDibuat_pada()) : "-";
+                                String dateFilter = (pb.getDibuat_pada() != null) ? sdfFull.format(pb.getDibuat_pada()) : "";
                         %>
-                        <tr class="hover:bg-purple-50/30 transition">
+                        <tr class="hover:bg-purple-50/30 transition data-row-baru" data-date="<%= dateFilter %>">
                              <td class="p-4 text-sm font-bold text-[#6C5DD3]">#<%= pb.getId_permohonan() %></td>
                             <td class="p-4 text-sm text-gray-600 font-medium"><%= dateDisplay %></td>
                             <td class="p-4">
@@ -102,17 +125,17 @@
                                         <%= (pb.getNama_penuh() != null) ? pb.getNama_penuh().substring(0,1) : "U" %>
                                     </div>
                                     <div class="flex flex-col">
-                                        <span class="text-sm font-bold text-gray-800"><%= (pb.getNama_penuh() != null) ? pb.getNama_penuh() : "TIADA NAMA" %></span>
+                                        <span class="text-sm font-bold text-gray-800 search-col"><%= (pb.getNama_penuh() != null) ? pb.getNama_penuh() : "TIADA NAMA" %></span>
                                         <span class="text-[10px] text-gray-400">Penduduk Sah</span>
                                     </div>
                                 </div>
                             </td>
                             <td class="p-4">
-                                <span class="bg-blue-50 text-blue-600 border border-blue-100 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider">
+                                <span class="bg-blue-50 text-blue-600 border border-blue-100 px-3 py-1 rounded-lg text-xs font-bold uppercase tracking-wider search-col">
                                     <%= namaBantuanDisplay %>
                                 </span>
                             </td>
-                            <td class="p-4 text-sm text-gray-500">
+                            <td class="p-4 text-sm text-gray-500 search-col">
                                 <%= (pb.getCatatan_pemohon() != null && !pb.getCatatan_pemohon().isEmpty()) ? pb.getCatatan_pemohon() : "-" %>
                             </td>
                             <td class="p-4">
@@ -160,6 +183,27 @@
                 Sejarah Tindakan <span class="bg-gray-100 text-gray-500 text-xs px-2 py-1 rounded-lg ml-2"><%= listSejarah.size() %></span>
             </h3>
 
+            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Carian Pantas</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
+                            <input type="text" id="searchSejarah" onkeyup="filterData('sejarah')" placeholder="Nama pemohon, jenis bantuan, ulasan..." 
+                                   class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm transition-all">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Tarikh Tindakan</label>
+                        <div class="relative">
+                            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="far fa-calendar-alt"></i></span>
+                            <input type="date" id="dateSejarah" onchange="filterData('sejarah')"
+                                   class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm transition-all">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -174,20 +218,21 @@
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
-                        <% if (!listSejarah.isEmpty()) { 
+                         <% if (!listSejarah.isEmpty()) { 
                             for (PermohonanBantuan pb : listSejarah) {
                                 String dateDisplay = (pb.getDibuat_pada() != null) ? sdf.format(pb.getDibuat_pada()) : "-";
+                                String dateFilter = (pb.getDibuat_pada() != null) ? sdfFull.format(pb.getDibuat_pada()) : "";
                         %>
-                         <tr class="hover:bg-gray-50 transition">
-                            <td class="p-4 text-sm text-gray-500"><%= (pb.getDibuat_pada() != null) ? sdf.format(pb.getDibuat_pada()) : "-" %></td>
-                            <td class="p-4 text-sm font-bold text-gray-700"><%= (pb.getNama_penuh() != null) ? pb.getNama_penuh() : "-" %></td>
-                            <td class="p-4 text-sm text-gray-600"><%= (pb.getNama_bantuan() != null) ? pb.getNama_bantuan() : "Lain-lain" %></td>
+                         <tr class="hover:bg-gray-50 transition data-row-sejarah" data-date="<%= dateFilter %>">
+                            <td class="p-4 text-sm text-gray-500"><%= dateDisplay %></td>
+                            <td class="p-4 text-sm font-bold text-gray-700 search-col"><%= (pb.getNama_penuh() != null) ? pb.getNama_penuh() : "-" %></td>
+                            <td class="p-4 text-sm text-gray-600 search-col"><%= (pb.getNama_bantuan() != null) ? pb.getNama_bantuan() : "Lain-lain" %></td>
                             <td class="p-4">
                                 <% if (pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
                                     <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" class="text-blue-500 hover:text-blue-700 text-xs font-bold underline">Lihat PDF</a>
                                 <% } else { %> - <% } %>
                             </td>
-                            <td class="p-4 text-sm text-gray-500 max-w-xs truncate" title="<%= pb.getCatatan_pemohon() %>">
+                            <td class="p-4 text-sm text-gray-500 max-w-xs truncate search-col" title="<%= pb.getCatatan_pemohon() %>">
                                 <%= (pb.getCatatan_pemohon() != null) ? pb.getCatatan_pemohon() : "-" %>
                             </td>
                             <td class="p-4">
@@ -525,6 +570,30 @@
         document.getElementById('editJenisBantuan').value = jenis;
         document.getElementById('editPeruntukan').value = peruntukan;
         openModal('modalEditBantuan');
+    }
+
+    // Filter Logic
+    function filterData(type) {
+        const searchInput = (type === 'baru') ? document.getElementById("searchBaru") : document.getElementById("searchSejarah");
+        const dateInput = (type === 'baru') ? document.getElementById("dateBaru") : document.getElementById("dateSejarah");
+        const rows = document.querySelectorAll(type === 'baru' ? ".data-row-baru" : ".data-row-sejarah");
+        
+        const searchVal = searchInput.value.toLowerCase();
+        const dateVal = dateInput.value;
+
+        rows.forEach(row => {
+            const rowDate = row.getAttribute("data-date");
+            let textContent = "";
+            row.querySelectorAll(".search-col").forEach(col => {
+                textContent += col.innerText.toLowerCase() + " ";
+            });
+
+            let showRow = true;
+            if (dateVal !== "" && rowDate !== dateVal) showRow = false;
+            if (searchVal !== "" && !textContent.includes(searchVal)) showRow = false;
+
+            row.style.display = showRow ? "" : "none";
+        });
     }
 </script>
 
