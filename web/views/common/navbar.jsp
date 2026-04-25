@@ -72,9 +72,9 @@
                     <span class="font-medium text-sm">Fasiliti Kampung</span>
                 </a>
 
-                <a href="<%= constructionPage %>?menu=aduan" 
-                   class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= (isConstruction && query.contains("menu=aduan")) ? activeClass : inactiveClass %>">
-                    <div class="w-6 text-center"><i class="fas fa-comment-dots <%= (isConstruction && query.contains("menu=aduan")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i></div>
+                <a href="<%= contextPath %>/aduan/list" 
+                   class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/aduan/") ? activeClass : inactiveClass %>">
+                    <div class="w-6 text-center"><i class="fas fa-comment-dots <%= currentPath.contains("/aduan/") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i></div>
                     <span class="font-medium text-sm">Aduan & Cadangan</span>
                 </a>
 
@@ -110,10 +110,10 @@
                 <span class="font-medium text-sm">Sokongan Bantuan</span>
             </a>
 
-            <a href="<%= constructionPage %>?menu=aduan_komuniti" 
-               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= (isConstruction && query.contains("menu=aduan_komuniti")) ? activeClass : inactiveClass %>">
+            <a href="<%= contextPath %>/aduan/list" 
+               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/aduan/") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-exclamation-circle <%= (isConstruction && query.contains("menu=aduan_komuniti")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-exclamation-circle <%= currentPath.contains("/aduan/") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
                 </div>
                 <span class="font-medium text-sm">Aduan Komuniti</span>
             </a>
@@ -174,10 +174,10 @@
             </a>
             <% } %>
 
-            <a href="<%= constructionPage %>?menu=laporan_aduan" 
-               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= (isConstruction && query.contains("menu=laporan_aduan")) ? activeClass : inactiveClass %>">
+            <a href="<%= contextPath %>/aduan/list" 
+               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/aduan/") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-clipboard-list <%= (isConstruction && query.contains("menu=laporan_aduan")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-clipboard-list <%= currentPath.contains("/aduan/") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
                 </div>
                 <span class="font-medium text-sm">Aduan & Laporan</span>
             </a>

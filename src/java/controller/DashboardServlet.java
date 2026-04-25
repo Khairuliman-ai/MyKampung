@@ -60,11 +60,11 @@ public class DashboardServlet extends HttpServlet {
                 request.getRequestDispatcher("views/dashboard/biroKebajikanDashboard.jsp").forward(request, response);
             } else if ("Biro Sukan & Riadah".equals(biro)) {
                 request.getRequestDispatcher("views/dashboard/biroSukanDashboard.jsp").forward(request, response);
-            } else if ("Biro Agama & Da'wah".equals(biro)) {
-                request.getRequestDispatcher("ajk/agama_dashboard.jsp").forward(request, response);
+            } else if ("Biro Keselamatan".equals(biro)) {
+                request.getRequestDispatcher("views/dashboard/biroKeselamatanDashboard.jsp").forward(request, response);
             } else {
-                // Untuk biro lain seperti Ekonomi/Pembangunan
-                request.getRequestDispatcher("ajk/umum_dashboard.jsp").forward(request, response);
+                // Default dashboard if biro-specific one doesn't exist
+                request.getRequestDispatcher("views/dashboard/dJKKK.jsp").forward(request, response);
             }
         } else if ("Penduduk".equals(peranan)) {
             request.getRequestDispatcher("views/dashboard/dPenduduk.jsp").forward(request, response);

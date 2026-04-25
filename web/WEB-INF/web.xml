@@ -22,6 +22,15 @@
         <url-pattern>/fasiliti/*</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>AduanServlet</servlet-name>
+        <servlet-class>controller.AduanServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AduanServlet</servlet-name>
+        <url-pattern>/aduan/*</url-pattern>
+    </servlet-mapping>
+
     <welcome-file-list>
         <welcome-file>home</welcome-file>
     </welcome-file-list>

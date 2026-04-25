@@ -46,6 +46,8 @@ public class FileServlet extends HttpServlet {
             subFolder = "lampiranBantuan";
         } else if ("profil".equals(type)) {
             subFolder = "fotoProfil";
+        } else if ("aduan".equals(type)) {
+            subFolder = "gambarAduan";
         } else {
             // Jika 'type' bukan kategori yang dikenali, mungkin ia sebenarnya adalah nama fail
             // Cuba cari dalam lampiranBantuan sebagai fallback
