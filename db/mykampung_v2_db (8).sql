@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 25, 2026 at 11:12 AM
+-- Generation Time: Apr 26, 2026 at 08:05 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -61,7 +61,7 @@ INSERT INTO `aduan` (`id_aduan`, `id_pengguna`, `id_kategori_aduan`, `tajuk`, `k
 (8, 9, 8, 'Kes Denggi Meningkat', 'Ada kes denggi dekat Lorong Kenanga 2, mohon fogging.', 'UNDER_REVIEW_AJK', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL),
 (9, 3, 7, 'Budak Motor Bising Malam', 'Sekumpulan remaja selalu merempit pukul 2 pagi.', 'SUBMITTED', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL),
 (10, 1, 10, 'Anjing Liar Berkeliaran', 'Bahaya untuk kanak-kanak yang pergi ke sekolah.', 'SUBMITTED', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL),
-(11, 2, 2, 'Test1', 'Test1.1', 'SUBMITTED', NULL, NULL, '2026-04-25 09:10:27', '2026-04-25 09:10:27', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL);
+(11, 2, 2, 'Test1', 'Test1.1', 'UNDER_REVIEW_AJK', NULL, NULL, '2026-04-25 09:10:27', '2026-04-25 09:20:05', NULL, NULL, 'SEDERHANA', NULL, 'test1', NULL);
 
 -- --------------------------------------------------------
 
@@ -205,7 +205,14 @@ CREATE TABLE `hebahan` (
   `id_hebahan` int(11) NOT NULL,
   `id_pengguna` int(11) NOT NULL,
   `tajuk` varchar(50) NOT NULL,
-  `kandungan` text NOT NULL,
+  `kandungan` text DEFAULT NULL,
+  `kategori` enum('Kecemasan','Aktiviti','Umum') DEFAULT 'Umum',
+  `gambar_poster` varchar(255) DEFAULT NULL,
+  `status_hebahan` enum('Draft','Published','Archived') DEFAULT 'Published',
+  `tarikh_mula_acara` datetime DEFAULT NULL,
+  `tarikh_tamat_acara` datetime DEFAULT NULL,
+  `lokasi_acara` varchar(255) DEFAULT NULL,
+  `tarikh_tamat` datetime DEFAULT NULL,
   `tarikh_hebahan` date NOT NULL,
   `dibuat_pada` timestamp NOT NULL DEFAULT current_timestamp(),
   `dikemaskini_pada` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -216,17 +223,17 @@ CREATE TABLE `hebahan` (
 -- Dumping data for table `hebahan`
 --
 
-INSERT INTO `hebahan` (`id_hebahan`, `id_pengguna`, `tajuk`, `kandungan`, `tarikh_hebahan`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`) VALUES
-(1, 1, 'Gotong Royong Perdana', 'Program membersihkan tanah perkuburan pada hari Sabtu ini.', '2023-11-01', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(2, 1, 'Mesyuarat AJK Bulanan', 'Semua AJK diwajibkan hadir ke balai raya pada malam Jumaat.', '2023-11-05', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(3, 1, 'Bantuan Banjir Monsun', 'Sila daftar di dewan untuk mangsa banjir.', '2023-11-15', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(4, 3, 'Kejohanan Futsal Belia', 'Penyertaan dibuka untuk belia kampung.', '2023-11-20', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(5, 8, 'Kuliah Maghrib Bulanan', 'Kuliah akan disampaikan oleh Ustaz jemputan bulan ini.', '2023-11-22', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(6, 9, 'Kutipan Yuran Khairat', 'Ahli diminta menjelaskan yuran RM20 setahun.', '2023-11-25', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(7, 1, 'Suntikan Vaksin Percuma', 'Klinik Kesihatan akan buka kaunter di Balai Raya.', '2023-12-01', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(8, 10, 'Rondaan SRS Malam', 'Jadual rondaan telah dikemaskini untuk bulan Disember.', '2023-12-05', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(9, 5, 'Sumbangan Asnaf', 'Majlis penyerahan bantuan asnaf di masjid.', '2023-12-10', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(10, 1, 'Sambutan Hari Keluarga', 'Semua penduduk dijemput hadir ke padang awam.', '2023-12-15', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL);
+INSERT INTO `hebahan` (`id_hebahan`, `id_pengguna`, `tajuk`, `kandungan`, `kategori`, `gambar_poster`, `status_hebahan`, `tarikh_mula_acara`, `tarikh_tamat_acara`, `lokasi_acara`, `tarikh_tamat`, `tarikh_hebahan`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`) VALUES
+(1, 1, 'Gotong Royong Perdana', 'Program membersihkan tanah perkuburan pada hari Sabtu ini.', 'Umum', NULL, 'Published', NULL, NULL, NULL, NULL, '2023-11-01', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(2, 1, 'Mesyuarat AJK Bulanan', 'Semua AJK diwajibkan hadir ke balai raya pada malam Jumaat.', 'Umum', NULL, 'Published', NULL, NULL, NULL, NULL, '2023-11-05', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(3, 1, 'Bantuan Banjir Monsun', 'Sila daftar di dewan untuk mangsa banjir.', 'Umum', NULL, 'Published', NULL, NULL, NULL, NULL, '2023-11-15', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(4, 3, 'Kejohanan Futsal Belia', 'Penyertaan dibuka untuk belia kampung.', 'Umum', NULL, 'Published', NULL, NULL, NULL, NULL, '2023-11-20', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(5, 8, 'Kuliah Maghrib Bulanan', 'Kuliah akan disampaikan oleh Ustaz jemputan bulan ini.', 'Umum', NULL, 'Published', NULL, NULL, NULL, NULL, '2023-11-22', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(6, 9, 'Kutipan Yuran Khairat', 'Ahli diminta menjelaskan yuran RM20 setahun.', 'Umum', NULL, 'Published', NULL, NULL, NULL, NULL, '2023-11-25', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(7, 1, 'Suntikan Vaksin Percuma', 'Klinik Kesihatan akan buka kaunter di Balai Raya.', 'Umum', NULL, 'Published', NULL, NULL, NULL, NULL, '2023-12-01', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(8, 10, 'Rondaan SRS Malam', 'Jadual rondaan telah dikemaskini untuk bulan Disember.', 'Umum', NULL, 'Published', NULL, NULL, NULL, NULL, '2023-12-05', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(9, 5, 'Sumbangan Asnaf', 'Majlis penyerahan bantuan asnaf di masjid.', 'Umum', NULL, 'Published', NULL, NULL, NULL, NULL, '2023-12-10', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(10, 1, 'Sambutan Hari Keluarga', 'Semua penduduk dijemput hadir ke padang awam.', 'Umum', NULL, 'Published', NULL, NULL, NULL, NULL, '2023-12-15', '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL);
 
 -- --------------------------------------------------------
 
@@ -254,7 +261,7 @@ INSERT INTO `jawatan_ajk` (`id_jawatan`, `nama_jawatan`) VALUES
 (8, 'Biro Sukan & Riadah'),
 (9, 'Biro Kebajikan & Sosial'),
 (10, 'Biro Ekonomi & Usahawan'),
-(11, 'Biro Test1'),
+(11, 'Biro Hebahan'),
 (12, 'Test last');
 
 -- --------------------------------------------------------
@@ -304,6 +311,13 @@ CREATE TABLE `log_aduan` (
   `catatan` text DEFAULT NULL,
   `dibuat_pada` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `log_aduan`
+--
+
+INSERT INTO `log_aduan` (`id_log_aduan`, `id_aduan`, `id_pelaku`, `status_lama`, `status_baru`, `catatan`, `dibuat_pada`) VALUES
+(1, 11, 10, 'SUBMITTED', 'UNDER_REVIEW_AJK', 'test1', '2026-04-25 09:20:05');
 
 -- --------------------------------------------------------
 
@@ -723,7 +737,7 @@ ALTER TABLE `kategori_aduan`
 -- AUTO_INCREMENT for table `log_aduan`
 --
 ALTER TABLE `log_aduan`
-  MODIFY `id_log_aduan` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_log_aduan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `log_aktiviti`
