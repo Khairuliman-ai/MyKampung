@@ -2,7 +2,7 @@
 <%
     Pengguna user = (Pengguna) session.getAttribute("currentUser");
     if (user == null) {
-        response.sendRedirect(request.getContextPath() + "/auth.jsp");
+        response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp");
         return;
     }
 %>

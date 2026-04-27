@@ -33,7 +33,7 @@ public class DashboardServlet extends HttpServlet {
             if (session != null) {
                 session.invalidate(); // Bersihkan sesi jika status tidak aktif
             }
-            response.sendRedirect("auth.jsp?error=unauthorized");
+            response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp?error=unauthorized");
             return;
         }
 
@@ -45,9 +45,9 @@ public class DashboardServlet extends HttpServlet {
         // --- 4. LOGIK ROUTING DASHBOARD (MVC Forwarding) ---
 
         if ("Pentadbir Sistem".equals(peranan)) {
-            request.getRequestDispatcher("admin/dashboard.jsp").forward(request, response);
+            request.getRequestDispatcher("/admin/dashboard.jsp").forward(request, response);
         } else if ("Ketua Kampung".equals(peranan)) {
-            request.getRequestDispatcher("views/dashboard/dKetuaKampung.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/dashboard/dKetuaKampung.jsp").forward(request, response);
         } else if ("AJK Kampung".equals(peranan)) {
             /**
              * Penapis Biro Spesifik:
@@ -55,25 +55,25 @@ public class DashboardServlet extends HttpServlet {
              * masing-masing.
              */
             if ("Setiausaha".equals(biro)) {
-                request.getRequestDispatcher("views/dashboard/dJKKK.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/dashboard/dJKKK.jsp").forward(request, response);
             } else if ("Biro Kebajikan & Sosial".equals(biro)) {
-                request.getRequestDispatcher("views/dashboard/biroKebajikanDashboard.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/dashboard/biroKebajikanDashboard.jsp").forward(request, response);
             } else if ("Biro Sukan & Riadah".equals(biro)) {
-                request.getRequestDispatcher("views/dashboard/biroSukanDashboard.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/dashboard/biroSukanDashboard.jsp").forward(request, response);
             } else if ("Biro Keselamatan".equals(biro)) {
-                request.getRequestDispatcher("views/dashboard/biroKeselamatanDashboard.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/dashboard/biroKeselamatanDashboard.jsp").forward(request, response);
             } else if ("Biro Hebahan".equals(biro)) {
-                request.getRequestDispatcher("views/dashboard/biroHebahanDashboard.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/dashboard/biroHebahanDashboard.jsp").forward(request, response);
             } else {
                 // Default dashboard if biro-specific one doesn't exist
-                request.getRequestDispatcher("views/dashboard/dJKKK.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/dashboard/dJKKK.jsp").forward(request, response);
             }
         } else if ("Penduduk".equals(peranan)) {
-            request.getRequestDispatcher("views/dashboard/dPenduduk.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/dashboard/dPenduduk.jsp").forward(request, response);
         } else {
             // Jika peranan tidak dikenali, hantar balik ke login
-            session.invalidate();
-            response.sendRedirect("auth/auth.jsp");
+            if (session != null) session.invalidate();
+            response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp");
         }
     }
 

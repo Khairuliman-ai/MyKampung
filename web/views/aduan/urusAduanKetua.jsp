@@ -18,8 +18,12 @@
     
     if (allList != null) {
         for (Aduan a : allList) {
-            if ("ESCALATED_TO_KETUA".equals(a.getStatus())) listDimajukan.add(a);
-            else if ("UNDER_REVIEW_KETUA".equals(a.getStatus()) || "IN_PROGRESS_HIGH_LEVEL".equals(a.getStatus())) listTindakan.add(a);
+            String status = a.getStatus();
+            if ("ESCALATED_TO_KETUA".equals(status)) {
+                listDimajukan.add(a);
+            } else if ("UNDER_REVIEW_KETUA".equals(status) || "IN_PROGRESS_HIGH_LEVEL".equals(status)) {
+                listTindakan.add(a);
+            }
             listSemua.add(a);
         }
     }

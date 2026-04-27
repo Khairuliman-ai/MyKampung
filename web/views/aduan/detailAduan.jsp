@@ -10,7 +10,6 @@
 <%@ include file="/views/common/navbar.jsp" %>
 
 <%
-    Pengguna currentUser = (Pengguna) session.getAttribute("currentUser");
     Aduan aduan = (Aduan) request.getAttribute("aduan");
     List<LogAduan> logList = (List<LogAduan>) request.getAttribute("logList");
     SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy, hh:mm a");

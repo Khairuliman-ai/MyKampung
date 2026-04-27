@@ -1,4 +1,18 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ page import="model.Pengguna" %>
+<%
+    // Prevent browser from caching pages (prevents "back button" access after logout)
+    response.setHeader("Cache-Control", "no-cache, no-store, must-revalidate"); // HTTP 1.1
+    response.setHeader("Pragma", "no-cache"); // HTTP 1.0
+    response.setDateHeader("Expires", 0); // Proxies
+
+    // Global Session Check
+    Pengguna currentUser = (Pengguna) session.getAttribute("currentUser");
+    if (currentUser == null) {
+        response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp");
+        return;
+    }
+%>
 <html>
 <head>
     <title>Papan Pemuka - Kampung Danan</title>

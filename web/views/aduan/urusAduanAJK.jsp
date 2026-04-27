@@ -18,9 +18,16 @@
     
     if (allList != null) {
         for (Aduan a : allList) {
-            if ("SUBMITTED".equals(a.getStatus())) listBaharu.add(a);
-            else if (a.getStatus().contains("IN_PROGRESS") || a.getStatus().contains("REVIEW")) listTindakan.add(a);
-            else listSejarah.add(a);
+            String status = a.getStatus();
+            if (status == null) {
+                listSejarah.add(a); // Default to history if status is missing
+            } else if ("SUBMITTED".equals(status)) {
+                listBaharu.add(a);
+            } else if (status.contains("IN_PROGRESS") || status.contains("REVIEW")) {
+                listTindakan.add(a);
+            } else {
+                listSejarah.add(a);
+            }
         }
     }
     
