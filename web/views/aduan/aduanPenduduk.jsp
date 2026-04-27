@@ -82,6 +82,41 @@
     </div>
 </div>
 
+<!-- Right Aside Bar -->
+<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
+    <div class="mb-10">
+        <h3 class="font-bold text-lg text-gray-800 mb-2">Pusat Bantuan</h3>
+        <p class="text-xs text-gray-400">Suara anda, perubahan kita</p>
+    </div>
+
+    <div class="bg-gray-50 rounded-3xl p-6 border border-gray-100 mb-10">
+        <h4 class="font-bold text-sm text-gray-800 mb-4">Kenapa Mengadu?</h4>
+        <div class="space-y-4">
+            <div class="flex items-start gap-3">
+                <div class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-[10px] flex-shrink-0"><i class="fas fa-check"></i></div>
+                <p class="text-[10px] text-gray-500 leading-relaxed">Membantu AJK mengenalpasti masalah infrastruktur dengan lebih pantas.</p>
+            </div>
+            <div class="flex items-start gap-3">
+                <div class="w-6 h-6 rounded-full bg-green-100 text-green-600 flex items-center justify-center text-[10px] flex-shrink-0"><i class="fas fa-check"></i></div>
+                <p class="text-[10px] text-gray-500 leading-relaxed">Meningkatkan keselamatan dan kesejahteraan komuniti Kampung Danan.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="space-y-6">
+        <h3 class="font-bold text-sm text-gray-800 uppercase tracking-widest">Kategori Isu</h3>
+        <div class="space-y-3">
+            <% if (kategoriList != null) { 
+                for (KategoriAduan k : kategoriList) { %>
+            <div class="flex items-center justify-between p-3 rounded-2xl bg-white border border-gray-50 hover:border-purple-100 transition">
+                <span class="text-xs font-bold text-gray-700"><%= k.getNama_kategori() %></span>
+                <i class="fas fa-arrow-right text-[10px] text-gray-300"></i>
+            </div>
+            <% } } %>
+        </div>
+    </div>
+</aside>
+
 <!-- Modal Aduan Baru -->
 <div id="modalAduanBaru" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalAduanBaru')"></div>

@@ -31,6 +31,15 @@
         <url-pattern>/aduan/*</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>HebahanServlet</servlet-name>
+        <servlet-class>controller.HebahanServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>HebahanServlet</servlet-name>
+        <url-pattern>/hebahan/*</url-pattern>
+    </servlet-mapping>
+
     <welcome-file-list>
         <welcome-file>home</welcome-file>
     </welcome-file-list>

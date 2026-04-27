@@ -190,7 +190,56 @@
             </table>
         </div>
     </div>
+    </div>
 </div>
+
+<!-- Right Aside Bar -->
+<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
+    <div class="mb-8">
+        <h3 class="font-bold text-lg text-gray-800">Rumusan Aduan</h3>
+        <p class="text-xs text-gray-400 font-medium">Prestasi penyelesaian masalah</p>
+    </div>
+
+    <div class="space-y-4 mb-10">
+        <div class="bg-gray-50 p-4 rounded-2xl flex items-center justify-between border border-gray-100">
+            <div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Perlu Keputusan</p>
+                <h4 class="font-bold text-xl text-gray-800"><%= listDimajukan.size() %></h4>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-purple-100 text-[#6C5DD3] flex items-center justify-center">
+                <i class="fas fa-gavel"></i>
+            </div>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-2xl flex items-center justify-between border border-gray-100">
+            <div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Keseluruhan Aduan</p>
+                <h4 class="font-bold text-xl text-gray-800"><%= listSemua.size() %></h4>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center">
+                <i class="fas fa-list-ul"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-10">
+        <h3 class="font-bold text-sm text-gray-800 mb-4 uppercase tracking-widest">Kuasa Ketua</h3>
+        <div class="space-y-6 relative">
+            <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-gray-100"></div>
+            
+            <div class="relative pl-10">
+                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-[#6C5DD3] flex items-center justify-center font-bold text-xs border-2 border-[#6C5DD3] z-10">1</div>
+                <h4 class="font-bold text-xs text-gray-800 uppercase">Keputusan Akhir</h4>
+                <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Gunakan ulasan untuk memberi arahan kepada AJK atau memberi maklum balas kepada pengadu.</p>
+            </div>
+
+            <div class="relative pl-10">
+                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-gray-400 flex items-center justify-center font-bold text-xs border-2 border-gray-100 z-10">2</div>
+                <h4 class="font-bold text-xs text-gray-800 uppercase">Pantau AJK</h4>
+                <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Pastikan AJK bertindak pantas sebelum kes dimajukan kepada anda.</p>
+            </div>
+        </div>
+    </div>
+</aside>
 
 <!-- Modal Update Status (Ketua) -->
 <div id="modalStatus" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">

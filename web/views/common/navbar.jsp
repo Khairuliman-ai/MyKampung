@@ -78,9 +78,9 @@
                     <span class="font-medium text-sm">Aduan & Cadangan</span>
                 </a>
 
-                <a href="<%= constructionPage %>?menu=info" 
-                   class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= (isConstruction && query.contains("menu=info")) ? activeClass : inactiveClass %>">
-                    <div class="w-6 text-center"><i class="fas fa-bullhorn <%= (isConstruction && query.contains("menu=info")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i></div>
+                <a href="<%= contextPath %>/hebahan/list" 
+                   class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/hebahan/") ? activeClass : inactiveClass %>">
+                    <div class="w-6 text-center"><i class="fas fa-bullhorn <%= currentPath.contains("/hebahan/") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i></div>
                     <span class="font-medium text-sm">Info & Hebahan</span>
                 </a>
 
@@ -118,10 +118,10 @@
                 <span class="font-medium text-sm">Aduan Komuniti</span>
             </a>
 
-            <a href="<%= constructionPage %>?menu=hebahan_urus" 
-               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= (isConstruction && query.contains("menu=hebahan_urus")) ? activeClass : inactiveClass %>">
+            <a href="<%= contextPath %>/hebahan/list" 
+               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/hebahan/") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-bullhorn <%= (isConstruction && query.contains("menu=hebahan_urus")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-bullhorn <%= currentPath.contains("/hebahan/") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
                 </div>
                 <span class="font-medium text-sm">Urus Hebahan</span>
             </a>
@@ -182,10 +182,10 @@
                 <span class="font-medium text-sm">Aduan & Laporan</span>
             </a>
 
-            <a href="<%= constructionPage %>?menu=hebahan_awam" 
-               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= (isConstruction && query.contains("menu=hebahan_awam")) ? activeClass : inactiveClass %>">
+            <a href="<%= contextPath %>/hebahan/list" 
+               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/hebahan/") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-bullhorn <%= (isConstruction && query.contains("menu=hebahan_awam")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-bullhorn <%= currentPath.contains("/hebahan/") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
                 </div>
                 <span class="font-medium text-sm">Hebahan Awam</span>
             </a>

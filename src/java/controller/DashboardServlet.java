@@ -62,6 +62,8 @@ public class DashboardServlet extends HttpServlet {
                 request.getRequestDispatcher("views/dashboard/biroSukanDashboard.jsp").forward(request, response);
             } else if ("Biro Keselamatan".equals(biro)) {
                 request.getRequestDispatcher("views/dashboard/biroKeselamatanDashboard.jsp").forward(request, response);
+            } else if ("Biro Hebahan".equals(biro)) {
+                request.getRequestDispatcher("views/dashboard/biroHebahanDashboard.jsp").forward(request, response);
             } else {
                 // Default dashboard if biro-specific one doesn't exist
                 request.getRequestDispatcher("views/dashboard/dJKKK.jsp").forward(request, response);

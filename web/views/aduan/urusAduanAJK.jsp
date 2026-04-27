@@ -198,6 +198,60 @@
     </div>
 </div>
 
+<!-- Right Aside Bar -->
+<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
+    <div class="mb-8">
+        <h3 class="font-bold text-lg text-gray-800">Ringkasan Aduan</h3>
+        <p class="text-xs text-gray-400 font-medium">Status tugasan biro anda</p>
+    </div>
+
+    <div class="space-y-4 mb-10">
+        <div class="bg-gray-50 p-4 rounded-2xl flex items-center justify-between border border-gray-100">
+            <div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Aduan Baharu</p>
+                <h4 class="font-bold text-xl text-gray-800"><%= listBaharu.size() %></h4>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-red-100 text-red-500 flex items-center justify-center">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-2xl flex items-center justify-between border border-gray-100">
+            <div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Dalam Tindakan</p>
+                <h4 class="font-bold text-xl text-gray-800"><%= listTindakan.size() %></h4>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-500 flex items-center justify-center">
+                <i class="fas fa-spinner"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-10">
+        <h3 class="font-bold text-xs text-gray-800 mb-4 uppercase tracking-widest">Aliran Kerja</h3>
+        <div class="space-y-6 relative">
+            <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-gray-100"></div>
+            
+            <div class="relative pl-10">
+                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-[#6C5DD3] flex items-center justify-center font-bold text-xs border-2 border-[#6C5DD3] z-10">1</div>
+                <h4 class="font-bold text-xs text-gray-800 uppercase">Semak Sah</h4>
+                <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Tukar status kepada 'Terima untuk Semakan' jika aduan berasas.</p>
+            </div>
+
+            <div class="relative pl-10">
+                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-gray-400 flex items-center justify-center font-bold text-xs border-2 border-gray-100 z-10">2</div>
+                <h4 class="font-bold text-xs text-gray-800 uppercase">Tindakan Lapangan</h4>
+                <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Lakukan siasatan atau kerja pembaikan mengikut aduan.</p>
+            </div>
+
+            <div class="relative pl-10">
+                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-gray-400 flex items-center justify-center font-bold text-xs border-2 border-gray-100 z-10">3</div>
+                <h4 class="font-bold text-xs text-gray-800 uppercase">Selesai & Lapor</h4>
+                <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Muat naik ulasan penyelesaian sebelum menutup aduan.</p>
+            </div>
+        </div>
+    </div>
+</aside>
+
 <!-- Modal Update Status -->
 <div id="modalStatus" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalStatus')"></div>
