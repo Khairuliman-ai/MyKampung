@@ -86,9 +86,16 @@
                             </span>
                         </td>
                         <td class="p-4 text-center">
+                            <% 
+                            String s1 = a.getStatus();
+                            if ("ESCALATED_TO_KETUA".equals(s1) || "UNDER_REVIEW_KETUA".equals(s1) || "IN_PROGRESS_HIGH_LEVEL".equals(s1) || "RESOLVED".equals(s1) || "REJECTED".equals(s1)) { 
+                            %>
                             <button onclick="event.stopPropagation(); openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" class="p-2 text-gray-400 hover:text-[#6C5DD3] transition">
                                 <i class="fas fa-tasks"></i>
                             </button>
+                            <% } else { %>
+                            <span class="text-gray-300">-</span>
+                            <% } %>
                         </td>
                     </tr>
                     <% } } else { %>
@@ -134,9 +141,16 @@
                             </span>
                         </td>
                         <td class="p-4 text-center">
+                            <% 
+                            String s2 = a.getStatus();
+                            if ("ESCALATED_TO_KETUA".equals(s2) || "UNDER_REVIEW_KETUA".equals(s2) || "IN_PROGRESS_HIGH_LEVEL".equals(s2) || "RESOLVED".equals(s2) || "REJECTED".equals(s2)) { 
+                            %>
                             <button onclick="event.stopPropagation(); openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" class="p-2 text-gray-400 hover:text-[#6C5DD3] transition">
                                 <i class="fas fa-tasks"></i>
                             </button>
+                            <% } else { %>
+                            <span class="text-gray-300">-</span>
+                            <% } %>
                         </td>
                     </tr>
                     <% } } else { %>
@@ -182,9 +196,16 @@
                             </span>
                         </td>
                         <td class="p-4 text-center">
+                            <% 
+                            String s3 = a.getStatus();
+                            if ("ESCALATED_TO_KETUA".equals(s3) || "UNDER_REVIEW_KETUA".equals(s3) || "IN_PROGRESS_HIGH_LEVEL".equals(s3) || "RESOLVED".equals(s3) || "REJECTED".equals(s3)) { 
+                            %>
                             <button onclick="event.stopPropagation(); openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" class="p-2 text-gray-400 hover:text-[#6C5DD3] transition">
                                 <i class="fas fa-tasks"></i>
                             </button>
+                            <% } else { %>
+                            <span class="text-gray-300">-</span>
+                            <% } %>
                         </td>
                     </tr>
                     <% } } else { %>

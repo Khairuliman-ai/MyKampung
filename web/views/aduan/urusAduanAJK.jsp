@@ -23,7 +23,7 @@
                 listSejarah.add(a); // Default to history if status is missing
             } else if ("SUBMITTED".equals(status)) {
                 listBaharu.add(a);
-            } else if (status.contains("IN_PROGRESS") || status.contains("REVIEW")) {
+            } else if ("UNDER_REVIEW_AJK".equals(status) || "IN_PROGRESS_AJK".equals(status)) {
                 listTindakan.add(a);
             } else {
                 listSejarah.add(a);
@@ -91,9 +91,13 @@
                             </span>
                         </td>
                         <td class="p-4 text-center">
+                            <% if ("SUBMITTED".equals(a.getStatus()) || "UNDER_REVIEW_AJK".equals(a.getStatus()) || "IN_PROGRESS_AJK".equals(a.getStatus())) { %>
                             <button onclick="event.stopPropagation(); openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" class="p-2 text-gray-400 hover:text-[#6C5DD3] transition">
                                 <i class="fas fa-edit"></i>
                             </button>
+                            <% } else { %>
+                            <span class="text-gray-300">-</span>
+                            <% } %>
                         </td>
                     </tr>
                     <% } } else { %>
@@ -141,9 +145,13 @@
                             </span>
                         </td>
                         <td class="p-4 text-center">
+                            <% if ("SUBMITTED".equals(a.getStatus()) || "UNDER_REVIEW_AJK".equals(a.getStatus()) || "IN_PROGRESS_AJK".equals(a.getStatus())) { %>
                             <button onclick="event.stopPropagation(); openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" class="p-2 text-gray-400 hover:text-[#6C5DD3] transition">
                                 <i class="fas fa-edit"></i>
                             </button>
+                            <% } else { %>
+                            <span class="text-gray-300">-</span>
+                            <% } %>
                         </td>
                     </tr>
                     <% } } else { %>
@@ -191,9 +199,13 @@
                             </span>
                         </td>
                         <td class="p-4 text-center">
+                            <% if ("SUBMITTED".equals(a.getStatus()) || "UNDER_REVIEW_AJK".equals(a.getStatus()) || "IN_PROGRESS_AJK".equals(a.getStatus())) { %>
                             <button onclick="event.stopPropagation(); openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" class="p-2 text-gray-400 hover:text-[#6C5DD3] transition">
                                 <i class="fas fa-edit"></i>
                             </button>
+                            <% } else { %>
+                            <span class="text-gray-300">-</span>
+                            <% } %>
                         </td>
                     </tr>
                     <% } } else { %>
