@@ -1,6 +1,9 @@
-<%@ page import="java.util.*, model.*" %>
+﻿<%@ page import="java.util.*, model.*" %>
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
+<!-- Leaflet Control Geocoder -->
+<link rel='stylesheet' href='https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css' />
+<script src='https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js'></script>
 
 <!-- Cropper.js CSS & JS -->
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
@@ -547,10 +550,12 @@
         
         fasilitiMap = L.map('mapFasiliti').setView([lat, lon], 15);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19, attribution: '© OpenStreetMap'
+            maxZoom: 19, attribution: 'Â© OpenStreetMap'
         }).addTo(fasilitiMap);
         
         fasilitiMarker = L.marker([lat, lon], { draggable: true }).addTo(fasilitiMap);
+
+        L.Control.geocoder({ defaultMarkGeocode: false, placeholder: 'Cari lokasi/alamat...', errorMessage: 'Lokasi tidak dijumpai.' }).on('markgeocode', function(e) { var latlng = e.geocode.center; fasilitiMarker.setLatLng(latlng); fasilitiMap.setView(latlng, 17); updateF(latlng); }).addTo(fasilitiMap);
         
         function updateF(ll) {
             document.getElementById('fasilitiLat').value = ll.lat.toFixed(8);
@@ -707,3 +712,4 @@
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>
+

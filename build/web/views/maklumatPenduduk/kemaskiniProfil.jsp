@@ -1,4 +1,4 @@
-<%@ page import="model.Pengguna, model.ActivityLog, java.util.List" %>
+﻿<%@ page import="model.Pengguna, model.ActivityLog, java.util.List" %>
 <%
     // 1. Dapatkan objek user dari session
     Pengguna pDetail = (Pengguna) session.getAttribute("currentUser");
@@ -11,6 +11,8 @@
 
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
+<link rel='stylesheet' href='https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.css' />
+<script src='https://unpkg.com/leaflet-control-geocoder/dist/Control.Geocoder.js'></script>
 
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
@@ -369,8 +371,10 @@
         var initLon = lonElement.value ? parseFloat(lonElement.value) : defaultLon;
 
         var map = L.map('mapProfil').setView([initLat, initLon], latElement.value ? 17 : 14);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '� OpenStreetMap'}).addTo(map);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '© OpenStreetMap'}).addTo(map);
         var marker = L.marker([initLat, initLon], {draggable: true}).addTo(map);
+
+        L.Control.geocoder({ defaultMarkGeocode: false, placeholder: 'Cari lokasi/alamat...', errorMessage: 'Lokasi tidak dijumpai.' }).on('markgeocode', function(e) { var latlng = e.geocode.center; marker.setLatLng(latlng); map.setView(latlng, 17); updateInputs(latlng); }).addTo(map);
 
         function updateInputs(latlng) {
             document.getElementById('latInput').value = latlng.lat.toFixed(8);
