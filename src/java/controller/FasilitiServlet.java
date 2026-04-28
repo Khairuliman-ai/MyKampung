@@ -27,8 +27,18 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.servlet.http.Part;
+import java.io.File;
+import javax.servlet.annotation.MultipartConfig;
 
+@MultipartConfig(
+    fileSizeThreshold = 1024 * 1024,     // 1MB
+    maxFileSize = 5 * 1024 * 1024,       // 5MB
+    maxRequestSize = 10 * 1024 * 1024    // 10MB
+)
 public class FasilitiServlet extends HttpServlet {
+
+    private static final String SAVE_DIR = "C:\\Users\\khayx\\OneDrive\\Documents\\SEM5_UMT\\PITA1\\MyKampungData\\gambarFasiliti";
 
     private FasilitiDAO fasilitiDAO = new FasilitiDAO();
     private TempahanFasilitiDAO tempahanDAO = new TempahanFasilitiDAO();
@@ -235,7 +245,7 @@ public class FasilitiServlet extends HttpServlet {
     }
 
     private void handleTambahFasiliti(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+            throws ServletException, IOException {
         Fasiliti f = new Fasiliti();
         f.setNama_fasiliti(request.getParameter("nama"));
         f.setLokasi(request.getParameter("lokasi"));
@@ -247,6 +257,17 @@ public class FasilitiServlet extends HttpServlet {
         
         String reqApp = request.getParameter("requires_approval");
         f.setRequiresApproval("1".equals(reqApp));
+
+        // Handle Image Upload
+        File saveDir = new File(SAVE_DIR);
+        if (!saveDir.exists()) saveDir.mkdirs();
+
+        Part filePart = request.getPart("gambar_fasiliti");
+        if (filePart != null && filePart.getSize() > 0) {
+            String fileName = "fasiliti_" + System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
+            filePart.write(SAVE_DIR + File.separator + fileName);
+            f.setGambar_fasiliti(fileName);
+        }
         
         if (fasilitiDAO.tambahFasiliti(f)) {
             response.sendRedirect(request.getContextPath() + "/fasiliti/urus?success=added");
@@ -256,7 +277,7 @@ public class FasilitiServlet extends HttpServlet {
     }
 
     private void handleEditFasiliti(HttpServletRequest request, HttpServletResponse response)
-            throws IOException {
+            throws ServletException, IOException {
         Fasiliti f = new Fasiliti();
         f.setId_fasiliti(Integer.parseInt(request.getParameter("id")));
         f.setNama_fasiliti(request.getParameter("nama"));
@@ -270,6 +291,21 @@ public class FasilitiServlet extends HttpServlet {
         
         String reqAppEdit = request.getParameter("requires_approval");
         f.setRequiresApproval("1".equals(reqAppEdit));
+
+        // Handle Image Upload
+        Part filePart = request.getPart("gambar_fasiliti");
+        if (filePart != null && filePart.getSize() > 0) {
+            File saveDir = new File(SAVE_DIR);
+            if (!saveDir.exists()) saveDir.mkdirs();
+
+            String fileName = "fasiliti_" + System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
+            filePart.write(SAVE_DIR + File.separator + fileName);
+            f.setGambar_fasiliti(fileName);
+        } else {
+            // Keep old image if no new one uploaded
+            Fasiliti old = fasilitiDAO.dapatkanFasilitiById(f.getId_fasiliti());
+            if (old != null) f.setGambar_fasiliti(old.getGambar_fasiliti());
+        }
         
         if (fasilitiDAO.kemaskiniFasiliti(f)) {
             response.sendRedirect(request.getContextPath() + "/fasiliti/urus?success=updated");

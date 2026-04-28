@@ -148,7 +148,8 @@ CREATE TABLE `fasiliti` (
   `dipadam_pada` timestamp NULL DEFAULT NULL,
   `latitude` decimal(10,8) DEFAULT NULL,
   `longitude` decimal(11,8) DEFAULT NULL,
-  `requires_approval` tinyint(1) DEFAULT 0
+  `requires_approval` tinyint(1) DEFAULT 0,
+  `gambar_fasiliti` varchar(255) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --

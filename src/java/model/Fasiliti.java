@@ -14,6 +14,7 @@ public class Fasiliti {
     private Timestamp dipadam_pada;
     private boolean occupied;
     private boolean requiresApproval;
+    private String gambar_fasiliti;
 
     // --- Constructor Kosong ---
     public Fasiliti() {}
@@ -103,5 +104,13 @@ public class Fasiliti {
 
     public void setLongitude(Double longitude) {
         this.longitude = longitude;
+    }
+
+    public String getGambar_fasiliti() {
+        return gambar_fasiliti;
+    }
+
+    public void setGambar_fasiliti(String gambar_fasiliti) {
+        this.gambar_fasiliti = gambar_fasiliti;
     }
 }

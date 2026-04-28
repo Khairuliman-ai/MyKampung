@@ -2,6 +2,10 @@
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
 
+<!-- Cropper.js CSS & JS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
 <%
     List<Fasiliti> senaraiFasiliti = (List<Fasiliti>) request.getAttribute("senaraiFasiliti");
     List<TempahanFasiliti> senaraiTempahan = (List<TempahanFasiliti>) request.getAttribute("senaraiTempahan");
@@ -88,8 +92,14 @@
                             <tr class="hover:bg-gray-50/50 transition-colors">
                                 <td class="px-8 py-6">
                                     <div class="flex items-center gap-4">
-                                        <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-brand-purple">
-                                            <i class="fas fa-building text-sm"></i>
+                                        <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
+                                            <% if (f.getGambar_fasiliti() != null) { %>
+                                                <img src="${pageContext.request.contextPath}/file/fasiliti/<%= f.getGambar_fasiliti() %>" class="w-full h-full object-cover">
+                                            <% } else { %>
+                                                <div class="w-full h-full flex items-center justify-center text-brand-purple">
+                                                    <i class="fas fa-building text-sm"></i>
+                                                </div>
+                                            <% } %>
                                         </div>
                                         <p class="text-sm font-bold text-gray-800"><%= f.getNama_fasiliti() %></p>
                                     </div>
@@ -114,7 +124,7 @@
                                             </a>
                                         <% } } %>
                                         
-                                        <button onclick="openEditModal('<%= f.getId_fasiliti() %>', '<%= f.getNama_fasiliti() %>', '<%= f.getLokasi() %>', '<%= f.getStatus() %>', '<%= f.getLatitude() != null ? f.getLatitude() : "" %>', '<%= f.getLongitude() != null ? f.getLongitude() : "" %>', <%= f.isRequiresApproval() %>)" 
+                                        <button onclick="openEditModal('<%= f.getId_fasiliti() %>', '<%= f.getNama_fasiliti() %>', '<%= f.getLokasi() %>', '<%= f.getStatus() %>', '<%= f.getLatitude() != null ? f.getLatitude() : "" %>', '<%= f.getLongitude() != null ? f.getLongitude() : "" %>', <%= f.isRequiresApproval() %>, '<%= f.getGambar_fasiliti() != null ? f.getGambar_fasiliti() : "" %>')" 
                                                 class="w-9 h-9 flex items-center justify-center bg-gray-50 text-gray-400 hover:text-brand-purple hover:bg-indigo-50 rounded-xl transition-all">
                                             <i class="fas fa-pen text-xs"></i>
                                         </button>
@@ -344,7 +354,7 @@
                 </button>
             </header>
 
-            <form action="<%= contextPath %>/fasiliti/tambah" method="post" id="formFasiliti" class="space-y-6">
+            <form action="<%= contextPath %>/fasiliti/tambah" method="post" id="formFasiliti" class="space-y-6" enctype="multipart/form-data">
                 <input type="hidden" name="id" id="fasilitiId">
                 
                 <div class="space-y-2">
@@ -365,6 +375,37 @@
                         <option value="AKTIF">AKTIF</option>
                         <option value="TIDAK AKTIF">TIDAK AKTIF</option>
                     </select>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Gambar Fasiliti</label>
+                    <input type="file" name="gambar_fasiliti" id="fasilitiGambar" accept="image/*" onchange="handleImageSelection(this)"
+                           class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium">
+                    <p class="text-[9px] text-gray-400 mt-1 px-2">Muat naik gambar baharu untuk menukar gambar sedia ada.</p>
+                </div>
+
+                <!-- Preview Card (Resident View) -->
+                <div class="space-y-3">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Pratinjau (Paparan Penduduk)</label>
+                    <div id="residentPreviewCard" class="w-full max-w-sm mx-auto bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden pointer-events-none opacity-80 scale-95 origin-top">
+                        <div class="h-40 bg-gray-100 overflow-hidden relative">
+                            <img id="cardPreviewImg" src="${pageContext.request.contextPath}/assets/img/placeholder.png" class="w-full h-full object-cover">
+                            <div class="absolute top-3 right-3">
+                                <span class="bg-green-500 text-white text-[8px] font-bold px-2 py-0.5 rounded-full uppercase tracking-wider shadow-sm">Tersedia</span>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <h3 class="text-sm font-bold text-gray-800 mb-1" id="cardPreviewNama">Nama Fasiliti</h3>
+                            <div class="flex items-center gap-1 text-gray-400 text-[10px]">
+                                <i class="fas fa-location-dot"></i>
+                                <span id="cardPreviewLokasi">Lokasi</span>
+                            </div>
+                            <div class="mt-4 flex flex-col gap-2">
+                                <div class="w-full h-8 bg-brand-purple/10 rounded-xl"></div>
+                                <div class="w-full h-6 bg-gray-50 rounded-xl"></div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="flex items-center gap-3 px-2">
@@ -415,6 +456,52 @@
                     Sahkan Penolakan
                 </button>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Image Cropper -->
+<div id="modalCrop" class="fixed inset-0 z-[70] hidden overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity backdrop-blur-md" onclick="closeCropModal()"></div>
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden transform transition-all">
+            <header class="flex justify-between items-center p-8 border-b border-gray-100">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">Laraskan Gambar</h3>
+                    <p class="text-xs text-gray-400 mt-1">Sila potong gambar mengikut bingkai yang disediakan untuk paparan penduduk yang kemas.</p>
+                </div>
+                <button onclick="closeCropModal()" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-gray-50 rounded-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </header>
+            
+            <div class="p-8">
+                <div class="max-h-[500px] bg-gray-900 rounded-2xl overflow-hidden flex items-center justify-center">
+                    <img id="cropperImage" class="max-w-full block">
+                </div>
+                
+                <div class="flex justify-between items-center mt-8">
+                    <div class="flex gap-2">
+                        <button onclick="cropper.rotate(-90)" class="w-12 h-12 flex items-center justify-center bg-gray-50 text-gray-600 rounded-xl hover:bg-gray-100 transition shadow-sm">
+                            <i class="fas fa-rotate-left"></i>
+                        </button>
+                        <button onclick="cropper.rotate(90)" class="w-12 h-12 flex items-center justify-center bg-gray-50 text-gray-600 rounded-xl hover:bg-gray-100 transition shadow-sm">
+                            <i class="fas fa-rotate-right"></i>
+                        </button>
+                        <button onclick="cropper.setDragMode('move')" class="w-12 h-12 flex items-center justify-center bg-gray-50 text-gray-600 rounded-xl hover:bg-gray-100 transition shadow-sm" title="Alih">
+                            <i class="fas fa-arrows-alt"></i>
+                        </button>
+                        <button onclick="cropper.setDragMode('crop')" class="w-12 h-12 flex items-center justify-center bg-brand-purple text-white rounded-xl shadow-lg shadow-indigo-100 transition" title="Potong">
+                            <i class="fas fa-crop-alt"></i>
+                        </button>
+                    </div>
+                    
+                    <div class="flex gap-4">
+                        <button onclick="closeCropModal()" class="px-6 py-3 text-gray-400 font-bold text-sm hover:text-gray-600 transition">Batal</button>
+                        <button onclick="applyCrop()" class="px-10 py-4 bg-brand-purple text-white rounded-2xl font-bold text-sm shadow-xl shadow-indigo-100 hover:bg-opacity-90 transition-all">Sahkan & Gunakan</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -477,6 +564,97 @@
         setTimeout(function() { fasilitiMap.invalidateSize(); }, 300);
     }
 
+    // Image Cropping & Preview Logic
+    let cropper;
+    let croppedBlob;
+    const cropModal = document.getElementById('modalCrop');
+    const cropperImage = document.getElementById('cropperImage');
+    const cardPreviewImg = document.getElementById('cardPreviewImg');
+
+    function handleImageSelection(input) {
+        if (input.files && input.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                cropperImage.src = e.target.result;
+                openCropModal();
+            };
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function openCropModal() {
+        cropModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        
+        if (cropper) {
+            cropper.destroy();
+        }
+        
+        setTimeout(() => {
+            cropper = new Cropper(cropperImage, {
+                aspectRatio: 16 / 9,
+                viewMode: 1,
+                dragMode: 'crop',
+                autoCropArea: 1,
+                restore: false,
+                guides: true,
+                center: true,
+                highlight: false,
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                toggleDragModeOnDblclick: false,
+            });
+        }, 100);
+    }
+
+    function closeCropModal() {
+        cropModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        if (cropper) {
+            cropper.destroy();
+        }
+    }
+
+    function applyCrop() {
+        const canvas = cropper.getCroppedCanvas({
+            width: 800,
+            height: 450, // 16:9 ratio
+        });
+        
+        canvas.toBlob((blob) => {
+            croppedBlob = blob;
+            cardPreviewImg.src = canvas.toDataURL('image/jpeg');
+            closeCropModal();
+        }, 'image/jpeg', 0.9);
+    }
+
+    // Override Form Submission to include Cropped Image
+    document.getElementById('formFasiliti').onsubmit = function(e) {
+        if (croppedBlob) {
+            e.preventDefault();
+            const formData = new FormData(this);
+            // Replace the original file with the cropped one
+            formData.set('gambar_fasiliti', croppedBlob, 'fasiliti_cropped.jpg');
+            
+            // Submit using Fetch
+            fetch(this.action, {
+                method: 'POST',
+                body: formData
+            }).then(response => {
+                if (response.redirected) {
+                    window.location.href = response.url;
+                } else {
+                    window.location.reload();
+                }
+            }).catch(err => {
+                console.error('Error submitting form:', err);
+                alert('Gagal menyimpan fasiliti. Sila cuba lagi.');
+            });
+            return false;
+        }
+        return true;
+    };
+
     function openAddModal() {
         document.getElementById('modalTitle').innerText = "Tambah Fasiliti Baru";
         document.getElementById('formFasiliti').action = "<%= contextPath %>/fasiliti/tambah";
@@ -484,11 +662,15 @@
         document.getElementById('fasilitiNama').value = "";
         document.getElementById('fasilitiLokasi').value = "";
         document.getElementById('fasilitiStatus').value = "AKTIF";
+        document.getElementById('cardPreviewNama').innerText = "Nama Fasiliti";
+        document.getElementById('cardPreviewLokasi').innerText = "Lokasi";
+        document.getElementById('cardPreviewImg').src = "${pageContext.request.contextPath}/assets/img/placeholder.png";
+        croppedBlob = null;
         document.getElementById('modalFasiliti').classList.remove('hidden');
         setTimeout(function(){ initFasilitiMap(); }, 100);
     }
 
-    function openEditModal(id, nama, lokasi, status, lat, lon, requiresApproval) {
+    function openEditModal(id, nama, lokasi, status, lat, lon, requiresApproval, currentImage) {
         document.getElementById('modalTitle').innerText = "Kemaskini Fasiliti";
         document.getElementById('formFasiliti').action = "<%= contextPath %>/fasiliti/edit";
         document.getElementById('fasilitiId').value = id;
@@ -496,9 +678,27 @@
         document.getElementById('fasilitiLokasi').value = lokasi;
         document.getElementById('fasilitiStatus').value = status;
         document.getElementById('fasilitiRequiresApproval').checked = requiresApproval;
+        
+        document.getElementById('cardPreviewNama').innerText = nama;
+        document.getElementById('cardPreviewLokasi').innerText = lokasi;
+        if (currentImage) {
+            document.getElementById('cardPreviewImg').src = "${pageContext.request.contextPath}/file/fasiliti/" + currentImage;
+        } else {
+            document.getElementById('cardPreviewImg').src = "${pageContext.request.contextPath}/assets/img/placeholder.png";
+        }
+        
+        croppedBlob = null;
         document.getElementById('modalFasiliti').classList.remove('hidden');
         setTimeout(function(){ initFasilitiMap(lat, lon); }, 100);
     }
+
+    // Live update preview text
+    document.getElementById('fasilitiNama').addEventListener('input', function() {
+        document.getElementById('cardPreviewNama').innerText = this.value || "Nama Fasiliti";
+    });
+    document.getElementById('fasilitiLokasi').addEventListener('input', function() {
+        document.getElementById('cardPreviewLokasi').innerText = this.value || "Lokasi";
+    });
 
     function closeModal() {
         document.getElementById('modalFasiliti').classList.add('hidden');

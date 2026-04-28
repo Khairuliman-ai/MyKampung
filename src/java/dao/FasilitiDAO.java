@@ -43,6 +43,7 @@ public class FasilitiDAO {
 
                 f.setOccupied(rs.getInt("occupancy_count") > 0);
                 f.setRequiresApproval(rs.getBoolean("requires_approval"));
+                f.setGambar_fasiliti(rs.getString("gambar_fasiliti"));
                 senarai.add(f);
             }
         } catch (SQLException e) {
@@ -75,6 +76,7 @@ public class FasilitiDAO {
                     double lon = rs.getDouble("longitude");
                     f.setLongitude(rs.wasNull() ? null : lon);
                     f.setRequiresApproval(rs.getBoolean("requires_approval"));
+                    f.setGambar_fasiliti(rs.getString("gambar_fasiliti"));
                 }
             }
         } catch (SQLException e) {
@@ -84,7 +86,7 @@ public class FasilitiDAO {
     }
 
     public boolean tambahFasiliti(Fasiliti f) {
-        String sql = "INSERT INTO fasiliti (nama_fasiliti, lokasi, status, latitude, longitude, requires_approval) VALUES (?, ?, 'AKTIF', ?, ?, ?)";
+        String sql = "INSERT INTO fasiliti (nama_fasiliti, lokasi, status, latitude, longitude, requires_approval, gambar_fasiliti) VALUES (?, ?, 'AKTIF', ?, ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, f.getNama_fasiliti());
@@ -92,6 +94,7 @@ public class FasilitiDAO {
             if (f.getLatitude() != null) ps.setDouble(3, f.getLatitude()); else ps.setNull(3, java.sql.Types.DECIMAL);
             if (f.getLongitude() != null) ps.setDouble(4, f.getLongitude()); else ps.setNull(4, java.sql.Types.DECIMAL);
             ps.setBoolean(5, f.isRequiresApproval());
+            ps.setString(6, f.getGambar_fasiliti());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Ralat pada FasilitiDAO (tambah): " + e.getMessage());
@@ -100,7 +103,7 @@ public class FasilitiDAO {
     }
 
     public boolean kemaskiniFasiliti(Fasiliti f) {
-        String sql = "UPDATE fasiliti SET nama_fasiliti=?, lokasi=?, status=?, latitude=?, longitude=?, requires_approval=?, dikemaskini_pada=NOW() WHERE id_fasiliti=?";
+        String sql = "UPDATE fasiliti SET nama_fasiliti=?, lokasi=?, status=?, latitude=?, longitude=?, requires_approval=?, gambar_fasiliti=?, dikemaskini_pada=NOW() WHERE id_fasiliti=?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, f.getNama_fasiliti());
@@ -109,7 +112,8 @@ public class FasilitiDAO {
             if (f.getLatitude() != null) ps.setDouble(4, f.getLatitude()); else ps.setNull(4, java.sql.Types.DECIMAL);
             if (f.getLongitude() != null) ps.setDouble(5, f.getLongitude()); else ps.setNull(5, java.sql.Types.DECIMAL);
             ps.setBoolean(6, f.isRequiresApproval());
-            ps.setInt(7, f.getId_fasiliti());
+            ps.setString(7, f.getGambar_fasiliti());
+            ps.setInt(8, f.getId_fasiliti());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Ralat pada FasilitiDAO (kemaskini): " + e.getMessage());
@@ -158,6 +162,7 @@ public class FasilitiDAO {
                 f.setLongitude(rs.wasNull() ? null : lon_);
                 f.setOccupied(rs.getInt("occupancy_count") > 0);
                 f.setRequiresApproval(rs.getBoolean("requires_approval"));
+                f.setGambar_fasiliti(rs.getString("gambar_fasiliti"));
                 senarai.add(f);
             }
         } catch (SQLException e) {

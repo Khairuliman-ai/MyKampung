@@ -78,43 +78,67 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <% if (senaraiFasiliti != null && !senaraiFasiliti.isEmpty()) { 
                 for (Fasiliti f : senaraiFasiliti) { %>
-                <div class="bg-white rounded-[2.5rem] p-8 border border-gray-50 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300">
-                    <div class="flex justify-between items-start mb-6">
-                        <div class="w-14 h-14 bg-brand-purple bg-opacity-10 text-brand-purple rounded-2xl flex items-center justify-center text-xl">
-                            <i class="fas fa-building"></i>
+                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                    <!-- Facility Image -->
+                    <% if (f.getGambar_fasiliti() != null) { %>
+                        <div class="h-48 bg-gray-100 overflow-hidden relative">
+                            <img src="${pageContext.request.contextPath}/file/fasiliti/<%= f.getGambar_fasiliti() %>"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute top-4 right-4">
+                                <% if (f.isOccupied()) { %>
+                                    <span class="bg-orange-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg animate-pulse">
+                                        <i class="fas fa-user-clock mr-1"></i> Penuh
+                                    </span>
+                                <% } else { %>
+                                    <span class="bg-green-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
+                                        Tersedia
+                                    </span>
+                                <% } %>
+                            </div>
                         </div>
-                        <div class="flex flex-col items-end gap-2">
-                            <% if (f.isOccupied()) { %>
-                                <span class="bg-orange-100 text-orange-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider animate-pulse">
-                                    <i class="fas fa-user-clock mr-1"></i> Sedang Digunakan
-                                </span>
-                            <% } else { %>
-                                <span class="bg-green-100 text-green-600 text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider">
-                                    Tersedia
-                                </span>
-                            <% } %>
+                    <% } else { %>
+                        <div class="h-48 bg-gradient-to-br from-[#6C5DD3] to-[#8B7EE0] flex items-center justify-center relative">
+                            <i class="fas fa-building text-white text-4xl opacity-30"></i>
+                            <div class="absolute top-4 right-4">
+                                <% if (f.isOccupied()) { %>
+                                    <span class="bg-orange-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg animate-pulse">
+                                        <i class="fas fa-user-clock mr-1"></i> Penuh
+                                    </span>
+                                <% } else { %>
+                                    <span class="bg-green-500 text-white text-[10px] font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-lg">
+                                        Tersedia
+                                    </span>
+                                <% } %>
+                            </div>
+                        </div>
+                    <% } %>
+
+                    <div class="p-6">
+                        <div class="flex justify-between items-start mb-2">
+                            <h3 class="text-lg font-bold text-gray-800"><%= f.getNama_fasiliti() %></h3>
                             <% if (f.isRequiresApproval()) { %>
-                                <span class="bg-blue-50 text-brand-purple text-[9px] font-bold px-2 py-0.5 rounded border border-indigo-100 mt-1">
-                                    <i class="fas fa-shield-halved mr-1"></i> Perlu Kelulusan
+                                <span class="bg-indigo-50 text-brand-purple text-[9px] font-bold px-2 py-0.5 rounded border border-indigo-100" title="Memerlukan kelulusan AJK">
+                                    <i class="fas fa-shield-halved"></i>
                                 </span>
                             <% } %>
                         </div>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-800 mb-2"><%= f.getNama_fasiliti() %></h3>
-                    <div class="flex items-center gap-2 text-gray-400 text-sm mb-8">
-                        <i class="fas fa-location-dot"></i>
-                        <span><%= f.getLokasi() %></span>
-                    </div>
-                    <div class="flex flex-col gap-3">
-                        <button onclick="openBookingModal('<%= f.getId_fasiliti() %>', '<%= f.getNama_fasiliti() %>', <%= f.isRequiresApproval() %>)" 
-                                <%= f.isOccupied() ? "disabled title='Fasiliti sedang digunakan'" : "" %>
-                                class="w-full py-4 <%= f.isOccupied() ? "bg-gray-200 text-gray-400 cursor-not-allowed" : "bg-brand-purple text-white shadow-lg shadow-indigo-100 hover:bg-opacity-90" %> rounded-2xl font-bold text-sm transition-all">
-                            <%= f.isOccupied() ? "Tidak Tersedia" : "Tempah Sekarang" %>
-                        </button>
-                        <button onclick="openDetailsModal('<%= f.getId_fasiliti() %>', '<%= f.getNama_fasiliti() %>', '<%= f.getLokasi() %>', '<%= f.getLatitude() %>', '<%= f.getLongitude() %>', <%= f.isOccupied() %>)"
-                                class="w-full py-3 bg-white text-gray-500 border border-gray-100 rounded-2xl font-bold text-xs hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
-                            <i class="fas fa-info-circle"></i> Lihat Butiran
-                        </button>
+                        
+                        <div class="flex items-center gap-2 text-gray-400 text-xs mb-6">
+                            <i class="fas fa-location-dot"></i>
+                            <span><%= f.getLokasi() %></span>
+                        </div>
+
+                        <div class="flex flex-col gap-3">
+                            <button onclick="openBookingModal('<%= f.getId_fasiliti() %>', '<%= f.getNama_fasiliti() %>', <%= f.isRequiresApproval() %>)" 
+                                    <%= f.isOccupied() ? "disabled title='Fasiliti sedang digunakan'" : "" %>
+                                    class="w-full py-3.5 <%= f.isOccupied() ? "bg-gray-100 text-gray-400 cursor-not-allowed" : "bg-brand-purple text-white shadow-lg shadow-indigo-100 hover:bg-opacity-90" %> rounded-2xl font-bold text-sm transition-all">
+                                <%= f.isOccupied() ? "Tidak Tersedia" : "Tempah Sekarang" %>
+                            </button>
+                            <button onclick="openDetailsModal('<%= f.getId_fasiliti() %>', '<%= f.getNama_fasiliti() %>', '<%= f.getLokasi() %>', '<%= f.getLatitude() %>', '<%= f.getLongitude() %>', <%= f.isOccupied() %>)"
+                                    class="w-full py-2.5 bg-white text-gray-500 border border-gray-100 rounded-2xl font-bold text-[10px] hover:bg-gray-50 transition-all flex items-center justify-center gap-2">
+                                <i class="fas fa-info-circle"></i> Lihat Butiran
+                            </button>
+                        </div>
                     </div>
                 </div>
             <% } } else { %>
