@@ -20,71 +20,165 @@
         </button>
     </div>
 
-    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-        <div class="overflow-x-auto">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-purple-50 border-b border-purple-100">
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Tajuk</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Kategori</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Status</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Tarikh Hebahan</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider text-center">Tindakan</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    <% if (list != null && !list.isEmpty()) { 
-                        for (Hebahan h : list) { %>
-                    <tr class="hover:bg-purple-50/30 transition">
-                        <td class="p-4">
-                            <div class="flex flex-col">
-                                <span class="text-sm font-bold text-gray-800"><%= h.getTajuk() %></span>
-                                <span class="text-[10px] text-gray-400 truncate w-48"><%= h.getKandungan() %></span>
+    <!-- List Layout (Mirror Resident View) -->
+    <div class="flex flex-col gap-6">
+        <% if (list != null && !list.isEmpty()) { 
+            for (Hebahan h : list) { 
+                String fullDate = h.getTarikh_hebahan() != null ? sdf.format(h.getTarikh_hebahan()) : "-";
+                String eventDateRange = "-";
+                if (h.getTarikh_mula_acara() != null) {
+                    eventDateRange = sdf.format(h.getTarikh_mula_acara());
+                    if (h.getTarikh_tamat_acara() != null) {
+                        eventDateRange += " - " + sdf.format(h.getTarikh_tamat_acara());
+                    }
+                }
+        %>
+        <div class="bg-white rounded-[2rem] shadow-sm border border-gray-50 overflow-hidden hover:shadow-xl transition-all duration-300 group flex flex-col md:flex-row md:h-64 relative">
+            
+            <!-- Admin Overlay: Status Badge -->
+            <div class="absolute top-4 right-4 z-10 flex gap-2">
+                <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase shadow-sm border <%= h.getStatusBadgeClass() %>">
+                    <i class="fas fa-circle text-[8px] mr-1"></i> <%= h.getStatus_hebahan() %>
+                </span>
+            </div>
+
+            <!-- Poster Image Section -->
+            <div class="w-full md:w-72 lg:w-96 shrink-0 relative overflow-hidden bg-gray-100">
+                <% if (h.getGambar_poster() != null) { %>
+                    <img src="${pageContext.request.contextPath}/file/hebahan/<%= h.getGambar_poster() %>"
+                         class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                <% } else { %>
+                    <div class="w-full h-full bg-gradient-to-br from-[#6C5DD3] to-[#8B7EE0] flex items-center justify-center">
+                        <i class="<%= h.getKategoriIcon() %> text-white text-5xl opacity-30"></i>
+                    </div>
+                <% } %>
+            </div>
+
+            <!-- Content Section -->
+            <div class="p-6 md:p-8 flex flex-col flex-1 min-w-0">
+                <div class="flex gap-2 mb-4">
+                    <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase border <%= h.getKategoriBadgeClass() %>">
+                        <%= h.getKategori() %>
+                    </span>
+                </div>
+
+                <div class="flex-1">
+                    <h3 class="text-xl md:text-2xl font-bold text-gray-800 mb-2 truncate"><%= h.getTajuk() %></h3>
+                    <p class="text-sm text-gray-500 line-clamp-2 mb-6 leading-relaxed"><%= h.getKandungan() %></p>
+                </div>
+
+                <div class="flex flex-wrap items-center gap-y-2 gap-x-6 pt-4 border-t border-gray-50">
+                    <div class="flex items-center gap-2 text-xs text-gray-400">
+                        <i class="fas fa-calendar-alt text-brand-purple"></i>
+                        <span class="font-medium"><%= fullDate %></span>
+                    </div>
+
+                    <!-- Management Actions -->
+                    <div class="ml-auto flex items-center gap-3">
+                        <button onclick="showHebahanDetail({
+                            tajuk: '<%= h.getTajuk().replace("'", "\\'") %>',
+                            kandungan: `<%= h.getKandungan().replace("`", "\\`") %>`,
+                            kategori: '<%= h.getKategori() %>',
+                            badgeClass: '<%= h.getKategoriBadgeClass() %>',
+                            icon: '<%= h.getKategoriIcon() %>',
+                            gambar: '<%= h.getGambar_poster() != null ? h.getGambar_poster() : "" %>',
+                            lokasi: '<%= h.getLokasi_acara() != null ? h.getLokasi_acara().replace("'", "\\'") : "-" %>',
+                            tarikhHebahan: '<%= fullDate %>',
+                            tarikhAcara: '<%= eventDateRange %>'
+                        })" class="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-xl text-xs font-bold transition flex items-center gap-2">
+                            <i class="fas fa-eye"></i> Pratinjau
+                        </button>
+
+                        <button onclick="openEditModal(this)" 
+                                data-id="<%= h.getId_hebahan() %>"
+                                data-tajuk="<%= h.getTajuk() %>"
+                                data-kandungan="<%= h.getKandungan() %>"
+                                data-kategori="<%= h.getKategori() %>"
+                                data-status="<%= h.getStatus_hebahan() %>"
+                                data-lokasi="<%= h.getLokasi_acara() != null ? h.getLokasi_acara() : "" %>"
+                                data-mula="<%= h.getTarikh_mula_acara() != null ? sdfInput.format(h.getTarikh_mula_acara()) : "" %>"
+                                data-tamat_acara="<%= h.getTarikh_tamat_acara() != null ? sdfInput.format(h.getTarikh_tamat_acara()) : "" %>"
+                                data-tamat_hebahan="<%= h.getTarikh_tamat() != null ? sdfInput.format(h.getTarikh_tamat()) : "" %>"
+                                class="w-10 h-10 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center transition shadow-sm">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                        
+                        <button onclick="confirmDelete(<%= h.getId_hebahan() %>)" 
+                                class="w-10 h-10 bg-red-50 hover:bg-red-100 text-red-600 rounded-xl flex items-center justify-center transition shadow-sm">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <% } } else { %>
+            <div class="py-20 text-center bg-white rounded-[3rem] border border-dashed border-gray-200">
+                <div class="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i class="fas fa-comment-slash text-3xl text-gray-200"></i>
+                </div>
+                <p class="font-bold text-gray-400">Tiada Rekod Hebahan</p>
+                <p class="text-xs text-gray-300 mt-1">Klik 'Tambah Hebahan Baru' untuk mula.</p>
+            </div>
+        <% } %>
+    </div>
+</div>
+
+<!-- Modal Detail Hebahan (Pratinjau Paparan Penduduk) -->
+<div id="modalDetailPreview" class="fixed inset-0 z-[60] hidden overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-900 bg-opacity-40 transition-opacity backdrop-blur-sm" onclick="closeDetailModal()"></div>
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative w-full max-w-4xl bg-white rounded-[3rem] shadow-2xl overflow-hidden transform transition-all duration-300">
+            <!-- Header Image -->
+            <div id="modalImageContainer" class="h-64 md:h-96 bg-gray-100 overflow-hidden relative">
+                <img id="modalImage" src="" class="w-full h-full object-cover">
+                <div id="modalGradient" class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+                <button onclick="closeDetailModal()" class="absolute top-6 right-6 w-12 h-12 bg-white/20 hover:bg-white/40 backdrop-blur-md text-white rounded-2xl flex items-center justify-center transition-all">
+                    <i class="fas fa-times"></i>
+                </button>
+                <div class="absolute bottom-8 left-8 right-8 text-white text-left">
+                    <div id="modalBadge" class="inline-block px-4 py-1.5 rounded-full text-[10px] font-bold uppercase mb-4 backdrop-blur-md border border-white/20"></div>
+                    <h2 id="modalTitlePreview" class="text-2xl md:text-4xl font-bold"></h2>
+                </div>
+            </div>
+
+            <!-- Content Body -->
+            <div class="p-8 md:p-12 text-left">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    <div class="md:col-span-2">
+                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-100 pb-2">Kandungan Hebahan</h3>
+                        <div id="modalKandungan" class="text-gray-600 leading-relaxed space-y-4 whitespace-pre-wrap"></div>
+                    </div>
+                    <div class="space-y-8">
+                        <div>
+                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-100 pb-2">Maklumat Acara</h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-xl bg-purple-50 text-brand-purple flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-[10px] font-bold text-gray-400 uppercase">Lokasi</p>
+                                        <p id="modalLokasi" class="text-sm font-bold text-gray-700"></p>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-4">
+                                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
+                                        <i class="fas fa-clock"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-[10px] font-bold text-gray-400 uppercase">Tarikh Acara</p>
+                                        <p id="modalTarikhAcara" class="text-sm font-bold text-gray-700"></p>
+                                    </div>
+                                </div>
                             </div>
-                        </td>
-                        <td class="p-4">
-                            <span class="px-3 py-1 rounded-lg text-[10px] font-bold uppercase <%= h.getKategoriBadgeClass() %>">
-                                <%= h.getKategori() %>
-                            </span>
-                        </td>
-                        <td class="p-4">
-                            <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase <%= h.getStatusBadgeClass() %>">
-                                <%= h.getStatus_hebahan() %>
-                            </span>
-                        </td>
-                        <td class="p-4 text-sm text-gray-600"><%= h.getTarikh_hebahan() != null ? sdf.format(h.getTarikh_hebahan()) : "-" %></td>
-                        <td class="p-4 text-center">
-                            <div class="flex justify-center gap-2">
-                                <button onclick="openEditModal(this)" 
-                                        data-id="<%= h.getId_hebahan() %>"
-                                        data-tajuk="<%= h.getTajuk() %>"
-                                        data-kandungan="<%= h.getKandungan() %>"
-                                        data-kategori="<%= h.getKategori() %>"
-                                        data-status="<%= h.getStatus_hebahan() %>"
-                                        data-lokasi="<%= h.getLokasi_acara() != null ? h.getLokasi_acara() : "" %>"
-                                        data-mula="<%= h.getTarikh_mula_acara() != null ? sdfInput.format(h.getTarikh_mula_acara()) : "" %>"
-                                        data-tamat_acara="<%= h.getTarikh_tamat_acara() != null ? sdfInput.format(h.getTarikh_tamat_acara()) : "" %>"
-                                        data-tamat_hebahan="<%= h.getTarikh_tamat() != null ? sdfInput.format(h.getTarikh_tamat()) : "" %>"
-                                        class="text-blue-400 hover:text-blue-600 transition">
-                                    <i class="fas fa-edit"></i>
-                                </button>
-                                <button onclick="confirmDelete(<%= h.getId_hebahan() %>)" class="text-red-400 hover:text-red-600 transition">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    <% } } else { %>
-                    <tr>
-                        <td colspan="5" class="p-12 text-center text-gray-400">
-                            <i class="fas fa-comment-slash text-4xl mb-4 opacity-20"></i>
-                            <p class="font-bold">Tiada Rekod Hebahan</p>
-                            <p class="text-xs">Klik 'Tambah Hebahan Baru' untuk mula.</p>
-                        </td>
-                    </tr>
-                    <% } %>
-                </tbody>
-            </table>
+                        </div>
+                        <div class="p-6 bg-gray-50 rounded-[2rem] border border-gray-100 text-center">
+                            <p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Hebahan Diterbitkan Pada</p>
+                            <p id="modalTarikhHebahan" class="text-xs font-bold text-gray-600"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -247,6 +341,54 @@
         document.getElementById('tarikh_tamat').value = btn.getAttribute('data-tamat_hebahan');
         
         document.getElementById('modalHebahan').classList.remove('hidden');
+    }
+
+    // Functions for Resident View Preview
+    function showHebahanDetail(data) {
+        const modal = document.getElementById('modalDetailPreview');
+        const img = document.getElementById('modalImage');
+        const imgContainer = document.getElementById('modalImageContainer');
+        const grad = document.getElementById('modalGradient');
+        
+        document.getElementById('modalTitlePreview').innerText = data.tajuk;
+        document.getElementById('modalKandungan').innerText = data.kandungan;
+        document.getElementById('modalLokasi').innerText = data.lokasi;
+        document.getElementById('modalTarikhAcara').innerText = data.tarikhAcara;
+        document.getElementById('modalTarikhHebahan').innerText = data.tarikhHebahan;
+        
+        const badge = document.getElementById('modalBadge');
+        badge.innerText = data.kategori;
+        badge.className = 'inline-block px-4 py-1.5 rounded-full text-[10px] font-bold uppercase mb-4 backdrop-blur-md border border-white/20 ' + data.badgeClass;
+
+        if (data.gambar) {
+            img.src = '${pageContext.request.contextPath}/file/hebahan/' + data.gambar;
+            img.classList.remove('hidden');
+            imgContainer.classList.remove('bg-gradient-to-br');
+            grad.classList.remove('hidden');
+        } else {
+            img.classList.add('hidden');
+            imgContainer.className = 'h-64 md:h-96 overflow-hidden relative bg-gradient-to-br from-[#6C5DD3] to-[#8B7EE0] flex items-center justify-center';
+            grad.classList.add('hidden');
+            const icon = document.createElement('i');
+            icon.className = data.icon + ' text-white text-9xl opacity-20';
+            icon.id = 'tempIcon';
+            imgContainer.appendChild(icon);
+        }
+
+        modal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeDetailModal() {
+        const modal = document.getElementById('modalDetailPreview');
+        modal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+        
+        const tempIcon = document.getElementById('tempIcon');
+        if (tempIcon) tempIcon.remove();
+        
+        const imgContainer = document.getElementById('modalImageContainer');
+        imgContainer.className = 'h-64 md:h-96 bg-gray-100 overflow-hidden relative';
     }
 
     function confirmDelete(id) {
