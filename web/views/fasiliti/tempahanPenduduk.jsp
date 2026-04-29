@@ -65,6 +65,17 @@
         </div>
     </div>
 
+    <!-- Search Bar -->
+    <div class="flex gap-4 mb-8">
+        <div class="flex gap-3 flex-1 relative group">
+            <div class="absolute left-5 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-purple transition-colors">
+                <i class="fas fa-search"></i>
+            </div>
+            <input type="text" id="searchInput" oninput="filterData()" placeholder="Cari fasiliti, lokasi, atau sejarah tempahan..." 
+                class="flex-1 pl-12 pr-6 py-4 rounded-[1.5rem] bg-white border border-gray-100 focus:ring-2 focus:ring-brand-purple focus:border-transparent text-sm shadow-sm transition-all outline-none">
+        </div>
+    </div>
+
     <!-- Main Content Tabs -->
     <div class="mb-8 border-b border-gray-200">
         <nav class="flex gap-8">
@@ -78,7 +89,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <% if (senaraiFasiliti != null && !senaraiFasiliti.isEmpty()) { 
                 for (Fasiliti f : senaraiFasiliti) { %>
-                <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+                <div class="facility-card bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
                     <!-- Facility Image -->
                     <% if (f.getGambar_fasiliti() != null) { %>
                         <div class="h-48 bg-gray-100 overflow-hidden relative">
@@ -115,7 +126,7 @@
 
                     <div class="p-6">
                         <div class="flex justify-between items-start mb-2">
-                            <h3 class="text-lg font-bold text-gray-800"><%= f.getNama_fasiliti() %></h3>
+                            <h3 class="facility-name text-lg font-bold text-gray-800"><%= f.getNama_fasiliti() %></h3>
                             <% if (f.isRequiresApproval()) { %>
                                 <span class="bg-indigo-50 text-brand-purple text-[9px] font-bold px-2 py-0.5 rounded border border-indigo-100" title="Memerlukan kelulusan AJK">
                                     <i class="fas fa-shield-halved"></i>
@@ -125,7 +136,7 @@
                         
                         <div class="flex items-center gap-2 text-gray-400 text-xs mb-6">
                             <i class="fas fa-location-dot"></i>
-                            <span><%= f.getLokasi() %></span>
+                            <span class="facility-location"><%= f.getLokasi() %></span>
                         </div>
 
                         <div class="flex flex-col gap-3">
@@ -141,7 +152,13 @@
                         </div>
                     </div>
                 </div>
-            <% } } else { %>
+                <% } %>
+                <!-- Empty state for search results -->
+                <div id="senarai-empty" class="hidden col-span-full py-20 text-center bg-white rounded-[2.5rem] border border-dashed border-gray-300">
+                    <i class="fas fa-search text-4xl text-gray-200 mb-4"></i>
+                    <p class="text-gray-400 font-medium">Tiada fasiliti sepadan dengan carian anda.</p>
+                </div>
+            <% } else { %>
                 <div class="col-span-full py-20 text-center bg-white rounded-[2.5rem] border border-dashed border-gray-300">
                     <i class="fas fa-building-circle-exclamation text-4xl text-gray-200 mb-4"></i>
                     <p class="text-gray-400 font-medium">Tiada fasiliti tersedia buat masa ini.</p>
@@ -174,41 +191,52 @@
                                 LocalTime endTime = t.getMasa_tamat().toLocalTime();
                                 boolean isFuture = bookingDate.isAfter(today) || (bookingDate.isEqual(today) && endTime.isAfter(nowTime));
                         %>
-                            <tr class="hover:bg-gray-50/50 transition-colors">
+                            <tr class="booking-row hover:bg-gray-50/50 transition-colors cursor-pointer"
+                                onclick='openBookingDetailModal({
+                                    namaFasiliti: "<%= t.getNama_fasiliti().replace("\"", "\\\"") %>",
+                                    tarikh: "<%= t.getTarikh_tempah() %>",
+                                    masa: "<%= t.getMasa_mula() %> - <%= t.getMasa_tamat() %>",
+                                    status: "<%= t.getStatus() %>",
+                                    catatan: "<%= t.getCatatan_pemohon() != null ? t.getCatatan_pemohon().replace("\"", "\\\"").replace("\n", " ").replace("\r", " ") : "" %>",
+                                    alasan: "<%= t.getAlasanPenolakan() != null ? t.getAlasanPenolakan().replace("\"", "\\\"").replace("\n", " ").replace("\r", " ") : "" %>",
+                                    lat: <%= t.getLatitude() %>,
+                                    lon: <%= t.getLongitude() %>,
+                                    gambar: "<%= t.getGambar_fasiliti() != null ? t.getGambar_fasiliti() : "" %>"
+                                })'>
                                 <td class="px-8 py-6">
                                     <div class="flex items-center gap-4">
                                         <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center text-brand-purple">
                                             <i class="fas fa-building text-sm"></i>
                                         </div>
                                         <div>
-                                            <p class="text-sm font-bold text-gray-800"><%= t.getNama_fasiliti() %></p>
+                                            <p class="booking-facility-name text-sm font-bold text-gray-800"><%= t.getNama_fasiliti() %></p>
                                         </div>
                                     </div>
                                 </td>
                                 <td class="px-8 py-6">
-                                    <p class="text-sm font-bold text-gray-700 mb-1"><%= t.getTarikh_tempah() %></p>
+                                    <p class="booking-date text-sm font-bold text-gray-700 mb-1"><%= t.getTarikh_tempah() %></p>
                                     <p class="text-xs text-gray-400 font-medium"><%= t.getMasa_mula() %> - <%= t.getMasa_tamat() %></p>
                                 </td>
                                 <td class="px-8 py-6">
                                     <% if ("LULUS".equals(t.getStatus())) { %>
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-bold">
+                                        <span class="booking-status inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-bold">
                                             <i class="fas fa-check-circle text-[8px]"></i> LULUS
                                         </span>
                                     <% } else if ("TOLAK".equals(t.getStatus())) { %>
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-bold">
+                                        <span class="booking-status inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-bold">
                                             <i class="fas fa-times-circle text-[8px]"></i> TOLAK
                                         </span>
                                     <% } else if ("DIBATAL".equals(t.getStatus())) { %>
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-[10px] font-bold">
+                                        <span class="booking-status inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-[10px] font-bold">
                                             <i class="fas fa-ban text-[8px]"></i> BATAL
                                         </span>
                                     <% } else { %>
-                                        <span class="inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold">
+                                        <span class="booking-status inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold">
                                             <i class="fas fa-clock text-[8px]"></i> MENUNGGU
                                         </span>
                                     <% } %>
                                 </td>
-                                <td class="px-8 py-6">
+                                <td class="px-8 py-6" onclick="event.stopPropagation()">
                                     <% if (isFuture && ("MENUNGGU".equals(t.getStatus()) || "LULUS".equals(t.getStatus()))) { %>
                                         <a href="<%= contextPath %>/fasiliti/batal?id=<%= t.getId_tempahan() %>" 
                                            onclick="return confirm('Adakah anda pasti mahu membatalkan tempahan ini?')"
@@ -221,6 +249,9 @@
                         <% } } else { %>
                             <tr><td colspan="4" class="px-8 py-10 text-center text-gray-400 text-sm italic">Tiada sejarah tempahan ditemui.</td></tr>
                         <% } %>
+                        <tr id="sejarah-empty" class="hidden">
+                            <td colspan="4" class="px-8 py-10 text-center text-gray-400 text-sm italic">Tiada tempahan sepadan dengan carian anda.</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -396,7 +427,198 @@
     </div>
 </div>
 
+<!-- Modal Detail Sejarah Tempahan -->
+<div id="modalHistoryDetail" class="fixed inset-0 z-[60] hidden overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-40 transition-opacity backdrop-blur-sm" onclick="closeHistoryDetailModal()"></div>
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl p-8 transform transition-all">
+            <header class="flex justify-between items-center mb-6">
+                <div>
+                    <h3 class="text-xl font-bold text-gray-800">Butiran Tempahan</h3>
+                    <p class="text-xs text-gray-400 mt-1" id="histNama">Nama Fasiliti</p>
+                </div>
+                <button onclick="closeHistoryDetailModal()" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-gray-50 rounded-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </header>
+
+            <div class="space-y-6">
+                <!-- Image Preview Section -->
+                <div id="histImageContainer" class="h-40 w-full rounded-3xl overflow-hidden hidden bg-gray-100 border border-gray-100">
+                    <img id="histImage" src="" class="w-full h-full object-cover">
+                </div>
+
+                <!-- Status & Timing -->
+                <div class="bg-gray-50 rounded-3xl p-6 border border-gray-100 flex justify-between items-center">
+                    <div class="space-y-1">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</p>
+                        <div id="histStatusBadge"></div>
+                    </div>
+                    <div class="text-right space-y-1">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tarikh & Masa</p>
+                        <p id="histTarikh" class="text-xs font-bold text-gray-700"></p>
+                        <p id="histMasa" class="text-[10px] text-gray-400 font-medium"></p>
+                    </div>
+                </div>
+
+                <!-- Note Section -->
+                <div class="space-y-2 px-2">
+                    <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Catatan Anda</h4>
+                    <p id="histCatatan" class="text-sm text-gray-600 leading-relaxed bg-white border border-gray-100 p-4 rounded-2xl"></p>
+                </div>
+
+                <!-- Rejection Reason Section -->
+                <div id="histRejectSection" class="space-y-2 px-2 hidden">
+                    <h4 class="text-[10px] font-bold text-red-400 uppercase tracking-widest">Alasan Penolakan (AJK)</h4>
+                    <div class="bg-red-50 border border-red-100 p-4 rounded-2xl">
+                        <p id="histAlasan" class="text-sm text-red-600 leading-relaxed font-medium"></p>
+                    </div>
+                </div>
+
+                <!-- Map Section -->
+                <div class="space-y-3">
+                    <h4 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Lokasi Fasiliti</h4>
+                    <div id="mapHistory" style="height: 180px; border-radius: 1.5rem; z-index: 0;" class="border border-gray-100 bg-gray-50"></div>
+                </div>
+
+                <div class="flex gap-4">
+                    <button id="histBtnNav" class="flex-1 py-4 bg-green-500 text-white rounded-2xl font-bold text-sm shadow-lg shadow-green-100 hover:bg-green-600 transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-route"></i> Navigasi
+                    </button>
+                    <button onclick="closeHistoryDetailModal()" class="flex-1 py-4 bg-gray-100 text-gray-500 rounded-2xl font-bold text-sm hover:bg-gray-200 transition-all">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
+    function filterData() {
+        const keyword = document.getElementById('searchInput').value.toLowerCase();
+        
+        // Filter Facility Cards
+        const cards = document.querySelectorAll('.facility-card');
+        let cardFound = false;
+        cards.forEach(card => {
+            const name = card.querySelector('.facility-name').innerText.toLowerCase();
+            const location = card.querySelector('.facility-location').innerText.toLowerCase();
+            if (name.includes(keyword) || location.includes(keyword)) {
+                card.classList.remove('hidden');
+                cardFound = true;
+            } else {
+                card.classList.add('hidden');
+            }
+        });
+
+        const cardEmpty = document.getElementById('senarai-empty');
+        if (cardEmpty) {
+            if (!cardFound && keyword !== "") {
+                cardEmpty.classList.remove('hidden');
+            } else {
+                cardEmpty.classList.add('hidden');
+            }
+        }
+
+        // Filter Booking Table
+        const rows = document.querySelectorAll('.booking-row');
+        let rowFound = false;
+        rows.forEach(row => {
+            const name = row.querySelector('.booking-facility-name').innerText.toLowerCase();
+            const date = row.querySelector('.booking-date').innerText.toLowerCase();
+            const status = row.querySelector('.booking-status').innerText.toLowerCase();
+            if (name.includes(keyword) || date.includes(keyword) || status.includes(keyword)) {
+                row.style.display = '';
+                rowFound = true;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        const rowEmpty = document.getElementById('sejarah-empty');
+        if (rowEmpty) {
+            if (!rowFound && keyword !== "") {
+                rowEmpty.style.display = '';
+            } else {
+                rowEmpty.style.display = 'none';
+            }
+        }
+    }
+
+    var historyMap, historyMarker;
+    function openBookingDetailModal(data) {
+        document.getElementById('histNama').innerText = data.namaFasiliti;
+        document.getElementById('histTarikh').innerText = data.tarikh;
+        document.getElementById('histMasa').innerText = data.masa;
+        document.getElementById('histCatatan').innerText = data.catatan || 'Tiada catatan.';
+        
+        const statusBadge = document.getElementById('histStatusBadge');
+        const rejectSection = document.getElementById('histRejectSection');
+        const rejectAlasan = document.getElementById('histAlasan');
+
+        if (data.status === 'LULUS') {
+            statusBadge.className = "inline-flex items-center gap-1.5 px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-bold";
+            statusBadge.innerHTML = '<i class="fas fa-check-circle text-[8px]"></i> LULUS';
+            rejectSection.classList.add('hidden');
+        } else if (data.status === 'TOLAK') {
+            statusBadge.className = "inline-flex items-center gap-1.5 px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-bold";
+            statusBadge.innerHTML = '<i class="fas fa-times-circle text-[8px]"></i> TOLAK';
+            rejectSection.classList.remove('hidden');
+            rejectAlasan.innerText = data.alasan || 'Tiada alasan dinyatakan.';
+        } else if (data.status === 'DIBATAL') {
+            statusBadge.className = "inline-flex items-center gap-1.5 px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-[10px] font-bold";
+            statusBadge.innerHTML = '<i class="fas fa-ban text-[8px]"></i> BATAL';
+            rejectSection.classList.add('hidden');
+        } else {
+            statusBadge.className = "inline-flex items-center gap-1.5 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-bold";
+            statusBadge.innerHTML = '<i class="fas fa-clock text-[8px]"></i> MENUNGGU';
+            rejectSection.classList.add('hidden');
+        }
+
+        // Image Logic
+        const imgContainer = document.getElementById('histImageContainer');
+        const imgElement = document.getElementById('histImage');
+        if (data.gambar) {
+            imgElement.src = '<%= request.getContextPath() %>/file/fasiliti/' + data.gambar;
+            imgContainer.classList.remove('hidden');
+        } else {
+            imgContainer.classList.add('hidden');
+        }
+
+        // Map Logic
+        const navBtn = document.getElementById('histBtnNav');
+        if (data.lat && data.lon) {
+            navBtn.onclick = () => window.open(`https://www.google.com/maps/dir/?api=1&destination=${data.lat},${data.lon}`, '_blank');
+            navBtn.classList.remove('hidden');
+            
+            setTimeout(() => {
+                if (historyMap) historyMap.remove();
+                historyMap = L.map('mapHistory').setView([data.lat, data.lon], 16);
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    maxZoom: 19, attribution: '© OpenStreetMap'
+                }).addTo(historyMap);
+                historyMarker = L.marker([data.lat, data.lon]).addTo(historyMap);
+            }, 300);
+        } else {
+            navBtn.classList.add('hidden');
+            document.getElementById('mapHistory').innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-gray-400 gap-2">
+                    <i class="fas fa-map-marked-alt text-3xl opacity-20"></i>
+                    <p class="text-[10px] font-bold uppercase tracking-widest">Tiada Koordinat GPS</p>
+                </div>
+            `;
+        }
+
+        document.getElementById('modalHistoryDetail').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeHistoryDetailModal() {
+        document.getElementById('modalHistoryDetail').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
     function toggleDuration() {
         const tempoh = document.getElementById('tempoh_tempahan').value;
         const slotContainer = document.getElementById('slot_container');

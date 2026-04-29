@@ -45,7 +45,7 @@ public class TempahanFasilitiDAO {
     // 2. Mendapatkan sejarah tempahan berdasarkan ID pengguna
     public List<TempahanFasiliti> dapatkanSejarahTempahanPenduduk(int idPengguna) {
         List<TempahanFasiliti> senarai = new ArrayList<>();
-        String sql = "SELECT t.*, f.nama_fasiliti FROM tempahan_fasiliti t " +
+        String sql = "SELECT t.*, f.nama_fasiliti, f.latitude, f.longitude, f.gambar_fasiliti FROM tempahan_fasiliti t " +
                      "JOIN fasiliti f ON t.id_fasiliti = f.id_fasiliti " +
                      "WHERE t.id_pengguna = ? ORDER BY t.dibuat_pada DESC";
         
@@ -67,6 +67,9 @@ public class TempahanFasilitiDAO {
                     t.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
                     t.setNama_fasiliti(rs.getString("nama_fasiliti"));
                     t.setAlasanPenolakan(rs.getString("alasan_penolakan"));
+                    t.setLatitude(rs.getObject("latitude") != null ? rs.getDouble("latitude") : null);
+                    t.setLongitude(rs.getObject("longitude") != null ? rs.getDouble("longitude") : null);
+                    t.setGambar_fasiliti(rs.getString("gambar_fasiliti"));
                     senarai.add(t);
                 }
             }

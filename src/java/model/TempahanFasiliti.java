@@ -22,10 +22,21 @@ public class TempahanFasiliti {
     // Untuk paparan UI (Join jadual Fasiliti & Pengguna)
     private String nama_fasiliti; 
     private String nama_pengguna;
+    private Double latitude;
+    private Double longitude;
+    private String gambar_fasiliti;
 
     public TempahanFasiliti() {}
 
     // --- Getters and Setters ---
+    public String getGambar_fasiliti() { return gambar_fasiliti; }
+    public void setGambar_fasiliti(String gambar_fasiliti) { this.gambar_fasiliti = gambar_fasiliti; }
+
+    public Double getLatitude() { return latitude; }
+    public void setLatitude(Double latitude) { this.latitude = latitude; }
+
+    public Double getLongitude() { return longitude; }
+    public void setLongitude(Double longitude) { this.longitude = longitude; }
 
     public int getId_tempahan() { return id_tempahan; }
     public void setId_tempahan(int id_tempahan) { this.id_tempahan = id_tempahan; }
