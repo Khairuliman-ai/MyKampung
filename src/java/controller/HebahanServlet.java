@@ -38,29 +38,32 @@ public class HebahanServlet extends HttpServlet {
 
         try {
             if (path == null || "/".equals(path) || "/list".equals(path)) {
+                String sort = req.getParameter("sort");
+                if (sort == null || sort.isEmpty()) sort = "DESC";
+                
                 if ("Penduduk".equalsIgnoreCase(role)) {
                     String keyword = req.getParameter("q");
                     List<Hebahan> list;
                     if (keyword != null && !keyword.trim().isEmpty()) {
-                        list = dao.searchPublished(keyword.trim());
+                        list = dao.searchPublished(keyword.trim(), sort);
                     } else {
-                        list = dao.getPublished();
+                        list = dao.getPublished(sort);
                     }
                     req.setAttribute("hebahanList", list);
                     req.getRequestDispatcher("/views/hebahan/hebahanPenduduk.jsp").forward(req, resp);
                 } else if ("AJK Kampung".equalsIgnoreCase(role) && "Biro Hebahan".equals(biro)) {
-                    List<Hebahan> list = dao.getByPengguna(user.getId_pengguna());
+                    List<Hebahan> list = dao.getAll(sort);
                     req.setAttribute("hebahanList", list);
                     req.getRequestDispatcher("/views/hebahan/urusHebahanAJK.jsp").forward(req, resp);
                 } else if ("Ketua Kampung".equalsIgnoreCase(role)) {
-                    List<Hebahan> list = dao.getAll();
+                    List<Hebahan> list = dao.getAll(sort);
                     req.setAttribute("hebahanList", list);
                     req.setAttribute("totalPublished", dao.countByStatus("Published"));
                     req.setAttribute("totalDraft", dao.countByStatus("Draft"));
                     req.setAttribute("totalArchived", dao.countByStatus("Archived"));
                     req.getRequestDispatcher("/views/hebahan/urusHebahanKetua.jsp").forward(req, resp);
                 } else {
-                    List<Hebahan> list = dao.getPublished();
+                    List<Hebahan> list = dao.getPublished(sort);
                     req.setAttribute("hebahanList", list);
                     req.getRequestDispatcher("/views/hebahan/hebahanPenduduk.jsp").forward(req, resp);
                 }

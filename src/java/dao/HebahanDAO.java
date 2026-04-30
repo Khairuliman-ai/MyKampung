@@ -33,11 +33,39 @@ public class HebahanDAO {
         return false;
     }
 
-    public List<Hebahan> getAll() {
+    public List<Hebahan> getAll(String sortOrder) {
+        if (sortOrder == null || (!sortOrder.equalsIgnoreCase("ASC") && !sortOrder.equalsIgnoreCase("DESC"))) {
+            sortOrder = "DESC";
+        }
         List<Hebahan> list = new ArrayList<>();
         String sql = "SELECT h.*, p.nama_penuh FROM hebahan h "
             + "JOIN pengguna p ON h.id_pengguna = p.id_pengguna "
-            + "WHERE h.dipadam_pada IS NULL ORDER BY h.dibuat_pada DESC";
+            + "WHERE h.dipadam_pada IS NULL ORDER BY h.tarikh_hebahan " + sortOrder + ", h.dibuat_pada " + sortOrder;
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) list.add(mapRow(rs));
+        } catch (SQLException e) { e.printStackTrace(); }
+        return list;
+    }
+
+    // Overloaded method for backward compatibility if needed, though we will update servlet
+    public List<Hebahan> getAll() {
+        return getAll("DESC");
+    }
+
+    public List<Hebahan> getPublished(String sortOrder) {
+        if (sortOrder == null || (!sortOrder.equalsIgnoreCase("ASC") && !sortOrder.equalsIgnoreCase("DESC"))) {
+            sortOrder = "DESC";
+        }
+        List<Hebahan> list = new ArrayList<>();
+        String sql = "SELECT h.*, p.nama_penuh FROM hebahan h "
+            + "JOIN pengguna p ON h.id_pengguna = p.id_pengguna "
+            + "WHERE h.status_hebahan = 'Published' "
+            + "AND h.dipadam_pada IS NULL "
+            + "AND (h.tarikh_tamat IS NULL OR h.tarikh_tamat > NOW()) "
+            + "ORDER BY FIELD(h.kategori, 'Kecemasan', 'Aktiviti', 'Umum'), "
+            + "h.tarikh_hebahan " + sortOrder;
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -47,20 +75,7 @@ public class HebahanDAO {
     }
 
     public List<Hebahan> getPublished() {
-        List<Hebahan> list = new ArrayList<>();
-        String sql = "SELECT h.*, p.nama_penuh FROM hebahan h "
-            + "JOIN pengguna p ON h.id_pengguna = p.id_pengguna "
-            + "WHERE h.status_hebahan = 'Published' "
-            + "AND h.dipadam_pada IS NULL "
-            + "AND (h.tarikh_tamat IS NULL OR h.tarikh_tamat > NOW()) "
-            + "ORDER BY FIELD(h.kategori, 'Kecemasan', 'Aktiviti', 'Umum'), "
-            + "h.tarikh_hebahan DESC";
-        try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) list.add(mapRow(rs));
-        } catch (SQLException e) { e.printStackTrace(); }
-        return list;
+        return getPublished("DESC");
     }
 
     public Hebahan getById(int id) {
@@ -77,7 +92,10 @@ public class HebahanDAO {
         return null;
     }
 
-    public List<Hebahan> searchPublished(String keyword) {
+    public List<Hebahan> searchPublished(String keyword, String sortOrder) {
+        if (sortOrder == null || (!sortOrder.equalsIgnoreCase("ASC") && !sortOrder.equalsIgnoreCase("DESC"))) {
+            sortOrder = "DESC";
+        }
         List<Hebahan> list = new ArrayList<>();
         String sql = "SELECT h.*, p.nama_penuh FROM hebahan h "
             + "JOIN pengguna p ON h.id_pengguna = p.id_pengguna "
@@ -86,7 +104,7 @@ public class HebahanDAO {
             + "AND (h.tarikh_tamat IS NULL OR h.tarikh_tamat > NOW()) "
             + "AND (h.tajuk LIKE ? OR h.kandungan LIKE ?) "
             + "ORDER BY FIELD(h.kategori, 'Kecemasan', 'Aktiviti', 'Umum'), "
-            + "h.tarikh_hebahan DESC";
+            + "h.tarikh_hebahan " + sortOrder;
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             String q = "%" + keyword + "%";
@@ -97,6 +115,10 @@ public class HebahanDAO {
             }
         } catch (SQLException e) { e.printStackTrace(); }
         return list;
+    }
+
+    public List<Hebahan> searchPublished(String keyword) {
+        return searchPublished(keyword, "DESC");
     }
 
     public List<Hebahan> getByPengguna(int idPengguna) {

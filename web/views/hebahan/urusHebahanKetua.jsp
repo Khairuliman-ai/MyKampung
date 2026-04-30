@@ -12,9 +12,20 @@
 %>
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F7F7F9]">
-    <div class="mb-8">
-        <h2 class="text-2xl font-bold text-gray-800">Pemantauan Hebahan</h2>
-        <p class="text-gray-500 text-sm">Oversight dan analitik untuk semua hebahan kampung.</p>
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Pemantauan Hebahan</h2>
+            <p class="text-gray-500 text-sm">Oversight dan analitik untuk semua hebahan kampung.</p>
+        </div>
+        <div class="relative min-w-[160px]">
+            <form action="${pageContext.request.contextPath}/hebahan/list" method="get" id="sortForm">
+                <select name="sort" onchange="this.form.submit()" class="w-full pl-4 pr-10 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm appearance-none cursor-pointer font-bold text-gray-600 shadow-sm transition-all">
+                    <option value="DESC" <%= "DESC".equals(request.getParameter("sort")) ? "selected" : "" %>>Terbaru</option>
+                    <option value="ASC" <%= "ASC".equals(request.getParameter("sort")) ? "selected" : "" %>>Terlama</option>
+                </select>
+                <i class="fas fa-sort-amount-down absolute right-4 top-1/2 -translate-y-1/2 text-brand-purple pointer-events-none"></i>
+            </form>
+        </div>
     </div>
 
     <!-- Stats Cards -->

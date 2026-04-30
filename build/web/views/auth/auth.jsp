@@ -85,58 +85,21 @@
 
         /* ===== OVERLAY ===== */
         .overlay-container {
+            position: absolute;
+            top: 0;
+            right: 0;
             width: 50%;
+            height: 100%;
             background: url('<%= request.getContextPath() %>/assets/img/kampung.png') center/cover no-repeat;
-            color: #fff;
-            display: flex;
-            align-items: flex-end; /* Letak di bahagian bawah gambar supaya tak tutup papan tanda */
-            justify-content: center;
-            padding: 40px;
-            text-align: center;
-            transition: transform 0.6s ease;
+            overflow: hidden;
+            transition: transform 0.6s ease-in-out, border-radius 0.6s ease-in-out;
+            z-index: 100;
+            border-radius: 120px 0 0 120px;
         }
 
         .auth-container.sign-up-mode .overlay-container {
             transform: translateX(-100%);
-        }
-
-        .overlay-content {
-            background: rgba(0, 0, 0, 0.7); /* Kotak gelap separuh lutsinar */
-            backdrop-filter: blur(5px); /* Efek kaca */
-            padding: 25px 30px;
-            border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            width: 100%;
-            max-width: 380px;
-            margin-bottom: 20px; /* Jarak sikit dari bawah */
-        }
-
-        .overlay-content h4 {
-            font-weight: 700;
-            margin-bottom: 5px;
-        }
-
-        .overlay-content p {
-            font-size: 0.95rem;
-            font-weight: 500;
-            opacity: 0.95;
-            margin-bottom: 15px;
-        }
-
-        /* ===== TOGGLE OVERLAY PANELS ===== */
-        .overlay-panel-signin {
-            display: none; /* Sembunyi secara default (mod Log Masuk) */
-        }
-        .overlay-panel-signup {
-            display: block; /* Tunjuk secara default (mod Log Masuk) */
-        }
-
-        .auth-container.sign-up-mode .overlay-panel-signup {
-            display: none; /* Sembunyi semasa mod Daftar */
-        }
-        .auth-container.sign-up-mode .overlay-panel-signin {
-            display: block; /* Tunjuk semasa mod Daftar */
+            border-radius: 0 120px 120px 0;
         }
 
         /* ===== INPUT ===== */
@@ -384,9 +347,7 @@
 </div>
 
     <!-- ===== OVERLAY ===== -->
-    <div class="overlay-container">
-        <!-- Sengaja dibiarkan kosong supaya gambar kampung terpapar sepenuhnya tanpa teks penghalang -->
-    </div>
+    <div class="overlay-container"></div>
 
 </div>
 

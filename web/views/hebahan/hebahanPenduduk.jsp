@@ -20,10 +20,22 @@
     <!-- Search & Filter Bar -->
     <div class="flex gap-4 mb-6">
         <form action="${pageContext.request.contextPath}/hebahan/list" method="get" class="flex gap-3 flex-1">
-            <input type="text" name="q" placeholder="Cari hebahan..." value="<%= keyword != null ? keyword : "" %>"
-                class="flex-1 px-4 py-3 rounded-xl bg-white border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-            <button type="submit" class="bg-[#6C5DD3] text-white px-6 py-3 rounded-xl font-bold text-sm">
-                <i class="fas fa-search"></i> Cari
+            <div class="flex-1 relative">
+                <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                <input type="text" name="q" placeholder="Cari hebahan..." value="<%= keyword != null ? keyword : "" %>"
+                    class="w-full pl-12 pr-4 py-3 rounded-xl bg-white border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm transition-all">
+            </div>
+            
+            <div class="relative min-w-[160px]">
+                <select name="sort" onchange="this.form.submit()" class="w-full px-4 py-3 rounded-xl bg-white border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm appearance-none cursor-pointer">
+                    <option value="DESC" <%= "DESC".equals(request.getParameter("sort")) ? "selected" : "" %>>Terbaru</option>
+                    <option value="ASC" <%= "ASC".equals(request.getParameter("sort")) ? "selected" : "" %>>Terlama</option>
+                </select>
+                <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[10px]"></i>
+            </div>
+
+            <button type="submit" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-8 py-3 rounded-xl font-bold text-sm transition shadow-lg shadow-purple-100 flex items-center gap-2">
+                Cari
             </button>
         </form>
     </div>

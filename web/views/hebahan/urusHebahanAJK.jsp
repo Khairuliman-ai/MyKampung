@@ -3,6 +3,10 @@
 <%@ page import="model.Hebahan, model.Pengguna" %>
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
+<!-- Cropper.js CSS -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+<!-- Cropper.js JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <%
     List<Hebahan> list = (List<Hebahan>) request.getAttribute("hebahanList");
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -15,9 +19,20 @@
             <h2 class="text-2xl font-bold text-gray-800">Urus Hebahan</h2>
             <p class="text-gray-500 text-sm">Cipta dan kemaskini pengumuman kampung.</p>
         </div>
-        <button onclick="openAddModal()" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-6 py-3 rounded-2xl font-bold text-sm transition shadow-lg shadow-purple-100 flex items-center gap-2">
-            <i class="fas fa-plus-circle"></i> Tambah Hebahan Baru
-        </button>
+        <div class="flex items-center gap-4">
+            <div class="relative min-w-[160px]">
+                <form action="${pageContext.request.contextPath}/hebahan/list" method="get" id="sortForm">
+                    <select name="sort" onchange="this.form.submit()" class="w-full pl-4 pr-10 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm appearance-none cursor-pointer font-bold text-gray-600 shadow-sm transition-all">
+                        <option value="DESC" <%= "DESC".equals(request.getParameter("sort")) ? "selected" : "" %>>Terbaru</option>
+                        <option value="ASC" <%= "ASC".equals(request.getParameter("sort")) ? "selected" : "" %>>Terlama</option>
+                    </select>
+                    <i class="fas fa-sort-amount-down absolute right-4 top-1/2 -translate-y-1/2 text-brand-purple pointer-events-none"></i>
+                </form>
+            </div>
+            <button onclick="openAddModal()" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-6 py-3 rounded-2xl font-bold text-sm transition shadow-lg shadow-purple-100 flex items-center gap-2">
+                <i class="fas fa-plus-circle"></i> Tambah Hebahan Baru
+            </button>
+        </div>
     </div>
 
     <!-- List Layout (Mirror Resident View) -->
@@ -285,7 +300,25 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Gambar Poster</label>
-                        <input type="file" name="gambar_poster" accept="image/*" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 text-sm transition">
+                        <div class="flex flex-col gap-4">
+                            <!-- Preview Box -->
+                            <div id="posterPreviewContainer" class="hidden relative w-full aspect-video rounded-2xl overflow-hidden border-2 border-dashed border-purple-100 bg-purple-50 group">
+                                <img id="posterPreview" class="w-full h-full object-cover">
+                                <button type="button" onclick="resetPosterSelection()" class="absolute top-2 right-2 w-8 h-8 bg-red-500 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition shadow-lg">
+                                    <i class="fas fa-times text-xs"></i>
+                                </button>
+                            </div>
+                            
+                            <!-- Custom File Input -->
+                            <div class="relative">
+                                <input type="file" name="gambar_poster" id="gambar_poster" accept="image/*" onchange="handleFileSelect(this)" 
+                                       class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                                <div class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 text-sm flex items-center gap-3 text-gray-400 group-hover:border-purple-200 transition">
+                                    <i class="fas fa-image text-[#6C5DD3]"></i>
+                                    <span id="fileNameLabel">Pilih atau Seret Gambar Poster</span>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="bg-gray-50 px-8 py-4 flex flex-row-reverse gap-3">
@@ -293,6 +326,63 @@
                     <button type="button" onclick="closeModal('modalHebahan')" class="bg-white hover:bg-gray-50 text-gray-500 px-6 py-2.5 rounded-xl font-bold text-sm border border-gray-100 transition">Batal</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Cropper -->
+<div id="modalCrop" class="fixed inset-0 z-[100] hidden">
+    <div class="fixed inset-0 bg-gray-900 bg-opacity-60 backdrop-blur-sm"></div>
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-4xl overflow-hidden transform transition-all">
+            <!-- Header -->
+            <div class="bg-[#6C5DD3] px-8 py-5 flex justify-between items-center">
+                <div>
+                    <h3 class="text-lg font-bold text-white">Laraskan & Potong Poster</h3>
+                    <p class="text-purple-100 text-[10px] uppercase font-bold tracking-widest">Suaikan mengikut bingkai yang disediakan</p>
+                </div>
+                <button onclick="closeCropModal()" class="text-white hover:rotate-90 transition-transform duration-300">
+                    <i class="fas fa-times text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Cropper Area -->
+            <div class="p-8">
+                <div class="bg-gray-100 rounded-3xl overflow-hidden max-h-[50vh] flex items-center justify-center">
+                    <img id="imageToCrop" class="max-w-full">
+                </div>
+                
+                <!-- Controls -->
+                <div class="mt-8 flex flex-wrap items-center justify-center gap-4">
+                    <div class="flex bg-gray-50 p-1.5 rounded-2xl border border-gray-100">
+                        <button type="button" onclick="cropper.rotate(-90)" class="w-10 h-10 rounded-xl hover:bg-white hover:text-brand-purple transition text-gray-400">
+                            <i class="fas fa-undo"></i>
+                        </button>
+                        <button type="button" onclick="cropper.rotate(90)" class="w-10 h-10 rounded-xl hover:bg-white hover:text-brand-purple transition text-gray-400">
+                            <i class="fas fa-redo"></i>
+                        </button>
+                        <div class="w-px bg-gray-200 mx-1 my-2"></div>
+                        <button type="button" onclick="cropper.scaleX(-1)" class="w-10 h-10 rounded-xl hover:bg-white hover:text-brand-purple transition text-gray-400">
+                            <i class="fas fa-arrows-alt-h"></i>
+                        </button>
+                    </div>
+
+                    <div class="flex bg-gray-50 p-1.5 rounded-2xl border border-gray-100">
+                        <button type="button" onclick="cropper.setAspectRatio(16/9)" class="px-4 h-10 rounded-xl hover:bg-white hover:text-brand-purple transition text-gray-400 text-xs font-bold">16:9</button>
+                        <button type="button" onclick="cropper.setAspectRatio(4/3)" class="px-4 h-10 rounded-xl hover:bg-white hover:text-brand-purple transition text-gray-400 text-xs font-bold">4:3</button>
+                        <button type="button" onclick="cropper.setAspectRatio(1)" class="px-4 h-10 rounded-xl hover:bg-white hover:text-brand-purple transition text-gray-400 text-xs font-bold">1:1</button>
+                        <button type="button" onclick="cropper.setAspectRatio(NaN)" class="px-4 h-10 rounded-xl hover:bg-white hover:text-brand-purple transition text-gray-400 text-xs font-bold">Bebas</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="bg-gray-50 px-8 py-6 flex flex-row-reverse gap-3">
+                <button type="button" onclick="saveCroppedImage()" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-8 py-3 rounded-2xl font-bold text-sm transition shadow-lg shadow-purple-100 flex items-center gap-2">
+                    <i class="fas fa-check-circle"></i> Gunakan Gambar Ini
+                </button>
+                <button type="button" onclick="closeCropModal()" class="bg-white hover:bg-gray-100 text-gray-500 px-6 py-3 rounded-2xl font-bold text-sm border border-gray-100 transition">Batal</button>
+            </div>
         </div>
     </div>
 </div>
@@ -324,6 +414,7 @@
         document.getElementById('formHebahan').action = '<%= request.getContextPath() %>/hebahan/create';
         document.getElementById('id_hebahan').value = '';
         document.getElementById('formHebahan').reset();
+        resetPosterSelection();
         document.getElementById('modalHebahan').classList.remove('hidden');
     }
 
@@ -340,6 +431,7 @@
         document.getElementById('tarikh_tamat_acara').value = btn.getAttribute('data-tamat_acara');
         document.getElementById('tarikh_tamat').value = btn.getAttribute('data-tamat_hebahan');
         
+        resetPosterSelection();
         document.getElementById('modalHebahan').classList.remove('hidden');
     }
 
@@ -408,6 +500,97 @@
             return false;
         }
         return true;
+    }
+
+    // --- Image Adjustment & Cropper Logic ---
+    let cropper;
+    const cropModal = document.getElementById('modalCrop');
+    const imageToCrop = document.getElementById('imageToCrop');
+    const posterInput = document.getElementById('gambar_poster');
+    const previewContainer = document.getElementById('posterPreviewContainer');
+    const previewImage = document.getElementById('posterPreview');
+    const fileNameLabel = document.getElementById('fileNameLabel');
+
+    function handleFileSelect(input) {
+        if (input.files && input.files[0]) {
+            const file = input.files[0];
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                imageToCrop.src = e.target.result;
+                openCropModal();
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function openCropModal() {
+        cropModal.classList.remove('hidden');
+        if (cropper) {
+            cropper.destroy();
+        }
+        
+        setTimeout(() => {
+            cropper = new Cropper(imageToCrop, {
+                aspectRatio: 16 / 9,
+                viewMode: 2,
+                autoCropArea: 1,
+                responsive: true,
+                restore: false,
+                checkCrossOrigin: false,
+                checkOrientation: false,
+                guides: true,
+                center: true,
+                highlight: false,
+                cropBoxMovable: true,
+                cropBoxResizable: true,
+                toggleDragModeOnDblclick: false,
+            });
+        }, 100);
+    }
+
+    function closeCropModal() {
+        cropModal.classList.add('hidden');
+        if (cropper) {
+            cropper.destroy();
+        }
+    }
+
+    function saveCroppedImage() {
+        const canvas = cropper.getCroppedCanvas({
+            width: 1280,
+            height: 720,
+            imageSmoothingEnabled: true,
+            imageSmoothingQuality: 'high',
+        });
+
+        canvas.toBlob((blob) => {
+            // Create a new File object from the blob
+            const originalFile = posterInput.files[0];
+            const croppedFile = new File([blob], originalFile.name, {
+                type: 'image/jpeg',
+                lastModified: Date.now()
+            });
+
+            // Replace the file input's content using DataTransfer
+            const dataTransfer = new DataTransfer();
+            dataTransfer.items.add(croppedFile);
+            posterInput.files = dataTransfer.files;
+
+            // Show Preview
+            previewImage.src = canvas.toDataURL('image/jpeg');
+            previewContainer.classList.remove('hidden');
+            fileNameLabel.innerText = originalFile.name + " (Telah Dipotong)";
+            
+            closeCropModal();
+        }, 'image/jpeg', 0.9);
+    }
+
+    function resetPosterSelection() {
+        posterInput.value = '';
+        previewContainer.classList.add('hidden');
+        previewImage.src = '';
+        fileNameLabel.innerText = 'Pilih atau Seret Gambar Poster';
     }
 </script>
 
