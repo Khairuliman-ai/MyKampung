@@ -47,6 +47,29 @@
         <p class="text-gray-500 text-sm">Uruskan permohonan baharu, semak sejarah, dan urus jenis bantuan.</p>
     </div>
 
+    <% if (request.getParameter("msg") != null) { %>
+        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
+            <i class="fas fa-check-circle text-lg"></i>
+            <div>
+                <span class="font-bold">Berjaya!</span> Rekod telah dikemaskini.
+            </div>
+            <button onclick="this.parentElement.remove()" class="ml-auto text-green-500 hover:text-green-700"><i class="fas fa-times"></i></button>
+        </div>
+    <% } %>
+
+    <% if (request.getParameter("error") != null) { %>
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
+            <i class="fas fa-exclamation-circle text-lg"></i>
+            <div>
+                <% String err = request.getParameter("error"); 
+                   if(err != null) err = err.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;");
+                %>
+                <span class="font-bold">Ralat!</span> <%= (err != null ? err : "") %>
+            </div>
+            <button onclick="this.parentElement.remove()" class="ml-auto text-red-500 hover:text-red-700"><i class="fas fa-times"></i></button>
+        </div>
+    <% } %>
+
     <div class="mb-8 border-b border-gray-200">
         <nav class="flex gap-8" aria-label="Tabs">
             <button onclick="switchTab('baru')" id="tab-baru" 

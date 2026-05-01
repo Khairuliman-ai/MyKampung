@@ -16,6 +16,29 @@
         <p class="text-gray-500 text-sm">Semak dan luluskan permohonan yang telah disahkan oleh AJK.</p>
     </header>
 
+    <% if (request.getParameter("msg") != null) { %>
+        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
+            <i class="fas fa-check-circle text-lg"></i>
+            <div>
+                <span class="font-bold">Berjaya!</span> Tindakan telah direkodkan.
+            </div>
+            <button onclick="this.parentElement.remove()" class="ml-auto text-green-500 hover:text-green-700"><i class="fas fa-times"></i></button>
+        </div>
+    <% } %>
+
+    <% if (request.getParameter("error") != null) { %>
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
+            <i class="fas fa-exclamation-circle text-lg"></i>
+            <div>
+                <% String err = request.getParameter("error"); 
+                   if(err != null) err = err.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;");
+                %>
+                <span class="font-bold">Ralat!</span> <%= (err != null ? err : "") %>
+            </div>
+            <button onclick="this.parentElement.remove()" class="ml-auto text-red-500 hover:text-red-700"><i class="fas fa-times"></i></button>
+        </div>
+    <% } %>
+
     <%
         // Logic Pengasingan Data
         List<PermohonanBantuan> list = (List<PermohonanBantuan>) request.getAttribute("permohonanList");
@@ -213,7 +236,7 @@
                             <td class="p-4 text-sm italic max-w-xs truncate"><%= (pb.getCatatan_pentadbir() != null) ? pb.getCatatan_pentadbir() : "-" %></td>
                         </tr>
                         <% } } else { %>
-                        <tr><td colspan="5" class="p-8 text-center text-gray-400"><i class="fas fa-archive text-3xl mb-2 block opacity-50"></i>Tiada rekod sejarah.</td></tr>
+                            <tr class="no-data"><td colspan="6" class="p-8 text-center text-gray-400"><i class="fas fa-archive text-3xl mb-2 block opacity-50"></i>Tiada rekod sejarah.</td></tr>
                         <% } %>
                     </tbody>
                 </table>
@@ -296,8 +319,8 @@
 
                     <div class="mt-4 pt-4 border-t border-gray-100">
                         <label class="block text-xs font-bold text-gray-500 mb-2">Muat Naik Dokumen Sokongan (Pilihan)</label>
-                        <input type="file" name="dokumenBalas" accept="application/pdf"
-                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-[#6C5DD3] hover:file:bg-purple-100" required>
+                        <input type="file" name="dokumenBalas" accept="application/pdf" id="dokumenBalas"
+                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-[#6C5DD3] hover:file:bg-purple-100">
                     </div>
 
                 </div>

@@ -8,6 +8,21 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import dao.AduanDAO;
+import dao.HebahanDAO;
+import dao.PermohonanBantuanDAO;
+import dao.TempahanFasilitiDAO;
+import dao.PenggunaDAO;
+import util.DBUtil;
+import model.Aduan;
+import model.Hebahan;
+import model.PermohonanBantuan;
+import model.TempahanFasiliti;
+import model.Pengguna;
+import java.sql.Connection;
+import java.util.List;
+import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 /**
  * DashboardServlet bertindak sebagai pengawal (Gatekeeper) untuk menghantar
@@ -69,6 +84,47 @@ public class DashboardServlet extends HttpServlet {
                 request.getRequestDispatcher("/views/dashboard/dJKKK.jsp").forward(request, response);
             }
         } else if ("Penduduk".equals(peranan)) {
+            // Fetch data for Resident Dashboard
+            AduanDAO aduanDao = new AduanDAO();
+            HebahanDAO hebahanDao = new HebahanDAO();
+            PermohonanBantuanDAO bantuanDao = new PermohonanBantuanDAO();
+            TempahanFasilitiDAO fasilitiDao = new TempahanFasilitiDAO();
+
+            int userId = user.getId_pengguna();
+
+            // 1. Latest 3 Announcements
+            List<Hebahan> latestHebahan = hebahanDao.getPublished();
+            if (latestHebahan.size() > 3) latestHebahan = latestHebahan.subList(0, 3);
+            request.setAttribute("latestHebahan", latestHebahan);
+
+            // 2. Complaints stats for user
+            List<Aduan> userAduan = aduanDao.getByPenduduk(userId);
+            long pendingAduan = userAduan.stream().filter(a -> !"RESOLVED".equals(a.getStatus()) && !"REJECTED".equals(a.getStatus())).count();
+            request.setAttribute("totalAduan", userAduan.size());
+            request.setAttribute("pendingAduan", pendingAduan);
+            request.setAttribute("userAduan", userAduan);
+
+            // 3. Bantuan apps
+            List<PermohonanBantuan> userBantuan = bantuanDao.getByPenduduk(userId);
+            request.setAttribute("totalBantuan", userBantuan.size());
+            request.setAttribute("userBantuan", userBantuan);
+
+            // 4. Facility Bookings
+            List<TempahanFasiliti> userTempahan = fasilitiDao.dapatkanSejarahTempahanPenduduk(userId);
+            long activeTempahan = userTempahan.stream().filter(t -> "LULUS".equals(t.getStatus()) || "MENUNGGU".equals(t.getStatus())).count();
+            request.setAttribute("totalTempahan", userTempahan.size());
+            request.setAttribute("activeTempahan", activeTempahan);
+            request.setAttribute("userTempahan", userTempahan);
+
+            // 5. AJK List for sidebar
+            try (Connection conn = DBUtil.getConnection()) {
+                PenggunaDAO pDao = new PenggunaDAO(conn);
+                List<Pengguna> ajkList = pDao.getAllAJK();
+                request.setAttribute("ajkList", ajkList);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             request.getRequestDispatcher("/views/dashboard/dPenduduk.jsp").forward(request, response);
         } else {
             // Jika peranan tidak dikenali, hantar balik ke login

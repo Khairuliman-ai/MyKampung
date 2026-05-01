@@ -1,5 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="model.Pengguna" %>
+<%@ page import="model.PermohonanBantuan" %>
+<%@ page import="java.util.List" %>
 
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
@@ -69,15 +71,50 @@
         <h3 class="font-bold text-lg text-gray-800">Status Permohonan</h3>
     </div>
 
-    <div class="text-center py-8">
-        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
-            <i class="fas fa-inbox text-xl"></i>
-        </div>
-        <p class="text-sm font-bold text-gray-800">Tiada Permohonan Aktif</p>
-        <p class="text-xs text-gray-500 mt-1">Sejarah permohonan bantuan anda akan dipaparkan di sini.</p>
+    <div class="flex flex-col gap-4">
+        <% 
+            List<PermohonanBantuan> pList = (List<PermohonanBantuan>) request.getAttribute("permohonanList");
+            int activeCount = 0;
+            if (pList != null) {
+                for (PermohonanBantuan pb : pList) {
+                    String s = pb.getStatus();
+                    if ("BARU".equalsIgnoreCase(s) || "DIKEMBALIKAN".equalsIgnoreCase(s) || "MENUNGGU_KETUA".equalsIgnoreCase(s)) {
+                        activeCount++;
+        %>
+            <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 transition-all hover:border-purple-200 group">
+                <div class="flex justify-between items-start mb-2">
+                    <span class="text-[10px] font-bold text-purple-400 uppercase tracking-widest"><%= pb.getNama_bantuan() %></span>
+                    <% if ("BARU".equalsIgnoreCase(s)) { %>
+                        <span class="bg-blue-100 text-blue-600 text-[9px] px-2 py-0.5 rounded-full font-bold">PROSES</span>
+                    <% } else if ("DIKEMBALIKAN".equalsIgnoreCase(s)) { %>
+                        <span class="bg-orange-100 text-orange-600 text-[9px] px-2 py-0.5 rounded-full font-bold">KEMBALI</span>
+                    <% } else { %>
+                        <span class="bg-purple-100 text-purple-600 text-[9px] px-2 py-0.5 rounded-full font-bold">SEMAKAN</span>
+                    <% } %>
+                </div>
+                <p class="text-xs font-bold text-gray-700 truncate mb-1">ID #<%= pb.getId_permohonan() %></p>
+                <div class="flex items-center gap-1.5 text-[10px] text-gray-400">
+                    <i class="far fa-clock"></i>
+                    <span>Sedang diproses...</span>
+                </div>
+            </div>
+        <% 
+                }
+            }
+        } 
+        if (activeCount == 0) {
+        %>
+            <div class="text-center py-8">
+                <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4 text-gray-400">
+                    <i class="fas fa-inbox text-xl"></i>
+                </div>
+                <p class="text-sm font-bold text-gray-800">Tiada Permohonan Aktif</p>
+                <p class="text-xs text-gray-500 mt-1">Sejarah permohonan bantuan anda akan dipaparkan di modul berkaitan.</p>
+            </div>
+        <% } %>
     </div>
 
-    <div class="mt-auto bg-purple-50 rounded-2xl p-6 relative overflow-hidden">
+    <div class="mt-8 bg-purple-50 rounded-2xl p-6 relative overflow-hidden">
         <div class="absolute -right-4 -top-4 w-16 h-16 bg-purple-200 rounded-full opacity-50"></div>
         <h4 class="font-bold text-[#6C5DD3] mb-2 relative z-10">Tahukah Anda?</h4>
         <p class="text-xs text-gray-600 leading-relaxed relative z-10">

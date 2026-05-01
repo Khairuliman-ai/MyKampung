@@ -1,5 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="model.PermohonanBantuan" %>
+<%@ page import="model.Bantuan" %>
+<%@ page import="java.util.List" %>
 
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
@@ -60,21 +62,16 @@
                         <select name="jenisBantuan" id="jenisBantuan" required onchange="toggleLainBantuan()"
                                 class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm appearance-none font-bold">
                             <option value="" disabled>-- Sila Pilih --</option>
-                            <option value="6" <%= pb.getId_bantuan() == 6 ? "selected" : "" %>>BANTUAN AM</option>
-                            <option value="7" <%= pb.getId_bantuan() == 7 ? "selected" : "" %>>BANTUAN HARI RAYA</option>
-                            <option value="8" <%= pb.getId_bantuan() == 8 ? "selected" : "" %>>BANTUAN KEPADA GHARIMIN</option>
-                            <option value="9" <%= pb.getId_bantuan() == 9 ? "selected" : "" %>>BANTUAN MELANJUT PELAJARAN KE IPT</option>
-                            <option value="10" <%= pb.getId_bantuan() == 10 ? "selected" : "" %>>BANTUAN PEMBANGUNAN ASNAF</option>
-                            <option value="11" <%= pb.getId_bantuan() == 11 ? "selected" : "" %>>BANTUAN PEMULIHAN RUMAH KEDIAMAN</option>
-                            <option value="12" <%= pb.getId_bantuan() == 12 ? "selected" : "" %>>BANTUAN RAWATAN PERUBATAN</option>
-                            <option value="13" <%= pb.getId_bantuan() == 13 ? "selected" : "" %>>BANTUAN SEWA RUMAH</option>
-                            <option value="14" <%= pb.getId_bantuan() == 14 ? "selected" : "" %>>BANTUAN TETAP BULANAN</option>
-                            <option value="15" <%= pb.getId_bantuan() == 15 ? "selected" : "" %>>BIASISWA PENDIDIKAN DALAM NEGARA (BPDN)</option>
-                            <option value="16" <%= pb.getId_bantuan() == 16 ? "selected" : "" %>>BIASISWA PENDIDIKAN LUAR NEGARA (BPLN)</option>
-                            <option value="17" <%= pb.getId_bantuan() == 17 ? "selected" : "" %>>BIASISWA PROFESIONAL PERAKAUNAN (BPP)</option>
-                            <option value="18" <%= pb.getId_bantuan() == 18 ? "selected" : "" %>>PROG. BIASISWA SULTAN ISMAIL PETRA (BSIP)</option>
-                            <option value="19" <%= pb.getId_bantuan() == 19 ? "selected" : "" %>>PROGRAM DERMASISWA SULTAN ISMAIL PETRA (DSIP)</option>
-                            <option value="20" <%= pb.getId_bantuan() == 20 ? "selected" : "" %>>SUMBANGAN IPT - FISABILILLAH</option>
+                            <% 
+                                List<Bantuan> senaraiBantuan = (List<Bantuan>) request.getAttribute("senaraiJenisBantuan");
+                                if (senaraiBantuan != null) {
+                                    for (Bantuan b : senaraiBantuan) {
+                            %>
+                                <option value="<%= b.getId_bantuan() %>" <%= pb.getId_bantuan() == b.getId_bantuan() ? "selected" : "" %>><%= b.getNama_bantuan() %></option>
+                            <% 
+                                    }
+                                }
+                            %>
                             <option value="999" <%= isLain ? "selected" : "" %>>LAIN-LAIN</option>
                         </select>
                         <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
@@ -114,9 +111,9 @@
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
-                  <a href="<%= request.getContextPath() %>/bantuan/list" class="...">
-    Batal
-</a>
+                    <a href="<%= request.getContextPath() %>/bantuan/list" class="px-6 py-3 rounded-xl bg-gray-100 text-gray-600 font-bold text-sm hover:bg-gray-200 transition">
+                        Batal
+                    </a>
                     <button type="submit" class="px-6 py-3 rounded-xl bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white font-bold text-sm shadow-md shadow-purple-200 flex items-center gap-2 transition">
                         <i class="fas fa-save"></i> Simpan Perubahan
                     </button>

@@ -88,7 +88,10 @@ public class BantuanServlet extends HttpServlet {
                 PermohonanBantuan pb = pbDao.getById(id);
 
                 if (pb != null && pb.getId_pengguna() == user.getId_pengguna()) {
+                    BantuanDAO bDao = new BantuanDAO();
+                    List<Bantuan> senaraiBantuan = bDao.getAllBantuan();
                     request.setAttribute("pb", pb);
+                    request.setAttribute("senaraiJenisBantuan", senaraiBantuan);
                     request.getRequestDispatcher("/views/bantuan/bantuanEdit.jsp")
                             .forward(request, response);
                 } else {
@@ -107,11 +110,7 @@ public class BantuanServlet extends HttpServlet {
     
     
 
-    if (false) {
-        // Jika profil penduduk tak jumpa, logout atau redirect ke profile
-        response.sendRedirect(request.getContextPath() + "/logout");
-        return;
-    }
+
 
     // 3. Tarik Semua Permohonan Penduduk Ini
     PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
@@ -156,11 +155,7 @@ public class BantuanServlet extends HttpServlet {
     
     
 
-    if (false) {
-        // Jika profil belum lengkap, redirect ke profile atau logout
-        response.sendRedirect(request.getContextPath() + "/logout");
-        return;
-    }
+
 
     // 3. Tarik Senarai Permohonan (Sejarah)
     PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
@@ -279,24 +274,12 @@ else if ("/borangDigital.jsp".equals(action)) {
                 Part filePart = request.getPart("dokumenSokongan");
                 String fileName = null;
 
-                System.out.println("=== DEBUG UPLOAD ===");
-                System.out.println("Part null?: " + (filePart == null));
-                if (filePart != null) {
-                    System.out.println("Size: " + filePart.getSize());
-                    System.out.println("Submitted Name: " + filePart.getSubmittedFileName());
-                }
-
                 if (filePart != null && filePart.getSize() > 0) {
                     String submitted = filePart.getSubmittedFileName().replaceAll("\\s+", "_");
                     fileName = System.currentTimeMillis() + "_" + submitted;
-                    
                     File saveFile = new File(SAVE_DIR, fileName);
-                    System.out.println("Writing to: " + saveFile.getAbsolutePath());
-                    
                     filePart.write(saveFile.getAbsolutePath());
-                    System.out.println("Write complete!");
                 }
-                System.out.println("====================");
 
                 // 2. Ambil Data Form
                 String jenisBantuan = request.getParameter("jenisBantuan");

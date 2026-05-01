@@ -45,7 +45,10 @@
         <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm animate-fade-in-up">
             <i class="fas fa-check-circle text-lg"></i>
             <div>
-                <span class="font-bold">Berjaya!</span> Permohonan anda telah dihantar.
+                <% String stat = request.getParameter("status"); 
+                   if(stat != null) stat = stat.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;").replace("\"", "&quot;").replace("'", "&#39;");
+                %>
+                <span class="font-bold">Berjaya!</span> <%= (stat != null ? stat : "") %>
             </div>
             <button onclick="this.parentElement.remove()" class="ml-auto text-green-500 hover:text-green-700"><i class="fas fa-times"></i></button>
         </div>
@@ -99,6 +102,7 @@
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">Dokumen</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Ulasan AJK</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">Status</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">Status</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center w-32">Tindakan</th>
                         </tr>
                     </thead>
@@ -148,34 +152,39 @@
 
                             <td class="p-4">
                                 <% if ("BARU".equalsIgnoreCase(pb.getStatus())) { %> 
-                                    <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold whitespace-nowrap">Dalam Proses</span>
+                                    <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold whitespace-nowrap">Dihantar</span>
                                 <% } else if ("DIKEMBALIKAN".equalsIgnoreCase(pb.getStatus())) { %> 
-                                    <span class="px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-bold whitespace-nowrap">Tidak Lengkap</span>
+                                    <span class="px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-bold whitespace-nowrap">Perlu Pembetulan</span>
                                 <% } else if ("MENUNGGU_KETUA".equalsIgnoreCase(pb.getStatus())) { %> 
-                                    <span class="px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-xs font-bold whitespace-nowrap">Disemak AJK</span> 
+                                    <span class="px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-xs font-bold whitespace-nowrap">Semakan Ketua</span> 
                                 <% } %>
                             </td>
-                            
-<td class="p-4 text-center">
-    <% if ("BARU".equalsIgnoreCase(pb.getStatus()) || "DIKEMBALIKAN".equalsIgnoreCase(pb.getStatus())) { %>
-        <div class="flex flex-col gap-2">
-            <a href="<%= request.getContextPath() %>/bantuan/edit?id=<%= pb.getId_permohonan() %>" 
-               class="group flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition w-full text-xs font-bold">
-                <i class="fas fa-edit group-hover:scale-110 transition-transform"></i> Kemaskini
-            </a>
 
-            <a href="<%= request.getContextPath() %>/bantuan/delete?idPermohonan=<%= pb.getId_permohonan() %>" 
-               onclick="return confirm('Adakah anda pasti mahu membatalkan dan memadam permohonan ini? Tindakan ini tidak boleh dikembalikan.');"
-               class="group flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition w-full text-xs font-bold">
-                <i class="fas fa-trash-alt group-hover:scale-110 transition-transform"></i> Batal
-            </a>
-        </div>
-    <% } else { %> 
-        <span class="text-gray-300 text-xs flex items-center justify-center gap-1">
-            <i class="fas fa-lock"></i> Kunci
-        </span> 
-    <% } %>
-</td>
+                            <td class="p-4 text-center">
+                                <div class="flex flex-col gap-2">
+                                    <button onclick="openDetailModal('<%= pb.getNama_bantuan() %>', '<%= displayDate %>', '<%= pb.getStatus() %>', '<%= jsCatatan %>', '<%= jsUlasan %>')" 
+                                            class="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-50 text-[#6C5DD3] hover:bg-purple-100 transition w-full text-xs font-bold">
+                                        <i class="fas fa-tasks"></i> Progres
+                                    </button>
+                                    
+                                    <% if ("BARU".equalsIgnoreCase(pb.getStatus()) || "DIKEMBALIKAN".equalsIgnoreCase(pb.getStatus())) { %>
+                                        <a href="<%= request.getContextPath() %>/bantuan/edit?id=<%= pb.getId_permohonan() %>" 
+                                           class="group flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-700 transition w-full text-xs font-bold">
+                                            <i class="fas fa-edit"></i> Kemaskini
+                                        </a>
+
+                                        <a href="<%= request.getContextPath() %>/bantuan/delete?idPermohonan=<%= pb.getId_permohonan() %>" 
+                                           onclick="return confirm('Padam permohonan ini?');"
+                                           class="group flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 hover:text-red-700 transition w-full text-xs font-bold">
+                                            <i class="fas fa-trash-alt"></i> Batal
+                                        </a>
+                                    <% } else { %> 
+                                        <span class="text-gray-300 text-[10px] flex items-center justify-center gap-1 mt-1">
+                                            <i class="fas fa-lock text-[8px]"></i> Dikunci
+                                        </span> 
+                                    <% } %>
+                                </div>
+                            </td>
                         </tr>
                         <% } } else { %>
                             <tr class="no-data"><td colspan="7" class="p-8 text-center text-gray-400"><i class="fas fa-inbox text-3xl mb-2 block opacity-50"></i>Tiada permohonan aktif.</td></tr>
@@ -223,6 +232,8 @@
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Keterangan</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Ulasan Admin</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">Status</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">Status</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center w-24">Detail</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -269,6 +280,12 @@
                                     <span class="px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-bold flex items-center w-max gap-1"><i class="fas fa-times-circle"></i> Ditolak</span>
                                 <% } %>
                             </td>
+                            <td class="p-4 text-center">
+                                <button onclick="openDetailModal('<%= pb.getNama_bantuan() %>', '<%= displayDate %>', '<%= pb.getStatus() %>', '<%= jsCatatan %>', '<%= jsUlasan %>')" 
+                                        class="w-10 h-10 rounded-full bg-gray-50 text-gray-400 hover:bg-purple-50 hover:text-[#6C5DD3] transition flex items-center justify-center mx-auto">
+                                    <i class="fas fa-info-circle text-lg"></i>
+                                </button>
+                            </td>
                         </tr>
                         <% } } else { %>
                             <tr class="no-data"><td colspan="6" class="p-8 text-center text-gray-400"><i class="fas fa-archive text-3xl mb-2 block opacity-50"></i>Tiada sejarah permohonan.</td></tr>
@@ -303,6 +320,92 @@
         </div>
     </div>
 </aside>
+
+<div id="modalDetail" class="fixed inset-0 z-[60] hidden" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalDetail')"></div>
+    <div class="flex min-h-full items-center justify-center p-4 text-center">
+        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-lg">
+            <div class="bg-[#6C5DD3] px-6 py-4 flex justify-between items-center">
+                <h3 class="text-white font-bold flex items-center gap-2">
+                    <i class="fas fa-tasks"></i> Progres Permohonan
+                </h3>
+                <button onclick="closeModal('modalDetail')" class="text-white/80 hover:text-white transition"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <div class="p-8">
+                <!-- Info Summary -->
+                <div class="flex justify-between items-start mb-8 bg-gray-50 p-4 rounded-2xl border border-gray-100">
+                    <div>
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Jenis Bantuan</p>
+                        <h4 id="detNama" class="text-lg font-bold text-gray-800">-</h4>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Tarikh Mohon</p>
+                        <p id="detTarikh" class="text-sm font-bold text-gray-700">-</p>
+                    </div>
+                </div>
+
+                <!-- Status Tracker (Large) -->
+                <div class="mb-12 relative px-4">
+                    <div class="flex justify-between items-center relative z-10">
+                        <!-- Step 1 -->
+                        <div class="flex flex-col items-center gap-2">
+                            <div id="step1" class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg transition-all duration-500 bg-gray-200">1</div>
+                            <span class="text-[10px] font-bold text-gray-500">DIHANTAR</span>
+                        </div>
+                        <!-- Line 1-2 -->
+                        <div class="flex-1 h-1 bg-gray-100 -mt-6 mx-1">
+                            <div id="line1" class="h-full bg-[#6C5DD3] transition-all duration-700 w-0"></div>
+                        </div>
+                        <!-- Step 2 -->
+                        <div class="flex flex-col items-center gap-2">
+                            <div id="step2" class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg transition-all duration-500 bg-gray-200">2</div>
+                            <span class="text-[10px] font-bold text-gray-500">AJK</span>
+                        </div>
+                        <!-- Line 2-3 -->
+                        <div class="flex-1 h-1 bg-gray-100 -mt-6 mx-1">
+                            <div id="line2" class="h-full bg-[#6C5DD3] transition-all duration-700 w-0"></div>
+                        </div>
+                        <!-- Step 3 -->
+                        <div class="flex flex-col items-center gap-2">
+                            <div id="step3" class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg transition-all duration-500 bg-gray-200">3</div>
+                            <span class="text-[10px] font-bold text-gray-500">KETUA</span>
+                        </div>
+                        <!-- Line 3-4 -->
+                        <div class="flex-1 h-1 bg-gray-100 -mt-6 mx-1">
+                            <div id="line3" class="h-full bg-[#6C5DD3] transition-all duration-700 w-0"></div>
+                        </div>
+                        <!-- Step 4 -->
+                        <div class="flex flex-col items-center gap-2">
+                            <div id="step4" class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg transition-all duration-500 bg-gray-200">4</div>
+                            <span class="text-[10px] font-bold text-gray-500">KEPUTUSAN</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Detailed Text -->
+                <div class="space-y-6">
+                    <div>
+                        <h5 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                            <i class="fas fa-comment-alt text-[#6C5DD3]"></i> Keterangan Anda
+                        </h5>
+                        <p id="detCatatan" class="text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-100 leading-relaxed">-</p>
+                    </div>
+                    <div id="ulasanDiv">
+                        <h5 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                            <i class="fas fa-shield-alt text-orange-500"></i> Ulasan JKKK / Ketua
+                        </h5>
+                        <p id="detUlasan" class="text-sm text-gray-600 bg-orange-50 p-4 rounded-xl border border-orange-100 leading-relaxed">-</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-gray-50 px-8 py-6 sm:flex sm:flex-row-reverse rounded-b-3xl">
+                <button type="button" class="w-full sm:w-auto px-8 py-3 bg-[#6C5DD3] text-white font-bold rounded-xl hover:bg-[#5b4eb8] transition shadow-lg shadow-purple-100" onclick="closeModal('modalDetail')">Faham</button>
+            </div>
+        </div>
+    </div>
+</div>
 
 <div id="modalText" class="fixed inset-0 z-[60] hidden" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalText')"></div>
@@ -432,7 +535,58 @@
         document.getElementById('content-' + tabName).classList.remove('hidden');
     }
 
-    // 1. OPEN TEXT MODAL LOGIC
+    // 1. OPEN DETAIL MODAL LOGIC
+    function openDetailModal(nama, tarikh, status, catatan, ulasan) {
+        document.getElementById('detNama').innerText = nama;
+        document.getElementById('detTarikh').innerText = tarikh;
+        document.getElementById('detCatatan').innerText = (catatan && catatan !== "null") ? catatan : "Tiada maklumat.";
+        document.getElementById('detUlasan').innerText = (ulasan && ulasan !== "null") ? ulasan : "Belum ada ulasan.";
+        
+        // Reset Steps
+        const steps = ['step1', 'step2', 'step3', 'step4'];
+        const lines = ['line1', 'line2', 'line3'];
+        
+        steps.forEach(s => {
+            const el = document.getElementById(s);
+            el.className = "w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg transition-all duration-500 bg-gray-200";
+            el.innerHTML = s.replace('step', '');
+        });
+        lines.forEach(l => document.getElementById(l).style.width = "0%");
+
+        let activeStep = 1;
+        let mainColor = "bg-[#6C5DD3]";
+        
+        if (status === "MENUNGGU_KETUA") activeStep = 3;
+        else if (status === "LULUS" || status === "DITOLAK") activeStep = 4;
+        else if (status === "DIKEMBALIKAN") mainColor = "bg-orange-500";
+
+        // Animate Steps
+        setTimeout(() => {
+            for(let i=1; i<=activeStep; i++) {
+                const el = document.getElementById('step'+i);
+                el.classList.remove('bg-gray-200');
+                el.classList.add(mainColor);
+                if(i < activeStep) el.innerHTML = "✓";
+                
+                if(i < activeStep && i <= 3) {
+                    document.getElementById('line'+i).style.width = "100%";
+                    if(mainColor !== "bg-[#6C5DD3]") document.getElementById('line'+i).classList.replace('bg-[#6C5DD3]', 'bg-orange-500');
+                }
+            }
+            
+            // Special color for decision
+            if(activeStep === 4) {
+                const lastStep = document.getElementById('step4');
+                lastStep.classList.remove('bg-[#6C5DD3]');
+                lastStep.classList.add(status === "LULUS" ? "bg-green-500" : "bg-red-500");
+                lastStep.innerHTML = "✓";
+            }
+        }, 100);
+
+        openModal('modalDetail');
+    }
+
+    // 2. OPEN TEXT MODAL LOGIC
     function openTextModal(title, text) {
         document.getElementById('modalTextTitle').innerText = title;
         document.getElementById('modalTextContent').innerText = (text && text.trim() !== "") ? text : "Tiada maklumat.";
