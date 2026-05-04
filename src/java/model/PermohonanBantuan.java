@@ -14,6 +14,11 @@ public class PermohonanBantuan {
     private Date dibuat_pada;
     private Date dikemaskini_pada;
     private Date dipadam_pada;
+
+    // Bank Information
+    private String nama_bank;
+    private String nombor_akaun;
+    private String penyata_bank;
     
     // Custom properties for UI and joins
     private String nama_bantuan;
@@ -60,6 +65,15 @@ public class PermohonanBantuan {
 
     public Date getDipadam_pada() { return dipadam_pada; }
     public void setDipadam_pada(Date dipadam_pada) { this.dipadam_pada = dipadam_pada; }
+
+    public String getNama_bank() { return nama_bank; }
+    public void setNama_bank(String nama_bank) { this.nama_bank = nama_bank; }
+
+    public String getNombor_akaun() { return nombor_akaun; }
+    public void setNombor_akaun(String nombor_akaun) { this.nombor_akaun = nombor_akaun; }
+
+    public String getPenyata_bank() { return penyata_bank; }
+    public void setPenyata_bank(String penyata_bank) { this.penyata_bank = penyata_bank; }
 
     public String getNama_bantuan() { return nama_bantuan; }
     public void setNama_bantuan(String nama_bantuan) { this.nama_bantuan = nama_bantuan; }

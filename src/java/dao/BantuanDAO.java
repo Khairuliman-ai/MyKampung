@@ -20,8 +20,8 @@ public class BantuanDAO {
                     b.setId_bantuan(rs.getInt("id_bantuan"));
                     b.setNama_bantuan(rs.getString("nama_bantuan"));
                     b.setJenis_bantuan(rs.getString("jenis_bantuan"));
-                    // Map database 'peruntukan' to model 'jumlah_bantuan'
                     b.setJumlah_bantuan(rs.getBigDecimal("peruntukan"));
+                    b.setSyarat_dokumen(rs.getString("syarat_dokumen"));
                     list.add(b);
                 }
             }
@@ -43,6 +43,7 @@ public class BantuanDAO {
                     b.setNama_bantuan(rs.getString("nama_bantuan"));
                     b.setJenis_bantuan(rs.getString("jenis_bantuan"));
                     b.setJumlah_bantuan(rs.getBigDecimal("peruntukan"));
+                    b.setSyarat_dokumen(rs.getString("syarat_dokumen"));
                     return b;
                 }
             }
@@ -64,6 +65,7 @@ public class BantuanDAO {
                 b.setNama_bantuan(rs.getString("nama_bantuan"));
                 b.setJenis_bantuan(rs.getString("jenis_bantuan"));
                 b.setJumlah_bantuan(rs.getBigDecimal("peruntukan"));
+                b.setSyarat_dokumen(rs.getString("syarat_dokumen"));
                 list.add(b);
             }
         } catch (SQLException e) {
@@ -73,12 +75,13 @@ public class BantuanDAO {
     }
 
     public boolean insertBantuan(Bantuan b) {
-        String sql = "INSERT INTO bantuan (nama_bantuan, jenis_bantuan, peruntukan) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO bantuan (nama_bantuan, jenis_bantuan, peruntukan, syarat_dokumen) VALUES (?, ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, b.getNama_bantuan());
             ps.setString(2, b.getJenis_bantuan() != null ? b.getJenis_bantuan() : "KOMUNITI");
             ps.setBigDecimal(3, b.getJumlah_bantuan());
+            ps.setString(4, b.getSyarat_dokumen());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -87,13 +90,14 @@ public class BantuanDAO {
     }
 
     public boolean updateBantuan(Bantuan b) {
-        String sql = "UPDATE bantuan SET nama_bantuan = ?, jenis_bantuan = ?, peruntukan = ? WHERE id_bantuan = ?";
+        String sql = "UPDATE bantuan SET nama_bantuan = ?, jenis_bantuan = ?, peruntukan = ?, syarat_dokumen = ? WHERE id_bantuan = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, b.getNama_bantuan());
             ps.setString(2, b.getJenis_bantuan());
             ps.setBigDecimal(3, b.getJumlah_bantuan());
-            ps.setInt(4, b.getId_bantuan());
+            ps.setString(4, b.getSyarat_dokumen());
+            ps.setInt(5, b.getId_bantuan());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();

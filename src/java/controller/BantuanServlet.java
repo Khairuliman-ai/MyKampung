@@ -60,7 +60,6 @@ public class BantuanServlet extends HttpServlet {
                             .forward(request, response);
 
                 } else if ("JKKK".equalsIgnoreCase(user.getNama_peranan()) || "AJK".equalsIgnoreCase(user.getNama_peranan()) || "AJK Kampung".equalsIgnoreCase(user.getNama_peranan())) {
-                    // --- TAMBAHAN BARU UNTUK JKKK ---
                     list = pbDao.getAll();
                     BantuanDAO bDao = new BantuanDAO();
                     List<Bantuan> senaraiBantuan = bDao.getAllBantuan();
@@ -70,15 +69,10 @@ public class BantuanServlet extends HttpServlet {
                     request.getRequestDispatcher("/views/bantuan/urusBantuanAJK.jsp").forward(request, response);
 
                 } else if ("Ketua Kampung".equalsIgnoreCase(user.getNama_peranan())) {
-                    // INI UNTUK KETUA KAMPUNG
                     list = pbDao.getAll();
                     request.setAttribute("permohonanList", list);
-
-                    // --- TUKAR BARIS INI ---
-                    // Tukar dari "/bantuanKetua.jsp" kepada fail baru kita:
                     request.getRequestDispatcher("/views/bantuan/urusBantuanKetua.jsp").forward(request, response);
                 } else {
-                    // Fallback jika peranan tidak dikenali
                     response.sendRedirect(request.getContextPath() + "/dashboard?error=invalid_role");
                 }
             } // ================== EDIT ==================
@@ -99,121 +93,80 @@ public class BantuanServlet extends HttpServlet {
                 }
             } // ================== RASMI ==================
             else if ("/rasmi".equals(action)) {
-
-    // 1. Semak Adakah User Itu Penduduk
-    if (!"Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
-        response.sendRedirect(request.getContextPath() + "/dashboard");
-        return;
-    }
-
-    // 2. Dapatkan Data Penduduk (Untuk dapatkan idPenduduk yang betul)
-    
-    
-
-
-
-    // 3. Tarik Semua Permohonan Penduduk Ini
-    PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
-    List<PermohonanBantuan> fullList = pbDao.getByPenduduk(user.getId_pengguna());
-
-    // 4. [PENTING]: Tapis Bantuan Berdasarkan Kategori RASMI dari DB
-    List<PermohonanBantuan> listRasmi = new ArrayList<>();
-    BantuanDAO bantuanDao = new BantuanDAO();
-    List<Bantuan> senaraiRasmiDB = bantuanDao.getBantuanByKategori("RASMI");
-
-    if (fullList != null) {
-        for (PermohonanBantuan pb : fullList) {
-            // Semak jika ID permohonan ini ada dalam senarai RASMI dari database
-            boolean isRasmi = false;
-            for (Bantuan b : senaraiRasmiDB) {
-                if (b.getId_bantuan() == pb.getId_bantuan()) {
-                    isRasmi = true;
-                    break;
+                if (!"Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
+                    response.sendRedirect(request.getContextPath() + "/dashboard");
+                    return;
                 }
-            }
-            // ID 999 biasanya diletakkan di Komuniti, tetapi jika mahu di Rasmi juga boleh disesuaikan
-            if (isRasmi) {
-                listRasmi.add(pb);
-            }
-        }
-    }
 
-    // 5. Hantar data ke JSP
-    request.setAttribute("permohonanList", listRasmi);
-    request.setAttribute("senaraiJenisBantuan", senaraiRasmiDB); // Untuk dropdown Mohon Baru
-    request.getRequestDispatcher("/views/bantuan/bantuanRas.jsp")
-            .forward(request, response);
-} else if ("/komuniti".equals(action)) {
+                PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
+                List<PermohonanBantuan> fullList = pbDao.getByPenduduk(user.getId_pengguna());
 
-    // 1. Semak Adakah User Itu Penduduk
-    if (!"Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
-        response.sendRedirect(request.getContextPath() + "/dashboard");
-        return;
-    }
+                List<PermohonanBantuan> listRasmi = new ArrayList<>();
+                BantuanDAO bantuanDao = new BantuanDAO();
+                List<Bantuan> senaraiRasmiDB = bantuanDao.getBantuanByKategori("RASMI");
 
-    // 2. Dapatkan Data Penduduk
-    
-    
-
-
-
-    // 3. Tarik Senarai Permohonan (Sejarah)
-    PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
-    List<PermohonanBantuan> fullList = pbDao.getByPenduduk(user.getId_pengguna());
-
-    // 4. Tarik Senarai Pilihan Bantuan Komuniti dari DB
-    BantuanDAO bantuanDao = new BantuanDAO();
-    List<Bantuan> senaraiKomunitiDB = bantuanDao.getBantuanByKategori("KOMUNITI");
-    
-    // Filter: Asingkan Bantuan Komuniti Sahaja
-    List<PermohonanBantuan> listKomuniti = new ArrayList<>();
-    if (fullList != null) {
-        for (PermohonanBantuan pb : fullList) {
-            boolean isKomuniti = false;
-            for (Bantuan b : senaraiKomunitiDB) {
-                if (b.getId_bantuan() == pb.getId_bantuan()) {
-                    isKomuniti = true;
-                    break;
+                if (fullList != null) {
+                    for (PermohonanBantuan pb : fullList) {
+                        boolean isRasmi = false;
+                        for (Bantuan b : senaraiRasmiDB) {
+                            if (b.getId_bantuan() == pb.getId_bantuan()) {
+                                isRasmi = true;
+                                break;
+                            }
+                        }
+                        if (isRasmi) {
+                            listRasmi.add(pb);
+                        }
+                    }
                 }
-            }
-            // ID 999 dikira sebagai Komuniti (Lain-lain)
-            if (isKomuniti || pb.getId_bantuan() == 999) {
-                listKomuniti.add(pb);
-            }
-        }
-    }
 
-    // 5. Hantar Data ke JSP
-    request.setAttribute("permohonanList", listKomuniti);       // Untuk Table Sejarah
-    request.setAttribute("senaraiJenisBantuan", senaraiKomunitiDB); // Untuk Dropdown Modal
-    
-    request.getRequestDispatcher("/views/bantuan/bantuanKom.jsp").forward(request, response);
-}
+                request.setAttribute("permohonanList", listRasmi);
+                request.setAttribute("senaraiJenisBantuan", senaraiRasmiDB); 
+                request.getRequestDispatcher("/views/bantuan/bantuanRas.jsp")
+                        .forward(request, response);
+            } else if ("/komuniti".equals(action)) {
+                if (!"Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
+                    response.sendRedirect(request.getContextPath() + "/dashboard");
+                    return;
+                }
 
-// ... (kod sedia ada)
+                PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
+                List<PermohonanBantuan> fullList = pbDao.getByPenduduk(user.getId_pengguna());
 
-// ================== BORANG DIGITAL (TAMBAHAN BARU) ==================
-else if ("/borangDigital.jsp".equals(action)) {
-    // Forward request ke lokasi sebenar fail JSP dalam folder views
-    request.getRequestDispatcher("/views/bantuan/borangDigital.jsp").forward(request, response);
-}
+                BantuanDAO bantuanDao = new BantuanDAO();
+                List<Bantuan> senaraiKomunitiDB = bantuanDao.getBantuanByKategori("KOMUNITI");
+                
+                List<PermohonanBantuan> listKomuniti = new ArrayList<>();
+                if (fullList != null) {
+                    for (PermohonanBantuan pb : fullList) {
+                        boolean isKomuniti = false;
+                        for (Bantuan b : senaraiKomunitiDB) {
+                            if (b.getId_bantuan() == pb.getId_bantuan()) {
+                                isKomuniti = true;
+                                break;
+                            }
+                        }
+                        if (isKomuniti || pb.getId_bantuan() == 999) {
+                            listKomuniti.add(pb);
+                        }
+                    }
+                }
 
-// ... (kod sedia ada seterusnya, contohnya /delete atau /rasmi)// ================== TAMBAH INI (DELETE) ==================
-// ================== DELETE (KEMASKINI) ==================
-            else if ("/delete".equals(action)) {
-                // Pastikan hanya PENDUDUK boleh delete (Security Check)
+                request.setAttribute("permohonanList", listKomuniti);       
+                request.setAttribute("senaraiJenisBantuan", senaraiKomunitiDB); 
+                request.setAttribute("currentUser", user);
+                
+                request.getRequestDispatcher("/views/bantuan/bantuanKom.jsp").forward(request, response);
+            } else if ("/delete".equals(action)) {
                 if ("Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
                     PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
                     int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
 
-                    // LANGKAH 1: Dapatkan info permohonan DAHULU sebelum delete
-                    // Tujuannya untuk tahu ID Bantuan (Rasmi atau Komuniti)
                     PermohonanBantuan pb = pbDao.getById(idPermohonan);
                     
-                    String redirectPage = "/bantuan/rasmi"; // Default ke rasmi
+                    String redirectPage = "/bantuan/rasmi"; 
 
                     if (pb != null) {
-                        // Semak jenis bantuan
                         if (pb.getId_bantuan() == 999) {
                             redirectPage = "/bantuan/komuniti";
                         } else {
@@ -223,16 +176,12 @@ else if ("/borangDigital.jsp".equals(action)) {
                                 redirectPage = "/bantuan/komuniti";
                             }
                         }
-                        
-                        // LANGKAH 2: Delete dari database selepas semakan
                         pbDao.deleteByIdAndPenduduk(idPermohonan, user.getId_pengguna());
                     }
 
-                    // LANGKAH 3: Redirect ke page yang betul berdasarkan semakan tadi
                     response.sendRedirect(request.getContextPath() + redirectPage + "?status=deleted");
                     
                 } else {
-                    // Kalau bukan penduduk cuba delete, tendang balik
                     response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?error=denied");
                 }
             }
@@ -250,7 +199,6 @@ else if ("/borangDigital.jsp".equals(action)) {
         HttpSession session = request.getSession();
         Pengguna user = (Pengguna) session.getAttribute("currentUser");
 
-        // Security Check
         if (user == null) {
             response.sendRedirect(request.getContextPath());
             return;
@@ -258,7 +206,6 @@ else if ("/borangDigital.jsp".equals(action)) {
 
         String action = request.getPathInfo();
 
-        // Setup Folder Upload
         File fileSaveDir = new File(SAVE_DIR);
         if (!fileSaveDir.exists()) {
             fileSaveDir.mkdirs();
@@ -270,7 +217,6 @@ else if ("/borangDigital.jsp".equals(action)) {
             // ===================== 1. APPLY (PENDUDUK) =====================
             if ("/apply".equals(action) && "Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
 
-                // 1. Handle File Upload
                 Part filePart = request.getPart("dokumenSokongan");
                 String fileName = null;
 
@@ -281,39 +227,42 @@ else if ("/borangDigital.jsp".equals(action)) {
                     filePart.write(saveFile.getAbsolutePath());
                 }
 
-                // 2. Ambil Data Form
                 String jenisBantuan = request.getParameter("jenisBantuan");
-                String jenisBantuanLain = request.getParameter("jenisBantuanLain"); // Input text khas
-                String keterangan = request.getParameter("keterangan"); // Textarea biasa
+                String jenisBantuanLain = request.getParameter("jenisBantuanLain"); 
+                String keterangan = request.getParameter("keterangan"); 
+                
+                String namaBank = request.getParameter("namaBank");
+                String nomorAkaun = request.getParameter("nomorAkaun");
+
+                Part penyataPart = request.getPart("penyataBank");
+                String penyataFileName = null;
+                if (penyataPart != null && penyataPart.getSize() > 0) {
+                    String submitted = penyataPart.getSubmittedFileName().replaceAll("\\s+", "_");
+                    penyataFileName = "BANK_" + System.currentTimeMillis() + "_" + submitted;
+                    penyataPart.write(SAVE_DIR + File.separator + penyataFileName);
+                }
 
                 PermohonanBantuan pb = new PermohonanBantuan();
                 pb.setId_pengguna(user.getId_pengguna());
                 pb.setDokumen_pemohon(fileName);
+                pb.setNama_bank(namaBank);
+                pb.setNombor_akaun(nomorAkaun);
+                pb.setPenyata_bank(penyataFileName);
 
-                // --- LOGIC PENENTU ID & CATATAN (UPDATED ID 999) ---
                 if ("999".equals(jenisBantuan)) {
-                    pb.setId_bantuan(999); // Set ID 999
-
-                    // Format: "LAIN-LAIN: [Nama Bantuan] | [Keterangan]"
-                    // Simbol '|' ini PENTING supaya JSP boleh pisahkan nanti
+                    pb.setId_bantuan(999); 
                     String catatanSimpan = "LAIN-LAIN: " + (jenisBantuanLain != null ? jenisBantuanLain : "Lain-lain");
-
                     if (keterangan != null && !keterangan.trim().isEmpty()) {
                         catatanSimpan += " | " + keterangan;
                     }
-
                     pb.setCatatan_pemohon(catatanSimpan);
-
                 } else {
-                    // Bantuan Biasa (ID 6 - 20)
                     pb.setId_bantuan(Integer.parseInt(jenisBantuan));
-                    pb.setCatatan_pemohon(keterangan); // Simpan keterangan biasa sahaja
+                    pb.setCatatan_pemohon(keterangan); 
                 }
-                // ----------------------------------------------------
 
-               pbDao.insertPermohonan(pb);
+                pbDao.insertPermohonan(pb);
 
-                // --- LOGIK REDIRECT PINTAR (DINAMIK BERDASARKAN KATEGORI) ---
                 BantuanDAO bDao = new BantuanDAO();
                 if (pb.getId_bantuan() == 999) {
                     response.sendRedirect(request.getContextPath() + "/bantuan/komuniti?status=success");
@@ -349,50 +298,56 @@ else if ("/borangDigital.jsp".equals(action)) {
                 pbDao.updateInfo(idPermohonan, catatan, fileName);
                 response.sendRedirect(request.getContextPath() + "/bantuan/list");
             } 
-
-// ===================== 5. UPDATE MY REQUEST (EDIT) =====================
             else if ("/updateMyRequest".equals(action) && "Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
 
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 String oldDokumen = request.getParameter("oldDokumen");
+                String oldPenyata = request.getParameter("oldPenyataBank");
 
                 Part filePart = request.getPart("dokumenSokongan");
                 String fileName = oldDokumen;
-
                 if (filePart != null && filePart.getSize() > 0) {
                     String submitted = filePart.getSubmittedFileName().replaceAll("\\s+", "_");
                     fileName = System.currentTimeMillis() + "_" + submitted;
                     filePart.write(SAVE_DIR + File.separator + fileName);
                 }
+                
+                Part penyataPart = request.getPart("penyataBank");
+                String penyataFileName = oldPenyata;
+                if (penyataPart != null && penyataPart.getSize() > 0) {
+                    String submitted = penyataPart.getSubmittedFileName().replaceAll("\\s+", "_");
+                    penyataFileName = "BANK_" + System.currentTimeMillis() + "_" + submitted;
+                    penyataPart.write(SAVE_DIR + File.separator + penyataFileName);
+                }
 
                 String jenisBantuan = request.getParameter("jenisBantuan");
                 String jenisBantuanLain = request.getParameter("jenisBantuanLain");
                 String keterangan = request.getParameter("keterangan");
+                String namaBank = request.getParameter("namaBank");
+                String nomorAkaun = request.getParameter("nomorAkaun");
 
                 PermohonanBantuan pb = new PermohonanBantuan();
                 pb.setId_permohonan_bantuan(idPermohonan);
                 pb.setId_pengguna(user.getId_pengguna());
                 pb.setDokumen_pemohon(fileName);
+                pb.setNama_bank(namaBank);
+                pb.setNombor_akaun(nomorAkaun);
+                pb.setPenyata_bank(penyataFileName);
 
-                // --- LOGIC PENENTUAN ID BANTUAN ---
                 if ("999".equals(jenisBantuan)) {
                     pb.setId_bantuan(999);
-
                     String catatanSimpan = "LAIN-LAIN: " + (jenisBantuanLain != null ? jenisBantuanLain : "Lain-lain");
                     if (keterangan != null && !keterangan.trim().isEmpty()) {
                         catatanSimpan += " | " + keterangan;
                     }
                     pb.setCatatan_pemohon(catatanSimpan);
-
                 } else {
                     pb.setId_bantuan(Integer.parseInt(jenisBantuan));
                     pb.setCatatan_pemohon(keterangan);
                 }
                 
-                // Simpan ke database
                 pbDao.updatePermohonan(pb);
 
-                // --- LOGIK REDIRECT PINTAR (UPDATE DI SINI) ---
                 BantuanDAO bDao = new BantuanDAO();
                 if (pb.getId_bantuan() == 999) {
                     response.sendRedirect(request.getContextPath() + "/bantuan/komuniti?status=updated");
@@ -405,52 +360,32 @@ else if ("/borangDigital.jsp".equals(action)) {
                     }
                 }
             }
-
-// ===================== 6. JKKK REVIEW (Semakan Dokumen) =====================
             else if ("/reviewJKKK".equals(action)) {
-
-                // 1. Ambil data dari form modal (urusBantuanAJK.jsp)
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
-                String keputusan = request.getParameter("keputusan"); // Value: "lengkap" atau "tak_lengkap"
-                String ulasanJKKK = request.getParameter("ulasan");   // Value: Apa yang ditaip dalam textarea
+                String keputusan = request.getParameter("keputusan"); 
+                String ulasanJKKK = request.getParameter("ulasan");   
 
                 int statusBaru;
                 String catatanSimpan;
 
                 if ("lengkap".equals(keputusan)) {
-                    // KES 1: Dokumen LENGKAP
-                    // Status 3: Bermaksud "Disemak oleh JKKK, menunggu kelulusan Ketua Kampung"
-                    // (Pastikan Status 3 ini wujud dalam logic database/JSP anda sebagai 'Pending Ketua')
                     statusBaru = 3;
                     catatanSimpan = "Disemak oleh JKKK: Dokumen Lengkap.";
                 } else {
-                    // KES 2: HANTAR BALIK (Tidak Lengkap)
-                    // Status 2: Bermaksud "Perlu Pembetulan / Returned"
                     statusBaru = 2;
-
-                    // Simpan ulasan JKKK terus ke database. 
-                    // Contoh: "Salinan IC kabur, sila upload semula."
-                    // Kita simpan 'ulasanJKKK' supaya pemohon nampak arahan yang jelas.
                     catatanSimpan = (ulasanJKKK != null && !ulasanJKKK.trim().isEmpty())
                             ? ulasanJKKK
                             : "Dokumen tidak lengkap. Sila hubungi JKKK.";
                 }
 
-                // 2. Update database (Status & Catatan)
                 pbDao.updateStatus(idPermohonan, statusBaru, catatanSimpan, null);
-
-                // 3. Redirect balik ke dashboard JKKK dengan mesej kejayaan
                 response.sendRedirect(request.getContextPath() + "/bantuan/list?msg=reviewed");
-            } // ===================== 7. KEPUTUSAN KETUA KAMPUNG (Lulus / Tolak) =====================
-            else if ("/keputusanKetua".equals(action)) {
-
-                // 1. Ambil data Form
+            } else if ("/keputusanKetua".equals(action)) {
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 String keputusan = request.getParameter("keputusan");
                 String ulasanKetua = request.getParameter("ulasan");
 
-                // 2. Handle File Upload (Dokumen Balas dari Ketua)
-                Part filePart = request.getPart("dokumenBalas"); // Pastikan nama ni sama dengan name="" di JSP
+                Part filePart = request.getPart("dokumenBalas"); 
                 String fileName = null;
 
                 if (filePart != null && filePart.getSize() > 0) {
@@ -459,7 +394,6 @@ else if ("/borangDigital.jsp".equals(action)) {
                     filePart.write(SAVE_DIR + File.separator + fileName);
                 }
 
-                // 3. Tentukan Status & Ulasan
                 int statusBaru;
                 String ulasanAdmin;
 
@@ -471,15 +405,11 @@ else if ("/borangDigital.jsp".equals(action)) {
                     ulasanAdmin = "DITOLAK oleh Ketua Kampung: " + (ulasanKetua != null ? ulasanKetua : "Tidak menepati syarat.");
                 }
 
-                // 4. Update Database (Panggil method baru tadi)
                 pbDao.updateStatus(idPermohonan, statusBaru, ulasanAdmin, fileName);
-
                 response.sendRedirect(request.getContextPath() + "/bantuan/list?msg=decision_made");
             }
             
-            // ===================== 8. PENGURUSAN JENIS BANTUAN (ADMIN) =====================
             else if ("/tambahJenisBantuan".equals(action) || "/kemaskiniJenisBantuan".equals(action)) {
-                // Security: Pastikan hanya JKKK/AJK atau Ketua Kampung boleh akses
                 String role = user.getNama_peranan();
                 if (!"JKKK".equalsIgnoreCase(role) && !"Ketua Kampung".equalsIgnoreCase(role) && !"AJK".equalsIgnoreCase(role) && !"AJK Kampung".equalsIgnoreCase(role)) {
                     response.sendRedirect(request.getContextPath() + "/dashboard?error=denied");
@@ -490,10 +420,12 @@ else if ("/borangDigital.jsp".equals(action)) {
                 String namaBantuan = request.getParameter("namaBantuan");
                 String jenisBantuan = request.getParameter("jenisBantuan");
                 String peruntukanStr = request.getParameter("peruntukan");
+                String syaratDokumen = request.getParameter("syaratDokumen");
 
                 Bantuan b = new Bantuan();
                 b.setNama_bantuan(namaBantuan);
                 b.setJenis_bantuan(jenisBantuan);
+                b.setSyarat_dokumen(syaratDokumen);
                 try {
                     b.setJumlah_bantuan(new java.math.BigDecimal(peruntukanStr));
                 } catch (Exception e) {

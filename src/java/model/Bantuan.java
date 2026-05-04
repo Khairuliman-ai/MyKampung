@@ -9,6 +9,7 @@ public class Bantuan {
     private String keterangan;
     private BigDecimal jumlah_bantuan;
     private String jenis_bantuan;
+    private String syarat_dokumen;
 
     // --- Helper Method ---
     public String getJumlahBantuanFormatted() {
@@ -35,4 +36,7 @@ public class Bantuan {
 
     public String getJenis_bantuan() { return jenis_bantuan; }
     public void setJenis_bantuan(String jenis_bantuan) { this.jenis_bantuan = jenis_bantuan; }
+
+    public String getSyarat_dokumen() { return syarat_dokumen; }
+    public void setSyarat_dokumen(String syarat_dokumen) { this.syarat_dokumen = syarat_dokumen; }
 }

@@ -99,15 +99,54 @@
                         <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
                             <i class="fas fa-file-pdf"></i>
                         </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-xs text-gray-500 uppercase font-bold">Fail Semasa</p>
-                            <p class="text-sm font-bold text-gray-800 truncate"><%= pb.getDokumen_pemohon() %></p>
+                        <div class="flex-1 min-w-0 text-xs">
+                            <p class="text-gray-400 uppercase font-bold text-[10px]">Fail Semasa</p>
+                            <p class="font-bold text-gray-800 truncate"><%= pb.getDokumen_pemohon() %></p>
                         </div>
                     </div>
 
                     <input type="file" name="dokumenSokongan" accept="application/pdf"
                            class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#6C5DD3] file:text-white hover:file:bg-[#5b4eb8] transition cursor-pointer bg-gray-50 rounded-xl">
-                    <p class="text-xs text-gray-400 mt-2 ml-1">Biarkan kosong jika tidak mahu menukar fail dokumen.</p>
+                    <p class="text-[10px] text-gray-400 mt-2 ml-1 italic">Biarkan kosong jika tidak mahu menukar fail dokumen.</p>
+                </div>
+
+                <!-- BANK SECTION UPDATE -->
+                <div class="mt-10 pt-8 border-t border-dashed border-gray-200">
+                    <h5 class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <i class="fas fa-university"></i> Kemaskini Maklumat Bank
+                    </h5>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-gray-50/50 p-6 rounded-3xl border border-gray-100 mb-6">
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Nama Bank</label>
+                            <input type="text" name="namaBank" value="<%= (pb.getNama_bank() != null) ? pb.getNama_bank() : "" %>" required
+                                   class="w-full px-4 py-3 rounded-xl bg-white border-none focus:ring-2 focus:ring-blue-400 text-gray-800 text-sm font-bold shadow-sm">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Nombor Akaun</label>
+                            <input type="text" name="nomorAkaun" value="<%= (pb.getNombor_akaun() != null) ? pb.getNombor_akaun() : "" %>" required
+                                   class="w-full px-4 py-3 rounded-xl bg-white border-none focus:ring-2 focus:ring-blue-400 text-gray-800 text-sm font-bold tracking-wider shadow-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-3">Penyata Bank (PDF)</label>
+                        <% if (pb.getPenyata_bank() != null) { %>
+                            <div class="flex items-center gap-3 p-3 bg-green-50 rounded-xl mb-3 border border-green-100">
+                                <div class="w-8 h-8 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
+                                    <i class="fas fa-file-invoice-dollar"></i>
+                                </div>
+                                <div class="flex-1 min-w-0 text-xs">
+                                    <p class="text-gray-400 uppercase font-bold text-[10px]">Fail Semasa</p>
+                                    <p class="font-bold text-gray-800 truncate"><%= pb.getPenyata_bank() %></p>
+                                </div>
+                            </div>
+                        <% } %>
+                        <input type="file" name="penyataBank" accept="application/pdf"
+                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition cursor-pointer bg-gray-50 rounded-xl">
+                        <p class="text-[10px] text-gray-400 mt-2 ml-1 italic">Kosongkan jika tiada perubahan pada penyata bank.</p>
+                    </div>
+                    <input type="hidden" name="oldPenyataBank" value="<%= (pb.getPenyata_bank() != null) ? pb.getPenyata_bank() : "" %>">
                 </div>
 
                 <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">

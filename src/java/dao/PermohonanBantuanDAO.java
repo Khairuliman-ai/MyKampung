@@ -72,13 +72,16 @@ public class PermohonanBantuanDAO {
     }
     
     public boolean insertPermohonan(PermohonanBantuan pb) {
-        String sql = "INSERT INTO permohonan_bantuan (id_pengguna, id_bantuan, catatan_pemohon, dokumen_pemohon, dibuat_pada, status) VALUES (?, ?, ?, ?, NOW(), 'BARU')";
+        String sql = "INSERT INTO permohonan_bantuan (id_pengguna, id_bantuan, catatan_pemohon, dokumen_pemohon, nama_bank, nombor_akaun, penyata_bank, dibuat_pada, status) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 'BARU')";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, pb.getId_pengguna());
             ps.setInt(2, pb.getId_bantuan());
             ps.setString(3, pb.getCatatan_pemohon());
             ps.setString(4, pb.getDokumen_pemohon());
+            ps.setString(5, pb.getNama_bank());
+            ps.setString(6, pb.getNombor_akaun());
+            ps.setString(7, pb.getPenyata_bank());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -87,14 +90,17 @@ public class PermohonanBantuanDAO {
     }
 
     public boolean updatePermohonan(PermohonanBantuan pb) {
-        String sql = "UPDATE permohonan_bantuan SET id_bantuan = ?, catatan_pemohon = ?, dokumen_pemohon = ?, status = 'BARU', dikemaskini_pada = NOW() WHERE id_permohonan = ? AND id_pengguna = ?";
+        String sql = "UPDATE permohonan_bantuan SET id_bantuan = ?, catatan_pemohon = ?, dokumen_pemohon = ?, nama_bank = ?, nombor_akaun = ?, penyata_bank = ?, status = 'BARU', dikemaskini_pada = NOW() WHERE id_permohonan = ? AND id_pengguna = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, pb.getId_bantuan());
             ps.setString(2, pb.getCatatan_pemohon());
             ps.setString(3, pb.getDokumen_pemohon());
-            ps.setInt(4, pb.getId_permohonan_bantuan());
-            ps.setInt(5, pb.getId_pengguna());
+            ps.setString(4, pb.getNama_bank());
+            ps.setString(5, pb.getNombor_akaun());
+            ps.setString(6, pb.getPenyata_bank());
+            ps.setInt(7, pb.getId_permohonan_bantuan());
+            ps.setInt(8, pb.getId_pengguna());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -150,6 +156,11 @@ public class PermohonanBantuanDAO {
         pb.setCatatan_pentadbir(rs.getString("catatan_pentadbir"));
         pb.setDokumen_pemohon(rs.getString("dokumen_pemohon"));
         pb.setDokumen_pentadbir(rs.getString("dokumen_pentadbir"));
+        
+        try { pb.setNama_bank(rs.getString("nama_bank")); } catch (SQLException e) {}
+        try { pb.setNombor_akaun(rs.getString("nombor_akaun")); } catch (SQLException e) {}
+        try { pb.setPenyata_bank(rs.getString("penyata_bank")); } catch (SQLException e) {}
+
         try {
             pb.setNama_bantuan(rs.getString("nama_bantuan"));
         } catch (SQLException e) {
