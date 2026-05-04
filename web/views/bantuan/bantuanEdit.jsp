@@ -2,6 +2,7 @@
 <%@ page import="model.PermohonanBantuan" %>
 <%@ page import="model.Bantuan" %>
 <%@ page import="java.util.List" %>
+<%@ page import="java.net.URLEncoder" %>
 
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
@@ -32,7 +33,7 @@
                 boolean isLain = false;
 
                 if (pb != null) {
-                    isLain = (pb.getId_bantuan() == 999);
+                    isLain = (pb.getId_bantuan() == 999 || pb.getId_bantuan() == 998);
                     String rawCatatan = (pb.getCatatan() != null) ? pb.getCatatan() : "";
 
                     if (isLain) {
@@ -49,21 +50,38 @@
                     } else {
                         keteranganClean = rawCatatan;
                     }
+                    
+                    // DAPATKAN KATEGORI BANTUAN
+                    String kategori = "KOMUNITI";
+                    List<Bantuan> senaraiBantuan = (List<Bantuan>) request.getAttribute("senaraiJenisBantuan");
+                    if (senaraiBantuan != null) {
+                        for (Bantuan b : senaraiBantuan) {
+                            if (b.getId_bantuan() == pb.getId_bantuan()) {
+                                kategori = b.getJenis_bantuan();
+                                break;
+                            }
+                        }
+                    }
+                    if(pb.getId_bantuan() == 999) kategori = "RASMI";
+                    if(pb.getId_bantuan() == 998) kategori = "KOMUNITI";
+                    
+                    boolean isRasmi = "RASMI".equalsIgnoreCase(kategori);
             %>
             
             <form action="<%= request.getContextPath() %>/bantuan/updateMyRequest" method="post" enctype="multipart/form-data">
                 
                 <input type="hidden" name="idPermohonan" value="<%= pb.getId_permohonan() %>">
-                <input type="hidden" name="oldDokumen" value="<%= pb.getDokumen_pemohon() %>">
 
+                <input type="hidden" name="jenisBantuan" value="<%= pb.getId_bantuan() %>">
                 <div class="mb-6">
-                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Jenis Bantuan</label>
+                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider flex items-center gap-2">
+                        Jenis Bantuan <span class="text-[10px] bg-gray-100 text-gray-400 px-2 py-0.5 rounded italic">Tidak boleh diubah</span>
+                    </label>
                     <div class="relative">
-                        <select name="jenisBantuan" id="jenisBantuan" required onchange="toggleLainBantuan()"
-                                class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm appearance-none font-bold">
+                        <select disabled
+                                class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm appearance-none font-bold cursor-not-allowed">
                             <option value="" disabled>-- Sila Pilih --</option>
                             <% 
-                                List<Bantuan> senaraiBantuan = (List<Bantuan>) request.getAttribute("senaraiJenisBantuan");
                                 if (senaraiBantuan != null) {
                                     for (Bantuan b : senaraiBantuan) {
                             %>
@@ -72,45 +90,79 @@
                                     }
                                 }
                             %>
-                            <option value="999" <%= isLain ? "selected" : "" %>>LAIN-LAIN</option>
+                            <option value="999" <%= pb.getId_bantuan() == 999 ? "selected" : "" %>>LAIN-LAIN (RASMI)</option>
+                            <option value="998" <%= pb.getId_bantuan() == 998 ? "selected" : "" %>>LAIN-LAIN (KOMUNITI)</option>
                         </select>
-                        <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-500">
-                            <i class="fas fa-chevron-down text-xs"></i>
+                        <div class="absolute inset-y-0 right-0 flex items-center px-4 pointer-events-none text-gray-300">
+                            <i class="fas fa-lock text-xs"></i>
                         </div>
                     </div>
                 </div>
 
                 <div class="mb-6 <%= isLain ? "" : "hidden" %>" id="lainBantuanDiv">
-                    <label class="block text-xs font-bold text-[#6C5DD3] mb-2 uppercase tracking-wider">Nyatakan Jenis Bantuan</label>
-                    <input type="text" name="jenisBantuanLain" id="jenisBantuanLain" value="<%= lainName %>" placeholder="Sila nyatakan jenis bantuan..."
-                           class="w-full px-4 py-3 rounded-xl bg-purple-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all placeholder-gray-400">
+                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider flex items-center gap-2">
+                        Nyatakan Jenis Bantuan <i class="fas fa-lock text-[10px]"></i>
+                    </label>
+                    <input type="text" name="jenisBantuanLain" id="jenisBantuanLain" value="<%= lainName %>" readonly
+                           class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium cursor-not-allowed">
                 </div>
 
                 <div class="mb-6">
-                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Keterangan / Sebab Permohonan</label>
-                    <textarea name="keterangan" rows="4" 
-                              class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all placeholder-gray-400"><%= keteranganClean %></textarea>
+                    <label class="block text-xs font-bold text-gray-400 mb-2 uppercase tracking-wider flex items-center gap-2">
+                        Keterangan / Sebab Permohonan <i class="fas fa-lock text-[10px]"></i>
+                    </label>
+                    <textarea name="keterangan" rows="4" readonly
+                              class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium cursor-not-allowed"><%= keteranganClean %></textarea>
                 </div>
 
                 <div class="mb-8">
                     <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Dokumen Sokongan (PDF)</label>
                     
-                    <div class="flex items-center gap-3 p-3 bg-blue-50 rounded-xl mb-3 border border-blue-100">
-                        <div class="w-8 h-8 bg-blue-100 text-blue-600 rounded-lg flex items-center justify-center">
-                            <i class="fas fa-file-pdf"></i>
+                    <div class="space-y-3 mb-4">
+                        <% 
+                            if (pb.getSenaraiLampiran() != null && !pb.getSenaraiLampiran().isEmpty()) {
+                                for (model.BantuanLampiran bl : pb.getSenaraiLampiran()) {
+                        %>
+                        <div class="flex items-center gap-3 p-3 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-purple-200 transition group">
+                            <div class="w-8 h-8 bg-red-50 text-red-500 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-file-pdf"></i>
+                            </div>
+                            <div class="flex-1 min-w-0 text-xs">
+                                <p class="text-gray-400 uppercase font-bold text-[8px]">Fail Terlampir</p>
+                                <p class="font-bold text-gray-700 truncate" title="<%= bl.getNama_fail() %>">
+                                    <%= bl.getNama_fail().substring(bl.getNama_fail().indexOf("_") + 1) %>
+                                </p>
+                            </div>
+                            <div class="flex gap-2">
+                                <a href="<%= request.getContextPath() %>/file/bantuan/<%= URLEncoder.encode(bl.getNama_fail(), "UTF-8") %>" target="_blank" 
+                                   class="w-7 h-7 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition">
+                                    <i class="fas fa-eye text-[10px]"></i>
+                                </a>
+                                <a href="<%= request.getContextPath() %>/bantuan/deleteAttachment?idLampiran=<%= bl.getId_lampiran() %>&idPermohonan=<%= pb.getId_permohonan() %>" 
+                                   onclick="return confirm('Padam fail ini?')"
+                                   class="w-7 h-7 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition">
+                                    <i class="fas fa-trash text-[10px]"></i>
+                                </a>
+                            </div>
                         </div>
-                        <div class="flex-1 min-w-0 text-xs">
-                            <p class="text-gray-400 uppercase font-bold text-[10px]">Fail Semasa</p>
-                            <p class="font-bold text-gray-800 truncate"><%= pb.getDokumen_pemohon() %></p>
-                        </div>
+                        <% 
+                                }
+                            } else {
+                        %>
+                            <p class="text-xs text-gray-400 italic p-4 bg-gray-50 rounded-2xl text-center border border-dashed">Tiada dokumen dilampirkan.</p>
+                        <% } %>
                     </div>
 
-                    <input type="file" name="dokumenSokongan" accept="application/pdf"
-                           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#6C5DD3] file:text-white hover:file:bg-[#5b4eb8] transition cursor-pointer bg-gray-50 rounded-xl">
-                    <p class="text-[10px] text-gray-400 mt-2 ml-1 italic">Biarkan kosong jika tidak mahu menukar fail dokumen.</p>
+                    <div class="bg-purple-50/50 p-4 rounded-2xl border border-purple-100 border-dashed">
+                        <label class="block text-[10px] font-bold text-[#6C5DD3] uppercase mb-2">Tambah Dokumen Baru</label>
+                        <input type="file" name="dokumenSokongan" accept="application/pdf" multiple
+                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-[#6C5DD3] file:text-white hover:file:bg-[#5b4eb8] transition cursor-pointer">
+                        <p class="text-[9px] text-gray-400 mt-2 italic">Boleh pilih lebih dari satu fail baru untuk ditambah.</p>
+                    </div>
                 </div>
 
                 <!-- BANK SECTION UPDATE -->
+                <% if (!isRasmi) { %>
                 <div class="mt-10 pt-8 border-t border-dashed border-gray-200">
                     <h5 class="text-xs font-bold text-blue-600 uppercase tracking-widest mb-6 flex items-center gap-2">
                         <i class="fas fa-university"></i> Kemaskini Maklumat Bank
@@ -148,6 +200,7 @@
                     </div>
                     <input type="hidden" name="oldPenyataBank" value="<%= (pb.getPenyata_bank() != null) ? pb.getPenyata_bank() : "" %>">
                 </div>
+                <% } %>
 
                 <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100">
                     <a href="<%= request.getContextPath() %>/bantuan/list" class="px-6 py-3 rounded-xl bg-gray-100 text-gray-600 font-bold text-sm hover:bg-gray-200 transition">

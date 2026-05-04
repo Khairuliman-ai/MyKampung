@@ -7,6 +7,7 @@ import java.util.List;
 import model.PermohonanBantuan;
 
 public class PermohonanBantuanDAO {
+    private BantuanLampiranDAO lampiranDao = new BantuanLampiranDAO();
 
     public List<PermohonanBantuan> getByPenduduk(int idPenduduk) {
         List<PermohonanBantuan> list = new ArrayList<>();
@@ -16,7 +17,9 @@ public class PermohonanBantuanDAO {
             ps.setInt(1, idPenduduk);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    list.add(mapRow(rs));
+                    PermohonanBantuan pb = mapRow(rs);
+                    pb.setSenaraiLampiran(lampiranDao.getByPermohonan(pb.getId_permohonan()));
+                    list.add(pb);
                 }
             }
         } catch (SQLException e) {
@@ -34,6 +37,7 @@ public class PermohonanBantuanDAO {
             while (rs.next()) {
                 PermohonanBantuan pb = mapRow(rs);
                 pb.setNama_penuh(rs.getString("nama_penuh"));
+                pb.setSenaraiLampiran(lampiranDao.getByPermohonan(pb.getId_permohonan()));
                 list.add(pb);
             }
         } catch (SQLException e) {
@@ -49,7 +53,9 @@ public class PermohonanBantuanDAO {
             ps.setInt(1, idPermohonan);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return mapRow(rs);
+                    PermohonanBantuan pb = mapRow(rs);
+                    pb.setSenaraiLampiran(lampiranDao.getByPermohonan(idPermohonan));
+                    return pb;
                 }
             }
         } catch (SQLException e) {
@@ -71,36 +77,42 @@ public class PermohonanBantuanDAO {
         return false;
     }
     
-    public boolean insertPermohonan(PermohonanBantuan pb) {
-        String sql = "INSERT INTO permohonan_bantuan (id_pengguna, id_bantuan, catatan_pemohon, dokumen_pemohon, nama_bank, nombor_akaun, penyata_bank, dibuat_pada, status) VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 'BARU')";
+    public int insertPermohonan(PermohonanBantuan pb) {
+        String sql = "INSERT INTO permohonan_bantuan (id_pengguna, id_bantuan, catatan_pemohon, nama_bank, nombor_akaun, penyata_bank, dibuat_pada, status) VALUES (?, ?, ?, ?, ?, ?, NOW(), 'BARU')";
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+             PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, pb.getId_pengguna());
             ps.setInt(2, pb.getId_bantuan());
             ps.setString(3, pb.getCatatan_pemohon());
-            ps.setString(4, pb.getDokumen_pemohon());
-            ps.setString(5, pb.getNama_bank());
-            ps.setString(6, pb.getNombor_akaun());
-            ps.setString(7, pb.getPenyata_bank());
-            return ps.executeUpdate() > 0;
+            ps.setString(4, pb.getNama_bank());
+            ps.setString(5, pb.getNombor_akaun());
+            ps.setString(6, pb.getPenyata_bank());
+            
+            int affectedRows = ps.executeUpdate();
+            if (affectedRows > 0) {
+                try (ResultSet generatedKeys = ps.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        return generatedKeys.getInt(1);
+                    }
+                }
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return false;
+        return -1;
     }
 
     public boolean updatePermohonan(PermohonanBantuan pb) {
-        String sql = "UPDATE permohonan_bantuan SET id_bantuan = ?, catatan_pemohon = ?, dokumen_pemohon = ?, nama_bank = ?, nombor_akaun = ?, penyata_bank = ?, status = 'BARU', dikemaskini_pada = NOW() WHERE id_permohonan = ? AND id_pengguna = ?";
+        String sql = "UPDATE permohonan_bantuan SET id_bantuan = ?, catatan_pemohon = ?, nama_bank = ?, nombor_akaun = ?, penyata_bank = ?, status = 'BARU', dikemaskini_pada = NOW() WHERE id_permohonan = ? AND id_pengguna = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, pb.getId_bantuan());
             ps.setString(2, pb.getCatatan_pemohon());
-            ps.setString(3, pb.getDokumen_pemohon());
-            ps.setString(4, pb.getNama_bank());
-            ps.setString(5, pb.getNombor_akaun());
-            ps.setString(6, pb.getPenyata_bank());
-            ps.setInt(7, pb.getId_permohonan_bantuan());
-            ps.setInt(8, pb.getId_pengguna());
+            ps.setString(3, pb.getNama_bank());
+            ps.setString(4, pb.getNombor_akaun());
+            ps.setString(5, pb.getPenyata_bank());
+            ps.setInt(6, pb.getId_permohonan_bantuan());
+            ps.setInt(7, pb.getId_pengguna());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -130,12 +142,11 @@ public class PermohonanBantuanDAO {
     }
 
     public boolean updateInfo(int idPermohonan, String catatan, String dokumen) {
-        String sql = "UPDATE permohonan_bantuan SET catatan_pemohon = ?, dokumen_pemohon = ?, dikemaskini_pada = NOW() WHERE id_permohonan = ?";
+        String sql = "UPDATE permohonan_bantuan SET catatan_pemohon = ?, dikemaskini_pada = NOW() WHERE id_permohonan = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, catatan);
-            ps.setString(2, dokumen);
-            ps.setInt(3, idPermohonan);
+            ps.setInt(2, idPermohonan);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -154,7 +165,6 @@ public class PermohonanBantuanDAO {
         pb.setStatus(rs.getString("status"));
         pb.setCatatan_pemohon(rs.getString("catatan_pemohon"));
         pb.setCatatan_pentadbir(rs.getString("catatan_pentadbir"));
-        pb.setDokumen_pemohon(rs.getString("dokumen_pemohon"));
         pb.setDokumen_pentadbir(rs.getString("dokumen_pentadbir"));
         
         try { pb.setNama_bank(rs.getString("nama_bank")); } catch (SQLException e) {}

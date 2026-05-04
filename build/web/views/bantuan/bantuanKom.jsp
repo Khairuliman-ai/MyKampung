@@ -112,7 +112,16 @@
                                 String jsBank = cleanForJS(pb.getNama_bank());
                                 String jsAkaun = cleanForJS(pb.getNombor_akaun());
                                 String jsPenyata = (pb.getPenyata_bank() != null) ? URLEncoder.encode(pb.getPenyata_bank(), "UTF-8") : "";
-                                String jsDokumen = (pb.getDokumen_pemohon() != null) ? URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8") : "";
+                                
+                                // Ambil senarai lampiran
+                                StringBuilder sbDocs = new StringBuilder();
+                                if(pb.getSenaraiLampiran() != null) {
+                                    for(model.BantuanLampiran bl : pb.getSenaraiLampiran()) {
+                                        if(sbDocs.length() > 0) sbDocs.append(",");
+                                        sbDocs.append(URLEncoder.encode(bl.getNama_fail(), "UTF-8"));
+                                    }
+                                }
+                                String jsDokumen = sbDocs.toString();
                         %>
                         <tr class="hover:bg-purple-50/50 transition cursor-pointer group" 
                             onclick="openDetailModal('<%= jsNama %>', '<%= displayDate %>', '<%= status %>', '<%= jsCatatan %>', '<%= jsUlasan %>', '<%= jsBank %>', '<%= jsAkaun %>', '<%= jsPenyata %>', '<%= jsDokumen %>')">
@@ -184,7 +193,16 @@
                             String jsBank = cleanForJS(pb.getNama_bank());
                             String jsAkaun = cleanForJS(pb.getNombor_akaun());
                             String jsPenyata = (pb.getPenyata_bank() != null) ? URLEncoder.encode(pb.getPenyata_bank(), "UTF-8") : "";
-                            String jsDokumen = (pb.getDokumen_pemohon() != null) ? URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8") : "";
+                            
+                            // Ambil senarai lampiran
+                            StringBuilder sbDocs = new StringBuilder();
+                            if(pb.getSenaraiLampiran() != null) {
+                                for(model.BantuanLampiran bl : pb.getSenaraiLampiran()) {
+                                    if(sbDocs.length() > 0) sbDocs.append(",");
+                                    sbDocs.append(URLEncoder.encode(bl.getNama_fail(), "UTF-8"));
+                                }
+                            }
+                            String jsDokumen = sbDocs.toString();
                     %>
                     <tr class="hover:bg-gray-50 transition cursor-pointer group"
                         onclick="openDetailModal('<%= jsNama %>', '<%= displayDate %>', '<%= sStatus %>', '<%= jsCatatan %>', '<%= jsUlasan %>', '<%= jsBank %>', '<%= jsAkaun %>', '<%= jsPenyata %>', '<%= jsDokumen %>')">
@@ -330,13 +348,16 @@
 
                         <div>
                             <h5 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Dokumen Sokongan</h5>
-                            <a id="linkDokumen" href="#" target="_blank" class="flex items-center gap-3 p-4 bg-gray-50 border border-gray-100 rounded-2xl hover:bg-gray-100 transition group">
-                                <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-red-500 shadow-sm group-hover:scale-110 transition">
-                                    <i class="fas fa-file-pdf text-lg"></i>
-                                </div>
-                                <span class="text-sm font-bold text-gray-700">Dokumen_Sokongan.pdf</span>
-                                <i class="fas fa-external-link-alt ml-auto text-gray-300"></i>
-                            </a>
+                            <div id="dokumenList" class="space-y-2">
+                                <!-- Dynamic List of Documents -->
+                                <a id="linkDokumen" href="#" target="_blank" class="flex items-center gap-3 p-3 bg-gray-50 border border-gray-100 rounded-2xl hover:bg-gray-100 transition group hidden">
+                                    <div class="w-8 h-8 bg-white rounded-xl flex items-center justify-center text-red-500 shadow-sm group-hover:scale-110 transition">
+                                        <i class="fas fa-file-pdf text-sm"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-gray-700 truncate max-w-[150px]">Dokumen_Sokongan.pdf</span>
+                                    <i class="fas fa-external-link-alt ml-auto text-gray-300 text-[10px]"></i>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -356,6 +377,7 @@
         <div class="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden transition-all duration-300">
             
             <form action="<%= request.getContextPath() %>/bantuan/apply" method="post" enctype="multipart/form-data" id="wizardForm">
+                <input type="hidden" name="bantuanSource" value="komuniti">
                 
                 <!-- Wizard Header -->
                 <div class="bg-[#6C5DD3] p-6 text-white">
@@ -400,7 +422,7 @@
                         <% } } %>
                         <!-- Lain-lain option -->
                         <label class="relative flex items-center p-4 bg-gray-50 border-2 border-transparent hover:border-purple-200 rounded-2xl cursor-pointer group transition">
-                            <input type="radio" name="jenisBantuan" value="999" data-name="Lain-lain" data-syarat="Sila lampirkan dokumen sokongan yang berkaitan." class="hidden peer" onchange="goToStep(2)">
+                            <input type="radio" name="jenisBantuan" value="998" data-name="Lain-lain" data-syarat="Sila lampirkan dokumen sokongan yang berkaitan." class="hidden peer" onchange="goToStep(2)">
                             <div class="flex-1"><p class="font-bold text-gray-700 group-hover:text-[#6C5DD3]">Lain-lain Bantuan</p></div>
                             <i class="fas fa-plus text-gray-300 group-hover:text-[#6C5DD3]"></i>
                             <div class="absolute inset-0 border-2 border-[#6C5DD3] rounded-2xl opacity-0 peer-checked:opacity-100 transition-opacity"></div>
@@ -451,7 +473,8 @@
                             </div>
                             <div>
                                 <label class="text-[10px] text-gray-400 uppercase font-bold">Lampiran Dokumen (PDF)</label>
-                                <input type="file" name="dokumenSokongan" accept="application/pdf" required class="block w-full text-[10px] text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-purple-100 file:text-[#6C5DD3] mt-1">
+                                <input type="file" name="dokumenSokongan" accept="application/pdf" multiple required class="block w-full text-[10px] text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-purple-100 file:text-[#6C5DD3] mt-1">
+                                <p class="text-[8px] text-gray-400 mt-1 italic">Boleh pilih lebih daripada satu fail.</p>
                             </div>
                         </div>
                     </div>
@@ -543,12 +566,22 @@
             linkPenyata.classList.add('hidden');
         }
 
-        const linkDokumen = document.getElementById('linkDokumen');
-        if(dokumen) {
-            linkDokumen.href = "<%= request.getContextPath() %>/file/bantuan/" + dokumen;
-            linkDokumen.classList.remove('hidden');
-        } else {
-            linkDokumen.classList.add('hidden');
+        // Files List
+        const dokumenList = document.getElementById('dokumenList');
+        // Clear previous except the template
+        const template = document.getElementById('linkDokumen');
+        dokumenList.innerHTML = '';
+        dokumenList.appendChild(template);
+        
+        if(dokumen && dokumen !== "") {
+            const files = dokumen.split(',');
+            files.forEach(f => {
+                const newLink = template.cloneNode(true);
+                newLink.classList.remove('hidden');
+                newLink.href = "<%= request.getContextPath() %>/file/bantuan/" + f;
+                newLink.querySelector('span').innerText = decodeURIComponent(f).split('_').slice(1).join('_') || decodeURIComponent(f);
+                dokumenList.appendChild(newLink);
+            });
         }
         
         // Reset Steps
@@ -649,7 +682,7 @@
             document.getElementById('syaratTxt').innerText = selected.getAttribute('data-syarat');
             const lainDiv = document.getElementById('lainInputDiv');
             const inLain = document.getElementById('inLain');
-            if(selected.value === "999") {
+            if(selected.value === "998") {
                 lainDiv.classList.remove('hidden');
                 inLain.required = true;
             } else {

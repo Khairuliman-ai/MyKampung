@@ -6,6 +6,11 @@ import dao.BantuanDAO;
 import model.PermohonanBantuan;
 import dao.PermohonanBantuanDAO;
 import model.Pengguna;
+import model.BantuanLampiran;
+import dao.BantuanLampiranDAO;
+
+import java.util.Collection;
+import javax.servlet.http.Part;
 
 import java.io.File;
 import java.io.IOException;
@@ -146,7 +151,7 @@ public class BantuanServlet extends HttpServlet {
                                 break;
                             }
                         }
-                        if (isKomuniti || pb.getId_bantuan() == 999) {
+                        if (isKomuniti) {
                             listKomuniti.add(pb);
                         }
                     }
@@ -184,6 +189,19 @@ public class BantuanServlet extends HttpServlet {
                 } else {
                     response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?error=denied");
                 }
+            } else if ("/deleteAttachment".equals(action) && "Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
+                int idLampiran = Integer.parseInt(request.getParameter("idLampiran"));
+                int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
+                
+                BantuanLampiranDAO lampiranDao = new BantuanLampiranDAO();
+                PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
+                PermohonanBantuan pb = pbDao.getById(idPermohonan);
+                
+                if (pb != null && pb.getId_pengguna() == user.getId_pengguna()) {
+                    lampiranDao.deleteById(idLampiran);
+                }
+                
+                response.sendRedirect(request.getContextPath() + "/bantuan/edit?id=" + idPermohonan + "&status=doc_deleted");
             }
 
         } catch (Exception e) {
@@ -217,14 +235,18 @@ public class BantuanServlet extends HttpServlet {
             // ===================== 1. APPLY (PENDUDUK) =====================
             if ("/apply".equals(action) && "Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
 
-                Part filePart = request.getPart("dokumenSokongan");
-                String fileName = null;
+                BantuanLampiranDAO lampiranDao = new BantuanLampiranDAO();
+                Collection<Part> parts = request.getParts();
+                List<String> savedFiles = new ArrayList<>();
 
-                if (filePart != null && filePart.getSize() > 0) {
-                    String submitted = filePart.getSubmittedFileName().replaceAll("\\s+", "_");
-                    fileName = System.currentTimeMillis() + "_" + submitted;
-                    File saveFile = new File(SAVE_DIR, fileName);
-                    filePart.write(saveFile.getAbsolutePath());
+                for (Part part : parts) {
+                    if ("dokumenSokongan".equals(part.getName()) && part.getSize() > 0) {
+                        String submitted = part.getSubmittedFileName().replaceAll("\\s+", "_");
+                        String fileName = System.currentTimeMillis() + "_" + submitted;
+                        File saveFile = new File(SAVE_DIR, fileName);
+                        part.write(saveFile.getAbsolutePath());
+                        savedFiles.add(fileName);
+                    }
                 }
 
                 String jenisBantuan = request.getParameter("jenisBantuan");
@@ -244,13 +266,12 @@ public class BantuanServlet extends HttpServlet {
 
                 PermohonanBantuan pb = new PermohonanBantuan();
                 pb.setId_pengguna(user.getId_pengguna());
-                pb.setDokumen_pemohon(fileName);
                 pb.setNama_bank(namaBank);
                 pb.setNombor_akaun(nomorAkaun);
                 pb.setPenyata_bank(penyataFileName);
 
-                if ("999".equals(jenisBantuan)) {
-                    pb.setId_bantuan(999); 
+                if ("999".equals(jenisBantuan) || "998".equals(jenisBantuan)) {
+                    pb.setId_bantuan(Integer.parseInt(jenisBantuan)); 
                     String catatanSimpan = "LAIN-LAIN: " + (jenisBantuanLain != null ? jenisBantuanLain : "Lain-lain");
                     if (keterangan != null && !keterangan.trim().isEmpty()) {
                         catatanSimpan += " | " + keterangan;
@@ -261,17 +282,34 @@ public class BantuanServlet extends HttpServlet {
                     pb.setCatatan_pemohon(keterangan); 
                 }
 
-                pbDao.insertPermohonan(pb);
+                int newId = pbDao.insertPermohonan(pb);
+                
+                // Save additional attachments
+                if (newId != -1) {
+                    for (String fName : savedFiles) {
+                        BantuanLampiran bl = new BantuanLampiran(newId, fName, "PEMOHON");
+                        lampiranDao.insert(bl);
+                    }
+                }
 
+                String source = request.getParameter("bantuanSource");
                 BantuanDAO bDao = new BantuanDAO();
-                if (pb.getId_bantuan() == 999) {
+                
+                if ("rasmi".equalsIgnoreCase(source)) {
+                    response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?status=success");
+                } else if ("komuniti".equalsIgnoreCase(source)) {
                     response.sendRedirect(request.getContextPath() + "/bantuan/komuniti?status=success");
                 } else {
-                    Bantuan bDetails = bDao.getBantuanById(pb.getId_bantuan());
-                    if (bDetails != null && "RASMI".equalsIgnoreCase(bDetails.getJenis_bantuan())) {
-                        response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?status=success");
-                    } else {
+                    // Fallback to existing logic
+                    if (pb.getId_bantuan() == 999) {
                         response.sendRedirect(request.getContextPath() + "/bantuan/komuniti?status=success");
+                    } else {
+                        Bantuan bDetails = bDao.getBantuanById(pb.getId_bantuan());
+                        if (bDetails != null && "RASMI".equalsIgnoreCase(bDetails.getJenis_bantuan())) {
+                            response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?status=success");
+                        } else {
+                            response.sendRedirect(request.getContextPath() + "/bantuan/komuniti?status=success");
+                        }
                     }
                 }
             } // ===================== 2. APPROVE / REJECT =====================
@@ -301,15 +339,22 @@ public class BantuanServlet extends HttpServlet {
             else if ("/updateMyRequest".equals(action) && "Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
 
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
-                String oldDokumen = request.getParameter("oldDokumen");
                 String oldPenyata = request.getParameter("oldPenyataBank");
 
-                Part filePart = request.getPart("dokumenSokongan");
-                String fileName = oldDokumen;
-                if (filePart != null && filePart.getSize() > 0) {
-                    String submitted = filePart.getSubmittedFileName().replaceAll("\\s+", "_");
-                    fileName = System.currentTimeMillis() + "_" + submitted;
-                    filePart.write(SAVE_DIR + File.separator + fileName);
+                // Handle Multiple Documents (New ones)
+                Collection<Part> parts = request.getParts();
+                BantuanLampiranDAO lampiranDao = new BantuanLampiranDAO();
+                
+                for (Part part : parts) {
+                    if ("dokumenSokongan".equals(part.getName()) && part.getSize() > 0) {
+                        String submitted = part.getSubmittedFileName().replaceAll("\\s+", "_");
+                        String newFileName = System.currentTimeMillis() + "_" + submitted;
+                        File saveFile = new File(SAVE_DIR, newFileName);
+                        part.write(saveFile.getAbsolutePath());
+                        
+                        BantuanLampiran bl = new BantuanLampiran(idPermohonan, newFileName, "PEMOHON");
+                        lampiranDao.insert(bl);
+                    }
                 }
                 
                 Part penyataPart = request.getPart("penyataBank");
@@ -329,7 +374,6 @@ public class BantuanServlet extends HttpServlet {
                 PermohonanBantuan pb = new PermohonanBantuan();
                 pb.setId_permohonan_bantuan(idPermohonan);
                 pb.setId_pengguna(user.getId_pengguna());
-                pb.setDokumen_pemohon(fileName);
                 pb.setNama_bank(namaBank);
                 pb.setNombor_akaun(nomorAkaun);
                 pb.setPenyata_bank(penyataFileName);

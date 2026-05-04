@@ -145,11 +145,20 @@
                                 </div>
                             </td>
                             <td class="p-4">
-                                <% if(pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
-                                    <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" class="text-red-500 hover:text-red-700 font-bold text-xs flex items-center gap-1">
-                                        <i class="fas fa-file-pdf"></i> PDF
-                                    </a>
-                                <% } else { %> - <% } %>
+                                <div class="flex flex-wrap gap-2">
+                                    <% if(pb.getSenaraiLampiran() != null && !pb.getSenaraiLampiran().isEmpty()) { 
+                                        for(model.BantuanLampiran bl : pb.getSenaraiLampiran()) {
+                                            String enc = URLEncoder.encode(bl.getNama_fail(), "UTF-8").replace("+", "%20");
+                                    %>
+                                        <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" 
+                                           class="inline-flex items-center gap-1 px-2 py-1 bg-red-50 text-red-600 rounded text-[10px] font-bold hover:bg-red-100 transition shadow-sm" 
+                                           title="<%= bl.getNama_fail() %>">
+                                            <i class="fas fa-file-pdf"></i> PDF
+                                        </a>
+                                    <% } } else { %>
+                                        <span class="text-[10px] text-gray-400 italic">Tiada fail</span>
+                                    <% } %>
+                                </div>
                             </td>
                             <td class="p-4 text-center">
                                 <div class="flex justify-center gap-2">
@@ -222,9 +231,19 @@
                             <td class="p-4 text-sm font-bold text-gray-700 search-col"><%= pb.getNama_penuh() %></td>
                             <td class="p-4 text-sm search-col"><%= pb.getNama_bantuan() %></td>
                             <td class="p-4">
-                                <% if(pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
-                                    <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" class="text-blue-500 hover:text-blue-700 text-xs font-bold underline">Lihat PDF</a>
-                                <% } else { %> - <% } %>
+                                <div class="flex flex-wrap gap-2">
+                                    <% if(pb.getSenaraiLampiran() != null && !pb.getSenaraiLampiran().isEmpty()) { 
+                                        for(model.BantuanLampiran bl : pb.getSenaraiLampiran()) {
+                                            String enc = URLEncoder.encode(bl.getNama_fail(), "UTF-8").replace("+", "%20");
+                                    %>
+                                        <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" 
+                                           class="text-blue-500 hover:text-blue-700 text-[10px] font-bold underline" title="<%= bl.getNama_fail() %>">
+                                            PDF
+                                        </a>
+                                    <% } } else { %>
+                                        <span class="text-gray-300 text-[10px]">-</span>
+                                    <% } %>
+                                </div>
                             </td>
                             <td class="p-4">
                                 <% if("LULUS".equalsIgnoreCase(pb.getStatus())) { %> 

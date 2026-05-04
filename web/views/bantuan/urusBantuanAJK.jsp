@@ -104,7 +104,18 @@
                             <td class="p-4 text-sm font-bold text-gray-800"><%= (pb.getNama_penuh() != null) ? pb.getNama_penuh() : "TIADA NAMA" %></td>
                             <td class="p-4 text-sm font-medium text-gray-600"><%= namaBantuanDisplay %></td>
                             <td class="p-4 text-center">
-                                <button onclick="viewDetail('<%= pb.getId_permohonan() %>', '<%= namaBantuanDisplay %>', '<%= pb.getNama_penuh() %>', '<%= pb.getCatatan_pemohon() %>', '<%= pb.getDokumen_pemohon() %>', '<%= pb.getNama_bank() %>', '<%= pb.getNombor_akaun() %>', '<%= pb.getPenyata_bank() %>')" 
+                                <% 
+                                    // Ambil senarai lampiran
+                                    StringBuilder sbDocs = new StringBuilder();
+                                    if(pb.getSenaraiLampiran() != null) {
+                                        for(model.BantuanLampiran bl : pb.getSenaraiLampiran()) {
+                                            if(sbDocs.length() > 0) sbDocs.append(",");
+                                            sbDocs.append(URLEncoder.encode(bl.getNama_fail(), "UTF-8"));
+                                        }
+                                    }
+                                    String jsDokumen = sbDocs.toString();
+                                %>
+                                <button onclick="viewDetail('<%= pb.getId_permohonan() %>', '<%= namaBantuanDisplay %>', '<%= pb.getNama_penuh() %>', '<%= pb.getCatatan_pemohon() %>', '<%= jsDokumen %>', '<%= pb.getNama_bank() %>', '<%= pb.getNombor_akaun() %>', '<%= pb.getPenyata_bank() %>')" 
                                         class="text-[#6C5DD3] hover:underline text-xs font-bold">Lihat Detail</button>
                             </td>
                             <td class="p-4 text-center">
@@ -162,7 +173,17 @@
                                 <% } %>
                             </td>
                             <td class="p-4 text-center">
-                                <button onclick="viewDetail('<%= pb.getId_permohonan() %>', '<%= pb.getNama_bantuan() %>', '<%= pb.getNama_penuh() %>', '<%= pb.getCatatan_pemohon() %>', '<%= pb.getDokumen_pemohon() %>', '<%= pb.getNama_bank() %>', '<%= pb.getNombor_akaun() %>', '<%= pb.getPenyata_bank() %>')" 
+                                <% 
+                                    StringBuilder sbDocsH = new StringBuilder();
+                                    if(pb.getSenaraiLampiran() != null) {
+                                        for(model.BantuanLampiran bl : pb.getSenaraiLampiran()) {
+                                            if(sbDocsH.length() > 0) sbDocsH.append(",");
+                                            sbDocsH.append(URLEncoder.encode(bl.getNama_fail(), "UTF-8"));
+                                        }
+                                    }
+                                    String jsDokumenH = sbDocsH.toString();
+                                %>
+                                <button onclick="viewDetail('<%= pb.getId_permohonan() %>', '<%= pb.getNama_bantuan() %>', '<%= pb.getNama_penuh() %>', '<%= pb.getCatatan_pemohon() %>', '<%= jsDokumenH %>', '<%= pb.getNama_bank() %>', '<%= pb.getNombor_akaun() %>', '<%= pb.getPenyata_bank() %>')" 
                                         class="text-gray-500 hover:text-[#6C5DD3] transition"><i class="fas fa-eye"></i></button>
                             </td>
                         </tr>
@@ -247,10 +268,12 @@
                             <p id="detKeterangan" class="text-sm text-gray-600 leading-relaxed">-</p>
                         </div>
                         <div>
-                            <p class="text-[10px] text-gray-400 uppercase">Lampiran Utama</p>
-                            <a id="detDokMain" href="#" target="_blank" class="text-blue-600 font-bold text-sm flex items-center gap-2 mt-1">
-                                <i class="fas fa-file-pdf"></i> Lihat Dokumen Sokongan
-                            </a>
+                            <p class="text-[10px] text-gray-400 uppercase mb-2">Dokumen Sokongan</p>
+                            <div id="dokumenList" class="space-y-2">
+                                <a id="detDokMain" href="#" target="_blank" class="inline-flex items-center gap-2 p-2 bg-red-50 text-red-600 rounded-lg text-xs font-bold hover:bg-red-100 transition mt-1 hidden">
+                                    <i class="fas fa-file-pdf"></i> Lihat Dokumen
+                                </a>
+                            </div>
                         </div>
                     </div>
                     <!-- Section 2: Info Bank -->
@@ -449,11 +472,23 @@
         document.getElementById('detAkaun').innerText = akaun || "TIDAK DINYATAKAN";
 
         const ctx = '<%= request.getContextPath() %>';
-        const dokBtn = document.getElementById('detDokMain');
+        
+        // Handle Multiple Documents
+        const dokumenList = document.getElementById('dokumenList');
+        const template = document.getElementById('detDokMain');
+        dokumenList.innerHTML = '';
+        if(template) dokumenList.appendChild(template);
+        
         if(dok) {
-            dokBtn.href = ctx + "/file/bantuan/" + encodeURIComponent(dok);
-            dokBtn.classList.remove('hidden');
-        } else { dokBtn.classList.add('hidden'); }
+            const files = dok.split(',');
+            files.forEach(f => {
+                const newLink = template.cloneNode(true);
+                newLink.classList.remove('hidden');
+                newLink.href = ctx + "/file/bantuan/" + f;
+                newLink.innerHTML = '<i class="fas fa-file-pdf"></i> ' + decodeURIComponent(f).split('_').slice(1).join('_');
+                dokumenList.appendChild(newLink);
+            });
+        }
 
         const bankBtn = document.getElementById('detDokBank');
         if(penBank) {

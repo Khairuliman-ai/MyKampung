@@ -27,7 +27,11 @@
     String inactiveClass = "text-gray-500 hover:bg-gray-50 hover:text-[#6C5DD3] group";
 %>
 
-<aside class="w-64 bg-white hidden md:flex flex-col border-r border-gray-100 flex-shrink-0 h-full justify-between">
+<aside id="mainSidebar" class="w-64 bg-white fixed inset-y-0 left-0 z-[60] flex flex-col border-r border-gray-100 flex-shrink-0 h-full justify-between transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:relative md:inset-auto md:z-0">
+    <!-- Mobile Close Button -->
+    <div class="p-4 md:hidden flex justify-end">
+        <button onclick="toggleSidebar()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+    </div>
     
     <div class="flex flex-col flex-1 overflow-hidden">
         <div class="p-8 flex items-center gap-3 flex-shrink-0">
@@ -212,9 +216,12 @@
 
 </aside>
 
-<main class="flex-1 flex overflow-hidden relative">
+<main class="flex-1 flex flex-col xl:flex-row overflow-y-auto xl:overflow-hidden relative bg-[#F7F7F9]">
+    <!-- Mobile Sidebar Backdrop -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[55] hidden md:hidden" onclick="toggleSidebar()"></div>
+
     <div class="absolute top-4 left-4 md:hidden z-50">
-        <button class="p-2 bg-white rounded-lg shadow text-gray-600"><i class="fas fa-bars"></i></button>
+        <button onclick="toggleSidebar()" class="p-2 bg-white rounded-lg shadow text-gray-600 focus:outline-none"><i class="fas fa-bars"></i></button>
     </div>
 
 <div id="modalLogout" class="fixed inset-0 z-[999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
@@ -242,5 +249,21 @@
     }
     function closeLogout() {
         document.getElementById('modalLogout').classList.add('hidden');
+    }
+
+    // Sidebar Mobile Toggle
+    function toggleSidebar() {
+        const sidebar = document.getElementById('mainSidebar');
+        const overlay = document.getElementById('sidebarOverlay');
+        
+        if (sidebar.classList.contains('-translate-x-full')) {
+            // Open
+            sidebar.classList.remove('-translate-x-full');
+            overlay.classList.remove('hidden');
+        } else {
+            // Close
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('hidden');
+        }
     }
 </script>

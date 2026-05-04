@@ -25,7 +25,7 @@
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
 
-<div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth h-full">
+<div class="flex-1 p-4 md:p-8 scroll-smooth h-auto xl:h-full xl:overflow-y-auto">
 
     <header class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
@@ -205,7 +205,7 @@
 </div> 
 
 
-<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
+<aside class="w-full xl:w-80 bg-white border-t xl:border-t-0 xl:border-l border-gray-100 flex flex-col p-8 flex-shrink-0">
     
     <div class="flex justify-between items-start mb-10">
         <h3 class="font-bold text-lg text-gray-800">Profil Anda</h3>

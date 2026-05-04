@@ -106,71 +106,72 @@
                 <table class="w-full text-left border-collapse" id="tableProses">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-100">
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Tarikh</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-16">No.</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Tarikh Mohon</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Jenis Bantuan</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Dokumen</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Keterangan</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">Status</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center w-32">Status</th>
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center w-32">Tindakan</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <% if (!listProses.isEmpty()) { 
+                            int noP = 1;
                             for (PermohonanBantuan pb : listProses) {
-                                String filterDate = (pb.getDibuat_pada() != null) ? sdfFull.format(pb.getDibuat_pada()) : "";
                                 String displayDate = (pb.getDibuat_pada() != null) ? sdfDisplay.format(pb.getDibuat_pada()) : "-";
+                                String status = (pb.getStatus() != null) ? pb.getStatus().trim().toUpperCase() : "BARU";
+                                
+                                // JS Data
+                                String jsNama = cleanForJS(pb.getNama_bantuan());
+                                String jsCatatan = cleanForJS(pb.getCatatan_pemohon());
+                                String jsUlasan = cleanForJS(pb.getCatatan_pentadbir());
+                                String jsBank = cleanForJS(pb.getNama_bank());
+                                String jsAkaun = cleanForJS(pb.getNombor_akaun());
+                                String jsPenyata = (pb.getPenyata_bank() != null) ? URLEncoder.encode(pb.getPenyata_bank(), "UTF-8") : "";
+                                
+                                // Ambil senarai lampiran
+                                StringBuilder sbDocs = new StringBuilder();
+                                if(pb.getSenaraiLampiran() != null) {
+                                    for(model.BantuanLampiran bl : pb.getSenaraiLampiran()) {
+                                        if(sbDocs.length() > 0) sbDocs.append(",");
+                                        sbDocs.append(URLEncoder.encode(bl.getNama_fail(), "UTF-8"));
+                                    }
+                                }
+                                String jsDokumen = sbDocs.toString();
                         %>
-                        <tr class="data-row hover:bg-purple-50/50 transition-colors" data-date="<%= filterDate %>" data-status="<%= pb.getStatus() %>">
-                            <td class="p-4 text-sm font-medium text-gray-600 whitespace-nowrap"><%= displayDate %></td>
-                            <td class="p-4 text-sm font-bold text-[#6C5DD3] search-col"><%= pb.getNama_bantuan() %></td>
-                            <td class="p-4">
-                                <% if (pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
-                                    <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" class="inline-flex items-center gap-2 px-3 py-1 bg-gray-100 text-gray-600 rounded-lg text-xs font-bold hover:bg-gray-200 transition">
-                                        <i class="fas fa-file-pdf text-red-500"></i> PDF
-                                    </a>
-                                <% } else { %> <span class="text-gray-400">-</span> <% } %>
-                            </td>
-                            <td class="p-4 text-sm text-gray-500 search-col max-w-xs truncate"><%= (pb.getCatatan_pemohon() != null) ? pb.getCatatan_pemohon() : "-" %></td>
-                            <td class="p-4">
-                                <% if ("DIKEMBALIKAN".equalsIgnoreCase(pb.getStatus())) { %> 
-                                    <span class="px-3 py-1 rounded-full bg-orange-50 text-orange-600 text-xs font-bold whitespace-nowrap">Perlu Pembetulan</span>
-                                <% } else if ("MENUNGGU_KETUA".equalsIgnoreCase(pb.getStatus())) { %> 
-                                    <span class="px-3 py-1 rounded-full bg-purple-50 text-purple-600 text-xs font-bold whitespace-nowrap">Semakan Ketua</span> 
+                        <tr class="data-row hover:bg-purple-50/50 transition cursor-pointer group" 
+                            onclick="openDetailModal('<%= jsNama %>', '<%= displayDate %>', '<%= status %>', '<%= jsCatatan %>', '<%= jsUlasan %>', '<%= jsBank %>', '<%= jsAkaun %>', '<%= jsPenyata %>', '<%= jsDokumen %>')">
+                            <td class="p-4 text-sm text-gray-400 font-medium"><%= noP++ %></td>
+                            <td class="p-4 text-sm text-gray-600"><%= displayDate %></td>
+                            <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-[#6C5DD3]"><%= pb.getNama_bantuan() %></td>
+                            <td class="p-4 text-center">
+                                <% if ("DIKEMBALIKAN".equalsIgnoreCase(status)) { %> 
+                                    <span class="px-3 py-1 rounded-full bg-orange-500 text-white text-[10px] font-bold uppercase whitespace-nowrap">Kembali</span>
+                                <% } else if ("MENUNGGU_KETUA".equalsIgnoreCase(status)) { %> 
+                                    <span class="px-3 py-1 rounded-full bg-purple-500 text-white text-[10px] font-bold uppercase whitespace-nowrap">Semakan Ketua</span> 
                                 <% } else { %>
-                                    <span class="px-3 py-1 rounded-full bg-blue-50 text-blue-600 text-xs font-bold whitespace-nowrap">Dihantar</span>
+                                    <span class="px-3 py-1 rounded-full bg-blue-500 text-white text-[10px] font-bold uppercase whitespace-nowrap">Dihantar</span>
                                 <% } %>
                             </td>
-
                             <td class="p-4 text-center">
-                                <div class="flex flex-col gap-2 items-center">
-                                    <% 
-                                        String jsCatatan = cleanForJS(pb.getCatatan_pemohon());
-                                        String jsUlasan = cleanForJS(pb.getCatatan_pentadbir());
-                                    %>
-                                    <button onclick="openDetailModal('<%= pb.getNama_bantuan() %>', '<%= displayDate %>', '<%= pb.getStatus() %>', '<%= jsCatatan %>', '<%= jsUlasan %>')" 
-                                            class="flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-50 text-[#6C5DD3] hover:bg-purple-100 transition w-full text-[10px] font-bold">
-                                        <i class="fas fa-tasks"></i> Progres
-                                    </button>
-
-                                    <div class="flex gap-2 w-full justify-center">
-                                        <% if ("DIKEMBALIKAN".equalsIgnoreCase(pb.getStatus()) || "BARU".equalsIgnoreCase(pb.getStatus())) { %>
-                                            <a href="<%= request.getContextPath() %>/bantuan/edit?id=<%= pb.getId_permohonan() %>" class="flex-1 py-1.5 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100 flex items-center justify-center transition" title="Kemaskini">
-                                                <i class="fas fa-pen text-[10px]"></i>
-                                            </a>
-                                            <a href="<%= request.getContextPath() %>/bantuan/delete?idPermohonan=<%= pb.getId_permohonan() %>" 
-                                               onclick="return confirm('Padam permohonan ini?');"
-                                               class="flex-1 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition" title="Padam">
-                                                <i class="fas fa-trash-alt text-[10px]"></i>
-                                            </a>
-                                        <% } else { %>
-                                            <span class="text-gray-300 text-[10px]"><i class="fas fa-lock mr-1"></i> Terkunci</span>
-                                        <% } %>
-                                    </div>
+                                <div class="flex justify-center gap-2" onclick="event.stopPropagation()">
+                                    <% if ("DIKEMBALIKAN".equalsIgnoreCase(status) || "BARU".equalsIgnoreCase(status)) { %>
+                                        <a href="<%= request.getContextPath() %>/bantuan/edit?id=<%= pb.getId_permohonan() %>" 
+                                           class="w-8 h-8 flex items-center justify-center text-blue-600 hover:bg-blue-100 rounded-lg transition" title="Kemaskini">
+                                            <i class="fas fa-pen text-xs"></i>
+                                        </a>
+                                        <a href="<%= request.getContextPath() %>/bantuan/delete?idPermohonan=<%= pb.getId_permohonan() %>" 
+                                           onclick="return confirm('Padam permohonan ini?');"
+                                           class="w-8 h-8 flex items-center justify-center text-red-600 hover:bg-red-100 rounded-lg transition" title="Padam">
+                                            <i class="fas fa-trash text-xs"></i>
+                                        </a>
+                                    <% } else { %>
+                                        <span class="text-[10px] text-gray-400 italic">Terkunci</span>
+                                    <% } %>
                                 </div>
                             </td>
                         </tr>
                         <% } } else { %>
-                            <tr class="no-data"><td colspan="6" class="p-8 text-center text-gray-400"><i class="fas fa-inbox text-3xl mb-2 block opacity-50"></i>Tiada permohonan sedang diproses.</td></tr>
+                            <tr class="no-data"><td colspan="5" class="p-12 text-center text-gray-400"><i class="fas fa-inbox text-3xl mb-2 block opacity-50"></i>Tiada permohonan sedang diproses.</td></tr>
                         <% } %>
                     </tbody>
                 </table>
@@ -216,68 +217,58 @@
         
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse" id="tableSejarah">
-                    <thead>
-                        <tr class="bg-gray-50 border-b border-gray-100">
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Tarikh</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Jenis Bantuan</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Dokumen</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Keterangan</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Ulasan</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center w-24">Info</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100">
-                        <% if (!listSejarah.isEmpty()) {
-                            for (PermohonanBantuan pb : listSejarah) {
-                                String filterDate = (pb.getDibuat_pada() != null) ? sdfFull.format(pb.getDibuat_pada()) : "";
-                                String displayDate = (pb.getDibuat_pada() != null) ? sdfDisplay.format(pb.getDibuat_pada()) : "-";
-                        %>
-                        <tr class="data-row text-gray-500" data-date="<%= filterDate %>" data-status="<%= pb.getStatus() %>">
-                            <td class="p-4 text-sm whitespace-nowrap"><%= displayDate %></td>
-                            <td class="p-4 text-sm font-bold text-gray-700 search-col"><%= pb.getNama_bantuan() %></td>
-                            <td class="p-4">
-                                <% if (pb.getDokumen_pemohon() != null) { String enc = URLEncoder.encode(pb.getDokumen_pemohon(), "UTF-8").replace("+", "%20"); %>
-                                    <a href="<%= request.getContextPath() %>/file/bantuan/<%= enc %>" target="_blank" class="text-xs font-bold text-blue-500 hover:underline"><i class="fas fa-file-pdf"></i> PDF</a>
-                                <% } else { %> - <% } %>
-                            </td>
-                            <td class="p-4 text-sm search-col max-w-xs truncate"><%= (pb.getCatatan_pemohon() != null) ? pb.getCatatan_pemohon() : "-" %></td>
-                            <td class="p-4 text-sm max-w-xs truncate"><%= (pb.getCatatan_pentadbir() != null) ? pb.getCatatan_pentadbir() : "-" %></td>
-                            <td class="p-4">
-                                <% if ("LULUS".equalsIgnoreCase(pb.getStatus())) { %> 
-                                    <span class="px-3 py-1 rounded-full bg-green-50 text-green-600 text-xs font-bold flex items-center w-max gap-1"><i class="fas fa-check-circle"></i> Disokong</span>
-                                <% } else { %> 
-                                    <span class="px-3 py-1 rounded-full bg-red-50 text-red-600 text-xs font-bold flex items-center w-max gap-1"><i class="fas fa-times-circle"></i> Ditolak</span>
-                                <% } %>
-                            </td>
-                            <td class="p-4">
-                                <div class="flex items-center w-full max-w-[250px]">
-                                    <div class="flex items-center justify-center w-4 h-4 rounded-full bg-[#6C5DD3] text-[8px] text-white">✓</div>
-                                    <div class="flex-1 h-0.5 bg-[#6C5DD3] mx-1"></div>
-                                    <div class="flex items-center justify-center w-4 h-4 rounded-full bg-[#6C5DD3] text-[8px] text-white">✓</div>
-                                    <div class="flex-1 h-0.5 bg-[#6C5DD3] mx-1"></div>
-                                    <div class="flex items-center justify-center w-4 h-4 rounded-full bg-[#6C5DD3] text-[8px] text-white">✓</div>
-                                    <div class="flex-1 h-0.5 bg-[#6C5DD3] mx-1"></div>
-                                    <div class="flex items-center justify-center w-4 h-4 rounded-full <%= "LULUS".equalsIgnoreCase(pb.getStatus()) ? "bg-green-500" : "bg-red-500" %> text-[8px] text-white">✓</div>
-                                </div>
-                            </td>
-                            <td class="p-4 text-center">
-                                <% 
-                                    String jsCatatan = cleanForJS(pb.getCatatan_pemohon());
-                                    String jsUlasan = cleanForJS(pb.getCatatan_pentadbir());
-                                %>
-                                <button onclick="openDetailModal('<%= pb.getNama_bantuan() %>', '<%= displayDate %>', '<%= pb.getStatus() %>', '<%= jsCatatan %>', '<%= jsUlasan %>')" 
-                                        class="w-10 h-10 rounded-full bg-gray-50 text-gray-400 hover:bg-purple-50 hover:text-[#6C5DD3] transition flex items-center justify-center mx-auto">
-                                    <i class="fas fa-info-circle text-lg"></i>
-                                </button>
-                            </td>
-                        </tr>
-                        <% } } else { %>
-                            <tr class="no-data"><td colspan="8" class="p-8 text-center text-gray-400"><i class="fas fa-archive text-3xl mb-2 block opacity-50"></i>Tiada sejarah permohonan.</td></tr>
-                        <% } %>
-                    </tbody>
-                </table>
+            <table class="w-full text-left border-collapse" id="tableSejarah">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gray-100">
+                        <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-16">No.</th>
+                        <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Tarikh Mohon</th>
+                        <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Jenis Bantuan</th>
+                        <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Status</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    <% if (!listSejarah.isEmpty()) {
+                        int noS = 1;
+                        for (PermohonanBantuan pb : listSejarah) {
+                            String displayDate = (pb.getDibuat_pada() != null) ? sdfDisplay.format(pb.getDibuat_pada()) : "-";
+                            String sStatus = (pb.getStatus() != null) ? pb.getStatus().trim().toUpperCase() : "";
+                            
+                            // JS Data
+                            String jsNama = cleanForJS(pb.getNama_bantuan());
+                            String jsCatatan = cleanForJS(pb.getCatatan_pemohon());
+                            String jsUlasan = cleanForJS(pb.getCatatan_pentadbir());
+                            String jsBank = cleanForJS(pb.getNama_bank());
+                            String jsAkaun = cleanForJS(pb.getNombor_akaun());
+                            String jsPenyata = (pb.getPenyata_bank() != null) ? URLEncoder.encode(pb.getPenyata_bank(), "UTF-8") : "";
+                            
+                            // Ambil senarai lampiran
+                            StringBuilder sbDocs = new StringBuilder();
+                            if(pb.getSenaraiLampiran() != null) {
+                                for(model.BantuanLampiran bl : pb.getSenaraiLampiran()) {
+                                    if(sbDocs.length() > 0) sbDocs.append(",");
+                                    sbDocs.append(URLEncoder.encode(bl.getNama_fail(), "UTF-8"));
+                                }
+                            }
+                            String jsDokumen = sbDocs.toString();
+                    %>
+                    <tr class="data-row hover:bg-gray-50 transition cursor-pointer group" 
+                        onclick="openDetailModal('<%= jsNama %>', '<%= displayDate %>', '<%= sStatus %>', '<%= jsCatatan %>', '<%= jsUlasan %>', '<%= jsBank %>', '<%= jsAkaun %>', '<%= jsPenyata %>', '<%= jsDokumen %>')">
+                        <td class="p-4 text-sm text-gray-400 font-medium"><%= noS++ %></td>
+                        <td class="p-4 text-sm text-gray-500 whitespace-nowrap"><%= displayDate %></td>
+                        <td class="p-4 text-sm font-bold text-gray-700 group-hover:text-[#6C5DD3] search-col"><%= pb.getNama_bantuan() %></td>
+                        <td class="p-4 text-center">
+                            <% if ("LULUS".equalsIgnoreCase(sStatus)) { %> 
+                                <span class="px-3 py-1 rounded-full bg-green-500 text-white text-[10px] font-bold uppercase whitespace-nowrap">Disokong</span>
+                            <% } else { %> 
+                                <span class="px-3 py-1 rounded-full bg-red-500 text-white text-[10px] font-bold uppercase whitespace-nowrap">Ditolak</span>
+                            <% } %>
+                        </td>
+                    </tr>
+                    <% } } else { %>
+                        <tr class="no-data"><td colspan="4" class="p-12 text-center text-gray-400"><i class="fas fa-archive text-3xl mb-2 block opacity-50"></i>Tiada sejarah permohonan.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
             </div>
         </div>
     </div>
@@ -337,18 +328,32 @@
                     </div>
                 </div>
 
-                <div class="space-y-6">
-                    <div>
-                        <h5 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                            <i class="fas fa-comment-alt text-[#6C5DD3]"></i> Keterangan Anda
-                        </h5>
-                        <p id="detCatatan" class="text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border border-gray-100 leading-relaxed">-</p>
+                <div class="space-y-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h5 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Sebab / Keterangan</h5>
+                            <p id="detCatatan" class="text-sm text-gray-600 bg-gray-50 p-4 rounded-2xl border border-gray-100 leading-relaxed">-</p>
+                        </div>
+                        <div>
+                            <h5 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Dokumen Sokongan</h5>
+                            <div id="dokumenList" class="space-y-2">
+                                <!-- Dynamic List of Documents -->
+                                <a id="linkDokumen" href="#" target="_blank" class="flex items-center gap-3 p-3 bg-gray-50 border border-gray-100 rounded-2xl hover:bg-gray-100 transition group hidden">
+                                    <div class="w-8 h-8 bg-white rounded-xl flex items-center justify-center text-red-500 shadow-sm group-hover:scale-110 transition">
+                                        <i class="fas fa-file-pdf text-sm"></i>
+                                    </div>
+                                    <span class="text-xs font-bold text-gray-700 truncate max-w-[150px]">Dokumen_Sokongan.pdf</span>
+                                    <i class="fas fa-external-link-alt ml-auto text-gray-300 text-[10px]"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
+
                     <div id="ulasanDiv">
-                        <h5 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                            <i class="fas fa-shield-alt text-orange-500"></i> Maklum Balas Pentadbir
+                        <h5 class="text-[10px] font-bold text-orange-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                            <i class="fas fa-shield-alt"></i> Maklum Balas Pentadbir
                         </h5>
-                        <p id="detUlasan" class="text-sm text-gray-600 bg-orange-50 p-4 rounded-xl border border-orange-100 leading-relaxed">-</p>
+                        <p id="detUlasan" class="text-sm text-gray-700 bg-orange-50 p-4 rounded-2xl border border-orange-100 leading-relaxed font-medium">-</p>
                     </div>
                 </div>
             </div>
@@ -406,6 +411,7 @@
         <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
             
             <form action="<%= request.getContextPath() %>/bantuan/apply" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="bantuanSource" value="rasmi">
                 <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
                     <div class="sm:flex sm:items-start">
                         <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-purple-100 sm:mx-0 sm:h-10 sm:w-10">
@@ -444,8 +450,9 @@
 
                                     <div>
                                         <label class="block text-xs font-bold text-gray-500 mb-1">Dokumen Sokongan (PDF)</label>
-                                        <input type="file" name="dokumenSokongan" accept="application/pdf" required
+                                        <input type="file" name="dokumenSokongan" accept="application/pdf" multiple required
                                                class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-purple-50 file:text-[#6C5DD3] hover:file:bg-purple-100">
+                                        <p class="text-[9px] text-gray-400 mt-1 italic">Boleh pilih lebih daripada satu fail.</p>
                                     </div>
 
                                     <div>
@@ -488,11 +495,28 @@
     }
 
     // 1. OPEN DETAIL MODAL LOGIC
-    function openDetailModal(nama, tarikh, status, catatan, ulasan) {
+    function openDetailModal(nama, tarikh, status, catatan, ulasan, bank, akaun, penyata, dokumen) {
         document.getElementById('detNama').innerText = nama;
         document.getElementById('detTarikh').innerText = tarikh;
         document.getElementById('detCatatan').innerText = (catatan && catatan !== "null") ? catatan : "Tiada maklumat.";
         document.getElementById('detUlasan').innerText = (ulasan && ulasan !== "null") ? ulasan : "Belum ada ulasan.";
+        
+        // Files List
+        const dokumenList = document.getElementById('dokumenList');
+        const template = document.getElementById('linkDokumen');
+        dokumenList.innerHTML = '';
+        dokumenList.appendChild(template);
+        
+        if(dokumen && dokumen !== "") {
+            const files = dokumen.split(',');
+            files.forEach(f => {
+                const newLink = template.cloneNode(true);
+                newLink.classList.remove('hidden');
+                newLink.href = "<%= request.getContextPath() %>/file/bantuan/" + f;
+                newLink.querySelector('span').innerText = decodeURIComponent(f).split('_').slice(1).join('_') || decodeURIComponent(f);
+                dokumenList.appendChild(newLink);
+            });
+        }
         
         // Reset Steps
         const steps = ['step1', 'step2', 'step3', 'step4'];

@@ -1,6 +1,8 @@
 package model;
 
 import java.util.Date;
+import java.util.List;
+import java.util.ArrayList;
 
 public class PermohonanBantuan {
     private int id_permohonan;
@@ -9,7 +11,6 @@ public class PermohonanBantuan {
     private String status; // 'BARU', 'MENUNGGU', 'LULUS', 'TOLAK'
     private String catatan_pemohon;
     private String catatan_pentadbir;
-    private String dokumen_pemohon;
     private String dokumen_pentadbir;
     private Date dibuat_pada;
     private Date dikemaskini_pada;
@@ -23,6 +24,12 @@ public class PermohonanBantuan {
     // Custom properties for UI and joins
     private String nama_bantuan;
     private String nama_penuh;
+
+    // Multiple Lampiran Support
+    private List<BantuanLampiran> senaraiLampiran = new ArrayList<>();
+
+    public List<BantuanLampiran> getSenaraiLampiran() { return senaraiLampiran; }
+    public void setSenaraiLampiran(List<BantuanLampiran> senaraiLampiran) { this.senaraiLampiran = senaraiLampiran; }
 
     // --- Helper Method ---
     public String getStatusBadge() {
@@ -51,9 +58,6 @@ public class PermohonanBantuan {
     public String getCatatan_pentadbir() { return catatan_pentadbir; }
     public void setCatatan_pentadbir(String catatan_pentadbir) { this.catatan_pentadbir = catatan_pentadbir; }
     
-    public String getDokumen_pemohon() { return dokumen_pemohon; }
-    public void setDokumen_pemohon(String dokumen_pemohon) { this.dokumen_pemohon = dokumen_pemohon; }
-
     public String getDokumen_pentadbir() { return dokumen_pentadbir; }
     public void setDokumen_pentadbir(String dokumen_pentadbir) { this.dokumen_pentadbir = dokumen_pentadbir; }
 
