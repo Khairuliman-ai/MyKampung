@@ -42,9 +42,37 @@
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth h-full bg-[#F7F7F9]">
 
-    <div class="mb-8">
-        <h2 class="text-2xl font-bold text-gray-800">Semakan Permohonan AJK</h2>
-        <p class="text-gray-500 text-sm">Uruskan permohonan baharu, semak sejarah, dan urus jenis bantuan.</p>
+    <div class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+        <div>
+            <h2 class="text-2xl font-bold text-gray-800">Semakan Permohonan AJK</h2>
+            <p class="text-gray-500 text-sm">Uruskan permohonan baharu, semak sejarah, dan urus jenis bantuan.</p>
+        </div>
+        
+        <!-- Professional Filter Bar -->
+        <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex flex-wrap items-center gap-3">
+            <div class="relative">
+                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
+                <input type="text" id="searchPemohon" onkeyup="filterData()" placeholder="Cari pemohon/ID..." 
+                       class="pl-9 pr-4 py-2 bg-gray-50 border-none rounded-xl text-xs focus:ring-2 focus:ring-[#6C5DD3] w-48">
+            </div>
+            
+            <select id="filterKategori" onchange="filterData()" class="bg-gray-50 border-none rounded-xl text-xs focus:ring-2 focus:ring-[#6C5DD3] py-2 px-3 pr-8">
+                <option value="ALL">Semua Kategori</option>
+                <option value="RASMI">Bantuan Rasmi</option>
+                <option value="KOMUNITI">Bantuan Komuniti</option>
+            </select>
+
+            <div class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-xl border border-transparent focus-within:border-[#6C5DD3]/30 transition">
+                <i class="fas fa-calendar-alt text-gray-400 text-[10px]"></i>
+                <input type="date" id="filterDateStart" onchange="filterData()" class="bg-transparent border-none p-0 text-[10px] focus:ring-0">
+                <span class="text-gray-300">-</span>
+                <input type="date" id="filterDateEnd" onchange="filterData()" class="bg-transparent border-none p-0 text-[10px] focus:ring-0">
+            </div>
+
+            <button onclick="resetFilters()" class="p-2 text-gray-400 hover:text-red-500 transition tooltip" title="Reset Tapisan">
+                <i class="fas fa-sync-alt text-xs"></i>
+            </button>
+        </div>
     </div>
 
     <% if (request.getParameter("msg") != null) { %>
@@ -87,6 +115,7 @@
                             <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">No. Rujukan</th>
                             <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Tarikh</th>
                             <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Pemohon</th>
+                            <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Kategori</th>
                             <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Jenis Bantuan</th>
                             <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider text-center">Butiran</th>
                             <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider text-center">Tindakan</th>
@@ -98,10 +127,20 @@
                                 String namaBantuanDisplay = (pb.getNama_bantuan() != null) ? pb.getNama_bantuan() : "Lain-lain";
                                 String dateDisplay = (pb.getDibuat_pada() != null) ? sdf.format(pb.getDibuat_pada()) : "-";
                         %>
-                        <tr class="hover:bg-purple-50/30 transition data-row-baru">
+                        <tr class="hover:bg-purple-50/30 transition data-row-filter" 
+                            data-search="<%= pb.getNama_penuh() %> #<%= pb.getId_permohonan() %>" 
+                            data-category="<%= (pb.getJenis_bantuan() != null) ? pb.getJenis_bantuan() : "" %>"
+                            data-date="<%= (pb.getDibuat_pada() != null) ? sdfFull.format(pb.getDibuat_pada()) : "" %>">
                             <td class="p-4 text-sm font-bold text-[#6C5DD3]">#<%= pb.getId_permohonan() %></td>
                             <td class="p-4 text-sm text-gray-600"><%= dateDisplay %></td>
                             <td class="p-4 text-sm font-bold text-gray-800"><%= (pb.getNama_penuh() != null) ? pb.getNama_penuh() : "TIADA NAMA" %></td>
+                            <td class="p-4">
+                                <% if ("RASMI".equalsIgnoreCase(pb.getJenis_bantuan())) { %>
+                                    <span class="px-2 py-1 rounded-lg text-[9px] font-bold bg-blue-50 text-blue-600 border border-blue-100">RASMI</span>
+                                <% } else { %>
+                                    <span class="px-2 py-1 rounded-lg text-[9px] font-bold bg-teal-50 text-teal-600 border border-teal-100">KOMUNITI</span>
+                                <% } %>
+                            </td>
                             <td class="p-4 text-sm font-medium text-gray-600"><%= namaBantuanDisplay %></td>
                             <td class="p-4 text-center">
                                 <% 
@@ -149,6 +188,7 @@
                         <tr class="bg-gray-50 border-b border-gray-100">
                             <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Tarikh</th>
                             <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Pemohon</th>
+                            <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Kategori</th>
                             <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Jenis Bantuan</th>
                             <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
                             <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Butiran</th>
@@ -157,9 +197,19 @@
                     <tbody class="divide-y divide-gray-100">
                         <% if (!listSejarah.isEmpty()) { 
                             for (PermohonanBantuan pb : listSejarah) { %>
-                        <tr class="hover:bg-gray-50 transition">
+                        <tr class="hover:bg-gray-50 transition data-row-filter"
+                            data-search="<%= pb.getNama_penuh() %> #<%= pb.getId_permohonan() %>" 
+                            data-category="<%= (pb.getJenis_bantuan() != null) ? pb.getJenis_bantuan() : "" %>"
+                            data-date="<%= (pb.getDibuat_pada() != null) ? sdfFull.format(pb.getDibuat_pada()) : "" %>">
                             <td class="p-4 text-sm text-gray-500"><%= sdf.format(pb.getDibuat_pada()) %></td>
                             <td class="p-4 text-sm font-bold text-gray-700"><%= pb.getNama_penuh() %></td>
+                            <td class="p-4">
+                                <% if ("RASMI".equalsIgnoreCase(pb.getJenis_bantuan())) { %>
+                                    <span class="px-2 py-1 rounded-lg text-[9px] font-bold bg-blue-50 text-blue-500 border border-blue-100/50">RASMI</span>
+                                <% } else { %>
+                                    <span class="px-2 py-1 rounded-lg text-[9px] font-bold bg-teal-50 text-teal-500 border border-teal-100/50">KOMUNITI</span>
+                                <% } %>
+                            </td>
                             <td class="p-4 text-sm text-gray-600"><%= pb.getNama_bantuan() %></td>
                             <td class="p-4">
                                 <% if ("LULUS".equalsIgnoreCase(pb.getStatus())) { %>
@@ -240,6 +290,81 @@
         </div>
     </div>
 </div>
+
+<!-- Right Aside Bar (Summary) -->
+<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
+    <div class="mb-8">
+        <h3 class="font-bold text-lg text-gray-800">Rumusan Bantuan</h3>
+        <p class="text-xs text-gray-400 font-medium">Status permohonan semasa</p>
+    </div>
+
+    <div class="space-y-4 mb-10">
+        <div class="bg-gray-50 p-4 rounded-2xl flex items-center justify-between border border-gray-100 shadow-sm">
+            <div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Perlu Semakan</p>
+                <h4 class="font-bold text-xl text-gray-800"><%= listBaru.size() %></h4>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-purple-100 text-[#6C5DD3] flex items-center justify-center">
+                <i class="fas fa-clipboard-check"></i>
+            </div>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-2xl flex items-center justify-between border border-gray-100 shadow-sm">
+            <div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Jumlah Sejarah</p>
+                <h4 class="font-bold text-xl text-gray-800"><%= listSejarah.size() %></h4>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center">
+                <i class="fas fa-history"></i>
+            </div>
+        </div>
+        <div class="bg-gray-50 p-4 rounded-2xl flex items-center justify-between border border-gray-100 shadow-sm">
+            <div>
+                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Jenis Bantuan</p>
+                <h4 class="font-bold text-xl text-gray-800"><%= (senaraiBantuan != null) ? senaraiBantuan.size() : 0 %></h4>
+            </div>
+            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
+                <i class="fas fa-cog"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="mb-10">
+        <h3 class="font-bold text-sm text-gray-800 mb-4 uppercase tracking-widest">Panduan AJK</h3>
+        <div class="space-y-6 relative">
+            <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-gray-100"></div>
+            
+            <div class="relative pl-10">
+                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-[#6C5DD3] flex items-center justify-center font-bold text-xs border-2 border-[#6C5DD3] z-10">1</div>
+                <h4 class="font-bold text-xs text-gray-800 uppercase">Semak Dokumen</h4>
+                <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Pastikan semua lampiran PDF yang dihantar oleh penduduk adalah lengkap dan sahih.</p>
+            </div>
+
+            <div class="relative pl-10">
+                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-gray-400 flex items-center justify-center font-bold text-xs border-2 border-gray-100 z-10">2</div>
+                <h4 class="font-bold text-xs text-gray-800 uppercase">Majukan Kes</h4>
+                <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Permohonan yang lengkap akan dimajukan kepada Ketua Kampung untuk kelulusan akhir.</p>
+            </div>
+
+            <div class="relative pl-10">
+                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-gray-400 flex items-center justify-center font-bold text-xs border-2 border-gray-100 z-10">3</div>
+                <h4 class="font-bold text-xs text-gray-800 uppercase">Maklum Balas</h4>
+                <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Gunakan fungsi 'Kembali' jika terdapat dokumen yang kurang lengkap untuk penduduk kemaskini.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-6 bg-[#6C5DD3]/5 rounded-3xl border border-[#6C5DD3]/10">
+        <div class="flex items-center gap-3 mb-3">
+            <div class="w-8 h-8 rounded-lg bg-[#6C5DD3] text-white flex items-center justify-center">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <h4 class="font-bold text-xs text-gray-800">Nota Integriti</h4>
+        </div>
+        <p class="text-[10px] text-gray-500 leading-relaxed italic">
+            "Bantuan yang tepat kepada mereka yang layak adalah tanggungjawab bersama."
+        </p>
+    </div>
+</aside>
 
 <!-- MODAL: DETAIL PERMOHONAN (INCLUDING BANK) -->
 <div id="modalDetail" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog">
@@ -415,6 +540,38 @@
 </div>
 
 <script>
+    function resetFilters() {
+        document.getElementById('searchPemohon').value = '';
+        document.getElementById('filterKategori').value = 'ALL';
+        document.getElementById('filterDateStart').value = '';
+        document.getElementById('filterDateEnd').value = '';
+        filterData();
+    }
+
+    function filterData() {
+        const search = document.getElementById('searchPemohon').value.toLowerCase();
+        const category = document.getElementById('filterKategori').value;
+        const dateStart = document.getElementById('filterDateStart').value;
+        const dateEnd = document.getElementById('filterDateEnd').value;
+
+        const rows = document.querySelectorAll('.data-row-filter');
+        rows.forEach(row => {
+            const rowSearch = row.getAttribute('data-search').toLowerCase();
+            const rowCategory = row.getAttribute('data-category');
+            const rowDate = row.getAttribute('data-date'); // YYYY-MM-DD
+
+            let show = true;
+
+            if (search && !rowSearch.includes(search)) show = false;
+            if (category !== 'ALL' && rowCategory !== category) show = false;
+            
+            if (dateStart && rowDate < dateStart) show = false;
+            if (dateEnd && rowDate > dateEnd) show = false;
+
+            row.style.display = show ? '' : 'none';
+        });
+    }
+
     function switchTab(tabName) {
         document.querySelectorAll('nav button').forEach(btn => {
             btn.classList.remove('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');

@@ -11,7 +11,7 @@ public class PermohonanBantuanDAO {
 
     public List<PermohonanBantuan> getByPenduduk(int idPenduduk) {
         List<PermohonanBantuan> list = new ArrayList<>();
-        String sql = "SELECT pb.*, b.nama_bantuan FROM permohonan_bantuan pb JOIN bantuan b ON pb.id_bantuan = b.id_bantuan WHERE pb.id_pengguna = ?";
+        String sql = "SELECT pb.*, b.nama_bantuan, b.jenis_bantuan FROM permohonan_bantuan pb JOIN bantuan b ON pb.id_bantuan = b.id_bantuan WHERE pb.id_pengguna = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idPenduduk);
@@ -30,7 +30,7 @@ public class PermohonanBantuanDAO {
 
     public List<PermohonanBantuan> getAll() {
         List<PermohonanBantuan> list = new ArrayList<>();
-        String sql = "SELECT pb.*, b.nama_bantuan, p.nama_penuh FROM permohonan_bantuan pb JOIN bantuan b ON pb.id_bantuan = b.id_bantuan JOIN pengguna p ON pb.id_pengguna = p.id_pengguna";
+        String sql = "SELECT pb.*, b.nama_bantuan, b.jenis_bantuan, p.nama_penuh FROM permohonan_bantuan pb JOIN bantuan b ON pb.id_bantuan = b.id_bantuan JOIN pengguna p ON pb.id_pengguna = p.id_pengguna";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -47,7 +47,7 @@ public class PermohonanBantuanDAO {
     }
 
     public PermohonanBantuan getById(int idPermohonan) {
-        String sql = "SELECT pb.*, b.nama_bantuan FROM permohonan_bantuan pb JOIN bantuan b ON pb.id_bantuan = b.id_bantuan WHERE pb.id_permohonan = ?";
+        String sql = "SELECT pb.*, b.nama_bantuan, b.jenis_bantuan FROM permohonan_bantuan pb JOIN bantuan b ON pb.id_bantuan = b.id_bantuan WHERE pb.id_permohonan = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idPermohonan);
@@ -173,9 +173,10 @@ public class PermohonanBantuanDAO {
 
         try {
             pb.setNama_bantuan(rs.getString("nama_bantuan"));
-        } catch (SQLException e) {
-            // Might not be joined
-        }
+        } catch (SQLException e) {}
+        try {
+            pb.setJenis_bantuan(rs.getString("jenis_bantuan"));
+        } catch (SQLException e) {}
         return pb;
     }
 

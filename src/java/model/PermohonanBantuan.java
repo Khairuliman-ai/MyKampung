@@ -23,6 +23,7 @@ public class PermohonanBantuan {
     
     // Custom properties for UI and joins
     private String nama_bantuan;
+    private String jenis_bantuan; // 'RASMI' or 'KOMUNITI'
     private String nama_penuh;
 
     // Multiple Lampiran Support
@@ -81,6 +82,9 @@ public class PermohonanBantuan {
 
     public String getNama_bantuan() { return nama_bantuan; }
     public void setNama_bantuan(String nama_bantuan) { this.nama_bantuan = nama_bantuan; }
+    
+    public String getJenis_bantuan() { return jenis_bantuan; }
+    public void setJenis_bantuan(String jenis_bantuan) { this.jenis_bantuan = jenis_bantuan; }
     
     public String getNama_penuh() { return nama_penuh; }
     public void setNama_penuh(String nama) { this.nama_penuh = nama; }
