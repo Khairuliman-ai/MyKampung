@@ -25,6 +25,11 @@ public class PermohonanBantuan {
     private String nama_bantuan;
     private String jenis_bantuan; // 'RASMI' or 'KOMUNITI'
     private String nama_penuh;
+    private String nombor_kp;
+    private String nombor_telefon;
+    private String status_keluarga;
+    private String pekerjaan;
+    private Double pendapatan;
 
     // Multiple Lampiran Support
     private List<BantuanLampiran> senaraiLampiran = new ArrayList<>();
@@ -88,6 +93,26 @@ public class PermohonanBantuan {
     
     public String getNama_penuh() { return nama_penuh; }
     public void setNama_penuh(String nama) { this.nama_penuh = nama; }
+
+    public String getNombor_kp() { return nombor_kp; }
+    public void setNombor_kp(String nombor_kp) { this.nombor_kp = nombor_kp; }
+
+    public String getNombor_telefon() { return nombor_telefon; }
+    public void setNombor_telefon(String nombor_telefon) { this.nombor_telefon = nombor_telefon; }
+
+    public String getStatus_keluarga() { return status_keluarga; }
+    public void setStatus_keluarga(String status_keluarga) { this.status_keluarga = status_keluarga; }
+
+    public String getPekerjaan() { return pekerjaan; }
+    public void setPekerjaan(String pekerjaan) { this.pekerjaan = pekerjaan; }
+
+    public Double getPendapatan() { return pendapatan; }
+    public void setPendapatan(Double pendapatan) { this.pendapatan = pendapatan; }
+    
+    public String getPendapatanFormatted() {
+        if (pendapatan == null) return "RM 0.00";
+        return String.format("RM %.2f", pendapatan);
+    }
     
     // For backwards compatibility mapping
     public int getId_permohonan_bantuan() { return id_permohonan; }

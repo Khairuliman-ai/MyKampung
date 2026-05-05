@@ -194,18 +194,25 @@
                             String jsAkaun = cleanForJS(pb.getNombor_akaun());
                             String jsPenyata = (pb.getPenyata_bank() != null) ? URLEncoder.encode(pb.getPenyata_bank(), "UTF-8") : "";
                             
-                            // Ambil senarai lampiran
+                            // Ambil senarai lampiran - Asingkan PEMOHON dan PENTADBIR
                             StringBuilder sbDocs = new StringBuilder();
+                            StringBuilder sbDocsAdmin = new StringBuilder();
                             if(pb.getSenaraiLampiran() != null) {
                                 for(model.BantuanLampiran bl : pb.getSenaraiLampiran()) {
-                                    if(sbDocs.length() > 0) sbDocs.append(",");
-                                    sbDocs.append(URLEncoder.encode(bl.getNama_fail(), "UTF-8"));
+                                    if("PEMOHON".equalsIgnoreCase(bl.getJenis_lampiran())) {
+                                        if(sbDocs.length() > 0) sbDocs.append(",");
+                                        sbDocs.append(URLEncoder.encode(bl.getNama_fail(), "UTF-8"));
+                                    } else if("PENTADBIR".equalsIgnoreCase(bl.getJenis_lampiran())) {
+                                        if(sbDocsAdmin.length() > 0) sbDocsAdmin.append(",");
+                                        sbDocsAdmin.append(URLEncoder.encode(bl.getNama_fail(), "UTF-8"));
+                                    }
                                 }
                             }
                             String jsDokumen = sbDocs.toString();
+                            String jsDokumenAdmin = sbDocsAdmin.toString();
                     %>
-                    <tr class="hover:bg-gray-50 transition cursor-pointer group"
-                        onclick="openDetailModal('<%= jsNama %>', '<%= displayDate %>', '<%= sStatus %>', '<%= jsCatatan %>', '<%= jsUlasan %>', '<%= jsBank %>', '<%= jsAkaun %>', '<%= jsPenyata %>', '<%= jsDokumen %>')">
+                    <tr class="data-row hover:bg-gray-50 transition cursor-pointer group"
+                        onclick="openDetailModal('<%= jsNama %>', '<%= displayDate %>', '<%= sStatus %>', '<%= jsCatatan %>', '<%= jsUlasan %>', '<%= jsBank %>', '<%= jsAkaun %>', '<%= jsPenyata %>', '<%= jsDokumen %>', '<%= jsDokumenAdmin %>')">
                         <td class="p-4 text-sm text-gray-400 font-medium"><%= noS++ %></td>
                         <td class="p-4 text-sm text-gray-500"><%= displayDate %></td>
                         <td class="p-4 text-sm font-bold text-gray-700 group-hover:text-[#6C5DD3]"><%= pb.getNama_bantuan() %></td>
@@ -320,7 +327,17 @@
                             <h5 class="text-[10px] font-bold text-orange-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                                 <i class="fas fa-shield-alt"></i> Maklum Balas Pentadbir
                             </h5>
-                            <p id="detUlasan" class="text-sm text-gray-700 bg-orange-50 p-4 rounded-2xl border border-orange-100 leading-relaxed font-medium">-</p>
+                            <div class="bg-orange-50 p-6 rounded-3xl border border-orange-100 space-y-4">
+                                <p id="detUlasan" class="text-sm text-gray-700 leading-relaxed font-medium italic">-</p>
+                                
+                                <!-- Admin Documents Section -->
+                                <div id="dokumenAdminSection" class="hidden pt-4 border-t border-orange-200">
+                                    <p class="text-[9px] font-bold text-orange-500 uppercase tracking-widest mb-3">Lampiran Daripada Pentadbir / Dokumen Disahkan</p>
+                                    <div id="dokumenAdminList" class="grid grid-cols-1 gap-2">
+                                        <!-- Dynamic Admin Files -->
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -347,7 +364,7 @@
                         </div>
 
                         <div>
-                            <h5 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Dokumen Sokongan</h5>
+                            <h5 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Dokumen Sokongan (Pemohon)</h5>
                             <div id="dokumenList" class="space-y-2">
                                 <!-- Dynamic List of Documents -->
                                 <a id="linkDokumen" href="#" target="_blank" class="flex items-center gap-3 p-3 bg-gray-50 border border-gray-100 rounded-2xl hover:bg-gray-100 transition group hidden">
@@ -548,7 +565,8 @@
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
 
     // TRACKING & DETAIL MODAL LOGIC
-    function openDetailModal(nama, tarikh, status, catatan, ulasan, bank, akaun, penyata, dokumen) {
+    // TRACKING & DETAIL MODAL LOGIC
+    function openDetailModal(nama, tarikh, status, catatan, ulasan, bank, akaun, penyata, dokumen, dokumenAdmin) {
         document.getElementById('detNama').innerText = nama;
         document.getElementById('detTarikh').innerText = tarikh;
         document.getElementById('detCatatan').innerText = (catatan && catatan !== "null") ? catatan : "Tiada maklumat.";
@@ -566,7 +584,7 @@
             linkPenyata.classList.add('hidden');
         }
 
-        // Files List
+        // Files List (PEMOHON)
         const dokumenList = document.getElementById('dokumenList');
         // Clear previous except the template
         const template = document.getElementById('linkDokumen');
@@ -582,6 +600,28 @@
                 newLink.querySelector('span').innerText = decodeURIComponent(f).split('_').slice(1).join('_') || decodeURIComponent(f);
                 dokumenList.appendChild(newLink);
             });
+        }
+
+        // Files List (PENTADBIR)
+        const dokAdminList = document.getElementById('dokumenAdminList');
+        const dokAdminSection = document.getElementById('dokumenAdminSection');
+        dokAdminList.innerHTML = '';
+        
+        if(dokumenAdmin && dokumenAdmin !== "") {
+            dokAdminSection.classList.remove('hidden');
+            const filesA = dokumenAdmin.split(',');
+            filesA.forEach(f => {
+                const newLink = template.cloneNode(true);
+                newLink.classList.remove('hidden');
+                newLink.classList.replace('bg-gray-50', 'bg-white');
+                newLink.classList.add('border-orange-100');
+                newLink.href = "<%= request.getContextPath() %>/file/bantuan/" + f;
+                newLink.querySelector('span').innerText = decodeURIComponent(f).split('_').slice(1).join('_') || decodeURIComponent(f);
+                newLink.querySelector('div').classList.replace('text-red-500', 'text-orange-500');
+                dokAdminList.appendChild(newLink);
+            });
+        } else {
+            dokAdminSection.classList.add('hidden');
         }
         
         // Reset Steps

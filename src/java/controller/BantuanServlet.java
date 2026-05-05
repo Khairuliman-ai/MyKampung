@@ -429,27 +429,37 @@ public class BantuanServlet extends HttpServlet {
                 String keputusan = request.getParameter("keputusan");
                 String ulasanKetua = request.getParameter("ulasan");
 
-                Part filePart = request.getPart("dokumenBalas"); 
-                String fileName = null;
+                BantuanLampiranDAO lampiranDao = new BantuanLampiranDAO();
+                Collection<Part> parts = request.getParts();
+                String firstFileName = null; // Still keep for backward compatibility in main table if needed
 
-                if (filePart != null && filePart.getSize() > 0) {
-                    String submitted = filePart.getSubmittedFileName().replaceAll("\\s+", "_");
-                    fileName = "KETUA_" + System.currentTimeMillis() + "_" + submitted;
-                    filePart.write(SAVE_DIR + File.separator + fileName);
+                for (Part part : parts) {
+                    if ("dokumenBalas".equals(part.getName()) && part.getSize() > 0) {
+                        String submitted = part.getSubmittedFileName().replaceAll("\\s+", "_");
+                        String fileName = "KETUA_" + System.currentTimeMillis() + "_" + submitted;
+                        part.write(SAVE_DIR + File.separator + fileName);
+                        
+                        // Insert into bantuan_lampiran table
+                        model.BantuanLampiran bl = new model.BantuanLampiran(idPermohonan, fileName, "PENTADBIR");
+                        lampiranDao.insert(bl);
+                        
+                        if (firstFileName == null) firstFileName = fileName;
+                    }
                 }
 
                 int statusBaru;
                 String ulasanAdmin;
 
-                if ("lulus".equals(keputusan)) {
+                if ("LULUS".equalsIgnoreCase(keputusan)) {
                     statusBaru = 1;
-                    ulasanAdmin = "DILULUSKAN: Permohonan disokong oleh Ketua Kampung.";
+                    ulasanAdmin = (ulasanKetua != null && !ulasanKetua.trim().isEmpty()) 
+                                 ? ulasanKetua : "DILULUSKAN: Permohonan disokong oleh Ketua Kampung.";
                 } else {
                     statusBaru = 4;
                     ulasanAdmin = "DITOLAK oleh Ketua Kampung: " + (ulasanKetua != null ? ulasanKetua : "Tidak menepati syarat.");
                 }
 
-                pbDao.updateStatus(idPermohonan, statusBaru, ulasanAdmin, fileName);
+                pbDao.updateStatus(idPermohonan, statusBaru, ulasanAdmin, firstFileName);
                 response.sendRedirect(request.getContextPath() + "/bantuan/list?msg=decision_made");
             }
             

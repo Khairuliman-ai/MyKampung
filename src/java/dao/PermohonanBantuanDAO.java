@@ -30,13 +30,23 @@ public class PermohonanBantuanDAO {
 
     public List<PermohonanBantuan> getAll() {
         List<PermohonanBantuan> list = new ArrayList<>();
-        String sql = "SELECT pb.*, b.nama_bantuan, b.jenis_bantuan, p.nama_penuh FROM permohonan_bantuan pb JOIN bantuan b ON pb.id_bantuan = b.id_bantuan JOIN pengguna p ON pb.id_pengguna = p.id_pengguna";
+        String sql = "SELECT pb.*, b.nama_bantuan, b.jenis_bantuan, p.nama_penuh, p.nombor_kp, p.nombor_telefon, p.status_keluarga, p.pekerjaan, p.pendapatan " +
+                     "FROM permohonan_bantuan pb " +
+                     "JOIN bantuan b ON pb.id_bantuan = b.id_bantuan " +
+                     "JOIN pengguna p ON pb.id_pengguna = p.id_pengguna";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 PermohonanBantuan pb = mapRow(rs);
-                pb.setNama_penuh(rs.getString("nama_penuh"));
+                try {
+                    pb.setNama_penuh(rs.getString("nama_penuh"));
+                    pb.setNombor_kp(rs.getString("nombor_kp"));
+                    pb.setNombor_telefon(rs.getString("nombor_telefon"));
+                    pb.setStatus_keluarga(rs.getString("status_keluarga"));
+                    pb.setPekerjaan(rs.getString("pekerjaan"));
+                    pb.setPendapatan(rs.getDouble("pendapatan"));
+                } catch (SQLException e) {}
                 pb.setSenaraiLampiran(lampiranDao.getByPermohonan(pb.getId_permohonan()));
                 list.add(pb);
             }
