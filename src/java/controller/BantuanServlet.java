@@ -65,12 +65,32 @@ public class BantuanServlet extends HttpServlet {
                             .forward(request, response);
 
                 } else if ("JKKK".equalsIgnoreCase(user.getNama_peranan()) || "AJK".equalsIgnoreCase(user.getNama_peranan()) || "AJK Kampung".equalsIgnoreCase(user.getNama_peranan())) {
-                    list = pbDao.getAll();
+                    int page = 1;
+                    int pageSize = 10;
+                    try {
+                        if (request.getParameter("page") != null) {
+                            page = Integer.parseInt(request.getParameter("page"));
+                        }
+                    } catch (NumberFormatException e) { page = 1; }
+
+                    int offset = (page - 1) * pageSize;
+                    
+                    // Ambil list baru (penuh) & sejarah (paginated)
+                    List<PermohonanBantuan> listBaru = pbDao.getByStatus("BARU");
+                    List<PermohonanBantuan> listSejarah = pbDao.getSejarahPaginated(offset, pageSize);
+                    int totalSejarahCount = pbDao.getSejarahCount();
+                    int totalPagesSejarah = (int) Math.ceil((double) totalSejarahCount / pageSize);
+
                     BantuanDAO bDao = new BantuanDAO();
                     List<Bantuan> senaraiBantuan = bDao.getAllBantuan();
                     
-                    request.setAttribute("permohonanList", list);
+                    request.setAttribute("listBaru", listBaru);
+                    request.setAttribute("listSejarah", listSejarah);
                     request.setAttribute("senaraiBantuan", senaraiBantuan);
+                    request.setAttribute("currentPage", page);
+                    request.setAttribute("totalPages", totalPagesSejarah);
+                    request.setAttribute("totalCount", totalSejarahCount);
+                    
                     request.getRequestDispatcher("/views/bantuan/urusBantuanAJK.jsp").forward(request, response);
 
                 } else if ("Ketua Kampung".equalsIgnoreCase(user.getNama_peranan())) {

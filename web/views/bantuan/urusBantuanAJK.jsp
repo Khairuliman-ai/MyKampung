@@ -20,24 +20,17 @@
 %>
 
 <%
-    // 1. ASINGKAN DATA KEPADA BARU & SEJARAH
-    List<PermohonanBantuan> allList = (List<PermohonanBantuan>) request.getAttribute("permohonanList");
+    // 1. DAPATKAN DATA DARI REQUEST (SERVER-SIDE PAGINATION)
+    List<PermohonanBantuan> listBaru = (List<PermohonanBantuan>) request.getAttribute("listBaru");
+    List<PermohonanBantuan> listSejarah = (List<PermohonanBantuan>) request.getAttribute("listSejarah");
     List<Bantuan> senaraiBantuan = (List<Bantuan>) request.getAttribute("senaraiBantuan");
-    List<PermohonanBantuan> listBaru = new ArrayList<>();
-    List<PermohonanBantuan> listSejarah = new ArrayList<>();
     
+    int currentPage = (Integer) request.getAttribute("currentPage");
+    int totalPages = (Integer) request.getAttribute("totalPages");
+    int totalCount = (Integer) request.getAttribute("totalCount");
+
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     SimpleDateFormat sdfFull = new SimpleDateFormat("yyyy-MM-dd");
-
-    if (allList != null) {
-        for (PermohonanBantuan pb : allList) {
-            if (pb.getStatus() == null || "BARU".equalsIgnoreCase(pb.getStatus())) {
-                listBaru.add(pb); // Belum Semak
-            } else {
-                listSejarah.add(pb); // Dah Semak (Lulus/Tolak/Return)
-            }
-        }
-    }
 %>
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth h-full bg-[#F7F7F9]">
@@ -238,6 +231,52 @@
                         <% } %>
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Pagination Footer for Sejarah -->
+            <div class="p-6 bg-white border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
+                <div class="text-xs text-gray-500 font-medium">
+                    Menunjukkan halaman <span class="text-gray-900 font-bold"><%= currentPage %></span> daripada <span class="text-gray-900 font-bold"><%= totalPages %></span> 
+                    (<%= totalCount %> rekod keseluruhan)
+                </div>
+                
+                <div class="flex items-center gap-2">
+                    <% if(currentPage > 1) { %>
+                        <a href="?page=<%= currentPage - 1 %>" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 transition flex items-center gap-2">
+                            <i class="fas fa-chevron-left"></i> Sebelumnya
+                        </a>
+                    <% } else { %>
+                        <button disabled class="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-300 cursor-not-allowed flex items-center gap-2">
+                            <i class="fas fa-chevron-left"></i> Sebelumnya
+                        </button>
+                    <% } %>
+
+                    <div class="flex items-center gap-1">
+                        <% 
+                            int startPage = Math.max(1, currentPage - 2);
+                            int endPage = Math.min(totalPages, startPage + 4);
+                            if (endPage - startPage < 4) startPage = Math.max(1, endPage - 4);
+                            
+                            for(int i = startPage; i <= endPage; i++) { 
+                        %>
+                            <a href="?page=<%= i %>" 
+                               class="w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold transition-all
+                                      <%= (i == currentPage) ? "bg-[#6C5DD3] text-white shadow-lg shadow-purple-100" : "bg-white text-gray-500 hover:bg-gray-50 border border-gray-100" %>">
+                                <%= i %>
+                            </a>
+                        <% } %>
+                    </div>
+
+                    <% if(currentPage < totalPages) { %>
+                        <a href="?page=<%= currentPage + 1 %>" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 transition flex items-center gap-2">
+                            Seterusnya <i class="fas fa-chevron-right"></i>
+                        </a>
+                    <% } else { %>
+                        <button disabled class="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-300 cursor-not-allowed flex items-center gap-2">
+                            Seterusnya <i class="fas fa-chevron-right"></i>
+                        </button>
+                    <% } %>
+                </div>
             </div>
         </div>
     </div>
@@ -680,6 +719,14 @@
         document.getElementById('content-jenis').classList.add('hidden');
         document.getElementById('content-' + tabName).classList.remove('hidden');
     }
+
+    // Auto-switch to sejarah tab if page param exists
+    window.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('page')) {
+            switchTab('sejarah');
+        }
+    });
 
     function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
     function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
