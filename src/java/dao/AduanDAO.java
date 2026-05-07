@@ -132,6 +132,9 @@ public class AduanDAO {
     }
 
     public boolean updateStatus(int id, String status, String catatanField, String catatanValue) {
+        if (!"catatan_ajk".equals(catatanField) && !"catatan_ketua".equals(catatanField) && !"catatan_pentadbir".equals(catatanField)) {
+            throw new IllegalArgumentException("Nama medan catatan tidak sah: " + catatanField);
+        }
         String sql = "UPDATE aduan SET status = ?, " + catatanField + " = ?, dikemaskini_pada = NOW() WHERE id_aduan = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

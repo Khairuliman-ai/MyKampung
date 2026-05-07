@@ -72,7 +72,7 @@
         List<PermohonanBantuan> list = (List<PermohonanBantuan>) request.getAttribute("permohonanList");
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
         SimpleDateFormat sdfFull = new SimpleDateFormat("yyyy-MM-dd");
-        List<PermohonanBantuan> listPending = new ArrayList<>(); // Status 3 (Dari JKKK)
+        List<PermohonanBantuan> listPending = new ArrayList<>(); // Status 3 (Dari AJK)
         List<PermohonanBantuan> listSejarah = new ArrayList<>(); // Status 1 (Lulus) atau 4 (Tolak)
         
         if(list != null) {
@@ -140,7 +140,23 @@
                             data-search="<%= pb.getNama_penuh() %> #<%= pb.getId_permohonan() %>" 
                             data-category="<%= (pb.getJenis_bantuan() != null) ? pb.getJenis_bantuan() : "" %>"
                             data-date="<%= (pb.getDibuat_pada() != null) ? sdfFull.format(pb.getDibuat_pada()) : "" %>"
-                            onclick="viewDetail('<%= pb.getId_permohonan() %>', '<%= namaBantuan %>', '<%= pb.getNama_penuh() %>', '<%= (pb.getCatatan_pemohon() != null ? pb.getCatatan_pemohon().replace("'", "\\'") : "") %>', '<%= jsDokumen %>', '<%= pb.getNama_bank() %>', '<%= pb.getNombor_akaun() %>', '<%= pb.getPenyata_bank() %>', true, '<%= pb.getNombor_kp() %>', '<%= pb.getNombor_telefon() %>', '<%= pb.getStatus_keluarga() %>', '<%= pb.getPekerjaan() %>', '<%= pb.getPendapatanFormatted() %>', '<%= pb.getJenis_bantuan() %>', '<%= (pb.getCatatan_pentadbir() != null ? pb.getCatatan_pentadbir().replace("'", "\\'") : "Tiada ulasan.") %>')">
+                            data-id="<%= pb.getId_permohonan() %>"
+                            data-bantuan="<%= (pb.getNama_bantuan() != null ? pb.getNama_bantuan().replace("\"", "&quot;") : "Lain-lain") %>"
+                            data-pemohon="<%= pb.getNama_penuh().replace("\"", "&quot;") %>"
+                            data-ket="<%= (pb.getCatatan_pemohon() != null ? pb.getCatatan_pemohon().replace("\"", "&quot;") : "") %>"
+                            data-dok="<%= jsDokumen %>"
+                            data-bank="<%= (pb.getNama_bank() != null ? pb.getNama_bank().replace("\"", "&quot;") : "") %>"
+                            data-akaun="<%= (pb.getNombor_akaun() != null ? pb.getNombor_akaun().replace("\"", "&quot;") : "") %>"
+                            data-penbank="<%= (pb.getPenyata_bank() != null ? pb.getPenyata_bank() : "") %>"
+                            data-showaction="true"
+                            data-ic="<%= (pb.getNombor_kp() != null ? pb.getNombor_kp() : "") %>"
+                            data-phone="<%= (pb.getNombor_telefon() != null ? pb.getNombor_telefon() : "") %>"
+                            data-statusk="<%= (pb.getStatus_keluarga() != null ? pb.getStatus_keluarga() : "") %>"
+                            data-kerja="<%= (pb.getPekerjaan() != null ? pb.getPekerjaan() : "") %>"
+                            data-gaji="<%= pb.getPendapatanFormatted() %>"
+                            data-kategori="<%= pb.getJenis_bantuan() %>"
+                            data-ulasanajk="<%= (pb.getCatatan_pentadbir() != null ? pb.getCatatan_pentadbir().replace("\"", "&quot;") : "Tiada ulasan.") %>"
+                            onclick="viewDetail(this)">
                             <td class="p-4 text-sm text-gray-400 font-medium"><%= noP++ %></td>
                             <td class="p-4 text-sm text-gray-500 whitespace-nowrap"><%= displayDate %></td>
                             <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-[#6C5DD3] transition-colors"><%= pb.getNama_penuh() %></td>
@@ -209,7 +225,24 @@
                             data-search="<%= pb.getNama_penuh() %> #<%= pb.getId_permohonan() %>" 
                             data-category="<%= (pb.getJenis_bantuan() != null) ? pb.getJenis_bantuan() : "" %>"
                             data-date="<%= (pb.getDibuat_pada() != null) ? sdfFull.format(pb.getDibuat_pada()) : "" %>"
-                            onclick="viewDetail('<%= pb.getId_permohonan() %>', '<%= namaBantuan %>', '<%= pb.getNama_penuh() %>', '<%= (pb.getCatatan_pemohon() != null ? pb.getCatatan_pemohon().replace("'", "\\'") : "") %>', '<%= jsDokumenH %>', '<%= pb.getNama_bank() %>', '<%= pb.getNombor_akaun() %>', '<%= pb.getPenyata_bank() %>', false, '<%= pb.getNombor_kp() %>', '<%= pb.getNombor_telefon() %>', '<%= pb.getStatus_keluarga() %>', '<%= pb.getPekerjaan() %>', '<%= pb.getPendapatanFormatted() %>', '<%= pb.getJenis_bantuan() %>', '<%= (pb.getCatatan_pentadbir() != null ? pb.getCatatan_pentadbir().replace("'", "\\'") : "Tiada ulasan.") %>', '<%= jsDokumenAdminH %>')">
+                            data-id="<%= pb.getId_permohonan() %>"
+                            data-bantuan="<%= (pb.getNama_bantuan() != null ? pb.getNama_bantuan().replace("\"", "&quot;") : "Lain-lain") %>"
+                            data-pemohon="<%= pb.getNama_penuh().replace("\"", "&quot;") %>"
+                            data-ket="<%= (pb.getCatatan_pemohon() != null ? pb.getCatatan_pemohon().replace("\"", "&quot;") : "") %>"
+                            data-dok="<%= jsDokumenH %>"
+                            data-bank="<%= (pb.getNama_bank() != null ? pb.getNama_bank().replace("\"", "&quot;") : "") %>"
+                            data-akaun="<%= (pb.getNombor_akaun() != null ? pb.getNombor_akaun().replace("\"", "&quot;") : "") %>"
+                            data-penbank="<%= (pb.getPenyata_bank() != null ? pb.getPenyata_bank() : "") %>"
+                            data-showaction="false"
+                            data-ic="<%= (pb.getNombor_kp() != null ? pb.getNombor_kp() : "") %>"
+                            data-phone="<%= (pb.getNombor_telefon() != null ? pb.getNombor_telefon() : "") %>"
+                            data-statusk="<%= (pb.getStatus_keluarga() != null ? pb.getStatus_keluarga() : "") %>"
+                            data-kerja="<%= (pb.getPekerjaan() != null ? pb.getPekerjaan() : "") %>"
+                            data-gaji="<%= pb.getPendapatanFormatted() %>"
+                            data-kategori="<%= pb.getJenis_bantuan() %>"
+                            data-ulasanajk="<%= (pb.getCatatan_pentadbir() != null ? pb.getCatatan_pentadbir().replace("\"", "&quot;") : "Tiada ulasan.") %>"
+                            data-dokadmin="<%= jsDokumenAdminH %>"
+                            onclick="viewDetail(this)">
                             <td class="p-4 text-sm text-gray-400 font-medium"><%= noS++ %></td>
                             <td class="p-4 text-sm text-gray-500 whitespace-nowrap"><%= displayDate %></td>
                             <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-[#6C5DD3] transition-colors"><%= pb.getNama_penuh() %></td>
@@ -382,7 +415,10 @@
                             <div class="space-y-4">
                                 <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Dokumen Sokongan (Pemohon)</label>
                                 <div id="dokumenList" class="flex flex-wrap gap-2">
-                                    <a id="detDokMain" href="#" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-100 transition shadow-sm border border-red-100 hidden">
+                                    <!-- Dynamic Content -->
+                                </div>
+                                <div class="hidden">
+                                    <a id="detDokMain" href="#" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-100 transition shadow-sm border border-red-100">
                                         <i class="fas fa-file-pdf"></i> PDF
                                     </a>
                                 </div>
@@ -525,18 +561,30 @@
         document.getElementById('content-' + name).classList.remove('hidden');
     }
 
-    function viewDetail(id, bantuan, pemohon, ket, dok, bank, akaun, penBank, showAction = false, ic, phone, statusK, kerja, gaji, kategori, ulasanAJK, dokAdmin) {
+    function viewDetail(row) {
+        const d = row.dataset;
+        const id = d.id;
+        const bantuan = d.bantuan;
+        const kategori = d.kategori;
+        const showAction = (d.showaction === "true");
         currentKategori = kategori;
+
         document.getElementById('detId').innerText = "#" + id;
         document.getElementById('detBantuan').innerText = bantuan;
-        document.getElementById('detPemohon').innerText = pemohon;
-        document.getElementById('detIC').innerText = (ic && ic !== "null") ? ic : "-";
-        document.getElementById('detPhone').innerText = (phone && phone !== "null") ? phone : "-";
-        document.getElementById('detStatusK').innerText = (statusK && statusK !== "null") ? statusK : "-";
-        document.getElementById('detPekerjaan').innerText = (kerja && kerja !== "null") ? kerja : "-";
-        document.getElementById('detPendapatan').innerText = (gaji && gaji !== "null") ? gaji : "RM 0.00";
-        document.getElementById('detKeterangan').innerText = (ket && ket !== "null") ? ket : "Tiada keterangan tambahan.";
-        document.getElementById('detUlasanAJK').innerText = (ulasanAJK && ulasanAJK !== "null") ? ulasanAJK : "Tiada ulasan dari AJK.";
+        document.getElementById('detPemohon').innerText = d.pemohon;
+        document.getElementById('detIC').innerText = (d.ic && d.ic !== "null") ? d.ic : "-";
+        document.getElementById('detPhone').innerText = (d.phone && d.phone !== "null") ? d.phone : "-";
+        document.getElementById('detStatusK').innerText = (d.statusk && d.statusk !== "null") ? d.statusk : "-";
+        document.getElementById('detPekerjaan').innerText = (d.kerja && d.kerja !== "null") ? d.kerja : "-";
+        document.getElementById('detPendapatan').innerText = (d.gaji && d.gaji !== "null") ? d.gaji : "RM 0.00";
+        document.getElementById('detKeterangan').innerText = (d.ket && d.ket !== "null") ? d.ket : "Tiada keterangan tambahan.";
+        document.getElementById('detUlasanAJK').innerText = (d.ulasanajk && d.ulasanajk !== "null") ? d.ulasanajk : "Tiada ulasan dari AJK.";
+
+        const bank = d.bank;
+        const akaun = d.akaun;
+        const penBank = d.penbank;
+        const dok = d.dok;
+        const dokAdmin = d.dokadmin;
 
         // Bank Section Logic
         const bankCard = document.getElementById('bankCard');
@@ -558,16 +606,16 @@
                 <div class="space-y-4 relative z-10">
                     <div>
                         <p class="text-[10px] text-blue-400 font-bold uppercase mb-1">Nama Bank</p>
-                        <p id="detBank" class="font-bold text-blue-900 uppercase tracking-wide text-lg">` + ((bank && bank !== "null") ? bank : "-") + `</p>
+                        <p id="detBank" class="font-bold text-blue-900 uppercase tracking-wide text-lg">\${(bank && bank !== "null") ? bank : "-"}</p>
                     </div>
                     <div>
                         <p class="text-[10px] text-blue-400 font-bold uppercase mb-1">Nombor Akaun</p>
-                        <p id="detAkaun" class="font-bold text-blue-900 text-xl tracking-widest">` + ((akaun && akaun !== "null") ? akaun : "-") + `</p>
+                        <p id="detAkaun" class="font-bold text-blue-900 text-xl tracking-widest">\${(akaun && akaun !== "null") ? akaun : "-"}</p>
                     </div>
                     <div class="pt-2">
-                        <a id="detDokBank" href="` + ((penBank && penBank !== "null") ? '<%= request.getContextPath() %>/file/bantuan/' + penBank : '#') + `" 
+                        <a id="detDokBank" href="\${(penBank && penBank !== "null") ? '<%= request.getContextPath() %>/file/bantuan/' + penBank : '#'}" 
                            target="_blank" 
-                           class="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-blue-600 rounded-xl text-xs font-bold shadow-sm border border-blue-100 hover:shadow-md transition-all ` + ((penBank && penBank !== "null") ? '' : 'opacity-50 pointer-events-none') + `">
+                           class="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-blue-600 rounded-xl text-xs font-bold shadow-sm border border-blue-100 hover:shadow-md transition-all \${(penBank && penBank !== "null") ? '' : 'opacity-50 pointer-events-none'}">
                             <i class="fas fa-file-invoice-dollar"></i> Lihat Penyata Bank
                         </a>
                     </div>
@@ -590,18 +638,20 @@
         // Handle Multiple Documents
         const dokumenList = document.getElementById('dokumenList');
         const template = document.getElementById('detDokMain');
-        dokumenList.innerHTML = '';
-        if(template) dokumenList.appendChild(template);
         
-        if(dok) {
-            const files = dok.split(',');
-            files.forEach(f => {
-                const newLink = template.cloneNode(true);
-                newLink.classList.remove('hidden');
-                newLink.href = ctx + "/file/bantuan/" + f;
-                newLink.innerHTML = '<i class="fas fa-file-pdf"></i> PDF';
-                dokumenList.appendChild(newLink);
-            });
+        if (dokumenList) {
+            dokumenList.innerHTML = '';
+            if(dok && template) {
+                const files = dok.split(',');
+                files.forEach(f => {
+                    const newLink = template.cloneNode(true);
+                    newLink.id = ""; // Remove ID to prevent collisions
+                    newLink.classList.remove('hidden');
+                    newLink.href = ctx + "/file/bantuan/" + f;
+                    newLink.innerHTML = '<i class="fas fa-file-pdf"></i> PDF';
+                    dokumenList.appendChild(newLink);
+                });
+            }
         }
 
         // Handle Admin Documents
@@ -609,17 +659,18 @@
         const adminDokSection = document.getElementById('detAdminDokSection');
         adminDokList.innerHTML = '';
         
-        if(dokAdmin && dokAdmin !== "") {
+        if(dokAdmin && dokAdmin !== "" && template) {
             adminDokSection.classList.remove('hidden');
             const filesA = dokAdmin.split(',');
             filesA.forEach(f => {
                 const newLink = template.cloneNode(true);
+                newLink.id = ""; // Remove ID to prevent collisions
                 newLink.classList.remove('hidden');
                 newLink.classList.replace('bg-red-50', 'bg-purple-50');
                 newLink.classList.replace('text-red-600', 'text-[#6C5DD3]');
                 newLink.classList.replace('border-red-100', 'border-purple-100');
                 newLink.href = ctx + "/file/bantuan/" + f;
-                newLink.innerHTML = '<i class="fas fa-file-check"></i> ' + decodeURIComponent(f).split('_').slice(2).join('_');
+                newLink.innerHTML = '<i class="fas fa-check-circle"></i> ' + decodeURIComponent(f).split('_').slice(2).join('_');
                 adminDokList.appendChild(newLink);
             });
         } else {
@@ -681,8 +732,7 @@
         openModal('modalKeputusan');
     }
 
-    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    // Functions centralized in footer.jsp
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>

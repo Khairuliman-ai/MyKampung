@@ -1,4 +1,4 @@
-﻿<%@ page import="java.util.*, model.*" %>
+<%@ page import="java.util.*, model.*" %>
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
 <!-- Leaflet Control Geocoder -->
@@ -347,12 +347,12 @@
 
 <!-- Modal: Tambah/Edit Fasiliti -->
 <div id="modalFasiliti" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-40 transition-opacity backdrop-blur-sm" onclick="closeModal()"></div>
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-40 transition-opacity backdrop-blur-sm" onclick="closeModal('modalFasiliti')"></div>
     <div class="flex min-h-screen items-center justify-center p-4">
         <div class="relative w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl p-8 transform transition-all">
             <header class="flex justify-between items-center mb-8">
                 <h3 class="text-xl font-bold text-gray-800" id="modalTitle">Tambah Fasiliti Baru</h3>
-                <button onclick="closeModal()" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-gray-50 rounded-xl">
+                <button onclick="closeModal('modalFasiliti')" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-gray-50 rounded-xl">
                     <i class="fas fa-times"></i>
                 </button>
             </header>
@@ -671,7 +671,7 @@
         document.getElementById('cardPreviewLokasi').innerText = "Lokasi";
         document.getElementById('cardPreviewImg').src = "${pageContext.request.contextPath}/assets/img/placeholder.png";
         croppedBlob = null;
-        document.getElementById('modalFasiliti').classList.remove('hidden');
+        openModal('modalFasiliti');
         setTimeout(function(){ initFasilitiMap(); }, 100);
     }
 
@@ -693,7 +693,7 @@
         }
         
         croppedBlob = null;
-        document.getElementById('modalFasiliti').classList.remove('hidden');
+        openModal('modalFasiliti');
         setTimeout(function(){ initFasilitiMap(lat, lon); }, 100);
     }
 
@@ -705,9 +705,7 @@
         document.getElementById('cardPreviewLokasi').innerText = this.value || "Lokasi";
     });
 
-    function closeModal() {
-        document.getElementById('modalFasiliti').classList.add('hidden');
-    }
+    // closeModal centralized in footer.jsp
 
 </script>
 

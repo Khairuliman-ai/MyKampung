@@ -10,7 +10,11 @@ import dao.PenggunaDAO;
 import dao.ActivityLogDAO;
 import model.Pengguna;
 import model.ActivityLog;
+import util.AppConfig;
+import util.FileUploadUtil;
 import util.DBUtil;
+
+
 import java.util.List;
 import javax.servlet.annotation.MultipartConfig;
 import java.io.File;
@@ -135,17 +139,10 @@ public class ProfileServlet extends HttpServlet {
                 }
 
                 // --- PROSES MUAT NAIK FOTO PROFIL ---
-                Part filePart = request.getPart("foto_profil");
-                if (filePart != null && filePart.getSize() > 0) {
-                    String fileName = "profil_" + currentUser.getId_pengguna() + "_" + System.currentTimeMillis() + ".jpg";
-                    String uploadPath = "C:\\Users\\khayx\\OneDrive\\Documents\\SEM5_UMT\\PITA1\\MyKampungData\\fotoProfil";
-                    File uploadDir = new File(uploadPath);
-                    if (!uploadDir.exists()) { uploadDir.mkdirs(); }
-                    filePart.write(uploadPath + File.separator + fileName);
-                    
-                    // Set nama file baru ke model
-                    currentUser.setFoto_profil(fileName);
-                }
+                String fotoName = FileUploadUtil.saveFile(
+                    request.getPart("foto_profil"), AppConfig.DIR_FOTO_PROFIL, "profil_" + currentUser.getId_pengguna() + "_");
+                if (fotoName != null) currentUser.setFoto_profil(fotoName);
+
 
                 // C. Simpan ke Database
                 PenggunaDAO pDao = new PenggunaDAO(conn);

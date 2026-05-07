@@ -70,7 +70,7 @@ public class DashboardServlet extends HttpServlet {
              * masing-masing.
              */
             if ("Setiausaha".equals(biro)) {
-                request.getRequestDispatcher("/views/dashboard/dJKKK.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/dashboard/dAJK.jsp").forward(request, response);
             } else if ("Biro Kebajikan & Sosial".equals(biro)) {
                 request.getRequestDispatcher("/views/dashboard/biroKebajikanDashboard.jsp").forward(request, response);
             } else if ("Biro Sukan & Riadah".equals(biro)) {
@@ -81,7 +81,7 @@ public class DashboardServlet extends HttpServlet {
                 request.getRequestDispatcher("/views/dashboard/biroHebahanDashboard.jsp").forward(request, response);
             } else {
                 // Default dashboard if biro-specific one doesn't exist
-                request.getRequestDispatcher("/views/dashboard/dJKKK.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/dashboard/dAJK.jsp").forward(request, response);
             }
         } else if ("Penduduk".equals(peranan)) {
             // Fetch data for Resident Dashboard

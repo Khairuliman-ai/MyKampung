@@ -488,9 +488,7 @@
         document.getElementById('modalDelete').classList.remove('hidden');
     }
 
-    function closeModal(id) {
-        document.getElementById(id).classList.add('hidden');
-    }
+    // closeModal centralized in footer.jsp
 
     function validateHebahanForm() {
         const mula = document.getElementById('tarikh_mula_acara').value;

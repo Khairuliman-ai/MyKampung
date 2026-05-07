@@ -1,4 +1,4 @@
-﻿<%@ page import="model.Pengguna, model.ActivityLog, java.util.List" %>
+<%@ page import="model.Pengguna, model.ActivityLog, java.util.List" %>
 <%
     // 1. Dapatkan objek user dari session
     Pengguna pDetail = (Pengguna) session.getAttribute("currentUser");
@@ -23,18 +23,30 @@
 <div class="flex flex-1 h-full overflow-hidden bg-[#F7F7F9]">
 
     <%-- 
-        KOTAK MERAH (Information Section): 
-        - flex-1: Memastikan ia 'expand' memenuhi ruang sehingga ke garisan Aside.
-        - overflow-y-auto: Skrol berasingan (Independent Scroll).
+        MAIN CONTENT (Information Section): 
     --%>
-    <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth h-full custom-scrollbar">
+    <div class="flex-1 overflow-y-auto p-4 md:p-10 scroll-smooth h-full custom-scrollbar relative">
+        
+        <%-- Background Decoration --%>
+        <div class="absolute top-0 left-0 w-full h-64 bg-gradient-to-b from-purple-50/50 to-transparent pointer-events-none -z-10"></div>
+        <div class="absolute top-20 right-10 w-64 h-64 bg-purple-200/20 rounded-full blur-3xl pointer-events-none -z-10"></div>
 
-        <header class="mb-8">
-            <h2 class="text-2xl font-bold text-gray-800">Profil Saya</h2>
-            <p class="text-gray-500 text-sm">Kemaskini maklumat peribadi dan status sosio-ekonomi.</p>
+        <header class="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
+            <div>
+                <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
+                    <span class="bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] bg-clip-text text-transparent">Profil Saya</span>
+                    <i class="fas fa-user-circle text-[#6C5DD3] text-2xl"></i>
+                </h2>
+                <p class="text-gray-500 mt-1 font-medium">Urus maklumat peribadi dan tetapan akaun anda di sini.</p>
+            </div>
+            
+            <div class="flex items-center gap-2 text-xs font-bold text-gray-400 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
+                <i class="fas fa-calendar-alt text-[#6C5DD3]"></i>
+                <span id="currentDateDisplay"><%= new java.text.SimpleDateFormat("dd MMM yyyy").format(new java.util.Date()) %></span>
+            </div>
         </header>
 
-        <%-- Script format nombor telefon --%>
+        <%-- Form Logic Scripts --%>
         <script>
             function formatPhoneNumber(input) {
                 let num = input.value.replace(/\D/g, '');
@@ -46,190 +58,314 @@
                     input.value = num;
                 }
             }
-        </script> 
-
-        <%-- script format IC --%>
-        <script>
             function formatIC(input) {
                 let val = input.value.replace(/\D/g, '');
-                if (val.length > 12) {
-                    val = val.substring(0, 12);
-                }
+                if (val.length > 12) val = val.substring(0, 12);
                 let formatted = "";
-                if (val.length > 0) {
-                    formatted += val.substring(0, 6);
-                }
-                if (val.length > 6) {
-                    formatted += '-' + val.substring(6, 8);
-                }
-                if (val.length > 8) {
-                    formatted += '-' + val.substring(8, 12);
-                }
+                if (val.length > 0) formatted += val.substring(0, 6);
+                if (val.length > 6) formatted += '-' + val.substring(6, 8);
+                if (val.length > 8) formatted += '-' + val.substring(8, 12);
                 input.value = formatted;
             }
         </script>
 
         <%-- Mesej Maklum Balas --%>
-        <% if (request.getParameter("status") != null) { %>
-        <% if (request.getParameter("status").equals("success")) { %>
-        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
-            <i class="fas fa-check-circle text-lg"></i>
-            <div><span class="font-bold">Berjaya!</span> Maklumat anda telah dikemaskini.</div>
-        </div>
-        <% } else if (request.getParameter("status").equals("error")) { %>
-        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
-            <i class="fas fa-exclamation-circle text-lg"></i>
-            <div><span class="font-bold">Ralat!</span> Berlaku masalah semasa mengemaskini maklumat.</div>
-        </div>
-        <% } else if (request.getParameter("status").equals("pass_success")) { %>
-        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
-            <i class="fas fa-check-circle text-lg"></i>
-            <div><span class="font-bold">Berjaya!</span> Kata laluan telah dikemaskini.</div>
-        </div>
-        <% } else if (request.getParameter("status").equals("pass_error")) { %>
-        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
-            <i class="fas fa-exclamation-circle text-lg"></i>
-            <div><span class="font-bold">Ralat!</span> Gagal menukar kata laluan.</div>
-        </div>
-        <% } else if (request.getParameter("status").equals("wrong_old_pass")) { %>
-        <div class="bg-yellow-50 border border-yellow-200 text-yellow-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
-            <i class="fas fa-exclamation-triangle text-lg"></i>
-            <div><span class="font-bold">Perhatian!</span> Kata laluan lama yang dimasukkan adalah salah.</div>
+        <% if (request.getParameter("status") != null) { 
+            String status = request.getParameter("status");
+            String msg = "";
+            String bgColor = "";
+            String textColor = "";
+            String icon = "";
+            
+            if (status.equals("success")) {
+                msg = "Berjaya! Maklumat anda telah dikemaskini.";
+                bgColor = "bg-green-500/10 border-green-500/20";
+                textColor = "text-green-700";
+                icon = "fa-check-circle";
+            } else if (status.equals("error")) {
+                msg = "Ralat! Berlaku masalah semasa mengemaskini maklumat.";
+                bgColor = "bg-red-500/10 border-red-500/20";
+                textColor = "text-red-700";
+                icon = "fa-exclamation-circle";
+            } else if (status.equals("pass_success")) {
+                msg = "Berjaya! Kata laluan telah dikemaskini.";
+                bgColor = "bg-green-500/10 border-green-500/20";
+                textColor = "text-green-700";
+                icon = "fa-shield-check";
+            } else if (status.equals("pass_error")) {
+                msg = "Ralat! Gagal menukar kata laluan.";
+                bgColor = "bg-red-500/10 border-red-500/20";
+                textColor = "text-red-700";
+                icon = "fa-exclamation-triangle";
+            } else if (status.equals("wrong_old_pass")) {
+                msg = "Perhatian! Kata laluan lama yang dimasukkan adalah salah.";
+                bgColor = "bg-yellow-500/10 border-yellow-500/20";
+                textColor = "text-yellow-700";
+                icon = "fa-key";
+            }
+        %>
+        <div class="<%= bgColor %> border <%= textColor %> px-6 py-4 rounded-2xl mb-8 flex items-center gap-4 animate-in zoom-in duration-300 backdrop-blur-md">
+            <div class="w-10 h-10 rounded-full bg-white/50 flex items-center justify-center shadow-sm">
+                <i class="fas <%= icon %> text-lg"></i>
+            </div>
+            <div class="font-semibold text-sm"><%= msg %></div>
+            <button onclick="this.parentElement.remove()" class="ml-auto text-gray-400 hover:text-gray-600 transition">
+                <i class="fas fa-times"></i>
+            </button>
         </div>
         <% } %>
-        <% }%>
 
-        <form action="<%= request.getContextPath()%>/profil/update" method="post" enctype="multipart/form-data" class="w-full">
+        <form action="<%= request.getContextPath()%>/profil/update" method="post" enctype="multipart/form-data" class="w-full space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
 
-            <%-- Bahagian Foto Profil (Expandable) --%>
-            <div class="bg-white rounded-3xl p-8 shadow-sm border border-gray-100 mb-8 flex flex-col md:flex-row items-center gap-8 relative overflow-hidden">
-                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8]"></div>
-
-                <div class="relative group">
-                    <div class="w-32 h-32 rounded-full p-1 border-4 border-[#6C5DD3] bg-white flex items-center justify-center text-4xl font-bold text-[#6C5DD3] shadow-lg overflow-hidden transition-transform group-hover:scale-105">
-                        <% if (pDetail.getFoto_profil() != null && !pDetail.getFoto_profil().isEmpty() && !pDetail.getFoto_profil().equals("default_avatar.png")) {%>
-                        <img id="previewFoto" src="<%= request.getContextPath()%>/file/profil/<%= pDetail.getFoto_profil()%>" class="w-full h-full object-cover">
-                        <% } else {%>
-                        <img id="previewFoto" src="https://ui-avatars.com/api/?name=<%= pDetail.getNama_penuh()%>&background=6C5DD3&color=fff&size=128" class="w-full h-full object-cover">
-                        <% }%>
+            <%-- Profile Header Card --%>
+            <div class="relative group">
+                <div class="absolute -inset-1 bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] rounded-[2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                <div class="relative bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-8 overflow-hidden">
+                    <%-- Decorative Background Pattern --%>
+                    <div class="absolute top-0 right-0 w-64 h-full opacity-[0.03] pointer-events-none">
+                        <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <path d="M0,0 L100,0 L100,100 L0,100 Z" fill="url(#grid)"></path>
+                            <defs>
+                                <pattern id="grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                                    <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" stroke-width="0.5"/>
+                                </pattern>
+                            </defs>
+                        </svg>
                     </div>
-                    <label for="fotoInput" class="absolute bottom-1 right-1 w-10 h-10 bg-[#6C5DD3] text-white rounded-full flex items-center justify-center cursor-pointer border-4 border-white shadow-md hover:bg-[#5b4eb8] transition-all">
-                        <i class="fas fa-camera text-sm"></i>
-                        <input type="file" id="fotoInput" name="foto_profil" class="hidden" accept="image/*" onchange="previewImage(this)">
-                    </label>
-                </div>
 
-                <div class="text-center md:text-left">
-                    <h3 class="text-2xl font-bold text-gray-800 mb-1"><%= pDetail.getNama_penuh()%></h3>
-                    <p class="text-gray-400 text-sm mb-3"><i class="far fa-id-card mr-1"></i> <%= pDetail.getNombor_kp()%></p>
-                    <span class="bg-purple-50 text-[#6C5DD3] px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-wider border border-purple-100">
-                        <%= pDetail.getNama_peranan()%>
-                    </span>
+                    <div class="relative">
+                        <div class="w-36 h-36 rounded-full p-1.5 bg-gradient-to-tr from-[#6C5DD3] to-[#8B7EF8] shadow-2xl relative">
+                            <div class="w-full h-full rounded-full bg-white overflow-hidden flex items-center justify-center text-5xl font-bold text-[#6C5DD3]">
+                                <% if (pDetail.getFoto_profil() != null && !pDetail.getFoto_profil().isEmpty() && !pDetail.getFoto_profil().equals("default_avatar.png")) {%>
+                                <img id="previewFoto" src="<%= request.getContextPath()%>/file/profil/<%= pDetail.getFoto_profil()%>" class="w-full h-full object-cover">
+                                <% } else {%>
+                                <img id="previewFoto" src="https://ui-avatars.com/api/?name=<%= pDetail.getNama_penuh()%>&background=6C5DD3&color=fff&size=128" class="w-full h-full object-cover">
+                                <% }%>
+                            </div>
+                            <label for="fotoInput" class="absolute bottom-2 right-2 w-11 h-11 bg-white text-[#6C5DD3] rounded-full flex items-center justify-center cursor-pointer shadow-xl border border-gray-100 hover:scale-110 active:scale-95 transition-all z-10">
+                                <i class="fas fa-camera text-base"></i>
+                                <input type="file" id="fotoInput" name="foto_profil" class="hidden" accept="image/*" onchange="previewImage(this)">
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="text-center md:text-left flex-1">
+                        <div class="flex flex-col md:flex-row md:items-center gap-3 mb-2">
+                            <h3 class="text-3xl font-extrabold text-gray-900 tracking-tight"><%= pDetail.getNama_penuh()%></h3>
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-purple-100 text-[#6C5DD3] uppercase tracking-widest border border-purple-200 w-fit mx-auto md:mx-0">
+                                <%= pDetail.getNama_peranan()%>
+                            </span>
+                        </div>
+                        <p class="text-gray-500 font-medium flex items-center justify-center md:justify-start gap-2 mb-4">
+                            <i class="far fa-id-card text-[#6C5DD3]"></i>
+                            <%= pDetail.getNombor_kp()%>
+                        </p>
+                        
+                        <div class="flex flex-wrap items-center justify-center md:justify-start gap-4">
+                            <div class="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
+                                <i class="fas fa-envelope text-xs text-gray-400"></i>
+                                <span class="text-xs font-semibold text-gray-600"><%= (pDetail.getEmail() != null) ? pDetail.getEmail() : "Tiada Email"%></span>
+                            </div>
+                            <div class="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
+                                <i class="fas fa-phone text-xs text-gray-400"></i>
+                                <span class="text-xs font-semibold text-gray-600"><%= pDetail.getNombor_telefon()%></span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <%-- Bahagian Borang Maklumat --%>
-            <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 w-full space-y-10">
+            <%-- Form Content --%>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                
+                <%-- Section 1: Peribadi --%>
+                <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-500 flex flex-col">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-[#6C5DD3] shadow-inner">
+                            <i class="fas fa-user-edit text-xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-lg font-bold text-gray-900">Maklumat Peribadi</h4>
+                            <p class="text-xs text-gray-500 font-medium tracking-wide uppercase">Lengkapkan data asas anda</p>
+                        </div>
+                    </div>
 
-                <%-- Bahagian 1: Peribadi --%>
-                <div>
-                    <h4 class="text-sm font-bold text-[#6C5DD3] uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">1. Maklumat Peribadi</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-500 mb-2">Nama Penuh</label>
-                            <input type="text" name="nama_penuh" value="<%= pDetail.getNama_penuh()%>" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
+                    <div class="space-y-6">
+                        <div class="group">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Nama Penuh</label>
+                            <div class="relative">
+                                <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#6C5DD3] transition-colors"></i>
+                                <input type="text" name="nama_penuh" value="<%= pDetail.getNama_penuh()%>" required 
+                                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3] text-gray-800 text-sm font-semibold transition-all">
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-2">No. Kad Pengenalan</label>
-                            <%
-                                String icRaw = pDetail.getNombor_kp();
-                                String icFormatted = (icRaw != null && icRaw.length() == 12)
-                                        ? icRaw.substring(0, 6) + "-" + icRaw.substring(6, 8) + "-" + icRaw.substring(8, 12) : icRaw;
-                            %>
-                            <input type="text" value="<%= icFormatted%>" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-400 text-sm cursor-not-allowed font-medium">
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="group opacity-70">
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">No. Kad Pengenalan</label>
+                                <%
+                                    String icRaw = pDetail.getNombor_kp();
+                                    String icFormatted = (icRaw != null && icRaw.length() == 12)
+                                            ? icRaw.substring(0, 6) + "-" + icRaw.substring(6, 8) + "-" + icRaw.substring(8, 12) : icRaw;
+                                %>
+                                <div class="relative">
+                                    <i class="fas fa-id-badge absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
+                                    <input type="text" value="<%= icFormatted%>" readonly 
+                                        class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-100 border-none text-gray-400 text-sm cursor-not-allowed font-semibold">
+                                </div>
+                            </div>
+                            <div class="group">
+                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">No. Telefon</label>
+                                <div class="relative">
+                                    <i class="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#6C5DD3] transition-colors"></i>
+                                    <input type="text" name="nombor_telefon" value="<%= pDetail.getNombor_telefon()%>" required oninput="formatPhoneNumber(this)" maxlength="13" 
+                                        class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3] text-gray-800 text-sm font-semibold transition-all">
+                                </div>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-2">No. Telefon</label>
-                            <input type="text" name="nombor_telefon" value="<%= pDetail.getNombor_telefon()%>" required oninput="formatPhoneNumber(this)" maxlength="13" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
-                        </div>
-                        <div class="md:col-span-2">
-                            <label class="block text-xs font-bold text-gray-500 mb-2">Alamat Emel</label>
-                            <input type="email" name="email" value="<%= (pDetail.getEmail() != null) ? pDetail.getEmail() : ""%>" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
+
+                        <div class="group">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Alamat Emel</label>
+                            <div class="relative">
+                                <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#6C5DD3] transition-colors"></i>
+                                <input type="email" name="email" value="<%= (pDetail.getEmail() != null) ? pDetail.getEmail() : ""%>" required 
+                                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3] text-gray-800 text-sm font-semibold transition-all">
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <%-- Bahagian 2: Alamat --%>
-                <div>
-                    <h4 class="text-sm font-bold text-[#6C5DD3] uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">2. Alamat Tempat Tinggal</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div class="md:col-span-3">
-                            <label class="block text-xs font-bold text-gray-500 mb-2">Nama Jalan / No. Rumah</label>
-                            <%-- Tambah name="nama_jalan" --%>
-                            <input type="text" 
-       name="nama_jalan" 
-       value="<%= pDetail.getNama_jalan()%>" 
-       class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
+                <%-- Section 2: Sosio-Ekonomi --%>
+                <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-500 flex flex-col">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-inner">
+                            <i class="fas fa-wallet text-xl"></i>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-2">Daerah</label>
-                            <%-- Tambah name="daerah" --%>
-                            <input type="text" name="daerah" value="<%= (pDetail.getDaerah() != null) ? pDetail.getDaerah() : "Selising"%>" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium">
+                            <h4 class="text-lg font-bold text-gray-900">Sosio-Ekonomi</h4>
+                            <p class="text-xs text-gray-500 font-medium tracking-wide uppercase">Status kewangan & keluarga</p>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-2">Poskod</label>
-                            <%-- Tambah name="nombor_poskod" --%>
-                            <input type="text" name="nombor_poskod" value="<%= (pDetail.getNombor_poskod() != null) ? pDetail.getNombor_poskod() : "16810"%>" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium">
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="group">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Status Keluarga</label>
+                            <div class="relative">
+                                <i class="fas fa-users absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors z-10"></i>
+                                <select name="status_keluarga" class="w-full pl-12 pr-10 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-gray-800 text-sm font-semibold transition-all appearance-none">
+                                    <option value="Bujang" <%= "Bujang".equals(pDetail.getStatus_keluarga()) ? "selected" : ""%>>Bujang</option>
+                                    <option value="Berkahwin" <%= "Berkahwin".equals(pDetail.getStatus_keluarga()) ? "selected" : ""%>>Berkahwin</option>
+                                    <option value="Ibu Tunggal" <%= "Ibu Tunggal".equals(pDetail.getStatus_keluarga()) ? "selected" : ""%>>Ibu Tunggal</option>
+                                    <option value="Bapa Tunggal" <%= "Bapa Tunggal".equals(pDetail.getStatus_keluarga()) ? "selected" : ""%>>Bapa Tunggal</option>
+                                </select>
+                                <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i>
+                            </div>
                         </div>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-2">Bandar</label>
-                            <%-- Tambah name="bandar" --%>
-                            <input type="text" name="bandar" value="<%= (pDetail.getBandar() != null) ? pDetail.getBandar() : "Pasir Puteh"%>" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium">
+
+                        <div class="group">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Pekerjaan</label>
+                            <div class="relative">
+                                <i class="fas fa-briefcase absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors"></i>
+                                <input type="text" name="pekerjaan" value="<%= (pDetail.getPekerjaan() != null) ? pDetail.getPekerjaan() : ""%>" 
+                                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-gray-800 text-sm font-semibold transition-all">
+                            </div>
                         </div>
-                        <%-- Tambahan: Negeri jika perlu --%>
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-2">Negeri</label>
-                            <%-- Tambah name="negeri" --%>
-                            <input type="text" name="negeri" value="<%= (pDetail.getNegeri() != null) ? pDetail.getNegeri() : "Kelantan"%>" readonly class="w-full px-4 py-3 rounded-xl bg-gray-100 border-none text-gray-500 text-sm font-medium">
+
+                        <div class="group">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Pendapatan Bulanan (RM)</label>
+                            <div class="relative">
+                                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm group-focus-within:text-blue-600 transition-colors">RM</div>
+                                <input type="number" step="0.01" name="pendapatan" value="<%= pDetail.getPendapatan()%>" 
+                                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-gray-800 text-sm font-semibold transition-all">
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-2 italic px-1">* Digunakan untuk penentuan kelayakan bantuan.</p>
                         </div>
                     </div>
                 </div>
 
-                <%-- Bahagian 3: Sosio-Ekonomi --%>
-                <div>
-                    <h4 class="text-sm font-bold text-[#6C5DD3] uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">3. Maklumat Sosio-Ekonomi</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-2">Status Keluarga</label>
-                            <select name="status_keluarga" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium">
-                                <option value="Bujang" <%= "Bujang".equals(pDetail.getStatus_keluarga()) ? "selected" : ""%>>Bujang</option>
-                                <option value="Berkahwin" <%= "Berkahwin".equals(pDetail.getStatus_keluarga()) ? "selected" : ""%>>Berkahwin</option>
-                                <option value="Ibu Tunggal" <%= "Ibu Tunggal".equals(pDetail.getStatus_keluarga()) ? "selected" : ""%>>Ibu Tunggal</option>
-                                <option value="Bapa Tunggal" <%= "Bapa Tunggal".equals(pDetail.getStatus_keluarga()) ? "selected" : ""%>>Bapa Tunggal</option>
-                            </select>
+                <%-- Section 3: Alamat --%>
+                <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-500 lg:col-span-2">
+                    <div class="flex items-center gap-4 mb-8">
+                        <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-600 shadow-inner">
+                            <i class="fas fa-map-marked-alt text-xl"></i>
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-2">Pekerjaan</label>
-                            <input type="text" name="pekerjaan" value="<%= (pDetail.getPekerjaan() != null) ? pDetail.getPekerjaan() : ""%>" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
+                            <h4 class="text-lg font-bold text-gray-900">Alamat Kediaman</h4>
+                            <p class="text-xs text-gray-500 font-medium tracking-wide uppercase">Lokasi tempat tinggal tetap</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div class="md:col-span-2 lg:col-span-2">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Nama Jalan / No. Rumah</label>
+                            <input type="text" name="nama_jalan" value="<%= pDetail.getNama_jalan()%>" 
+                                class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 text-gray-800 text-sm font-semibold transition-all">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-500 mb-2">Pendapatan (RM)</label>
-                            <input type="number" step="0.01" name="pendapatan" value="<%= pDetail.getPendapatan()%>" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm font-medium transition-all">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Daerah</label>
+                            <input type="text" name="daerah" value="<%= (pDetail.getDaerah() != null) ? pDetail.getDaerah() : "Selising"%>" readonly 
+                                class="w-full px-5 py-4 rounded-2xl bg-gray-100 border-none text-gray-500 text-sm font-semibold cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Poskod</label>
+                            <input type="text" name="nombor_poskod" value="<%= (pDetail.getNombor_poskod() != null) ? pDetail.getNombor_poskod() : "16810"%>" readonly 
+                                class="w-full px-5 py-4 rounded-2xl bg-gray-100 border-none text-gray-500 text-sm font-semibold cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Bandar</label>
+                            <input type="text" name="bandar" value="<%= (pDetail.getBandar() != null) ? pDetail.getBandar() : "Pasir Puteh"%>" readonly 
+                                class="w-full px-5 py-4 rounded-2xl bg-gray-100 border-none text-gray-500 text-sm font-semibold cursor-not-allowed">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Negeri</label>
+                            <input type="text" name="negeri" value="<%= (pDetail.getNegeri() != null) ? pDetail.getNegeri() : "Kelantan"%>" readonly 
+                                class="w-full px-5 py-4 rounded-2xl bg-gray-100 border-none text-gray-500 text-sm font-semibold cursor-not-allowed">
                         </div>
                     </div>
                 </div>
 
-                <%-- Bahagian 4: Lokasi Rumah --%>
-                <div>
-                    <h4 class="text-sm font-bold text-[#6C5DD3] uppercase tracking-wider mb-4 border-b border-gray-100 pb-2">4. Lokasi Rumah</h4>
-                    <div id="mapProfil" style="height: 350px; border-radius: 1rem; z-index: 0;" class="border-2 border-dashed border-gray-200"></div>
+                <%-- Section 4: Lokasi Peta --%>
+                <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-500 lg:col-span-2">
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center text-red-600 shadow-inner">
+                                <i class="fas fa-location-dot text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900">Pin Lokasi Rumah</h4>
+                                <p class="text-xs text-gray-500 font-medium tracking-wide uppercase">Koordinat GPS untuk rujukan kecemasan</p>
+                            </div>
+                        </div>
+                        <div class="hidden md:block text-[10px] bg-red-50 text-red-600 font-bold px-3 py-1.5 rounded-lg border border-red-100">
+                            DRAG MARKER PADA PETA
+                        </div>
+                    </div>
+
+                    <div class="relative rounded-3xl overflow-hidden border-4 border-gray-50 shadow-inner group">
+                        <div id="mapProfil" style="height: 400px; z-index: 0;" class="w-full transition-transform duration-700"></div>
+                        <div class="absolute bottom-4 left-4 right-4 flex gap-4 pointer-events-none">
+                            <div class="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg border border-gray-100 pointer-events-auto flex items-center gap-3">
+                                <i class="fas fa-crosshairs text-[#6C5DD3] animate-pulse"></i>
+                                <span class="text-[10px] font-bold text-gray-600 tracking-tight" id="coord-display">Sila pilih lokasi</span>
+                            </div>
+                        </div>
+                    </div>
+                    
                     <input type="hidden" name="latitude" id="latInput" value="<%= (pDetail.getLatitude() != null) ? pDetail.getLatitude() : ""%>">
                     <input type="hidden" name="longitude" id="lonInput" value="<%= (pDetail.getLongitude() != null) ? pDetail.getLongitude() : ""%>">
                 </div>
+            </div>
 
-                <div class="pt-4">
-                    <button type="submit" class="w-full bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white font-bold py-3.5 rounded-xl shadow-lg shadow-purple-200 transition-all flex justify-center items-center gap-2">
-                        <i class="fas fa-save"></i> Simpan Perubahan
+            <%-- Action Bar --%>
+            <div class="sticky bottom-4 z-20">
+                <div class="bg-white/80 backdrop-blur-md p-4 rounded-3xl border border-white shadow-2xl flex flex-col md:flex-row gap-4 items-center justify-between max-w-4xl mx-auto ring-1 ring-black/5">
+                    <div class="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-2xl">
+                        <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+                        <span class="text-xs font-bold text-gray-500">Auto-save sedia ada</span>
+                    </div>
+                    <button type="submit" class="w-full md:w-auto px-10 py-4 bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] hover:shadow-lg hover:shadow-purple-500/30 text-white font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 active:scale-[0.98]">
+                        <i class="fas fa-save text-lg"></i>
+                        <span>Simpan Semua Perubahan</span>
                     </button>
                 </div>
             </div>
@@ -237,70 +373,105 @@
     </div>
 
     <%-- 
-        RIGHT SECTION (Aside): 
-        - w-80: Lebar tetap.
-        - overflow-y-auto: Skrol berasingan (Independent Scroll).
+        ASIDE BAR (Right Section): 
     --%>
-    <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full custom-scrollbar shrink-0">
-        <div class="flex justify-between items-start mb-10">
-            <h3 class="font-bold text-lg text-gray-800">Status Profil</h3>
-        </div>
-
-        <div class="text-center mb-10">
-            <div class="w-full bg-purple-50 rounded-2xl p-6">
-                <p class="text-xs font-bold text-gray-400 uppercase mb-2">Kelengkapan Data</p>
+    <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full custom-scrollbar shrink-0 animate-in slide-in-from-right duration-700">
+        
+        <%-- Quick Stats --%>
+        <div class="mb-10">
+            <h3 class="font-extrabold text-sm text-gray-900 uppercase tracking-widest mb-6 flex items-center gap-2">
+                <span class="w-1.5 h-4 bg-[#6C5DD3] rounded-full"></span>
+                Status Profil
+            </h3>
+            
+            <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden group">
+                <%-- Abstract Decor --%>
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-[#6C5DD3] rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Kelengkapan Data</p>
                 <%
                     int progress = 0;
-                    if (pDetail.getPekerjaan() != null && !pDetail.getPekerjaan().isEmpty()) {
-                        progress += 33;
-                    }
-                    if (pDetail.getPendapatan() != null) {
-                        progress += 33;
-                    }
-                    if (pDetail.getStatus_keluarga() != null && !pDetail.getStatus_keluarga().isEmpty())
-                        progress += 34;
+                    if (pDetail.getPekerjaan() != null && !pDetail.getPekerjaan().isEmpty()) progress += 33;
+                    if (pDetail.getPendapatan() != null) progress += 33;
+                    if (pDetail.getStatus_keluarga() != null && !pDetail.getStatus_keluarga().isEmpty()) progress += 34;
                 %>
-                <div class="relative pt-1">
-                    <div class="overflow-hidden h-2 mb-4 text-xs flex rounded bg-purple-200">
-                        <div style="width: <%= progress%>%" class="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-[#6C5DD3]"></div>
+                <div class="flex items-end gap-3 mb-4">
+                    <h4 class="text-4xl font-black text-white"><%= progress%>%</h4>
+                    <span class="text-[10px] text-gray-400 mb-1 font-bold"><%= progress == 100 ? "LENGKAP" : "KEMASKINI" %></span>
+                </div>
+                
+                <div class="relative w-full h-2.5 bg-white/10 rounded-full overflow-hidden mb-6">
+                    <div style="width: <%= progress%>%" class="absolute top-0 left-0 h-full bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] rounded-full transition-all duration-1000"></div>
+                </div>
+                
+                <div class="space-y-3">
+                    <div class="flex items-center gap-2 text-[10px] font-medium <%= (pDetail.getPekerjaan() != null && !pDetail.getPekerjaan().isEmpty()) ? "text-green-400" : "text-gray-500" %>">
+                        <i class="fas <%= (pDetail.getPekerjaan() != null && !pDetail.getPekerjaan().isEmpty()) ? "fa-check-circle" : "fa-circle-notch" %>"></i>
+                        <span>Maklumat Kerjaya</span>
                     </div>
-                    <p class="text-2xl font-bold text-[#6C5DD3]"><%= progress%>%</p>
+                    <div class="flex items-center gap-2 text-[10px] font-medium <%= (pDetail.getPendapatan() != null) ? "text-green-400" : "text-gray-500" %>">
+                        <i class="fas <%= (pDetail.getPendapatan() != null) ? "fa-check-circle" : "fa-circle-notch" %>"></i>
+                        <span>Maklumat Pendapatan</span>
+                    </div>
+                    <div class="flex items-center gap-2 text-[10px] font-medium <%= (pDetail.getStatus_keluarga() != null && !pDetail.getStatus_keluarga().isEmpty()) ? "text-green-400" : "text-gray-500" %>">
+                        <i class="fas <%= (pDetail.getStatus_keluarga() != null && !pDetail.getStatus_keluarga().isEmpty()) ? "fa-check-circle" : "fa-circle-notch" %>"></i>
+                        <span>Status Perkahwinan</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="mt-8">
-            <h3 class="font-bold text-sm text-gray-800 mb-4 uppercase">Keselamatan</h3>
-            <button onclick="showChangePassModal()" class="w-full flex items-center gap-3 p-3 rounded-xl hover:bg-gray-50 border border-gray-100 transition text-left">
-                <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
-                    <i class="fas fa-key text-xs"></i>
+        <%-- Security Section --%>
+        <div class="mb-10">
+            <h3 class="font-extrabold text-sm text-gray-900 uppercase tracking-widest mb-6 flex items-center gap-2">
+                <span class="w-1.5 h-4 bg-blue-500 rounded-full"></span>
+                Keselamatan
+            </h3>
+            
+            <button onclick="showChangePassModal()" class="w-full group relative p-4 rounded-[1.5rem] bg-blue-50/50 border border-blue-100 hover:bg-blue-100/50 transition-all text-left overflow-hidden">
+                <div class="relative z-10 flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
+                        <i class="fas fa-key-skeleton"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-900">Tukar Kata Laluan</p>
+                        <p class="text-[10px] text-gray-500 font-medium">Lindungi akaun anda</p>
+                    </div>
+                    <i class="fas fa-chevron-right ml-auto text-blue-300 text-xs group-hover:translate-x-1 transition-transform"></i>
                 </div>
-                <p class="text-sm font-bold text-gray-800">Tukar Kata Laluan</p>
-                <i class="fas fa-chevron-right ml-auto text-gray-300 text-xs"></i>
             </button>
         </div>
 
-        <div class="mt-8">
-            <h3 class="font-bold text-sm text-gray-800 mb-4 flex items-center gap-2 uppercase">
-                <i class="fas fa-history text-[#6C5DD3]"></i> Sejarah Log Aktiviti Pentadbir
+        <%-- Activity Logs --%>
+        <div class="flex-1">
+            <h3 class="font-extrabold text-sm text-gray-900 uppercase tracking-widest mb-6 flex items-center gap-2">
+                <span class="w-1.5 h-4 bg-orange-500 rounded-full"></span>
+                Sejarah Aktiviti
             </h3>
-            <div class="space-y-3">
+            
+            <div class="space-y-4">
                 <%
                     List<ActivityLog> logs = (List<ActivityLog>) request.getAttribute("activityLogs");
                     if (logs != null && !logs.isEmpty()) {
                         for (ActivityLog log : logs) {
                 %>
-                <div class="p-3 rounded-xl bg-gray-50 border border-gray-100">
-                    <div class="flex justify-between items-start mb-1">
-                        <span class="text-[10px] font-bold text-[#6C5DD3]">Admin</span>
-                        <span class="text-[9px] text-gray-400"><%= new java.text.SimpleDateFormat("dd/MM/yy").format(log.getDibuat_pada())%></span>
+                <div class="relative pl-6 pb-2 border-l-2 border-gray-100 group">
+                    <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-gray-200 group-hover:border-[#6C5DD3] transition-colors"></div>
+                    <div class="bg-gray-50 rounded-2xl p-4 border border-transparent hover:border-gray-200 hover:bg-white transition-all">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-[10px] font-bold text-[#6C5DD3] bg-purple-50 px-2 py-0.5 rounded-md">ADMIN</span>
+                            <span class="text-[9px] font-bold text-gray-400"><%= new java.text.SimpleDateFormat("dd MMM yyyy").format(log.getDibuat_pada())%></span>
+                        </div>
+                        <p class="text-[11px] font-semibold text-gray-700 leading-snug"><%= log.getKeterangan_tindakan()%></p>
                     </div>
-                    <p class="text-[11px] text-gray-600 leading-tight mb-1"><%= log.getKeterangan_tindakan()%></p>
                 </div>
                 <%      }
                 } else { %>
-                <div class="text-center py-6 bg-gray-50 rounded-xl border border-dashed border-gray-200">
-                    <p class="text-[10px] text-gray-400 italic">Tiada rekod aktiviti.</p>
+                <div class="text-center py-12 bg-gray-50 rounded-[2rem] border-2 border-dashed border-gray-200">
+                    <div class="w-12 h-12 rounded-full bg-white mx-auto flex items-center justify-center text-gray-300 mb-3 shadow-sm">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <p class="text-[11px] text-gray-400 font-bold italic tracking-wide uppercase">Tiada Rekod Aktiviti</p>
                 </div>
                 <% }%>
             </div>
@@ -310,34 +481,68 @@
 </div>
 
 <style>
-    .custom-scrollbar::-webkit-scrollbar {
-        width: 4px;
+    @keyframes fade-in-up {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
     }
-    .custom-scrollbar::-webkit-scrollbar-track {
-        background: transparent;
+    .animate-fade-in-up {
+        animation: fade-in-up 0.7s ease-out forwards;
     }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-        background: #e2e2e2;
-        border-radius: 10px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-        background: #6C5DD3;
-    }
+    
+    /* Custom Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6C5DD3; }
+
+    /* Map Custom Styling */
+    .leaflet-container { font-family: inherit; }
+    .leaflet-bar { border: none !important; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1) !important; }
+    .leaflet-bar a { background-color: white !important; color: #374151 !important; border-radius: 12px !important; margin-bottom: 4px !important; }
 </style>
 
-<%-- Modal Tukar Kata Laluan --%>
-<div id="changePassModal" class="fixed inset-0 bg-black bg-opacity-50 z-[999] hidden flex items-center justify-center backdrop-blur-sm">
-    <div class="bg-white rounded-3xl p-8 w-full max-w-md shadow-2xl relative">
-        <button onclick="hideChangePassModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600"><i class="fas fa-times"></i></button>
-        <div class="text-center mb-6">
-            <h3 class="text-xl font-bold text-gray-800">Tukar Kata Laluan</h3>
+<%-- Modal Tukar Kata Laluan (Glass Edition) --%>
+<div id="changePassModal" class="fixed inset-0 bg-gray-900/40 z-[999] hidden flex items-center justify-center backdrop-blur-md animate-in fade-in duration-300 p-4">
+    <div class="bg-white/90 backdrop-blur-2xl rounded-[3rem] p-10 w-full max-w-md shadow-2xl relative border border-white/50 animate-in zoom-in-95 duration-300">
+        <button onclick="hideChangePassModal()" class="absolute top-6 right-6 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition hover:scale-110 active:scale-95">
+            <i class="fas fa-times"></i>
+        </button>
+        
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 text-2xl mx-auto mb-4 shadow-inner">
+                <i class="fas fa-shield-keyhole"></i>
+            </div>
+            <h3 class="text-2xl font-black text-gray-900 tracking-tight">Tukar Kata Laluan</h3>
+            <p class="text-gray-500 text-sm mt-1 font-medium">Sila pastikan kata laluan anda kukuh.</p>
         </div>
-        <form action="<%= request.getContextPath()%>/profil/update?action=changePassword" method="post" class="space-y-4">
-            <input type="password" name="oldPassword" placeholder="Kata Laluan Lama" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-sm">
-            <input type="password" name="newPassword" placeholder="Kata Laluan Baharu" required minlength="6" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-sm">
-            <div class="flex gap-3 pt-4">
-                <button type="button" onclick="hideChangePassModal()" class="flex-1 py-3 bg-gray-100 text-gray-600 font-bold rounded-xl">Batal</button>
-                <button type="submit" class="flex-1 py-3 bg-[#6C5DD3] text-white font-bold rounded-xl">Kemaskini</button>
+
+        <form action="<%= request.getContextPath()%>/profil/update?action=changePassword" method="post" class="space-y-6">
+            <div class="space-y-4">
+                <div class="group">
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Kata Laluan Lama</label>
+                    <div class="relative">
+                        <i class="fas fa-lock-open absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#6C5DD3] transition-colors"></i>
+                        <input type="password" name="oldPassword" required 
+                            class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3] text-sm font-semibold transition-all">
+                    </div>
+                </div>
+                <div class="group">
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Kata Laluan Baharu</label>
+                    <div class="relative">
+                        <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#6C5DD3] transition-colors"></i>
+                        <input type="password" name="newPassword" required minlength="6" 
+                            class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3] text-sm font-semibold transition-all">
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex flex-col gap-3 pt-4">
+                <button type="submit" class="w-full py-4 bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] text-white font-bold rounded-2xl shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                    Kemaskini Kata Laluan
+                </button>
+                <button type="button" onclick="hideChangePassModal()" class="w-full py-4 text-gray-500 font-bold hover:text-gray-700 transition">
+                    Batal
+                </button>
             </div>
         </form>
     </div>
@@ -364,34 +569,59 @@
         var defaultLat = 6.0289, defaultLon = 102.2935;
         var latElement = document.getElementById('latInput');
         var lonElement = document.getElementById('lonInput');
-        if (!latElement || !lonElement)
-            return;
+        var coordDisplay = document.getElementById('coord-display');
+        
+        if (!latElement || !lonElement) return;
 
         var initLat = latElement.value ? parseFloat(latElement.value) : defaultLat;
         var initLon = lonElement.value ? parseFloat(lonElement.value) : defaultLon;
 
-        var map = L.map('mapProfil').setView([initLat, initLon], latElement.value ? 17 : 14);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '© OpenStreetMap'}).addTo(map);
-        var marker = L.marker([initLat, initLon], {draggable: true}).addTo(map);
+        var map = L.map('mapProfil', { zoomControl: false }).setView([initLat, initLon], latElement.value ? 17 : 14);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap',
+            className: 'map-tiles'
+        }).addTo(map);
+        
+        L.control.zoom({ position: 'topright' }).addTo(map);
 
-        L.Control.geocoder({ defaultMarkGeocode: false, placeholder: 'Cari lokasi/alamat...', errorMessage: 'Lokasi tidak dijumpai.' }).on('markgeocode', function(e) { var latlng = e.geocode.center; marker.setLatLng(latlng); map.setView(latlng, 17); updateInputs(latlng); }).addTo(map);
-
-        function updateInputs(latlng) {
-            document.getElementById('latInput').value = latlng.lat.toFixed(8);
-            document.getElementById('lonInput').value = latlng.lng.toFixed(8);
+        var marker = L.marker([initLat, initLon], { draggable: true }).addTo(map);
+        
+        if (latElement.value && lonElement.value) {
+            updateDisplay({ lat: initLat, lng: initLon });
         }
 
-        marker.on('dragend', function (e) {
-            updateInputs(e.target.getLatLng());
-        });
+        L.Control.geocoder({ 
+            defaultMarkGeocode: false, 
+            placeholder: 'Cari lokasi/alamat...', 
+            errorMessage: 'Lokasi tidak dijumpai.' 
+        }).on('markgeocode', function(e) { 
+            var latlng = e.geocode.center; 
+            marker.setLatLng(latlng); 
+            map.setView(latlng, 17); 
+            updateInputs(latlng); 
+        }).addTo(map);
+
+        function updateInputs(latlng) {
+            latElement.value = latlng.lat.toFixed(8);
+            lonElement.value = latlng.lng.toFixed(8);
+            updateDisplay(latlng);
+        }
+        
+        function updateDisplay(latlng) {
+            if(coordDisplay) {
+                coordDisplay.innerText = latlng.lat.toFixed(4) + ', ' + latlng.lng.toFixed(4);
+            }
+        }
+
+        marker.on('dragend', function (e) { updateInputs(e.target.getLatLng()); });
         map.on('click', function (e) {
             marker.setLatLng(e.latlng);
             updateInputs(e.latlng);
         });
-        setTimeout(function () {
-            map.invalidateSize();
-        }, 300);
+        
+        setTimeout(function () { map.invalidateSize(); }, 300);
     })();
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>
+>

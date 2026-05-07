@@ -285,103 +285,154 @@
         </div>
     </div>
 </div>
+<!-- MODAL: TRACKING PROGRES (PREMIUM REDESIGN) -->
 <div id="modalDetail" class="fixed inset-0 z-[60] hidden" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalDetail')"></div>
-    <div class="flex min-h-full items-center justify-center p-4 text-center">
-        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-lg">
-            <div class="bg-[#6C5DD3] px-6 py-4 flex justify-between items-center">
-                <h3 class="text-white font-bold flex items-center gap-2">
-                    <i class="fas fa-tasks"></i> Progres Permohonan
-                </h3>
-                <button onclick="closeModal('modalDetail')" class="text-white/80 hover:text-white transition"><i class="fas fa-times"></i></button>
-            </div>
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal('modalDetail')"></div>
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 flex flex-col max-h-[90vh]">
             
-            <div class="p-8">
-                <!-- Info Summary -->
-                <div class="flex justify-between items-start mb-8 bg-gray-50 p-4 rounded-2xl border border-gray-100">
+            <!-- Modal Header (Matching Admin Design) -->
+            <div class="bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] px-8 py-6 text-white relative shrink-0">
+                <div class="absolute top-0 right-0 p-6 opacity-10">
+                    <i class="fas fa-tasks text-8xl rotate-12"></i>
+                </div>
+                <div class="flex justify-between items-start relative z-10">
                     <div>
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Jenis Bantuan</p>
-                        <h4 id="detNama" class="text-lg font-bold text-gray-800">-</h4>
+                        <span id="detTarikhBadge" class="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border border-white/20">DIBUAT PADA: <span id="detTarikh">-</span></span>
+                        <h3 class="text-2xl font-bold mt-2" id="detNama">-</h3>
                     </div>
-                    <div class="text-right">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Tarikh Mohon</p>
-                        <p id="detTarikh" class="text-sm font-bold text-gray-700">-</p>
-                    </div>
+                    <button onclick="closeModal('modalDetail')" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all">
+                        <i class="fas fa-times"></i>
+                    </button>
                 </div>
+            </div>
 
-                <!-- Status Tracker (Large) -->
-                <div class="mb-12 relative px-4">
-                    <div class="flex justify-between items-center relative z-10">
-                        <div class="flex flex-col items-center gap-2">
-                            <div id="step1" class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg transition-all duration-500 bg-gray-200">1</div>
-                            <span class="text-[10px] font-bold text-gray-500 uppercase">Mula</span>
-                        </div>
-                        <div class="flex-1 h-1 bg-gray-100 -mt-6 mx-1">
-                            <div id="line1" class="h-full bg-[#6C5DD3] transition-all duration-700 w-0"></div>
-                        </div>
-                        <div class="flex flex-col items-center gap-2">
-                            <div id="step2" class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg transition-all duration-500 bg-gray-200">2</div>
-                            <span class="text-[10px] font-bold text-gray-500 uppercase">AJK</span>
-                        </div>
-                        <div class="flex-1 h-1 bg-gray-100 -mt-6 mx-1">
-                            <div id="line2" class="h-full bg-[#6C5DD3] transition-all duration-700 w-0"></div>
-                        </div>
-                        <div class="flex flex-col items-center gap-2">
-                            <div id="step3" class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg transition-all duration-500 bg-gray-200">3</div>
-                            <span class="text-[10px] font-bold text-gray-500 uppercase">Ketua</span>
-                        </div>
-                        <div class="flex-1 h-1 bg-gray-100 -mt-6 mx-1">
-                            <div id="line3" class="h-full bg-[#6C5DD3] transition-all duration-700 w-0"></div>
-                        </div>
-                        <div class="flex flex-col items-center gap-2">
-                            <div id="step4" class="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg transition-all duration-500 bg-gray-200">4</div>
-                            <span class="text-[10px] font-bold text-gray-500 uppercase">Hasil</span>
-                        </div>
-                    </div>
-                </div>
+            <!-- Scrollable Content -->
+            <div class="p-8 overflow-y-auto custom-scrollbar flex-1 bg-white">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+                    
+                    <!-- LEFT COLUMN: VERTICAL PROGRESS TRACKER (STATIC) -->
+                    <div class="lg:col-span-4 border-r border-gray-100 pr-8">
+                        <h5 class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-8 flex items-center gap-2">
+                            <i class="fas fa-stream text-[#6C5DD3]"></i> Status Semasa
+                        </h5>
+                        
+                        <div class="space-y-0 relative">
+                            <!-- Vertical Line -->
+                            <div class="absolute left-[15px] top-2 bottom-2 w-0.5 bg-gray-100"></div>
 
-                <div class="space-y-8">
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <div>
-                            <h5 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Sebab / Keterangan</h5>
-                            <p id="detCatatan" class="text-sm text-gray-600 bg-gray-50 p-4 rounded-2xl border border-gray-100 leading-relaxed">-</p>
-                        </div>
-                        <div>
-                            <h5 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Dokumen Sokongan (Pemohon)</h5>
-                            <div id="dokumenList" class="space-y-2">
-                                <!-- Dynamic List of Documents -->
-                                <a id="linkDokumen" href="#" target="_blank" class="flex items-center gap-3 p-3 bg-gray-50 border border-gray-100 rounded-2xl hover:bg-gray-100 transition group hidden">
-                                    <div class="w-8 h-8 bg-white rounded-xl flex items-center justify-center text-red-500 shadow-sm group-hover:scale-110 transition">
-                                        <i class="fas fa-file-pdf text-sm"></i>
-                                    </div>
-                                    <span class="text-xs font-bold text-gray-700 truncate max-w-[150px]">Dokumen_Sokongan.pdf</span>
-                                    <i class="fas fa-external-link-alt ml-auto text-gray-300 text-[10px]"></i>
-                                </a>
+                            <!-- Step 1: Dihantar -->
+                            <div class="relative pl-12 pb-10">
+                                <div id="vStep1" class="absolute left-0 top-0 w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs border-4 border-white shadow-sm z-10">✓</div>
+                                <h4 class="font-bold text-sm text-gray-800">Permohonan Dihantar</h4>
+                                <p class="text-[10px] text-gray-400 mt-1 leading-relaxed">Berjaya direkodkan dalam sistem.</p>
+                            </div>
+
+                            <!-- Step 2: Biro (AJK) -->
+                            <div class="relative pl-12 pb-10">
+                                <div id="vStep2" class="absolute left-0 top-0 w-8 h-8 rounded-full bg-gray-200 text-white flex items-center justify-center font-bold text-xs border-4 border-white shadow-sm z-10">2</div>
+                                <h4 id="vTitle2" class="font-bold text-sm text-gray-400">Semakan Biro Kebajikan</h4>
+                                <p id="vDesc2" class="text-[10px] text-gray-400 mt-1 leading-relaxed">Menunggu Biro menyemak dokumen.</p>
+                            </div>
+
+                            <!-- Step 3: Ketua Kampung -->
+                            <div class="relative pl-12 pb-10">
+                                <div id="vStep3" class="absolute left-0 top-0 w-8 h-8 rounded-full bg-gray-200 text-white flex items-center justify-center font-bold text-xs border-4 border-white shadow-sm z-10">3</div>
+                                <h4 id="vTitle3" class="font-bold text-sm text-gray-400">Pengesahan Ketua Kampung</h4>
+                                <p id="vDesc3" class="text-[10px] text-gray-400 mt-1 leading-relaxed">Menunggu kelulusan akhir.</p>
+                            </div>
+
+                            <!-- Step 4: Hasil -->
+                            <div class="relative pl-12">
+                                <div id="vStep4" class="absolute left-0 top-0 w-8 h-8 rounded-full bg-gray-200 text-white flex items-center justify-center font-bold text-xs border-4 border-white shadow-sm z-10">4</div>
+                                <h4 id="vTitle4" class="font-bold text-sm text-gray-400">Keputusan</h4>
+                                <p id="vDesc4" class="text-[10px] text-gray-400 mt-1 leading-relaxed">Status akhir permohonan.</p>
                             </div>
                         </div>
                     </div>
 
-                    <div id="ulasanDiv">
-                        <h5 class="text-[10px] font-bold text-orange-400 uppercase tracking-widest mb-2 flex items-center gap-2">
-                            <i class="fas fa-shield-alt"></i> Maklum Balas Pentadbir
-                        </h5>
-                        <div class="bg-orange-50 p-6 rounded-3xl border border-orange-100 space-y-4">
-                            <p id="detUlasan" class="text-sm text-gray-700 leading-relaxed font-medium italic">-</p>
-                            
-                            <!-- Admin Documents Section -->
-                            <div id="dokumenAdminSection" class="hidden pt-4 border-t border-orange-200">
-                                <p class="text-[9px] font-bold text-orange-500 uppercase tracking-widest mb-3">Lampiran Daripada Pentadbir / Dokumen Disahkan</p>
-                                <div id="dokumenAdminList" class="grid grid-cols-1 gap-2">
-                                    <!-- Dynamic Admin Files -->
+                    <!-- RIGHT COLUMN: DETAILS -->
+                    <div class="lg:col-span-8 space-y-8">
+                        
+                        <!-- Top Row: Bank & Documents -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <!-- Bank Card (Matching Admin Style) -->
+                            <div class="bg-blue-50/50 p-6 rounded-[2rem] border border-blue-100 relative overflow-hidden">
+                                <div class="absolute -right-4 -bottom-4 opacity-5">
+                                    <i class="fas fa-university text-7xl"></i>
+                                </div>
+                                <h5 class="text-[10px] font-bold text-blue-400 uppercase tracking-widest mb-4">Butiran Bank</h5>
+                                <div class="space-y-4 relative z-10">
+                                    <div>
+                                        <p class="text-[9px] text-blue-400/60 font-bold uppercase">Nama Bank</p>
+                                        <p id="detBank" class="font-bold text-blue-900 uppercase text-sm">-</p>
+                                    </div>
+                                    <div>
+                                        <p class="text-[9px] text-blue-400/60 font-bold uppercase">Nombor Akaun</p>
+                                        <p id="detAkaun" class="font-bold text-blue-900 text-lg tracking-widest">-</p>
+                                    </div>
+                                    <div class="pt-2">
+                                        <a id="linkPenyata" href="#" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 bg-white text-blue-600 rounded-xl text-[10px] font-bold shadow-sm border border-blue-100 hover:shadow-md transition-all">
+                                            <i class="fas fa-file-invoice-dollar"></i> Lihat Penyata
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Documents -->
+                            <div class="bg-gray-50 p-6 rounded-[2rem] border border-gray-100 flex flex-col">
+                                <h5 class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-4">Dokumen Sokongan</h5>
+                                <div id="dokumenList" class="space-y-2 flex-1">
+                                    <!-- Dynamic List -->
+                                </div>
+                                <div class="hidden">
+                                    <a id="linkDokumen" href="#" target="_blank" class="flex items-center gap-3 p-3 bg-white border border-gray-100 rounded-2xl hover:border-red-200 transition group">
+                                        <div class="w-8 h-8 bg-red-50 rounded-xl flex items-center justify-center text-red-500 shadow-sm group-hover:scale-110 transition">
+                                            <i class="fas fa-file-pdf text-xs"></i>
+                                        </div>
+                                        <span class="text-[10px] font-bold text-gray-700 truncate max-w-[120px]">Fail_Sokongan.pdf</span>
+                                        <i class="fas fa-external-link-alt ml-auto text-gray-300 text-[10px]"></i>
+                                    </a>
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Feedback Section (Admin Feedback) -->
+                        <div id="ulasanDiv" class="space-y-4">
+                            <h5 class="text-[11px] font-bold text-orange-400 uppercase tracking-widest flex items-center gap-2">
+                                <i class="fas fa-shield-alt"></i> Maklum Balas Pentadbir
+                            </h5>
+                            <div class="bg-orange-50/50 p-6 rounded-[2rem] border border-orange-100 relative">
+                                <i class="fas fa-quote-left absolute top-4 left-4 text-orange-100 text-3xl"></i>
+                                <div class="relative z-10 pl-8">
+                                    <p id="detUlasan" class="text-sm text-gray-700 leading-relaxed font-medium italic">-</p>
+                                    
+                                    <div id="dokumenAdminSection" class="hidden mt-6 pt-4 border-t border-orange-200/50">
+                                        <p class="text-[9px] font-bold text-orange-500 uppercase tracking-widest mb-3">Dokumen Daripada Pentadbir</p>
+                                        <div id="dokumenAdminList" class="flex flex-wrap gap-2">
+                                            <!-- Dynamic Admin Files -->
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Reason / Description Section -->
+                        <div class="space-y-4">
+                            <h5 class="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Keterangan Pemohon</h5>
+                            <div class="bg-gray-50/50 p-6 rounded-[2rem] border border-gray-100">
+                                <p id="detCatatan" class="text-sm text-gray-600 leading-relaxed">-</p>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="bg-gray-50 px-8 py-6 sm:flex sm:flex-row-reverse rounded-b-3xl">
-                <button type="button" class="w-full sm:w-auto px-8 py-3 bg-[#6C5DD3] text-white font-bold rounded-xl hover:bg-[#5b4eb8] transition shadow-lg shadow-purple-100" onclick="closeModal('modalDetail')">Tutup</button>
+            <!-- Modal Footer -->
+            <div class="bg-slate-50 p-8 flex justify-end border-t border-slate-100 shrink-0">
+                <button type="button" class="px-10 py-3 bg-[#6C5DD3] text-white font-bold rounded-2xl hover:bg-[#5b4eb8] transition shadow-lg shadow-purple-100" onclick="closeModal('modalDetail')">
+                    Tutup
+                </button>
             </div>
         </div>
     </div>
@@ -582,21 +633,35 @@
         document.getElementById('detCatatan').innerText = (catatan && catatan !== "null") ? catatan : "Tiada maklumat.";
         document.getElementById('detUlasan').innerText = (ulasan && ulasan !== "null") ? ulasan : "Belum ada ulasan.";
         
+        // Bank & Files
+        document.getElementById('detBank').innerText = (bank && bank !== "null") ? bank : "-";
+        document.getElementById('detAkaun').innerText = (akaun && akaun !== "null") ? akaun : "-";
+        
+        const linkPenyata = document.getElementById('linkPenyata');
+        if(penyata) {
+            linkPenyata.href = "<%= request.getContextPath() %>/file/bantuan/" + penyata;
+            linkPenyata.classList.remove('hidden');
+        } else {
+            linkPenyata.classList.add('hidden');
+        }
+
         // Files List (PEMOHON)
         const dokumenList = document.getElementById('dokumenList');
         const template = document.getElementById('linkDokumen');
-        dokumenList.innerHTML = '';
-        dokumenList.appendChild(template);
         
-        if(dokumen && dokumen !== "") {
-            const files = dokumen.split(',');
-            files.forEach(f => {
-                const newLink = template.cloneNode(true);
-                newLink.classList.remove('hidden');
-                newLink.href = "<%= request.getContextPath() %>/file/bantuan/" + f;
-                newLink.querySelector('span').innerText = decodeURIComponent(f).split('_').slice(1).join('_') || decodeURIComponent(f);
-                dokumenList.appendChild(newLink);
-            });
+        if (dokumenList) {
+            dokumenList.innerHTML = '';
+            if(dokumen && dokumen !== "" && template) {
+                const files = dokumen.split(',');
+                files.forEach(f => {
+                    const newLink = template.cloneNode(true);
+                    newLink.id = ""; // Remove ID to prevent collisions
+                    newLink.classList.remove('hidden');
+                    newLink.href = "<%= request.getContextPath() %>/file/bantuan/" + f;
+                    newLink.querySelector('span').innerText = decodeURIComponent(f).split('_').slice(1).join('_') || decodeURIComponent(f);
+                    dokumenList.appendChild(newLink);
+                });
+            }
         }
 
         // Files List (PENTADBIR)
@@ -604,14 +669,15 @@
         const dokAdminSection = document.getElementById('dokumenAdminSection');
         dokAdminList.innerHTML = '';
         
-        if(dokumenAdmin && dokumenAdmin !== "") {
+        if(dokumenAdmin && dokumenAdmin !== "" && template) {
             dokAdminSection.classList.remove('hidden');
             const filesA = dokumenAdmin.split(',');
             filesA.forEach(f => {
                 const newLink = template.cloneNode(true);
+                newLink.id = ""; // Remove ID to prevent collisions
                 newLink.classList.remove('hidden');
-                newLink.classList.replace('bg-gray-50', 'bg-white');
-                newLink.classList.add('border-orange-100');
+                newLink.classList.replace('bg-white', 'bg-orange-50');
+                newLink.classList.replace('border-gray-100', 'border-orange-100');
                 newLink.href = "<%= request.getContextPath() %>/file/bantuan/" + f;
                 newLink.querySelector('span').innerText = decodeURIComponent(f).split('_').slice(1).join('_') || decodeURIComponent(f);
                 newLink.querySelector('div').classList.replace('text-red-500', 'text-orange-500');
@@ -621,64 +687,68 @@
             dokAdminSection.classList.add('hidden');
         }
         
-        // Reset Steps
-        const steps = ['step1', 'step2', 'step3', 'step4'];
-        const lines = ['line1', 'line2', 'line3'];
-        
-        steps.forEach(s => {
-            const el = document.getElementById(s);
-            el.className = "w-10 h-10 rounded-full flex items-center justify-center text-white font-bold shadow-lg transition-all duration-500 bg-gray-200";
-            el.innerHTML = s.replace('step', '');
-        });
-        lines.forEach(l => {
-            const el = document.getElementById(l);
-            el.style.width = "0%";
-            el.classList.remove('bg-orange-500');
-            el.classList.add('bg-[#6C5DD3]');
+        // --- VERTICAL PROGRESS LOGIC (STATIC) ---
+        const vSteps = ['vStep2', 'vStep3', 'vStep4'];
+        const vTitles = ['vTitle2', 'vTitle3', 'vTitle4'];
+        const vDescs = ['vDesc2', 'vDesc3', 'vDesc4'];
+
+        // Reset to default
+        vSteps.forEach((s, i) => {
+            const stepEl = document.getElementById(s);
+            if(stepEl) {
+                stepEl.className = "absolute left-0 top-0 w-8 h-8 rounded-full bg-gray-100 text-gray-400 flex items-center justify-center font-bold text-xs border-4 border-white shadow-sm z-10";
+                stepEl.innerHTML = i + 2;
+                document.getElementById(vTitles[i]).className = "font-bold text-sm text-gray-400";
+                document.getElementById(vDescs[i]).className = "text-[10px] text-gray-400 mt-1 leading-relaxed";
+            }
         });
 
-        let activeStep = 1;
-        let mainColor = "bg-[#6C5DD3]";
-        
-        if (status === "MENUNGGU_KETUA") activeStep = 3;
-        else if (status === "LULUS" || status === "DITOLAK") activeStep = 4;
-        else if (status === "DIKEMBALIKAN") mainColor = "bg-orange-500";
+        const setStepActive = (idx, color = "bg-[#6C5DD3]", title = "Sedang Diproses", desc = "") => {
+            const el = document.getElementById('vStep' + idx);
+            if(el) {
+                el.className = `absolute left-0 top-0 w-8 h-8 rounded-full \${color} text-white flex items-center justify-center font-bold text-xs border-4 border-white shadow-sm z-10`;
+                el.innerHTML = idx;
+                document.getElementById('vTitle' + idx).className = "font-bold text-sm text-gray-800";
+                if(desc) document.getElementById('vDesc' + idx).innerText = desc;
+            }
+        };
 
-        // Animate Steps
-        setTimeout(() => {
-            for(let i=1; i<=activeStep; i++) {
-                const el = document.getElementById('step'+i);
-                el.classList.remove('bg-gray-200');
-                el.classList.add(mainColor);
-                if(i < activeStep) el.innerHTML = "✓";
-                
-                if(i < activeStep && i <= 3) {
-                    const line = document.getElementById('line'+i);
-                    line.style.width = "100%";
-                    if(mainColor === "bg-orange-500") {
-                        line.classList.remove('bg-[#6C5DD3]');
-                        line.classList.add('bg-orange-500');
-                    }
-                }
+        const setStepDone = (idx) => {
+            const el = document.getElementById('vStep' + idx);
+            if(el) {
+                el.className = "absolute left-0 top-0 w-8 h-8 rounded-full bg-emerald-500 text-white flex items-center justify-center font-bold text-xs border-4 border-white shadow-sm z-10";
+                el.innerHTML = "✓";
+                document.getElementById('vTitle' + idx).className = "font-bold text-sm text-gray-800";
             }
-            
-            if(activeStep === 4) {
-                const lastStep = document.getElementById('step4');
-                lastStep.classList.remove('bg-[#6C5DD3]');
-                lastStep.classList.add(status === "LULUS" ? "bg-green-500" : "bg-red-500");
-                lastStep.innerHTML = "✓";
-            }
-        }, 100);
+        };
+
+        if (status === "BARU") {
+            setStepActive(2, "bg-[#6C5DD3]", "Semakan Biro Kebajikan", "Dokumen anda sedang disemak oleh AJK.");
+        } else if (status === "MENUNGGU_KETUA") {
+            setStepDone(2);
+            setStepActive(3, "bg-[#6C5DD3]", "Pengesahan Ketua Kampung", "Telah disokong oleh AJK. Menunggu kelulusan Ketua Kampung.");
+        } else if (status === "DIKEMBALIKAN") {
+            setStepActive(2, "bg-orange-500", "Perlu Kemaskini", "Sila semak maklum balas dan hantar semula dokumen.");
+            const step2 = document.getElementById('vStep2');
+            if(step2) step2.innerHTML = "!";
+        } else if (status === "LULUS" || status === "DITOLAK") {
+            setStepDone(2);
+            setStepDone(3);
+            const color = status === "LULUS" ? "bg-emerald-500" : "bg-red-500";
+            setStepActive(4, color, status === "LULUS" ? "Permohonan Diluluskan" : "Permohonan Ditolak", status === "LULUS" ? "Bantuan telah diluluskan. Sila semak akaun/penerimaan." : "Mohon maaf, permohonan tidak berjaya.");
+            const step4 = document.getElementById('vStep4');
+            if(status === "DITOLAK" && step4) step4.innerHTML = "✕";
+        }
 
         openModal('modalDetail');
     }
 
     function openWizard() {
-        document.getElementById('modalWizard').classList.remove('hidden');
+        openModal('modalWizard');
         goToStep(1);
     }
     function closeWizard() {
-        document.getElementById('modalWizard').classList.add('hidden');
+        closeModal('modalWizard');
     }
 
     function goToStep(step) {
@@ -731,13 +801,7 @@
         }
     }
 
-    function openModal(modalId) {
-        document.getElementById(modalId).classList.remove('hidden');
-    }
 
-    function closeModal(modalId) {
-        document.getElementById(modalId).classList.add('hidden');
-    }
 
     // Toggle Input Lain-lain
     function toggleLainBantuan() {

@@ -19,12 +19,16 @@ import model.Aduan;
 import model.KategoriAduan;
 import model.LogAduan;
 import model.Pengguna;
+import util.AppConfig;
+import util.FileUploadUtil;
 import util.DBUtil;
+
+
 
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 5 * 1024 * 1024, maxRequestSize = 10 * 1024 * 1024)
 public class AduanServlet extends HttpServlet {
 
-    private static final String SAVE_DIR = "C:\\Users\\khayx\\OneDrive\\Documents\\SEM5_UMT\\PITA1\\MyKampungData\\gambarAduan";
+    private static final String SAVE_DIR = AppConfig.DIR_GAMBAR_ADUAN;
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
@@ -95,24 +99,17 @@ public class AduanServlet extends HttpServlet {
         AduanDAO aduanDAO = new AduanDAO();
         LogAduanDAO logDAO = new LogAduanDAO();
 
-        File fileSaveDir = new File(SAVE_DIR);
-        if (!fileSaveDir.exists())
-            fileSaveDir.mkdirs();
-
         try {
+
             if ("/submit".equals(pathInfo)) {
                 String tajuk = request.getParameter("tajuk");
                 int idKategori = Integer.parseInt(request.getParameter("id_kategori"));
                 String keterangan = request.getParameter("keterangan");
                 String keutamaan = request.getParameter("keutamaan");
 
-                Part filePart = request.getPart("gambar_aduan");
-                String fileName = null;
-                if (filePart != null && filePart.getSize() > 0) {
-                    fileName = "aduan_" + user.getId_pengguna() + "_" + System.currentTimeMillis() + "_"
-                            + filePart.getSubmittedFileName();
-                    filePart.write(SAVE_DIR + File.separator + fileName);
-                }
+                String fileName = FileUploadUtil.saveFile(
+                    request.getPart("gambar_aduan"), SAVE_DIR, "aduan_" + user.getId_pengguna() + "_");
+
 
                 Aduan aduan = new Aduan();
                 aduan.setId_pengguna(user.getId_pengguna());

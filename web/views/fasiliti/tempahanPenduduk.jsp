@@ -317,7 +317,7 @@
 
 <!-- Modal Tempahan -->
 <div id="modalTempah" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-40 transition-opacity backdrop-blur-sm" onclick="closeModal()"></div>
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-40 transition-opacity backdrop-blur-sm" onclick="closeModal('modalTempah')"></div>
     <div class="flex min-h-screen items-center justify-center p-4">
         <div class="relative w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl p-8 transform transition-all">
             <header class="flex justify-between items-center mb-8">
@@ -325,7 +325,7 @@
                     <h3 class="text-xl font-bold text-gray-800">Borang Tempahan</h3>
                     <p class="text-xs text-gray-400 mt-1" id="modalFasilitiName"></p>
                 </div>
-                <button onclick="closeModal()" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-gray-50 rounded-xl">
+                <button onclick="closeModal('modalTempah')" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-gray-50 rounded-xl">
                     <i class="fas fa-times"></i>
                 </button>
             </header>
@@ -391,7 +391,7 @@
 
 <!-- Modal Butiran Fasiliti -->
 <div id="modalButiran" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-40 transition-opacity backdrop-blur-sm" onclick="closeDetailsModal()"></div>
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-40 transition-opacity backdrop-blur-sm" onclick="closeModal('modalButiran')"></div>
     <div class="flex min-h-screen items-center justify-center p-4 text-center sm:p-0">
         <div class="relative transform overflow-hidden rounded-[2.5rem] bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg p-8">
             <header class="flex justify-between items-start mb-6">
@@ -401,7 +401,7 @@
                         <i class="fas fa-location-dot"></i> <span id="detLokasi">Lokasi</span>
                     </p>
                 </div>
-                <button onclick="closeDetailsModal()" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-gray-50 rounded-xl transition-colors">
+                <button onclick="closeModal('modalButiran')" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-gray-50 rounded-xl transition-colors">
                     <i class="fas fa-times"></i>
                 </button>
             </header>
@@ -429,7 +429,7 @@
 
 <!-- Modal Detail Sejarah Tempahan -->
 <div id="modalHistoryDetail" class="fixed inset-0 z-[60] hidden overflow-y-auto" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-40 transition-opacity backdrop-blur-sm" onclick="closeHistoryDetailModal()"></div>
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-40 transition-opacity backdrop-blur-sm" onclick="closeModal('modalHistoryDetail')"></div>
     <div class="flex min-h-screen items-center justify-center p-4">
         <div class="relative w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl p-8 transform transition-all">
             <header class="flex justify-between items-center mb-6">
@@ -437,7 +437,7 @@
                     <h3 class="text-xl font-bold text-gray-800">Butiran Tempahan</h3>
                     <p class="text-xs text-gray-400 mt-1" id="histNama">Nama Fasiliti</p>
                 </div>
-                <button onclick="closeHistoryDetailModal()" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-gray-50 rounded-xl">
+                <button onclick="closeModal('modalHistoryDetail')" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-gray-50 rounded-xl">
                     <i class="fas fa-times"></i>
                 </button>
             </header>
@@ -485,7 +485,7 @@
                     <button id="histBtnNav" class="flex-1 py-4 bg-green-500 text-white rounded-2xl font-bold text-sm shadow-lg shadow-green-100 hover:bg-green-600 transition-all flex items-center justify-center gap-2">
                         <i class="fas fa-route"></i> Navigasi
                     </button>
-                    <button onclick="closeHistoryDetailModal()" class="flex-1 py-4 bg-gray-100 text-gray-500 rounded-2xl font-bold text-sm hover:bg-gray-200 transition-all">
+                    <button onclick="closeModal('modalHistoryDetail')" class="flex-1 py-4 bg-gray-100 text-gray-500 rounded-2xl font-bold text-sm hover:bg-gray-200 transition-all">
                         Tutup
                     </button>
                 </div>
@@ -610,14 +610,10 @@
             `;
         }
 
-        document.getElementById('modalHistoryDetail').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+        openModal('modalHistoryDetail');
     }
 
-    function closeHistoryDetailModal() {
-        document.getElementById('modalHistoryDetail').classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    }
+    // closeHistoryDetailModal centralized in footer.jsp
 
     function toggleDuration() {
         const tempoh = document.getElementById('tempoh_tempahan').value;
@@ -849,8 +845,7 @@
             navBtn.classList.add('hidden');
         }
 
-        document.getElementById('modalButiran').classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
+        openModal('modalButiran');
 
         // Init Map
         setTimeout(() => {
@@ -872,15 +867,7 @@
         }, 300);
     }
 
-    function closeDetailsModal() {
-        document.getElementById('modalButiran').classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    }
-
-    function closeModal() {
-        document.getElementById('modalTempah').classList.add('hidden');
-        document.body.style.overflow = 'auto';
-    }
+    // Modal close functions centralized in footer.jsp
 
     // Alert Handling
     document.addEventListener('DOMContentLoaded', function() {

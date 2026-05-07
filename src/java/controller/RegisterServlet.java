@@ -2,7 +2,11 @@ package controller;
 
 import model.Pengguna;
 import dao.PenggunaDAO;
+import util.AppConfig;
+import util.FileUploadUtil;
 import util.DBUtil;
+
+
 import org.mindrot.jbcrypt.BCrypt; // 1. IMPORT PENTING
 import java.io.File;
 import java.io.IOException;
@@ -47,15 +51,10 @@ public class RegisterServlet extends HttpServlet {
             String hashedPassword = BCrypt.hashpw(kata_laluan_mentah, BCrypt.gensalt());
 
             // 3. Proses Muat Naik Fail PDF (Kekalkan kod sedia ada)
-            Part filePart = request.getPart("bukti_pdf");
-            String fileName = "";
-            if (filePart != null && filePart.getSize() > 0) {
-                fileName = "bukti_" + nombor_kp + "_" + System.currentTimeMillis() + ".pdf";
-                String uploadPath = "C:\\Users\\khayx\\OneDrive\\Documents\\SEM5_UMT\\PITA1\\MyKampungData\\lampiranPengguna";
-                File uploadDir = new File(uploadPath);
-                if (!uploadDir.exists()) { uploadDir.mkdirs(); }
-                filePart.write(uploadPath + File.separator + fileName);
-            }
+            String fileName = FileUploadUtil.saveFile(
+                request.getPart("bukti_pdf"), AppConfig.DIR_LAMPIRAN_PENGGUNA, "bukti_" + nombor_kp + "_");
+            if (fileName == null) fileName = "";
+
 
             // 4. Set Data ke Model Pengguna
             Pengguna p = new Pengguna();

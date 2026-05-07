@@ -55,18 +55,8 @@ public class TempahanFasilitiDAO {
             ps.setInt(1, idPengguna);
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
-                    TempahanFasiliti t = new TempahanFasiliti();
-                    t.setId_tempahan(rs.getInt("id_tempahan"));
-                    t.setId_pengguna(rs.getInt("id_pengguna"));
-                    t.setId_fasiliti(rs.getInt("id_fasiliti"));
-                    t.setTarikh_tempah(rs.getDate("tarikh_tempah"));
-                    t.setMasa_mula(rs.getTime("masa_mula"));
-                    t.setMasa_tamat(rs.getTime("masa_tamat"));
-                    t.setStatus(rs.getString("status"));
-                    t.setCatatan_pemohon(rs.getString("catatan_pemohon"));
-                    t.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
+                    TempahanFasiliti t = mapRowBase(rs);
                     t.setNama_fasiliti(rs.getString("nama_fasiliti"));
-                    t.setAlasanPenolakan(rs.getString("alasan_penolakan"));
                     t.setLatitude(rs.getObject("latitude") != null ? rs.getDouble("latitude") : null);
                     t.setLongitude(rs.getObject("longitude") != null ? rs.getDouble("longitude") : null);
                     t.setGambar_fasiliti(rs.getString("gambar_fasiliti"));
@@ -90,20 +80,10 @@ public class TempahanFasilitiDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
-                TempahanFasiliti t = new TempahanFasiliti();
-                t.setId_tempahan(rs.getInt("id_tempahan"));
-                t.setId_fasiliti(rs.getInt("id_fasiliti"));
-                t.setId_pengguna(rs.getInt("id_pengguna"));
-                t.setTarikh_tempah(rs.getDate("tarikh_tempah"));
-                t.setMasa_mula(rs.getTime("masa_mula"));
-                t.setMasa_tamat(rs.getTime("masa_tamat"));
-                t.setStatus(rs.getString("status"));
-                t.setCatatan_pemohon(rs.getString("catatan_pemohon"));
+                TempahanFasiliti t = mapRowBase(rs);
                 t.setCatatan_pentadbir(rs.getString("catatan_pentadbir"));
-                t.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
                 t.setNama_fasiliti(rs.getString("nama_fasiliti"));
                 t.setNama_pengguna(rs.getString("nama_penuh"));
-                t.setAlasanPenolakan(rs.getString("alasan_penolakan"));
                 senarai.add(t);
             }
         } catch (SQLException e) {
@@ -123,20 +103,10 @@ public class TempahanFasilitiDAO {
             ps.setInt(1, id);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    t = new TempahanFasiliti();
-                    t.setId_tempahan(rs.getInt("id_tempahan"));
-                    t.setId_fasiliti(rs.getInt("id_fasiliti"));
-                    t.setId_pengguna(rs.getInt("id_pengguna"));
-                    t.setTarikh_tempah(rs.getDate("tarikh_tempah"));
-                    t.setMasa_mula(rs.getTime("masa_mula"));
-                    t.setMasa_tamat(rs.getTime("masa_tamat"));
-                    t.setStatus(rs.getString("status"));
-                    t.setCatatan_pemohon(rs.getString("catatan_pemohon"));
+                    t = mapRowBase(rs);
                     t.setCatatan_pentadbir(rs.getString("catatan_pentadbir"));
-                    t.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
                     t.setNama_fasiliti(rs.getString("nama_fasiliti"));
                     t.setNama_pengguna(rs.getString("nama_penuh"));
-                    t.setAlasanPenolakan(rs.getString("alasan_penolakan"));
                 }
             }
         } catch (SQLException e) {
@@ -245,5 +215,20 @@ public class TempahanFasilitiDAO {
             e.printStackTrace();
             return false;
         }
+    }
+
+    private TempahanFasiliti mapRowBase(ResultSet rs) throws SQLException {
+        TempahanFasiliti t = new TempahanFasiliti();
+        t.setId_tempahan(rs.getInt("id_tempahan"));
+        t.setId_pengguna(rs.getInt("id_pengguna"));
+        t.setId_fasiliti(rs.getInt("id_fasiliti"));
+        t.setTarikh_tempah(rs.getDate("tarikh_tempah"));
+        t.setMasa_mula(rs.getTime("masa_mula"));
+        t.setMasa_tamat(rs.getTime("masa_tamat"));
+        t.setStatus(rs.getString("status"));
+        t.setCatatan_pemohon(rs.getString("catatan_pemohon"));
+        t.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
+        t.setAlasanPenolakan(rs.getString("alasan_penolakan"));
+        return t;
     }
 }

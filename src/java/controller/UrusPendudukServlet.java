@@ -36,7 +36,7 @@ public class UrusPendudukServlet extends HttpServlet {
                 List<Pengguna> pendingList = penggunaDAO.getPendingPenduduk();
                 request.setAttribute("pendingList", pendingList);
                 request.setAttribute("activeList", activeList);
-                request.getRequestDispatcher("/views/maklumatPenduduk/urusPendudukJKKK.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/maklumatPenduduk/urusPendudukAJK.jsp").forward(request, response);
             } 
             else if ("/ketua/urus".equals(action)) {
                 List<Pengguna> listAJK = penggunaDAO.getAllAJK();

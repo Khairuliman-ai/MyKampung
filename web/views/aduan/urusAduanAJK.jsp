@@ -354,7 +354,7 @@
         document.getElementById('modalStatus').classList.remove('hidden');
     }
 
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    // closeModal centralized in footer.jsp
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>

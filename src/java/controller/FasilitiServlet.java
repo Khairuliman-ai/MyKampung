@@ -10,7 +10,9 @@ import model.Pengguna;
 import model.TempahanFasiliti;
 import model.ActivityLog;
 import dao.ActivityLogDAO;
+import util.AppConfig;
 import util.DBUtil;
+
 import java.sql.Connection;
 
 import java.io.IOException;
@@ -38,7 +40,7 @@ import javax.servlet.annotation.MultipartConfig;
 )
 public class FasilitiServlet extends HttpServlet {
 
-    private static final String SAVE_DIR = "C:\\Users\\khayx\\OneDrive\\Documents\\SEM5_UMT\\PITA1\\MyKampungData\\gambarFasiliti";
+    private static final String SAVE_DIR = AppConfig.DIR_GAMBAR_FASILITI;
 
     private FasilitiDAO fasilitiDAO = new FasilitiDAO();
     private TempahanFasilitiDAO tempahanDAO = new TempahanFasilitiDAO();

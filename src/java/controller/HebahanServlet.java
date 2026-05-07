@@ -10,6 +10,10 @@ import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.http.*;
 import model.Hebahan;
 import model.Pengguna;
+import util.AppConfig;
+import util.FileUploadUtil;
+
+
 
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024,     // 1MB
@@ -18,7 +22,7 @@ import model.Pengguna;
 )
 public class HebahanServlet extends HttpServlet {
 
-    private static final String SAVE_DIR = "C:\\Users\\khayx\\OneDrive\\Documents\\SEM5_UMT\\PITA1\\MyKampungData\\gambarHebahan";
+    private static final String SAVE_DIR = AppConfig.DIR_GAMBAR_HEBAHAN;
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp)
@@ -94,10 +98,8 @@ public class HebahanServlet extends HttpServlet {
         HebahanDAO dao = new HebahanDAO();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
 
-        File saveDir = new File(SAVE_DIR);
-        if (!saveDir.exists()) saveDir.mkdirs();
-
         try {
+
             if ("/create".equals(path)) {
                 Hebahan h = new Hebahan();
                 h.setId_pengguna(user.getId_pengguna());
@@ -114,12 +116,10 @@ public class HebahanServlet extends HttpServlet {
                 if (tamat != null && !tamat.isEmpty()) h.setTarikh_tamat_acara(sdf.parse(tamat));
                 if (tamatHebahan != null && !tamatHebahan.isEmpty()) h.setTarikh_tamat(sdf.parse(tamatHebahan));
 
-                Part filePart = req.getPart("gambar_poster");
-                if (filePart != null && filePart.getSize() > 0) {
-                    String fileName = "hebahan_" + user.getId_pengguna() + "_" + System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
-                    filePart.write(SAVE_DIR + File.separator + fileName);
-                    h.setGambar_poster(fileName);
-                }
+                String fileName = FileUploadUtil.saveFile(
+                    req.getPart("gambar_poster"), SAVE_DIR, "hebahan_" + user.getId_pengguna() + "_");
+                if (fileName != null) h.setGambar_poster(fileName);
+
 
                 dao.insertHebahan(h);
                 resp.sendRedirect(req.getContextPath() + "/hebahan/list?msg=created");
@@ -138,12 +138,10 @@ public class HebahanServlet extends HttpServlet {
                 if (mula != null && !mula.isEmpty()) h.setTarikh_mula_acara(sdf.parse(mula));
                 if (tamat != null && !tamat.isEmpty()) h.setTarikh_tamat_acara(sdf.parse(tamat));
 
-                Part filePart = req.getPart("gambar_poster");
-                if (filePart != null && filePart.getSize() > 0) {
-                    String fileName = "hebahan_" + user.getId_pengguna() + "_" + System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
-                    filePart.write(SAVE_DIR + File.separator + fileName);
-                    h.setGambar_poster(fileName);
-                }
+                String fileName = FileUploadUtil.saveFile(
+                    req.getPart("gambar_poster"), SAVE_DIR, "hebahan_" + user.getId_pengguna() + "_");
+                if (fileName != null) h.setGambar_poster(fileName);
+
 
                 dao.updateHebahan(h);
                 resp.sendRedirect(req.getContextPath() + "/hebahan/list?msg=updated");

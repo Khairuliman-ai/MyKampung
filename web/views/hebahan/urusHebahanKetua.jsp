@@ -178,9 +178,7 @@
         document.getElementById('delete_id').value = id;
         document.getElementById('modalDelete').classList.remove('hidden');
     }
-    function closeModal(id) {
-        document.getElementById(id).classList.add('hidden');
-    }
+    // closeModal centralized in footer.jsp
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>

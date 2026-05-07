@@ -28,6 +28,29 @@ public class PermohonanBantuanDAO {
         return list;
     }
 
+    public List<PermohonanBantuan> getByPendudukAndKategori(int idPenduduk, String kategori) {
+        List<PermohonanBantuan> list = new ArrayList<>();
+        String sql = "SELECT pb.*, b.nama_bantuan, b.jenis_bantuan " +
+                     "FROM permohonan_bantuan pb " +
+                     "JOIN bantuan b ON pb.id_bantuan = b.id_bantuan " +
+                     "WHERE pb.id_pengguna = ? AND b.jenis_bantuan = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idPenduduk);
+            ps.setString(2, kategori);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    PermohonanBantuan pb = mapRow(rs);
+                    pb.setSenaraiLampiran(lampiranDao.getByPermohonan(pb.getId_permohonan()));
+                    list.add(pb);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
     public List<PermohonanBantuan> getAll() {
         return getAllPaginated(0, Integer.MAX_VALUE);
     }
@@ -82,6 +105,9 @@ public class PermohonanBantuanDAO {
                     pb.setNama_penuh(rs.getString("nama_penuh"));
                     pb.setNombor_kp(rs.getString("nombor_kp"));
                     pb.setNombor_telefon(rs.getString("nombor_telefon"));
+                    pb.setStatus_keluarga(rs.getString("status_keluarga"));
+                    pb.setPekerjaan(rs.getString("pekerjaan"));
+                    pb.setPendapatan(rs.getDouble("pendapatan"));
                     pb.setSenaraiLampiran(lampiranDao.getByPermohonan(pb.getId_permohonan()));
                     list.add(pb);
                 }
@@ -111,6 +137,9 @@ public class PermohonanBantuanDAO {
                     pb.setNama_penuh(rs.getString("nama_penuh"));
                     pb.setNombor_kp(rs.getString("nombor_kp"));
                     pb.setNombor_telefon(rs.getString("nombor_telefon"));
+                    pb.setStatus_keluarga(rs.getString("status_keluarga"));
+                    pb.setPekerjaan(rs.getString("pekerjaan"));
+                    pb.setPendapatan(rs.getDouble("pendapatan"));
                     pb.setSenaraiLampiran(lampiranDao.getByPermohonan(pb.getId_permohonan()));
                     list.add(pb);
                 }

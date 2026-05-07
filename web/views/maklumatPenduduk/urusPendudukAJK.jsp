@@ -359,9 +359,7 @@
         }, 300);
     }
 
-    function openModal(modalId) {
-        document.getElementById(modalId).classList.remove('hidden');
-    }
+    // openModal centralized in footer.jsp
 
     function switchTab(tabName) {
         document.querySelectorAll('nav button').forEach(btn => {
@@ -401,9 +399,7 @@
         document.getElementById('modalEdit').classList.remove('hidden');
     }
 
-    function closeModal(modalId) {
-        document.getElementById(modalId).classList.add('hidden');
-    }
+    // closeModal centralized in footer.jsp
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>

@@ -140,7 +140,24 @@
                                 String jsDokumen = sbDocs.toString();
                                 String jsDokumenAdmin = sbDocsAdmin.toString();
                             %>
-                            onclick="viewDetail('<%= pb.getId_permohonan() %>', '<%= namaBantuanDisplay %>', '<%= pb.getNama_penuh() %>', '<%= (pb.getCatatan_pemohon() != null ? pb.getCatatan_pemohon().replace("'", "\\'") : "") %>', '<%= jsDokumen %>', '<%= pb.getNama_bank() %>', '<%= pb.getNombor_akaun() %>', '<%= pb.getPenyata_bank() %>', true, '<%= pb.getNombor_kp() %>', '<%= pb.getNombor_telefon() %>', '<%= pb.getStatus_keluarga() %>', '<%= pb.getPekerjaan() %>', '<%= pb.getPendapatanFormatted() %>', '<%= pb.getJenis_bantuan() %>', '<%= jsDokumenAdmin %>')">
+                            data-id="<%= pb.getId_permohonan() %>"
+                            data-bantuan="<%= (pb.getNama_bantuan() != null ? pb.getNama_bantuan().replace("\"", "&quot;") : "Lain-lain") %>"
+                            data-pemohon="<%= pb.getNama_penuh().replace("\"", "&quot;") %>"
+                            data-ket="<%= (pb.getCatatan_pemohon() != null ? pb.getCatatan_pemohon().replace("\"", "&quot;") : "") %>"
+                            data-dok="<%= jsDokumen %>"
+                            data-bank="<%= (pb.getNama_bank() != null ? pb.getNama_bank().replace("\"", "&quot;") : "") %>"
+                            data-akaun="<%= (pb.getNombor_akaun() != null ? pb.getNombor_akaun().replace("\"", "&quot;") : "") %>"
+                            data-penbank="<%= (pb.getPenyata_bank() != null ? pb.getPenyata_bank() : "") %>"
+                            data-showaction="true"
+                            data-ic="<%= (pb.getNombor_kp() != null ? pb.getNombor_kp() : "") %>"
+                            data-phone="<%= (pb.getNombor_telefon() != null ? pb.getNombor_telefon() : "") %>"
+                            data-statusk="<%= (pb.getStatus_keluarga() != null ? pb.getStatus_keluarga() : "") %>"
+                            data-kerja="<%= (pb.getPekerjaan() != null ? pb.getPekerjaan() : "") %>"
+                            data-gaji="<%= pb.getPendapatanFormatted() %>"
+                            data-kategori="<%= pb.getJenis_bantuan() %>"
+                            data-ulasan="<%= (pb.getCatatan_pentadbir() != null ? pb.getCatatan_pentadbir().replace("\"", "&quot;") : "") %>"
+                            data-dokadmin="<%= jsDokumenAdmin %>"
+                            onclick="viewDetail(this)">
                             <td class="p-4 text-sm text-gray-400 font-medium"><%= noBaru++ %></td>
                             <td class="p-4 text-sm text-gray-500"><%= dateDisplay %></td>
                             <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-[#6C5DD3] transition-colors"><%= (pb.getNama_penuh() != null) ? pb.getNama_penuh() : "TIADA NAMA" %></td>
@@ -202,7 +219,24 @@
                                 String jsDokumenH = sbDocsH.toString();
                                 String jsDokumenAdminH = sbDocsAdminH.toString();
                             %>
-                            onclick="viewDetail('<%= pb.getId_permohonan() %>', '<%= pb.getNama_bantuan() %>', '<%= pb.getNama_penuh() %>', '<%= (pb.getCatatan_pemohon() != null ? pb.getCatatan_pemohon().replace("'", "\\'") : "") %>', '<%= jsDokumenH %>', '<%= pb.getNama_bank() %>', '<%= pb.getNombor_akaun() %>', '<%= pb.getPenyata_bank() %>', false, '<%= pb.getNombor_kp() %>', '<%= pb.getNombor_telefon() %>', '<%= pb.getStatus_keluarga() %>', '<%= pb.getPekerjaan() %>', '<%= pb.getPendapatanFormatted() %>', '<%= pb.getJenis_bantuan() %>', '<%= jsDokumenAdminH %>')">
+                            data-id="<%= pb.getId_permohonan() %>"
+                            data-bantuan="<%= (pb.getNama_bantuan() != null ? pb.getNama_bantuan().replace("\"", "&quot;") : "Lain-lain") %>"
+                            data-pemohon="<%= pb.getNama_penuh().replace("\"", "&quot;") %>"
+                            data-ket="<%= (pb.getCatatan_pemohon() != null ? pb.getCatatan_pemohon().replace("\"", "&quot;") : "") %>"
+                            data-dok="<%= jsDokumenH %>"
+                            data-bank="<%= (pb.getNama_bank() != null ? pb.getNama_bank().replace("\"", "&quot;") : "") %>"
+                            data-akaun="<%= (pb.getNombor_akaun() != null ? pb.getNombor_akaun().replace("\"", "&quot;") : "") %>"
+                            data-penbank="<%= (pb.getPenyata_bank() != null ? pb.getPenyata_bank() : "") %>"
+                            data-showaction="false"
+                            data-ic="<%= (pb.getNombor_kp() != null ? pb.getNombor_kp() : "") %>"
+                            data-phone="<%= (pb.getNombor_telefon() != null ? pb.getNombor_telefon() : "") %>"
+                            data-statusk="<%= (pb.getStatus_keluarga() != null ? pb.getStatus_keluarga() : "") %>"
+                            data-kerja="<%= (pb.getPekerjaan() != null ? pb.getPekerjaan() : "") %>"
+                            data-gaji="<%= pb.getPendapatanFormatted() %>"
+                            data-kategori="<%= pb.getJenis_bantuan() %>"
+                            data-ulasan="<%= (pb.getCatatan_pentadbir() != null ? pb.getCatatan_pentadbir().replace("\"", "&quot;") : "") %>"
+                            data-dokadmin="<%= jsDokumenAdminH %>"
+                            onclick="viewDetail(this)">
                             <td class="p-4 text-sm text-gray-400 font-medium"><%= noSejarah++ %></td>
                             <td class="p-4 text-sm text-gray-500"><%= sdf.format(pb.getDibuat_pada()) %></td>
                             <td class="p-4 text-sm font-bold text-gray-700 group-hover:text-[#6C5DD3] transition-colors"><%= pb.getNama_penuh() %></td>
@@ -321,7 +355,7 @@
                         </td>
                         <td class="p-4 text-center">
                             <div class="flex justify-center gap-2">
-                                <button onclick="openEditBantuanModal('<%= b.getId_bantuan() %>', '<%= b.getNama_bantuan() %>', '<%= b.getJenis_bantuan() %>', '<%= b.getJumlah_bantuan() %>', '<%= (b.getSyarat_dokumen() != null ? b.getSyarat_dokumen().replace("'", "\\'") : "") %>')" 
+                                <button onclick="openEditBantuanModal('<%= b.getId_bantuan() %>', '<%= b.getNama_bantuan().replace("'", "\\'") %>', '<%= b.getJenis_bantuan() %>', '<%= b.getJumlah_bantuan() %>', '<%= (b.getSyarat_dokumen() != null ? b.getSyarat_dokumen().replace("'", "\\'") : "") %>')" 
                                         class="w-8 h-8 flex items-center justify-center rounded-lg text-blue-600 hover:bg-blue-50 transition" title="Edit">
                                     <i class="fas fa-edit text-xs"></i>
                                 </button>
@@ -510,6 +544,19 @@
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- Feedback Section (Admin Feedback) -->
+                    <div id="ulasanDiv" class="space-y-4 pt-4 border-t border-gray-100 hidden">
+                        <h5 class="text-[11px] font-bold text-orange-400 uppercase tracking-widest flex items-center gap-2">
+                            <i class="fas fa-comment-dots"></i> Maklum Balas Semasa
+                        </h5>
+                        <div class="bg-orange-50/50 p-6 rounded-[2rem] border border-orange-100 relative">
+                            <i class="fas fa-quote-left absolute top-4 left-4 text-orange-100 text-3xl"></i>
+                            <div class="relative z-10 pl-8">
+                                <p id="detUlasan" class="text-sm text-gray-700 leading-relaxed font-medium italic">-</p>
+                            </div>
+                        </div>
+                    </div>
 
                     <!-- Bottom Section: Keterangan & Documents -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
@@ -528,14 +575,17 @@
                             <h5 class="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                                 <i class="fas fa-folder-open text-gray-400"></i> Dokumen Sokongan
                             </h5>
-                        <div class="space-y-4">
-                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Dokumen Sokongan (Pemohon)</label>
                         <div id="dokumenList" class="flex flex-wrap gap-2">
-                            <a id="detDokMain" href="#" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-100 transition shadow-sm border border-red-100 hidden">
+                            <!-- Dynamic Documents -->
+                        </div>
+                        <%-- Template hidden separate from the list to prevent destruction --%>
+                        <div class="hidden">
+                            <a id="detDokMain" href="#" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-100 transition shadow-sm border border-red-100">
                                 <i class="fas fa-file-pdf"></i> PDF
                             </a>
                         </div>
                     </div>
+                </div>
 
                     <!-- Admin Documents Section -->
                     <div id="detAdminDokSection" class="space-y-4 pt-4 border-t border-gray-100 hidden">
@@ -653,7 +703,7 @@
                 <span id="actTitle">Tindakan AJK</span>
                 <button onclick="closeModal('modalTindakan')"><i class="fas fa-times"></i></button>
             </div>
-            <form action="<%= request.getContextPath() %>/bantuan/reviewJKKK" method="post" class="p-6">
+            <form action="<%= request.getContextPath() %>/bantuan/reviewAJK" method="post" class="p-6">
                 <input type="hidden" name="idPermohonan" id="actId">
                 <input type="hidden" name="keputusan" id="actDecision">
                 <div id="boxLengkap" class="hidden text-center py-4">
@@ -728,8 +778,7 @@
         }
     });
 
-    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    // Functions centralized in footer.jsp
 
     function openActionModal(id, name, type) {
         document.getElementById('actId').value = id;
@@ -765,103 +814,135 @@
         openModal('modalEditBantuan');
     }
 
-    function viewDetail(id, bantuan, pemohon, ket, dok, bank, akaun, penBank, showAction = false, ic, phone, statusK, kerja, gaji, kategori, dokAdmin) {
+    function viewDetail(row) {
+        const d = row.dataset;
+        const id = d.id;
+        const bantuan = d.bantuan;
+        const showAction = (d.showaction === "true");
+        const kategori = d.kategori;
+
         document.getElementById('detId').innerText = "#" + id;
         document.getElementById('detBantuan').innerText = bantuan;
-        document.getElementById('detPemohon').innerText = pemohon;
-        document.getElementById('detIC').innerText = (ic && ic !== "null") ? ic : "-";
-        document.getElementById('detPhone').innerText = (phone && phone !== "null") ? phone : "-";
-        document.getElementById('detStatusK').innerText = (statusK && statusK !== "null") ? statusK : "-";
-        document.getElementById('detPekerjaan').innerText = (kerja && kerja !== "null") ? kerja : "-";
-        document.getElementById('detPendapatan').innerText = (gaji && gaji !== "null") ? gaji : "RM 0.00";
-        document.getElementById('detKeterangan').innerText = (ket && ket !== "null") ? ket : "Tiada keterangan tambahan.";
+        document.getElementById('detPemohon').innerText = d.pemohon;
+        document.getElementById('detIC').innerText = (d.ic && d.ic !== "null") ? d.ic : "-";
+        document.getElementById('detPhone').innerText = (d.phone && d.phone !== "null") ? d.phone : "-";
+        document.getElementById('detStatusK').innerText = (d.statusk && d.statusk !== "null") ? d.statusk : "-";
+        document.getElementById('detPekerjaan').innerText = (d.kerja && d.kerja !== "null") ? d.kerja : "-";
+        document.getElementById('detPendapatan').innerText = (d.gaji && d.gaji !== "null") ? d.gaji : "RM 0.00";
+        document.getElementById('detKeterangan').innerText = (d.ket && d.ket !== "null") ? d.ket : "Tiada keterangan tambahan.";
         
+        // Handle Ulasan Display
+        const ulasanDiv = document.getElementById('ulasanDiv');
+        const detUlasan = document.getElementById('detUlasan');
+        if (ulasanDiv && detUlasan) {
+            if (d.ulasan && d.ulasan !== "" && d.ulasan !== "null") {
+                ulasanDiv.classList.remove('hidden');
+                detUlasan.innerText = d.ulasan;
+            } else {
+                ulasanDiv.classList.add('hidden');
+            }
+        }
+        
+        const bank = d.bank;
+        const akaun = d.akaun;
+        const penBank = d.penbank;
+        const dok = d.dok;
+        const dokAdmin = d.dokadmin;
+        const ctx = '<%= request.getContextPath() %>';
+
         // Bank Section Logic
         const bankCard = document.getElementById('bankCard');
-        if (kategori === "RASMI") {
-            bankCard.innerHTML = `
-                <div class="flex flex-col items-center justify-center h-full text-center p-4">
-                    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-500 mb-3">
-                        <i class="fas fa-info-circle text-xl"></i>
+        if (bankCard) {
+            if (kategori === "RASMI") {
+                bankCard.innerHTML = `
+                    <div class="flex flex-col items-center justify-center h-full text-center p-4">
+                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-500 mb-3">
+                            <i class="fas fa-info-circle text-xl"></i>
+                        </div>
+                        <p class="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Bantuan Rasmi</p>
+                        <p class="text-xs text-blue-600 font-medium mt-1 italic leading-relaxed">Maklumat perbankan tidak diperlukan atau dikendalikan oleh agensi luar.</p>
                     </div>
-                    <p class="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Bantuan Rasmi</p>
-                    <p class="text-xs text-blue-600 font-medium mt-1 italic leading-relaxed">Maklumat perbankan tidak diperlukan atau dikendalikan oleh agensi luar.</p>
-                </div>
-            `;
-        } else {
-            bankCard.innerHTML = `
-                <div class="absolute -right-4 -bottom-4 opacity-5">
-                    <i class="fas fa-credit-card text-7xl"></i>
-                </div>
-                <div class="space-y-4 relative z-10">
-                    <div>
-                        <p class="text-[10px] text-blue-400 font-bold uppercase mb-1">Nama Bank</p>
-                        <p id="detBank" class="font-bold text-blue-900 uppercase tracking-wide text-lg">` + ((bank && bank !== "null") ? bank : "-") + `</p>
+                `;
+            } else {
+                const pbUrl = (penBank && penBank !== "null") ? ctx + '/file/bantuan/' + penBank : '#';
+                const pbClass = (penBank && penBank !== "null") ? '' : 'opacity-50 pointer-events-none';
+                
+                bankCard.innerHTML = `
+                    <div class="absolute -right-4 -bottom-4 opacity-5">
+                        <i class="fas fa-credit-card text-7xl"></i>
                     </div>
-                    <div>
-                        <p class="text-[10px] text-blue-400 font-bold uppercase mb-1">Nombor Akaun</p>
-                        <p id="detAkaun" class="font-bold text-blue-900 text-xl tracking-widest">` + ((akaun && akaun !== "null") ? akaun : "-") + `</p>
+                    <div class="space-y-4 relative z-10">
+                        <div>
+                            <p class="text-[10px] text-blue-400 font-bold uppercase mb-1">Nama Bank</p>
+                            <p class="font-bold text-blue-900 uppercase tracking-wide text-lg">\${(bank && bank !== "null") ? bank : "-"}</p>
+                        </div>
+                        <div>
+                            <p class="text-[10px] text-blue-400 font-bold uppercase mb-1">Nombor Akaun</p>
+                            <p class="font-bold text-blue-900 text-xl tracking-widest">\${(akaun && akaun !== "null") ? akaun : "-"}</p>
+                        </div>
+                        <div class="pt-2">
+                            <a href="\${pbUrl}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-blue-600 rounded-xl text-xs font-bold shadow-sm border border-blue-100 hover:shadow-md transition-all \${pbClass}">
+                                <i class="fas fa-file-invoice-dollar"></i> Lihat Penyata Bank
+                            </a>
+                        </div>
                     </div>
-                    <div class="pt-2">
-                        <a id="detDokBank" href="` + ((penBank && penBank !== "null") ? '<%= request.getContextPath() %>/file/bantuan/' + penBank : '#') + `" 
-                           target="_blank" 
-                           class="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-blue-600 rounded-xl text-xs font-bold shadow-sm border border-blue-100 hover:shadow-md transition-all ` + ((penBank && penBank !== "null") ? '' : 'opacity-50 pointer-events-none') + `">
-                            <i class="fas fa-file-invoice-dollar"></i> Lihat Penyata Bank
-                        </a>
-                    </div>
-                </div>
-            `;
+                `;
+            }
         }
-
-        const ctx = '<%= request.getContextPath() %>';
         
         // Handle Action Buttons
         const actionBox = document.getElementById('detActionBox');
-        if(showAction) {
-            actionBox.classList.remove('hidden');
-            document.getElementById('btnDetReject').onclick = () => { closeModal('modalDetail'); openActionModal(id, bantuan, 'tak_lengkap'); };
-            document.getElementById('btnDetApprove').onclick = () => { closeModal('modalDetail'); openActionModal(id, bantuan, 'lengkap'); };
-        } else {
-            actionBox.classList.add('hidden');
+        if(actionBox) {
+            if(showAction) {
+                actionBox.classList.remove('hidden');
+                document.getElementById('btnDetReject').onclick = () => { closeModal('modalDetail'); openActionModal(id, bantuan, 'tak_lengkap'); };
+                document.getElementById('btnDetApprove').onclick = () => { closeModal('modalDetail'); openActionModal(id, bantuan, 'lengkap'); };
+            } else {
+                actionBox.classList.add('hidden');
+            }
         }
 
         // Handle Multiple Documents
         const dokumenList = document.getElementById('dokumenList');
         const template = document.getElementById('detDokMain');
-        dokumenList.innerHTML = '';
-        if(template) dokumenList.appendChild(template);
         
-        if(dok) {
-            const files = dok.split(',');
-            files.forEach(f => {
-                const newLink = template.cloneNode(true);
-                newLink.classList.remove('hidden');
-                newLink.href = ctx + "/file/bantuan/" + f;
-                newLink.innerHTML = '<i class="fas fa-file-pdf"></i> PDF';
-                dokumenList.appendChild(newLink);
-            });
+        if (dokumenList) {
+            dokumenList.innerHTML = '';
+            if(dok && template) {
+                const files = dok.split(',');
+                files.forEach(f => {
+                    const newLink = template.cloneNode(true);
+                    newLink.id = "";
+                    newLink.classList.remove('hidden');
+                    newLink.href = ctx + "/file/bantuan/" + f;
+                    newLink.innerHTML = '<i class="fas fa-file-pdf"></i> PDF';
+                    dokumenList.appendChild(newLink);
+                });
+            }
         }
 
         // Handle Admin Documents
         const adminDokList = document.getElementById('dokumenAdminList');
         const adminDokSection = document.getElementById('detAdminDokSection');
-        adminDokList.innerHTML = '';
-        
-        if(dokAdmin && dokAdmin !== "") {
-            adminDokSection.classList.remove('hidden');
-            const filesA = dokAdmin.split(',');
-            filesA.forEach(f => {
-                const newLink = template.cloneNode(true);
-                newLink.classList.remove('hidden');
-                newLink.classList.replace('bg-red-50', 'bg-purple-50');
-                newLink.classList.replace('text-red-600', 'text-[#6C5DD3]');
-                newLink.classList.replace('border-red-100', 'border-purple-100');
-                newLink.href = ctx + "/file/bantuan/" + f;
-                newLink.innerHTML = '<i class="fas fa-file-check"></i> ' + decodeURIComponent(f).split('_').slice(2).join('_');
-                adminDokList.appendChild(newLink);
-            });
-        } else {
-            adminDokSection.classList.add('hidden');
+        if (adminDokList) {
+            adminDokList.innerHTML = '';
+            if(dokAdmin && dokAdmin !== "" && template) {
+                if(adminDokSection) adminDokSection.classList.remove('hidden');
+                const filesA = dokAdmin.split(',');
+                filesA.forEach(f => {
+                    const newLink = template.cloneNode(true);
+                    newLink.id = "";
+                    newLink.classList.remove('hidden');
+                    newLink.classList.replace('bg-red-50', 'bg-purple-50');
+                    newLink.classList.replace('text-red-600', 'text-[#6C5DD3]');
+                    newLink.classList.replace('border-red-100', 'border-purple-100');
+                    newLink.href = ctx + "/file/bantuan/" + f;
+                    newLink.innerHTML = '<i class="fas fa-check-circle"></i> ' + decodeURIComponent(f).split('_').slice(2).join('_');
+                    adminDokList.appendChild(newLink);
+                });
+            } else {
+                if(adminDokSection) adminDokSection.classList.add('hidden');
+            }
         }
 
         openModal('modalDetail');

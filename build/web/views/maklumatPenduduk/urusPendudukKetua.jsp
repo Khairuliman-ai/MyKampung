@@ -53,7 +53,7 @@
 
     <div class="mb-6 border-b border-gray-200">
         <nav class="flex gap-6" aria-label="Tabs">
-            <button onclick="switchTab('jkkk')" id="tab-jkkk" 
+            <button onclick="switchTab('ajk')" id="tab-ajk" 
                     class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-[#6C5DD3] text-[#6C5DD3]">
                 <i class="fas fa-id-badge"></i> Senarai AJK
             </button>
@@ -64,7 +64,7 @@
         </nav>
     </div>
 
-    <div id="content-jkkk" class="block">
+    <div id="content-ajk" class="block">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -80,10 +80,10 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <% 
-                        List<Pengguna> listJKKK = (List<Pengguna>) request.getAttribute("listAJK");
-                        if (listJKKK != null && !listJKKK.isEmpty()) {
+                        List<Pengguna> listAJK = (List<Pengguna>) request.getAttribute("listAJK");
+                        if (listAJK != null && !listAJK.isEmpty()) {
                             int countAJK = 1;
-                            for (Pengguna p : listJKKK) { 
+                            for (Pengguna p : listAJK) { 
                         %>
                         <tr class="hover:bg-purple-50/30 transition">
                             <td class="p-4 text-sm text-gray-500 font-medium"><%= countAJK++ %></td>
@@ -220,7 +220,7 @@
             </div>
             <div>
                 <p class="text-xs text-gray-500 font-bold uppercase">Ahli AJK</p>
-                <h4 class="font-bold text-xl text-gray-800"><%= (listJKKK != null) ? listJKKK.size() : 0 %></h4>
+                <h4 class="font-bold text-xl text-gray-800"><%= (listAJK != null) ? listAJK.size() : 0 %></h4>
             </div>
         </div>
         <div class="bg-blue-50 p-4 rounded-2xl flex items-center gap-4 border border-blue-100">
@@ -466,13 +466,12 @@
         });
         document.getElementById('tab-' + tabName).classList.add('border-[#6C5DD3]', 'text-[#6C5DD3]');
         document.getElementById('tab-' + tabName).classList.remove('border-transparent', 'text-gray-500');
-        document.getElementById('content-jkkk').classList.add('hidden');
+        document.getElementById('content-ajk').classList.add('hidden');
         document.getElementById('content-penduduk').classList.add('hidden');
         document.getElementById('content-' + tabName).classList.remove('hidden');
     }
 
-    function openModal(modalId) { document.getElementById(modalId).classList.remove('hidden'); }
-    function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
+    // Functions centralized in footer.jsp
 
     function openEditModal(id, nama, kp, tel, jalan, bandar, poskod, negeri, tarikh, statusKeluarga) {
         document.getElementById('editId').value = id;

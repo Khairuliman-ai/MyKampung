@@ -275,7 +275,7 @@
     <form action="${pageContext.request.contextPath}/RegisterServlet" method="post" enctype="multipart/form-data" class="py-3 px-4">
 
         <h4 class="fw-bold text-center mb-1">Daftar Penduduk</h4>
-        <p class="text-muted text-center small mb-4">Sila isi butiran dengan lengkap untuk pengesahan JKKK</p>
+        <p class="text-muted text-center small mb-4">Sila isi butiran dengan lengkap untuk pengesahan AJK</p>
 
         <div class="mb-3 text-start">
             <label class="form-label small fw-bold text-dark">Nama Penuh (Seperti dalam MyKad):</label>
@@ -426,7 +426,7 @@
             </div>
             
             <div class="modal-footer border-0 pt-0 pb-4 px-4 justify-content-center">
-                <p class="text-muted mb-0" style="font-size: 11px;">Perlukan bantuan? Hubungi pentadbir JKKK Danan.</p>
+                <p class="text-muted mb-0" style="font-size: 11px;">Perlukan bantuan? Hubungi pentadbir AJK Danan.</p>
             </div>
         </div>
     </div>

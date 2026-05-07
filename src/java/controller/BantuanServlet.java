@@ -8,6 +8,8 @@ import dao.PermohonanBantuanDAO;
 import model.Pengguna;
 import model.BantuanLampiran;
 import dao.BantuanLampiranDAO;
+import util.AppConfig;
+
 
 import java.util.Collection;
 import javax.servlet.http.Part;
@@ -30,7 +32,8 @@ import javax.servlet.http.*;
 public class BantuanServlet extends HttpServlet {
 
     private static final String SAVE_DIR
-            = "C:\\Users\\khayx\\OneDrive\\Documents\\SEM5_UMT\\PITA1\\MyKampungData\\lampiranBantuan";
+            = AppConfig.DIR_LAMPIRAN_BANTUAN;
+
 
     // ======================= GET =======================
     @Override
@@ -64,7 +67,7 @@ public class BantuanServlet extends HttpServlet {
                     request.getRequestDispatcher("/views/bantuan/jenisBantuan.jsp")
                             .forward(request, response);
 
-                } else if ("JKKK".equalsIgnoreCase(user.getNama_peranan()) || "AJK".equalsIgnoreCase(user.getNama_peranan()) || "AJK Kampung".equalsIgnoreCase(user.getNama_peranan())) {
+                } else if ("AJK".equalsIgnoreCase(user.getNama_peranan()) || "AJK Kampung".equalsIgnoreCase(user.getNama_peranan())) {
                     int page = 1;
                     int pageSize = 10;
                     try {
@@ -124,26 +127,10 @@ public class BantuanServlet extends HttpServlet {
                 }
 
                 PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
-                List<PermohonanBantuan> fullList = pbDao.getByPenduduk(user.getId_pengguna());
-
-                List<PermohonanBantuan> listRasmi = new ArrayList<>();
                 BantuanDAO bantuanDao = new BantuanDAO();
+                List<PermohonanBantuan> listRasmi = pbDao.getByPendudukAndKategori(user.getId_pengguna(), "RASMI");
                 List<Bantuan> senaraiRasmiDB = bantuanDao.getBantuanByKategori("RASMI");
 
-                if (fullList != null) {
-                    for (PermohonanBantuan pb : fullList) {
-                        boolean isRasmi = false;
-                        for (Bantuan b : senaraiRasmiDB) {
-                            if (b.getId_bantuan() == pb.getId_bantuan()) {
-                                isRasmi = true;
-                                break;
-                            }
-                        }
-                        if (isRasmi) {
-                            listRasmi.add(pb);
-                        }
-                    }
-                }
 
                 request.setAttribute("permohonanList", listRasmi);
                 request.setAttribute("senaraiJenisBantuan", senaraiRasmiDB); 
@@ -156,26 +143,10 @@ public class BantuanServlet extends HttpServlet {
                 }
 
                 PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
-                List<PermohonanBantuan> fullList = pbDao.getByPenduduk(user.getId_pengguna());
-
                 BantuanDAO bantuanDao = new BantuanDAO();
+                List<PermohonanBantuan> listKomuniti = pbDao.getByPendudukAndKategori(user.getId_pengguna(), "KOMUNITI");
                 List<Bantuan> senaraiKomunitiDB = bantuanDao.getBantuanByKategori("KOMUNITI");
-                
-                List<PermohonanBantuan> listKomuniti = new ArrayList<>();
-                if (fullList != null) {
-                    for (PermohonanBantuan pb : fullList) {
-                        boolean isKomuniti = false;
-                        for (Bantuan b : senaraiKomunitiDB) {
-                            if (b.getId_bantuan() == pb.getId_bantuan()) {
-                                isKomuniti = true;
-                                break;
-                            }
-                        }
-                        if (isKomuniti) {
-                            listKomuniti.add(pb);
-                        }
-                    }
-                }
+
 
                 request.setAttribute("permohonanList", listKomuniti);       
                 request.setAttribute("senaraiJenisBantuan", senaraiKomunitiDB); 
@@ -424,22 +395,22 @@ public class BantuanServlet extends HttpServlet {
                     }
                 }
             }
-            else if ("/reviewJKKK".equals(action)) {
+            else if ("/reviewAJK".equals(action)) {
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 String keputusan = request.getParameter("keputusan"); 
-                String ulasanJKKK = request.getParameter("ulasan");   
+                String ulasanAJK = request.getParameter("ulasan");   
 
                 int statusBaru;
                 String catatanSimpan;
 
                 if ("lengkap".equals(keputusan)) {
                     statusBaru = 3;
-                    catatanSimpan = "Disemak oleh JKKK: Dokumen Lengkap.";
+                    catatanSimpan = "Disemak oleh AJK: Dokumen Lengkap.";
                 } else {
                     statusBaru = 2;
-                    catatanSimpan = (ulasanJKKK != null && !ulasanJKKK.trim().isEmpty())
-                            ? ulasanJKKK
-                            : "Dokumen tidak lengkap. Sila hubungi JKKK.";
+                    catatanSimpan = (ulasanAJK != null && !ulasanAJK.trim().isEmpty())
+                            ? ulasanAJK
+                            : "Dokumen tidak lengkap. Sila hubungi AJK.";
                 }
 
                 pbDao.updateStatus(idPermohonan, statusBaru, catatanSimpan, null);
@@ -485,7 +456,7 @@ public class BantuanServlet extends HttpServlet {
             
             else if ("/tambahJenisBantuan".equals(action) || "/kemaskiniJenisBantuan".equals(action)) {
                 String role = user.getNama_peranan();
-                if (!"JKKK".equalsIgnoreCase(role) && !"Ketua Kampung".equalsIgnoreCase(role) && !"AJK".equalsIgnoreCase(role) && !"AJK Kampung".equalsIgnoreCase(role)) {
+                if (!"AJK".equalsIgnoreCase(role) && !"Ketua Kampung".equalsIgnoreCase(role) && !"AJK Kampung".equalsIgnoreCase(role)) {
                     response.sendRedirect(request.getContextPath() + "/dashboard?error=denied");
                     return;
                 }

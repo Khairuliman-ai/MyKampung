@@ -31,7 +31,7 @@
                 <ul class="list-unstyled footer-contact">
                     <li class="mb-3">
                         <i class="bi bi-geo-alt-fill me-2 text-primary"></i>
-                        Pejabat JKKK Kampung Danan, Besut, Terengganu
+                        Pejabat AJK Kampung Danan, Besut, Terengganu
                     </li>
                     <li class="mb-3">
                         <i class="bi bi-envelope-fill me-2 text-primary"></i>

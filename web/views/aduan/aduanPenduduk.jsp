@@ -181,8 +181,7 @@
 </div>
 
 <script>
-    function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+    // Functions now centralized in footer.jsp
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>
