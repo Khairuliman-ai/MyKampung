@@ -49,9 +49,9 @@
 
             <a href="<%= contextPath %>/DashboardServlet" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
-               <%= (currentPath.contains("dashboard") || currentPath.contains("dpenduduk") || currentPath.contains("dketua") || currentPath.contains("dajk")) ? activeClass : inactiveClass %>">
+               <%= (currentPath.contains("dashboard")) ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-th-large <%= (currentPath.contains("dashboard") || currentPath.contains("dpenduduk") || currentPath.contains("dketua") || currentPath.contains("dAJK")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-th-large <%= (currentPath.contains("dashboard")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
                 </div>
                 <span class="font-medium text-sm">Papan Pemuka</span>
             </a>

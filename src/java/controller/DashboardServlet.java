@@ -62,7 +62,7 @@ public class DashboardServlet extends HttpServlet {
         if ("Pentadbir Sistem".equals(peranan)) {
             request.getRequestDispatcher("/admin/dashboard.jsp").forward(request, response);
         } else if ("Ketua Kampung".equals(peranan)) {
-            request.getRequestDispatcher("/views/dashboard/dKetuaKampung.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/dashboard/ketuaDashboard.jsp").forward(request, response);
         } else if ("AJK Kampung".equals(peranan)) {
             /**
              * Penapis Biro Spesifik:
@@ -70,7 +70,7 @@ public class DashboardServlet extends HttpServlet {
              * masing-masing.
              */
             if ("Setiausaha".equals(biro)) {
-                request.getRequestDispatcher("/views/dashboard/dAJK.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/dashboard/setiausahaDashboard.jsp").forward(request, response);
             } else if ("Biro Kebajikan & Sosial".equals(biro)) {
                 request.getRequestDispatcher("/views/dashboard/biroKebajikanDashboard.jsp").forward(request, response);
             } else if ("Biro Sukan & Riadah".equals(biro)) {
@@ -81,7 +81,7 @@ public class DashboardServlet extends HttpServlet {
                 request.getRequestDispatcher("/views/dashboard/biroHebahanDashboard.jsp").forward(request, response);
             } else {
                 // Default dashboard if biro-specific one doesn't exist
-                request.getRequestDispatcher("/views/dashboard/dAJK.jsp").forward(request, response);
+                request.getRequestDispatcher("/views/dashboard/setiausahaDashboard.jsp").forward(request, response);
             }
         } else if ("Penduduk".equals(peranan)) {
             // Fetch data for Resident Dashboard
@@ -125,7 +125,7 @@ public class DashboardServlet extends HttpServlet {
                 e.printStackTrace();
             }
 
-            request.getRequestDispatcher("/views/dashboard/dPenduduk.jsp").forward(request, response);
+            request.getRequestDispatcher("/views/dashboard/pendudukDashboard.jsp").forward(request, response);
         } else {
             // Jika peranan tidak dikenali, hantar balik ke login
             if (session != null) session.invalidate();
