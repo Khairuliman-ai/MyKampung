@@ -1,1 +1,9 @@
-/dist/
+# Abaikan hasil compile NetBeans
+build/
+nbbuild/
+dist/
+nbproject/private/
+
+# Abaikan fail sistem
+.DS_Store
+Thumbs.db
