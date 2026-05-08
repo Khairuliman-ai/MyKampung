@@ -7,7 +7,7 @@ public class FasilitiSlot {
     private int id_fasiliti;
     private Time masa_mula;
     private Time masa_tamat;
-    private int durasi;
+    private String durasi;
 
     public FasilitiSlot() {}
 
@@ -23,6 +23,6 @@ public class FasilitiSlot {
     public Time getMasa_tamat() { return masa_tamat; }
     public void setMasa_tamat(Time masa_tamat) { this.masa_tamat = masa_tamat; }
 
-    public int getDurasi() { return durasi; }
-    public void setDurasi(int durasi) { this.durasi = durasi; }
+    public String getDurasi() { return durasi; }
+    public void setDurasi(String durasi) { this.durasi = durasi; }
 }

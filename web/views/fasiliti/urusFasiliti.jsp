@@ -1,4 +1,4 @@
-<%@ page import="java.util.*, model.*" %>
+<%@ page import="java.util.*, model.*, util.StatusConstant" %>
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
 <!-- Leaflet Control Geocoder -->
@@ -49,7 +49,7 @@
                 <% 
                     int pendingCount = 0;
                     if (senaraiTempahan != null) {
-                        for (TempahanFasiliti t : senaraiTempahan) if ("MENUNGGU".equals(t.getStatus())) pendingCount++;
+                        for (TempahanFasiliti t : senaraiTempahan) if (StatusConstant.TEMPAHAN_MENUNGGU.equals(t.getStatus())) pendingCount++;
                     }
                 %>
                 <h3 class="text-2xl font-bold text-gray-800"><%= pendingCount %></h3>
@@ -109,7 +109,7 @@
                                 </td>
                                 <td class="px-8 py-6 text-sm text-gray-500"><%= f.getLokasi() %></td>
                                 <td class="px-8 py-6">
-                                    <% if ("AKTIF".equalsIgnoreCase(f.getStatus())) { %>
+                                    <% if (StatusConstant.FASILITI_AKTIF.equalsIgnoreCase(f.getStatus())) { %>
                                         <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-bold uppercase tracking-wider">Aktif</span>
                                     <% } else { %>
                                         <span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-bold uppercase tracking-wider">Tidak Aktif</span>
@@ -117,7 +117,7 @@
                                 </td>
                                 <td class="px-8 py-6">
                                     <div class="flex justify-center gap-3">
-                                        <% if ("Ketua Kampung".equalsIgnoreCase(role) || "Setiausaha".equals(biro)) {
+                                        <% if (StatusConstant.ROLE_KETUA_KAMPUNG.equalsIgnoreCase(role) || "Setiausaha".equals(biro)) {
                                             if (f.getLatitude() != null && f.getLongitude() != null) { %>
                                             <a href="https://www.google.com/maps/dir/?api=1&destination=<%= f.getLatitude() %>,<%= f.getLongitude() %>"
                                                target="_blank"
@@ -167,7 +167,7 @@
                         <% if (senaraiTempahan != null) { 
                             boolean hasPending = false;
                             for (TempahanFasiliti t : senaraiTempahan) { 
-                                if ("MENUNGGU".equals(t.getStatus())) {
+                                if (StatusConstant.TEMPAHAN_MENUNGGU.equals(t.getStatus())) {
                                     hasPending = true; %>
                             <tr class="hover:bg-gray-50/50 transition-colors">
                                 <td class="px-8 py-6">
@@ -220,7 +220,7 @@
                         <% if (senaraiTempahan != null) { 
                             boolean hasActive = false;
                             for (TempahanFasiliti t : senaraiTempahan) { 
-                                if ("LULUS".equals(t.getStatus())) {
+                                if (StatusConstant.TEMPAHAN_LULUS.equals(t.getStatus())) {
                                     hasActive = true; %>
                             <tr class="hover:bg-gray-50/50 transition-colors">
                                 <td class="px-8 py-6">
@@ -263,7 +263,7 @@
                         <% if (senaraiTempahan != null) { 
                             boolean hasHistory = false;
                             for (TempahanFasiliti t : senaraiTempahan) { 
-                                if ("TOLAK".equals(t.getStatus()) || "DIBATAL".equals(t.getStatus())) {
+                                if (StatusConstant.TEMPAHAN_TOLAK.equals(t.getStatus()) || StatusConstant.TEMPAHAN_DIBATAL.equals(t.getStatus())) {
                                     hasHistory = true; %>
                             <tr class="hover:bg-gray-50/50 transition-colors">
                                 <td class="px-8 py-6">
@@ -274,11 +274,11 @@
                                 <td class="px-8 py-6 text-xs text-gray-700 font-bold"><%= t.getTarikh_tempah() %></td>
                                 <td class="px-8 py-6">
                                     <p class="text-[10px] text-gray-500 italic max-w-[200px]">
-                                        <%= t.getStatus().equals("TOLAK") ? "Alasan: " + (t.getAlasanPenolakan() != null ? t.getAlasanPenolakan() : "-") : "Dibatalkan oleh penduduk" %>
+                                        <%= t.getStatus().equals(StatusConstant.TEMPAHAN_TOLAK) ? "Alasan: " + (t.getAlasanPenolakan() != null ? t.getAlasanPenolakan() : "-") : "Dibatalkan oleh penduduk" %>
                                     </p>
                                 </td>
                                 <td class="px-8 py-6 text-center">
-                                    <% if ("TOLAK".equals(t.getStatus())) { %>
+                                    <% if (StatusConstant.TEMPAHAN_TOLAK.equals(t.getStatus())) { %>
                                         <span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-bold uppercase tracking-wider">Ditolak</span>
                                     <% } else { %>
                                         <span class="px-3 py-1 bg-gray-50 text-gray-400 rounded-full text-[10px] font-bold uppercase tracking-wider">Dibatalkan</span>
@@ -375,8 +375,8 @@
                 <div class="space-y-2">
                     <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Status</label>
                     <select name="status" id="fasilitiStatus" class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium appearance-none">
-                        <option value="AKTIF">AKTIF</option>
-                        <option value="TIDAK AKTIF">TIDAK AKTIF</option>
+                        <option value="<%= StatusConstant.FASILITI_AKTIF %>">AKTIF</option>
+                        <option value="<%= StatusConstant.FASILITI_TIDAK_AKTIF %>">TIDAK AKTIF</option>
                     </select>
                 </div>
 
@@ -666,7 +666,7 @@
         document.getElementById('fasilitiId').value = "";
         document.getElementById('fasilitiNama').value = "";
         document.getElementById('fasilitiLokasi').value = "";
-        document.getElementById('fasilitiStatus').value = "AKTIF";
+        document.getElementById('fasilitiStatus').value = "<%= StatusConstant.FASILITI_AKTIF %>";
         document.getElementById('cardPreviewNama').innerText = "Nama Fasiliti";
         document.getElementById('cardPreviewLokasi').innerText = "Lokasi";
         document.getElementById('cardPreviewImg').src = "${pageContext.request.contextPath}/assets/img/placeholder.png";

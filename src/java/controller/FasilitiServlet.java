@@ -12,6 +12,7 @@ import model.ActivityLog;
 import dao.ActivityLogDAO;
 import util.AppConfig;
 import util.DBUtil;
+import util.StatusConstant;
 
 import java.sql.Connection;
 
@@ -128,10 +129,10 @@ public class FasilitiServlet extends HttpServlet {
                     if (isStaff(user)) handleEditFasiliti(request, response);
                     break;
                 case "/approve":
-                    if (isStaff(user)) handleStatusTempahan(request, response, "LULUS");
+                    if (isStaff(user)) handleStatusTempahan(request, response, StatusConstant.TEMPAHAN_LULUS);
                     break;
                 case "/reject":
-                    if (isStaff(user)) handleStatusTempahan(request, response, "TOLAK");
+                    if (isStaff(user)) handleStatusTempahan(request, response, StatusConstant.TEMPAHAN_TOLAK);
                     break;
                 default:
                     response.sendRedirect(request.getContextPath() + "/fasiliti/list");
@@ -215,21 +216,21 @@ public class FasilitiServlet extends HttpServlet {
         // 3. Determine Initial Status
         String tempoh = request.getParameter("tempoh_tempahan");
         if ("2".equals(tempoh)) {
-            t.setStatus("LULUS");
+            t.setStatus(StatusConstant.TEMPAHAN_LULUS);
         } else if ("FullDay".equals(tempoh) || "HalfDay".equals(tempoh)) {
-            t.setStatus("MENUNGGU");
+            t.setStatus(StatusConstant.TEMPAHAN_MENUNGGU);
         } else {
             // Fallback to facility default
             Fasiliti f = fasilitiDAO.dapatkanFasilitiById(idFasiliti);
             if (f.isRequiresApproval()) {
-                t.setStatus("MENUNGGU");
+                t.setStatus(StatusConstant.TEMPAHAN_MENUNGGU);
             } else {
-                t.setStatus("LULUS");
+                t.setStatus(StatusConstant.TEMPAHAN_LULUS);
             }
         }
         
         if (tempahanDAO.simpanTempahanBaru(t)) {
-            String msg = t.getStatus().equals("LULUS") ? "booked" : "pending_approval";
+            String msg = t.getStatus().equals(StatusConstant.TEMPAHAN_LULUS) ? "booked" : "pending_approval";
             response.sendRedirect(request.getContextPath() + "/fasiliti/list?success=" + msg);
         } else {
             response.sendRedirect(request.getContextPath() + "/fasiliti/list?error=db");
@@ -340,7 +341,7 @@ public class FasilitiServlet extends HttpServlet {
 
     private boolean isStaff(Pengguna user) {
         String role = user.getNama_peranan();
-        return "AJK Kampung".equalsIgnoreCase(role) || "Ketua Kampung".equalsIgnoreCase(role);
+        return StatusConstant.ROLE_AJK_KAMPUNG.equalsIgnoreCase(role) || StatusConstant.ROLE_KETUA_KAMPUNG.equalsIgnoreCase(role);
     }
 
     private void handleGetSlots(HttpServletRequest request, HttpServletResponse response) throws IOException {
@@ -375,42 +376,41 @@ public class FasilitiServlet extends HttpServlet {
 
             List<FasilitiSlot> slots = new ArrayList<>();
             
-            if ("2".equals(durasiStr)) {
-                // Slot 2 Jam: 08:00 - 00:00 (Every 2 hours)
-                int[][] windows = {
-                    {8, 10}, {10, 12}, {12, 14}, {14, 16}, 
-                    {16, 18}, {18, 20}, {20, 22}, {22, 24}
-                };
-                for (int[] win : windows) {
-                    String startStr = String.format("%02d:00:00", win[0]);
-                    String endStr = win[1] == 24 ? "23:59:59" : String.format("%02d:00:00", win[1]);
-                    
-                    Time mula = Time.valueOf(startStr);
-                    Time tamat = Time.valueOf(endStr);
+            // Ambil slot dari database (Database-Driven)
+            List<FasilitiSlot> dbSlots = slotDAO.getSlotsByFasilitiAndDurasi(idFasiliti, durasiStr);
+            
+            for (FasilitiSlot ds : dbSlots) {
+                if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, ds.getMasa_mula(), ds.getMasa_tamat())) {
+                    slots.add(ds);
+                }
+            }
+            
+            // Fallback: Jika tiada slot dalam DB untuk fasiliti ini, gunakan default lama
+            if (slots.isEmpty() && dbSlots.isEmpty()) {
+                if ("2".equals(durasiStr)) {
+                    int[][] windows = {{8, 10}, {10, 12}, {12, 14}, {14, 16}, {16, 18}, {18, 20}, {20, 22}, {22, 24}};
+                    for (int[] win : windows) {
+                        Time mula = Time.valueOf(String.format("%02d:00:00", win[0]));
+                        Time tamat = Time.valueOf(win[1] == 24 ? "23:59:59" : String.format("%02d:00:00", win[1]));
+                        if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, mula, tamat)) {
+                            FasilitiSlot s = new FasilitiSlot();
+                            s.setMasa_mula(mula);
+                            s.setMasa_tamat(tamat);
+                            slots.add(s);
+                        }
+                    }
+                } else if ("HalfDay".equals(durasiStr)) {
+                    Time mula = Time.valueOf("08:00:00"), tamat = Time.valueOf("14:00:00");
                     if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, mula, tamat)) {
                         FasilitiSlot s = new FasilitiSlot();
-                        s.setMasa_mula(mula);
-                        s.setMasa_tamat(tamat);
-                        slots.add(s);
+                        s.setMasa_mula(mula); s.setMasa_tamat(tamat); slots.add(s);
                     }
-                }
-            } else if ("HalfDay".equals(durasiStr)) {
-                Time mula = Time.valueOf("08:00:00");
-                Time tamat = Time.valueOf("14:00:00");
-                if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, mula, tamat)) {
-                    FasilitiSlot s = new FasilitiSlot();
-                    s.setMasa_mula(mula);
-                    s.setMasa_tamat(tamat);
-                    slots.add(s);
-                }
-            } else if ("FullDay".equals(durasiStr)) {
-                Time mula = Time.valueOf("08:00:00");
-                Time tamat = Time.valueOf("22:00:00");
-                if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, mula, tamat)) {
-                    FasilitiSlot s = new FasilitiSlot();
-                    s.setMasa_mula(mula);
-                    s.setMasa_tamat(tamat);
-                    slots.add(s);
+                } else if ("FullDay".equals(durasiStr)) {
+                    Time mula = Time.valueOf("08:00:00"), tamat = Time.valueOf("22:00:00");
+                    if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, mula, tamat)) {
+                        FasilitiSlot s = new FasilitiSlot();
+                        s.setMasa_mula(mula); s.setMasa_tamat(tamat); slots.add(s);
+                    }
                 }
             }
             

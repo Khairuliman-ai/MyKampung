@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.TempahanFasiliti;
 import util.DBUtil;
+import util.StatusConstant;
 
 public class TempahanFasilitiDAO {
 
@@ -130,9 +131,9 @@ public class TempahanFasilitiDAO {
     }
 
     public boolean batalTempahan(int idTempahan, int idPengguna) {
-        String sql = "UPDATE tempahan_fasiliti SET status='DIBATAL', dikemaskini_pada=NOW() " +
+        String sql = "UPDATE tempahan_fasiliti SET status='" + StatusConstant.TEMPAHAN_DIBATAL + "', dikemaskini_pada=NOW() " +
                      "WHERE id_tempahan=? AND id_pengguna=? " +
-                     "AND status IN ('MENUNGGU', 'LULUS') " +
+                     "AND status IN ('" + StatusConstant.TEMPAHAN_MENUNGGU + "', '" + StatusConstant.TEMPAHAN_LULUS + "') " +
                      "AND (tarikh_tempah > CURRENT_DATE OR (tarikh_tempah = CURRENT_DATE AND masa_tamat > CURRENT_TIME))";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -148,7 +149,7 @@ public class TempahanFasilitiDAO {
     public boolean semakKonflikMasa(int idFasiliti, java.sql.Date tarikh, java.sql.Time mula, java.sql.Time tamat) {
         String sql = "SELECT COUNT(*) FROM tempahan_fasiliti " +
                      "WHERE id_fasiliti = ? AND tarikh_tempah = ? " +
-                     "AND status NOT IN ('TOLAK', 'DIBATAL') " +
+                     "AND status NOT IN ('" + StatusConstant.TEMPAHAN_TOLAK + "', '" + StatusConstant.TEMPAHAN_DIBATAL + "') " +
                      "AND ((masa_mula < ? AND masa_tamat > ?) " +
                      "OR (masa_mula < ? AND masa_tamat > ?) " +
                      "OR (masa_mula >= ? AND masa_tamat <= ?))";
@@ -188,7 +189,7 @@ public class TempahanFasilitiDAO {
     public int checkUserQuotaActive(int idPengguna, int idFasiliti) {
         String sql = "SELECT COUNT(*) FROM tempahan_fasiliti " +
                      "WHERE id_pengguna = ? AND id_fasiliti = ? " +
-                     "AND status IN ('MENUNGGU', 'LULUS') " +
+                     "AND status IN ('" + StatusConstant.TEMPAHAN_MENUNGGU + "', '" + StatusConstant.TEMPAHAN_LULUS + "') " +
                      "AND (tarikh_tempah > CURRENT_DATE OR (tarikh_tempah = CURRENT_DATE AND masa_tamat > CURRENT_TIME))";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {

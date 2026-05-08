@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 import model.Fasiliti;
 import util.DBUtil;
+import util.StatusConstant;
 
 public class FasilitiDAO {
 
@@ -17,10 +18,10 @@ public class FasilitiDAO {
                      "(SELECT COUNT(*) FROM tempahan_fasiliti t " +
                      " WHERE t.id_fasiliti = f.id_fasiliti " +
                      " AND t.tarikh_tempah = CURRENT_DATE() " +
-                     " AND t.status = 'LULUS' " +
+                     " AND t.status = '" + StatusConstant.TEMPAHAN_LULUS + "' " +
                      " AND CURRENT_TIME() BETWEEN t.masa_mula AND t.masa_tamat) as occupancy_count, " +
                      "f.requires_approval " +
-                     "FROM fasiliti f WHERE f.status = 'AKTIF'";
+                     "FROM fasiliti f WHERE f.status = '" + StatusConstant.FASILITI_AKTIF + "'";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
@@ -86,7 +87,7 @@ public class FasilitiDAO {
     }
 
     public boolean tambahFasiliti(Fasiliti f) {
-        String sql = "INSERT INTO fasiliti (nama_fasiliti, lokasi, status, latitude, longitude, requires_approval, gambar_fasiliti) VALUES (?, ?, 'AKTIF', ?, ?, ?, ?)";
+        String sql = "INSERT INTO fasiliti (nama_fasiliti, lokasi, status, latitude, longitude, requires_approval, gambar_fasiliti) VALUES (?, ?, '" + StatusConstant.FASILITI_AKTIF + "', ?, ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, f.getNama_fasiliti());
@@ -122,7 +123,7 @@ public class FasilitiDAO {
     }
 
     public boolean padamFasiliti(int id) {
-        String sql = "UPDATE fasiliti SET status='TIDAK_AKTIF', dipadam_pada=NOW() WHERE id_fasiliti=?";
+        String sql = "UPDATE fasiliti SET status='" + StatusConstant.FASILITI_TIDAK_AKTIF + "', dipadam_pada=NOW() WHERE id_fasiliti=?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -139,7 +140,7 @@ public class FasilitiDAO {
                      "(SELECT COUNT(*) FROM tempahan_fasiliti t " +
                      " WHERE t.id_fasiliti = f.id_fasiliti " +
                      " AND t.tarikh_tempah = CURRENT_DATE() " +
-                     " AND t.status = 'LULUS' " +
+                     " AND t.status = '" + StatusConstant.TEMPAHAN_LULUS + "' " +
                      " AND CURRENT_TIME() BETWEEN t.masa_mula AND t.masa_tamat) as occupancy_count, " +
                      "f.requires_approval " +
                      "FROM fasiliti f ORDER BY f.status DESC, f.nama_fasiliti";
