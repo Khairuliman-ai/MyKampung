@@ -7,20 +7,39 @@
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth h-full bg-[#F7F7F9]">
 
-    <header class="flex justify-between items-center mb-8">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-4">
         <div>
-            <h2 class="text-2xl font-bold text-gray-800">Pengurusan Penduduk</h2>
-            <p class="text-gray-500 text-sm">Urus pendaftaran baharu dan kemaskini maklumat penduduk.</p>
+            <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Pengurusan Komuniti</h2>
+            <p class="text-gray-500 mt-1 flex items-center gap-2">
+                <span class="flex h-2 w-2 rounded-full bg-indigo-500"></span>
+                Urus pendaftaran baharu dan kemaskini maklumat penduduk kampung.
+            </p>
         </div>
-    </header>
+    </div>
+
+    <% 
+        List<Pengguna> pendingList = (List<Pengguna>) request.getAttribute("pendingList");
+        List<Pengguna> activeList = (List<Pengguna>) request.getAttribute("activeList");
+    %>
 
     <% if (request.getParameter("status") != null) { %>
-        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
-            <i class="fas fa-check-circle text-lg"></i>
-            <div>
-                <span class="font-bold">Berjaya!</span> Tindakan telah direkodkan.
-            </div>
-            <button onclick="this.parentElement.remove()" class="ml-auto text-green-500 hover:text-green-700"><i class="fas fa-times"></i></button>
+        <% 
+            String status = request.getParameter("status");
+            String alertClass = "bg-green-50 border-green-500 text-green-700";
+            String icon = "fa-check-circle";
+            String msg = "Tindakan telah berjaya direkodkan!";
+            
+            if (status.equals("updated")) msg = "Profil penduduk telah dikemaskini!";
+            else if (status.equals("approved")) msg = "Pendaftaran penduduk telah diluluskan!";
+            else if (status.equals("rejected")) {
+                alertClass = "bg-orange-50 border-orange-500 text-orange-700";
+                icon = "fa-user-minus";
+                msg = "Pendaftaran penduduk telah ditolak.";
+            }
+        %>
+        <div class="<%= alertClass %> border-l-4 p-4 mb-6 rounded-r-xl shadow-sm flex items-center gap-3 animate-fade-in">
+            <i class="fas <%= icon %>"></i>
+            <p class="text-sm font-bold"><%= msg %></p>
         </div>
     <% } %>
 
@@ -29,11 +48,7 @@
             <button onclick="switchTab('pending')" id="tab-pending" 
                     class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-[#6C5DD3] text-[#6C5DD3]">
                 <i class="fas fa-user-plus"></i> Permohonan Baru
-                <% 
-             List<Pengguna> pendingList = (List<Pengguna>) request.getAttribute("pendingList");
-                   if(pendingList != null && !pendingList.isEmpty()) { 
-                %>
-                
+                <% if(pendingList != null && !pendingList.isEmpty()) { %>
                     <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><%= pendingList.size() %></span>
                 <% } %>
             </button>
@@ -44,75 +59,83 @@
         </nav>
     </div>
 
-    <div id="content-pending" class="block">
+    <!-- Tab: Pending Applications -->
+    <div id="content-pending" class="block animate-in fade-in slide-in-from-bottom-2 duration-300">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-gray-50 border-b border-gray-100">
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-16">No.</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Nama Penuh</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">No. Kad Pengenalan</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Alamat</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">No. Telefon</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Lampiran Pengesahan</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Tindakan</th>
+                        <tr class="bg-gray-50/50 border-b border-gray-100">
+                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest w-16">No.</th>
+                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">Pemohon</th>
+                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">Alamat & Hubungan</th>
+                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">Dokumen</th>
+                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest text-center">Tindakan</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <% if (pendingList != null && !pendingList.isEmpty()) {
                             int countPending = 1;
                             for (Pengguna p : pendingList) { %>
-                        <tr class="hover:bg-gray-50/50 transition">
-                            <td class="p-4 text-sm text-gray-500 font-medium"><%= countPending++ %></td>
-                            <td class="p-4 text-sm font-bold text-gray-800"><%= p.getNama_penuh() %></td>
-                            <td class="p-4 text-sm text-gray-600">
-                                <span class="bg-gray-100 px-2 py-1 rounded text-xs font-mono"><%= p.getNombor_kp() %></span>
+                        <tr class="hover:bg-gray-50/50 transition-colors group">
+                            <td class="p-5 text-sm text-gray-400 font-medium"><%= countPending++ %></td>
+                            <td class="p-5">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-11 h-11 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-sm font-bold shadow-sm">
+                                        <%= (p.getNama_penuh() != null && !p.getNama_penuh().isEmpty()) ? p.getNama_penuh().substring(0,1).toUpperCase() : "U" %>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-gray-800"><%= p.getNama_penuh() %></div>
+                                        <div class="text-[11px] text-gray-400 font-medium mt-0.5">
+                                            <i class="fas fa-id-card text-[10px]"></i> <%= p.getNombor_kp() %>
+                                        </div>
+                                    </div>
+                                </div>
                             </td>
-                            <td class="p-4 text-sm text-gray-500"><%= p.getNama_jalan() %></td>
-                            <td class="p-4 text-sm text-gray-500"><%= p.getNombor_telefon() %></td>
-                             <td class="p-4 text-sm">
-    <% if (p.getLampiran_pengesahan() != null && !p.getLampiran_pengesahan().isEmpty()) { %>
-     <a href="<%= request.getContextPath() %>/file/pengguna/<%= p.getLampiran_pengesahan() %>" target="_blank">
-   Lihat Lampiran
-</a>
-    <% } else { %>
-        <span class="text-gray-400 italic text-xs">Tiada lampiran</span>
-    <% } %>
-</td>
-                            <td class="p-4 text-center">
-                                <div class="flex justify-center gap-2">
-                                    <% if (p.getLatitude() != null && p.getLongitude() != null) { %>
-                                        <button onclick="viewLocation('<%= p.getNama_penuh() %>', <%= p.getLatitude() %>, <%= p.getLongitude() %>)"
-                                                class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition"
-                                                title="Lihat Lokasi">
-                                            <i class="fas fa-map-marker-alt"></i>
-                                        </button>
-                                        <a href="https://www.google.com/maps/dir/?api=1&destination=<%= p.getLatitude() %>,<%= p.getLongitude() %>"
-                                           target="_blank"
-                                           class="text-green-500 hover:bg-green-50 p-2 rounded-lg transition"
-                                           title="Navigasi (Google Maps)">
-                                            <i class="fas fa-route"></i>
-                                        </a>
-                                    <% } %>
-
-                                    <form action="<%= request.getContextPath() %>/penduduk/approve" method="post">
+                            <td class="p-5">
+                                <div class="flex flex-col gap-1">
+                                    <span class="text-xs font-bold text-gray-700 truncate max-w-[200px]"><%= p.getNama_jalan() %></span>
+                                    <span class="text-[10px] text-gray-400 font-bold"><i class="fas fa-phone-alt text-[9px]"></i> <%= p.getNombor_telefon() %></span>
+                                </div>
+                            </td>
+                            <td class="p-5">
+                                <% if (p.getLampiran_pengesahan() != null && !p.getLampiran_pengesahan().isEmpty()) { %>
+                                    <a href="<%= request.getContextPath() %>/file/pengguna/<%= p.getLampiran_pengesahan() %>" target="_blank" 
+                                       class="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-lg text-[10px] font-bold hover:bg-gray-200 transition-colors flex items-center gap-2 w-fit">
+                                        <i class="fas fa-file-download text-xs text-brand-purple"></i> Lampiran
+                                    </a>
+                                <% } else { %>
+                                    <span class="text-gray-300 italic text-[10px]">Tiada lampiran</span>
+                                <% } %>
+                            </td>
+                            <td class="p-5">
+                                <div class="flex items-center justify-center gap-2">
+                                    <form action="<%= request.getContextPath() %>/penduduk/approve" method="post" class="m-0">
                                         <input type="hidden" name="idPengguna" value="<%= p.getId_pengguna() %>">
-                                        <button type="submit" class="bg-green-100 text-green-600 hover:bg-green-200 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition">
-                                            <i class="fas fa-check"></i> Lulus
+                                        <button type="submit" class="px-4 py-2 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-tight transition-all">
+                                            Lulus
                                         </button>
                                     </form>
-                                    <form action="<%= request.getContextPath() %>/penduduk/reject" method="post">
+                                    <form action="<%= request.getContextPath() %>/penduduk/reject" method="post" class="m-0">
                                         <input type="hidden" name="idPengguna" value="<%= p.getId_pengguna() %>">
-                                        <button type="submit" class="bg-red-100 text-red-600 hover:bg-red-200 px-3 py-1.5 rounded-lg text-xs font-bold flex items-center gap-1 transition">
-                                            <i class="fas fa-times"></i> Tolak
+                                        <button type="submit" class="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-tight transition-all">
+                                            Tolak
                                         </button>
                                     </form>
                                 </div>
                             </td>
                         </tr>
                         <% } } else { %>
-                        <tr><td colspan="7" class="p-8 text-center text-gray-400"><i class="fas fa-inbox text-3xl mb-2 block opacity-50"></i>Tiada permohonan baharu.</td></tr>
+                        <tr>
+                            <td colspan="5" class="p-20 text-center">
+                                <div class="flex flex-col items-center justify-center opacity-40">
+                                    <div class="w-16 h-16 mb-4 rounded-full bg-gray-100 flex items-center justify-center">
+                                        <i class="fas fa-inbox text-3xl text-gray-400"></i>
+                                    </div>
+                                    <p class="font-bold text-gray-500 italic">Tiada permohonan baharu buat masa ini.</p>
+                                </div>
+                            </td>
+                        </tr>
                         <% } %>
                     </tbody>
                 </table>
@@ -120,12 +143,15 @@
         </div>
     </div>
 
-    <div id="content-active" class="hidden">
+    <!-- Tab: Active Residents -->
+    <div id="content-active" class="hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
         <div class="mb-4">
-            <div class="relative">
-                <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
-                <input type="text" id="searchActive" placeholder="Cari penduduk..." 
-                       class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-[#6C5DD3] focus:border-transparent text-sm">
+            <div class="relative group">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 group-focus-within:text-brand-purple transition-colors">
+                    <i class="fas fa-search text-sm"></i>
+                </span>
+                <input type="text" id="searchActive" placeholder="Cari nama, No. KP atau alamat penduduk..." 
+                       class="w-full pl-11 pr-4 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-4 focus:ring-purple-100 focus:border-[#6C5DD3] text-sm shadow-sm transition-all outline-none">
             </div>
         </div>
 
@@ -133,173 +159,374 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse" id="tableActive">
                     <thead>
-                        <tr class="bg-gray-50 border-b border-gray-100">
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-16">No.</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Nama Penuh</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">No. Kad Pengenalan</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Alamat</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">No. Telefon</th>
-                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Tindakan</th>
+                        <tr class="bg-gray-50/50 border-b border-gray-100">
+                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest w-16">No.</th>
+                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">Informasi Penduduk</th>
+                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">Alamat Kediaman</th>
+                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest text-center">Status</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <% 
-                        List<Pengguna> activeList = (List<Pengguna>) request.getAttribute("activeList");
                         if (activeList != null && !activeList.isEmpty()) {
                             int countActive = 1;
                             for (Pengguna p : activeList) { 
+                                // Serialize family info
+                                StringBuilder sbFam = new StringBuilder();
+                                if (p.getSenaraiAhliKeluarga() != null) {
+                                    for (model.AhliKeluarga ak : p.getSenaraiAhliKeluarga()) {
+                                        if (sbFam.length() > 0) sbFam.append(";;");
+                                        sbFam.append(ak.getNama_penuh()).append("::")
+                                             .append(ak.getHubungan()).append("::")
+                                             .append(ak.getUmur()).append("::")
+                                             .append(ak.getStatus_tanggungan());
+                                    }
+                                }
                         %>
-                        <tr class="hover:bg-gray-50/50 transition">
-                            <td class="p-4 text-sm text-gray-500 font-medium"><%= countActive++ %></td>
-                            <td class="p-4 text-sm font-bold text-gray-800 search-col"><%= p.getNama_penuh() %></td>
-                            <td class="p-4 text-sm text-gray-600 search-col"><%= p.getNombor_kp() %></td>
-                            <td class="p-4 text-sm text-gray-500 max-w-xs truncate search-col"><%= p.getNama_jalan() %></td>
-                            <td class="p-4 text-sm text-gray-500"><%= p.getNombor_telefon() %></td>
-                            <td class="p-4 text-center">
-                                <div class="flex justify-center gap-2">
-                                    <% 
-                                        String tarikh = (p.getTarikh_lahir() != null) ? new java.text.SimpleDateFormat("yyyy-MM-dd").format(p.getTarikh_lahir()) : "";
-                                    %>
-                                    <button onclick="openEditModal('<%= p.getId_pengguna() %>', '<%= p.getNama_penuh() %>', '<%= p.getNombor_kp() %>', '<%= p.getNombor_telefon() %>', '<%= p.getNama_jalan() %>', '<%= p.getBandar() %>', '<%= p.getNombor_poskod() %>', '<%= p.getNegeri() %>', '<%= tarikh %>', '<%= p.getStatus_keluarga() %>')"
-                                             class="text-[#6C5DD3] hover:bg-purple-50 p-2 rounded-lg transition" title="Kemaskini">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    
-                                    <%-- View Location Modal Button --%>
-                                    <% if (p.getLatitude() != null && p.getLongitude() != null) { %>
-                                        <button onclick="viewLocation('<%= p.getNama_penuh() %>', <%= p.getLatitude() %>, <%= p.getLongitude() %>)"
-                                                class="text-blue-500 hover:bg-blue-50 p-2 rounded-lg transition"
-                                                title="Lihat Lokasi">
-                                            <i class="fas fa-map-marker-alt"></i>
-                                        </button>
-                                        <a href="https://www.google.com/maps/dir/?api=1&destination=<%= p.getLatitude() %>,<%= p.getLongitude() %>"
-                                           target="_blank"
-                                           class="text-green-500 hover:bg-green-50 p-2 rounded-lg transition"
-                                           title="Navigasi (Google Maps)">
-                                            <i class="fas fa-route"></i>
-                                        </a>
-                                    <% } else { %>
-                                        <span class="text-gray-300 p-2 cursor-not-allowed" title="Koordinat belum ditetapkan">
-                                            <i class="fas fa-map-marker-alt"></i>
-                                        </span>
-                                    <% } %>
+                        <tr class="hover:bg-gray-50 transition-all group cursor-pointer" 
+                            onclick="showUserInfo(this)"
+                            data-id="<%= p.getId_pengguna() %>"
+                            data-nama="<%= p.getNama_penuh() %>"
+                            data-kp="<%= p.getNombor_kp() %>"
+                            data-tel="<%= p.getNombor_telefon() %>"
+                            data-jalan="<%= p.getNama_jalan() %>"
+                            data-bandar="<%= (p.getBandar() != null) ? p.getBandar() : "-" %>"
+                            data-poskod="<%= (p.getNombor_poskod() != null) ? p.getNombor_poskod() : "-" %>"
+                            data-negeri="<%= (p.getNegeri() != null) ? p.getNegeri() : "-" %>"
+                            data-tarikh="<%= (p.getTarikh_lahir() != null) ? new java.text.SimpleDateFormat("yyyy-MM-dd").format(p.getTarikh_lahir()) : "-" %>"
+                            data-statusk="<%= (p.getStatus_keluarga() != null) ? p.getStatus_keluarga() : "-" %>"
+                            data-lat="<%= p.getLatitude() %>"
+                            data-lon="<%= p.getLongitude() %>"
+                            data-jawatan="Penduduk"
+                            data-pekerjaan="<%= (p.getPekerjaan() != null) ? p.getPekerjaan() : "Tiada" %>"
+                            data-pendapatan="<%= p.getPendapatan() %>"
+                            data-email="<%= (p.getEmail() != null) ? p.getEmail() : "Tiada" %>"
+                            data-foto="<%= (p.getFoto_profil() != null) ? p.getFoto_profil() : "default_avatar.png" %>"
+                            data-family="<%= sbFam.toString() %>"
+                            data-role="Penduduk">
+                            <td class="p-5 text-sm text-gray-400 font-medium"><%= countActive++ %></td>
+                            <td class="p-5">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-11 h-11 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center text-sm font-bold border border-gray-100 group-hover:bg-brand-purple group-hover:text-white transition-all">
+                                        <%= (p.getNama_penuh() != null && !p.getNama_penuh().isEmpty()) ? p.getNama_penuh().substring(0,1).toUpperCase() : "U" %>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-gray-800 search-col"><%= p.getNama_penuh() %></div>
+                                        <div class="text-[11px] text-gray-400 font-medium mt-0.5 search-col">
+                                            <i class="fas fa-id-card text-[10px]"></i> <%= p.getNombor_kp() %>
+                                        </div>
+                                    </div>
                                 </div>
+                            </td>
+                            <td class="p-5">
+                                <div class="flex flex-col">
+                                    <span class="text-xs font-bold text-gray-700 search-col"><%= p.getNama_jalan() %></span>
+                                    <span class="text-[10px] text-gray-400"><%= p.getNombor_poskod() %> <%= p.getBandar() %></span>
+                                </div>
+                            </td>
+                            <td class="p-5 text-center">
+                                <span class="px-3 py-1 rounded-full bg-green-50 text-green-600 text-[10px] font-black uppercase tracking-widest border border-green-100">
+                                    Aktif
+                                </span>
                             </td>
                         </tr>
                         <% } } else { %>
-                        <tr><td colspan="6" class="p-8 text-center text-gray-400"><i class="fas fa-users-slash text-3xl mb-2 block opacity-50"></i>Tiada data penduduk aktif.</td></tr>
+                        <tr>
+                            <td colspan="4" class="p-20 text-center text-gray-400">
+                                <i class="fas fa-users-slash text-3xl mb-4 block opacity-30"></i>
+                                <p class="font-bold italic">Tiada data penduduk aktif dijumpai.</p>
+                            </td>
+                        </tr>
                         <% } %>
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
-
-</div> 
+</div>
 
 <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
-    <div class="flex justify-between items-start mb-8">
-        <h3 class="font-bold text-lg text-gray-800">Statistik</h3>
+    <div class="mb-8">
+        <h3 class="text-lg font-black text-gray-900 tracking-tight">Ringkasan Statistik</h3>
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Status Penduduk Semasa</p>
     </div>
 
     <div class="space-y-4">
-        <div class="bg-blue-50 p-4 rounded-2xl flex items-center gap-4">
-            <div class="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center font-bold"><i class="fas fa-users"></i></div>
+        <div class="bg-indigo-50/50 p-5 rounded-[2rem] border border-indigo-100/50 flex items-center gap-4 group hover:bg-indigo-50 transition-colors">
+            <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                <i class="fas fa-users text-lg"></i>
+            </div>
             <div>
-                <p class="text-xs text-gray-500 font-bold uppercase">Jumlah Penduduk</p>
-                <h4 class="font-bold text-xl text-gray-800"><%= (activeList != null) ? activeList.size() : 0 %></h4>
+                <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Jumlah Aktif</p>
+                <h4 class="font-black text-2xl text-gray-900"><%= (activeList != null) ? activeList.size() : 0 %></h4>
             </div>
         </div>
 
-        <div class="bg-red-50 p-4 rounded-2xl flex items-center gap-4">
-            <div class="w-10 h-10 bg-red-100 text-red-600 rounded-full flex items-center justify-center font-bold"><i class="fas fa-user-clock"></i></div>
+        <div class="bg-rose-50/50 p-5 rounded-[2rem] border border-rose-100/50 flex items-center gap-4 group hover:bg-rose-50 transition-colors">
+            <div class="w-12 h-12 bg-rose-100 text-rose-600 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                <i class="fas fa-user-clock text-lg"></i>
+            </div>
             <div>
-                <p class="text-xs text-gray-500 font-bold uppercase">Menunggu</p>
-                <h4 class="font-bold text-xl text-gray-800"><%= (pendingList != null) ? pendingList.size() : 0 %></h4>
+                <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Menunggu Kelulusan</p>
+                <h4 class="font-black text-2xl text-gray-900"><%= (pendingList != null) ? pendingList.size() : 0 %></h4>
             </div>
         </div>
     </div>
 
-    <div class="mt-auto bg-gray-50 rounded-2xl p-6 border border-gray-100">
-        <h4 class="font-bold text-gray-700 mb-2 text-sm">Nota Admin</h4>
-        <p class="text-xs text-gray-500 leading-relaxed">
-            Sila pastikan maklumat penduduk disemak dengan teliti sebelum meluluskan pendaftaran. Penduduk yang ditolak perlu mendaftar semula.
-        </p>
+    <div class="mt-8 pt-8 border-t border-gray-100">
+        <h4 class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-4">Nota Pengurusan</h4>
+        <div class="bg-gray-50 rounded-3xl p-6 border border-gray-100 relative overflow-hidden group">
+            <i class="fas fa-info-circle absolute -right-2 -bottom-2 text-gray-200 text-6xl opacity-20"></i>
+            <p class="text-xs text-gray-500 leading-relaxed relative z-10 font-medium">
+                Sila pastikan maklumat penduduk disemak dengan teliti sebelum meluluskan pendaftaran. Penduduk yang ditolak perlu mendaftar semula dengan maklumat yang betul.
+            </p>
+        </div>
     </div>
 </aside>
 
-<div id="modalEdit" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalEdit')"></div>
+<!-- Modal Zoom Foto -->
+<div id="modalZoom" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4" onclick="closeModal('modalZoom')">
+    <div class="fixed inset-0 bg-black/90 backdrop-blur-xl"></div>
+    <div class="relative max-w-4xl w-full flex flex-col items-center gap-4">
+        <img id="zoomImage" src="" class="max-h-[80vh] w-auto rounded-3xl shadow-2xl border-4 border-white/10 transition-transform duration-300">
+        <button class="bg-white/10 hover:bg-white/20 text-white px-8 py-3 rounded-2xl font-bold backdrop-blur-md border border-white/10 transition-all flex items-center gap-2">
+            <i class="fas fa-times"></i> Tutup Pratinjau
+        </button>
+    </div>
+</div>
 
-    <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-2xl">
-            
-            <form action="<%= request.getContextPath() %>/penduduk/update" method="post">
-                <input type="hidden" name="idPengguna" id="editId">
-                
-                <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
-                            <i class="fas fa-user-edit text-blue-600"></i>
+<div id="modalInfoUser" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity" onclick="closeModal('modalInfoUser')"></div>
+    <div class="flex min-h-full items-center justify-center p-4">
+        <div class="relative transform overflow-hidden rounded-[2.5rem] bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-3xl border border-white/20 flex flex-col max-h-[90vh]">
+            <!-- Header Modal -->
+            <div class="bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] px-8 py-10 text-white relative shrink-0">
+                <div class="absolute top-0 right-0 p-8 opacity-10">
+                    <i class="fas fa-user-circle text-8xl"></i>
+                </div>
+                <div class="flex justify-between items-start relative z-10">
+                    <div class="flex items-center gap-6">
+                        <div class="relative group/avatar cursor-pointer" onclick="zoomProfilePic()">
+                            <img id="infoFoto" src="" class="w-24 h-24 rounded-3xl object-cover border-4 border-white/30 shadow-xl group-hover:scale-105 transition-transform">
+                            <div class="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl">
+                                <i class="fas fa-search-plus text-white"></i>
+                            </div>
                         </div>
-                        <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
-                            <h3 class="text-lg font-semibold leading-6 text-gray-900">Kemaskini Maklumat Penduduk</h3>
-                            
-                            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 mb-1">Nama Penuh</label>
-                                    <input type="text" id="editNama" readonly class="w-full px-4 py-2 rounded-xl bg-gray-100 border-none text-gray-500 text-sm cursor-not-allowed">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 mb-1">No. Kad Pengenalan</label>
-                                    <input type="text" id="editKP" readonly class="w-full px-4 py-2 rounded-xl bg-gray-100 border-none text-gray-500 text-sm cursor-not-allowed">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 mb-1">Tarikh Lahir</label>
-                                    <input type="text" id="editTarikhLahir" readonly class="w-full px-4 py-2 rounded-xl bg-gray-100 border-none text-gray-500 text-sm cursor-not-allowed">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 mb-1">Status Keluarga</label>
-                                    <select name="statusKeluarga" id="editStatusKeluarga" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                                        <option value="Bujang">Bujang</option>
-                                        <option value="Berkahwin">Berkahwin</option>
-                                        <option value="Ibu Tunggal">Ibu Tunggal</option>
-                                        <option value="Duda">Duda</option>
-                                    </select>
-                                </div>
+                        <div>
+                            <span id="infoRoleBadge" class="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border border-white/20">PENDUDUK</span>
+                            <h3 class="text-3xl font-black mt-2 tracking-tight" id="infoNama">-</h3>
+                            <p class="text-white/70 text-sm font-medium" id="infoJawatan">-</p>
+                        </div>
+                    </div>
+                    <button onclick="closeModal('modalInfoUser')" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+            </div>
 
-                                <div class="md:col-span-2 border-t border-gray-100 my-2 pt-4">
-                                    <h4 class="text-sm font-bold text-gray-700">Maklumat Boleh Dikemaskini</h4>
+            <!-- Scrollable Content -->
+            <div class="p-8 overflow-y-auto custom-scrollbar flex-1 bg-gray-50/30">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Maklumat Peribadi -->
+                    <div class="space-y-4">
+                        <h5 class="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                            <i class="fas fa-id-card text-brand-purple"></i> Maklumat Peribadi
+                        </h5>
+                        <div class="space-y-3">
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-1">
+                                <span class="text-[10px] text-gray-400 font-bold uppercase">No. Kad Pengenalan</span>
+                                <span id="infoKP" class="text-sm font-bold text-gray-800">-</span>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-1">
+                                <span class="text-[10px] text-gray-400 font-bold uppercase">No. Telefon</span>
+                                <div class="flex justify-between items-center">
+                                    <span id="infoTel" class="text-sm font-bold text-gray-800">-</span>
+                                    <a id="infoWA" href="#" target="_blank" class="text-[#25D366] text-xl hover:scale-110 transition-transform"><i class="fab fa-whatsapp"></i></a>
                                 </div>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-1">
+                                <span class="text-[10px] text-gray-400 font-bold uppercase">E-mel</span>
+                                <span id="infoEmail" class="text-sm font-bold text-gray-800">-</span>
+                            </div>
+                        </div>
+                    </div>
 
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 mb-1">No. Telefon</label>
-                                    <input type="text" name="nomborTelefon" id="editTel" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm" required>
-                                </div>
+                    <!-- Status Sosio-Ekonomi -->
+                    <div class="space-y-4">
+                        <h5 class="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                            <i class="fas fa-wallet text-indigo-400"></i> Sosio-Ekonomi
+                        </h5>
+                        <div class="space-y-3">
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-1">
+                                <span class="text-[10px] text-gray-400 font-bold uppercase">Status Keluarga</span>
+                                <span id="infoStatusK" class="text-sm font-bold text-gray-800">-</span>
+                            </div>
+                            <div class="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex flex-col gap-1">
+                                <span class="text-[10px] text-gray-400 font-bold uppercase">Pekerjaan</span>
+                                <span id="infoKerja" class="text-sm font-bold text-gray-800">-</span>
+                            </div>
+                            <div class="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 shadow-sm flex flex-col gap-1">
+                                <span class="text-[10px] text-indigo-400 font-bold uppercase">Pendapatan Bulanan</span>
+                                <span id="infoGaji" class="text-sm font-black text-indigo-700">-</span>
+                            </div>
+                        </div>
+                    </div>
 
-                                <div class="md:col-span-2">
-                                    <label class="block text-xs font-bold text-gray-500 mb-1">Nama Jalan / No. Rumah</label>
-                                    <input type="text" name="namaJalan" id="editJalan" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm" required>
+                    <!-- Maklumat Ahli Keluarga -->
+                    <div class="md:col-span-2 space-y-4">
+                        <h5 class="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                            <i class="fas fa-users-medical text-green-500"></i> Maklumat Ahli Keluarga
+                        </h5>
+                        <div id="infoFamilyContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <!-- Dynamic Content -->
+                        </div>
+                    </div>
+
+                    <!-- Alamat Kediaman -->
+                    <div class="md:col-span-2 space-y-4">
+                        <h5 class="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                            <i class="fas fa-map-marked-alt text-orange-400"></i> Alamat & Lokasi
+                        </h5>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="bg-white p-5 rounded-3xl border border-gray-100 shadow-sm space-y-2">
+                                <div class="flex flex-col">
+                                    <span class="text-[10px] text-gray-400 font-bold uppercase">Alamat Penuh</span>
+                                    <p id="infoAlamat" class="text-sm font-bold text-gray-800 leading-relaxed mt-1">-</p>
+                                    <p id="infoPoskodBandar" class="text-xs text-gray-500 font-medium"></p>
+                                    <p id="infoNegeri" class="text-xs text-gray-500 font-medium"></p>
                                 </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 mb-1">Poskod</label>
-                                    <input type="text" name="nomborPoskod" id="editPoskod" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                            </div>
+                            <div class="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center justify-center gap-3">
+                                <div id="mapInfoPreview" class="w-full h-32 bg-gray-100 rounded-2xl overflow-hidden relative">
+                                    <div class="absolute inset-0 flex items-center justify-center text-gray-300">
+                                        <i class="fas fa-map-marker-alt text-2xl"></i>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 mb-1">Bandar</label>
-                                    <input type="text" name="bandar" id="editBandar" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
-                                </div>
-                                <div>
-                                    <label class="block text-xs font-bold text-gray-500 mb-1">Negeri</label>
-                                    <input type="text" name="negeri" id="editNegeri" class="w-full px-4 py-2 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                                <div class="flex gap-2 w-full">
+                                    <button onclick="viewLocationFromModal()" class="flex-1 px-4 py-2 bg-blue-50 text-blue-600 rounded-xl text-xs font-bold hover:bg-blue-100 transition-all flex items-center justify-center gap-2">
+                                        <i class="fas fa-search-location"></i> Preview Peta
+                                    </button>
+                                    <a id="infoNav" href="#" target="_blank" class="flex-1 px-4 py-2 bg-green-500 text-white rounded-xl text-xs font-bold hover:bg-green-600 transition-all flex items-center justify-center gap-2 shadow-lg shadow-green-100">
+                                        <i class="fas fa-directions"></i> Navigasi
+                                    </a>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6 gap-2">
-                    <button type="submit" class="inline-flex w-full justify-center rounded-xl bg-[#6C5DD3] px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-[#5b4eb8] sm:ml-3 sm:w-auto">Simpan Perubahan</button>
-                    <button type="button" class="mt-3 inline-flex w-full justify-center rounded-xl bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50 sm:mt-0 sm:w-auto" onclick="closeModal('modalEdit')">Batal</button>
+            </div>
+
+            <!-- Action Footer -->
+            <div class="p-8 bg-gray-50 border-t border-gray-100 shrink-0 flex flex-col md:flex-row justify-between items-center gap-4">
+                <button onclick="closeModal('modalInfoUser')" class="text-gray-400 hover:text-gray-600 font-bold text-sm transition order-2 md:order-1">Tutup Profil</button>
+                <div class="flex gap-3 order-1 md:order-2 w-full md:w-auto">
+                    <button id="infoBtnEdit" class="flex-1 md:flex-none px-10 py-3 bg-[#6C5DD3] text-white rounded-2xl font-bold text-sm shadow-lg shadow-purple-100 hover:bg-[#5b4eb8] transition-all flex items-center justify-center gap-2">
+                        <i class="fas fa-user-edit"></i> Kemaskini Profil
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="modalEdit" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity" onclick="closeModal('modalEdit')"></div>
+    <div class="flex min-h-full items-center justify-center p-4">
+        <div class="relative transform overflow-hidden rounded-[2.5rem] bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-3xl border border-white/20 flex flex-col max-h-[90vh]">
+            <form action="<%= request.getContextPath() %>/penduduk/update" method="post" class="flex flex-col h-full">
+                <input type="hidden" name="idPengguna" id="editId">
+                
+                <!-- Header Modal -->
+                <div class="bg-gradient-to-r from-gray-800 to-gray-900 px-8 py-8 text-white relative shrink-0">
+                    <div class="flex justify-between items-center relative z-10">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-xl border border-white/20">
+                                <i class="fas fa-user-edit"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-extrabold tracking-tight">Kemaskini Profil Penduduk</h3>
+                                <p class="text-gray-400 text-xs mt-0.5">Sila pastikan maklumat adalah tepat.</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="closeModal('modalEdit')" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-all">
+                            <i class="fas fa-times text-lg"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Scrollable Body -->
+                <div class="p-8 overflow-y-auto custom-scrollbar flex-1 bg-gray-50/30">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Peribadi -->
+                        <div class="space-y-4">
+                            <h5 class="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                                <i class="fas fa-id-card text-brand-purple"></i> Informasi Asas
+                            </h5>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1">Nama Penuh (Kekal)</label>
+                                    <input type="text" id="editNama" readonly class="w-full px-5 py-3 rounded-2xl bg-gray-100 border-none text-gray-400 text-sm font-semibold cursor-not-allowed">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1">No. Kad Pengenalan (Kekal)</label>
+                                    <input type="text" id="editKP" readonly class="w-full px-5 py-3 rounded-2xl bg-gray-100 border-none text-gray-400 text-sm font-semibold cursor-not-allowed">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">No. Telefon</label>
+                                    <input type="text" name="nomborTelefon" id="editTel" required class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3] text-sm font-semibold transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1">Tarikh Lahir (Kekal)</label>
+                                    <input type="text" id="editTarikhLahir" readonly class="w-full px-5 py-3 rounded-2xl bg-gray-100 border-none text-gray-400 text-sm font-semibold cursor-not-allowed">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Alamat -->
+                        <div class="space-y-4">
+                            <h5 class="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
+                                <i class="fas fa-map-marked-alt text-indigo-400"></i> Kediaman & Status
+                            </h5>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">Status Keluarga</label>
+                                    <select name="statusKeluarga" id="editStatusKeluarga" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold appearance-none focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3]">
+                                        <option value="Bujang">Bujang</option>
+                                        <option value="Berkahwin">Berkahwin</option>
+                                        <option value="Ibu Tunggal">Ibu Tunggal</option>
+                                        <option value="Bapa Tunggal">Bapa Tunggal</option>
+                                        <option value="Duda">Duda</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">Alamat Rumah (Jalan)</label>
+                                    <input type="text" name="namaJalan" id="editJalan" required class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3]">
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">Bandar</label>
+                                        <input type="text" name="bandar" id="editBandar" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3]">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">Poskod</label>
+                                        <input type="text" name="nomborPoskod" id="editPoskod" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3]">
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">Negeri</label>
+                                    <input type="text" name="negeri" id="editNegeri" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3]">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div class="p-8 bg-gray-50 border-t border-gray-100 shrink-0 flex justify-between items-center">
+                    <button type="button" onclick="closeModal('modalEdit')" class="text-gray-400 hover:text-gray-600 font-bold text-sm transition-colors">Batal</button>
+                    <button type="submit" class="px-10 py-3 bg-brand-purple text-white rounded-2xl font-bold text-sm shadow-lg shadow-purple-100 hover:bg-purple-700 transition-all flex items-center gap-2">
+                        <i class="fas fa-save"></i> Simpan Perubahan
+                    </button>
                 </div>
             </form>
         </div>
@@ -313,23 +540,29 @@
 <div id="modalLocation" class="fixed inset-0 z-[60] hidden" role="dialog" aria-modal="true">
     <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onclick="closeModal('modalLocation')"></div>
     <div class="relative min-h-screen flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all">
-            <div class="bg-[#6C5DD3] p-6 text-white flex justify-between items-center">
-                <div>
-                    <h3 class="text-xl font-bold" id="locationTitle">Lokasi Kediaman</h3>
-                    <p class="text-xs opacity-80">Koordinat GPS penduduk.</p>
+        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all border border-white/20">
+            <div class="bg-[#6C5DD3] p-8 text-white flex justify-between items-center relative overflow-hidden">
+                <div class="absolute -right-4 -top-4 opacity-10">
+                    <i class="fas fa-map-marker-alt text-8xl"></i>
                 </div>
-                <button onclick="closeModal('modalLocation')" class="text-white hover:rotate-90 transition-transform duration-300">
+                <div class="relative z-10">
+                    <h3 class="text-2xl font-black tracking-tight" id="locationTitle">Lokasi Kediaman</h3>
+                    <p class="text-xs font-medium opacity-80 mt-1">Koordinat GPS penduduk.</p>
+                </div>
+                <button onclick="closeModal('modalLocation')" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all relative z-10">
                     <i class="fas fa-times text-xl"></i>
                 </button>
             </div>
             <div class="p-4">
-                <div id="mapView" style="height: 450px; border-radius: 1.5rem;" class="border border-gray-200"></div>
+                <div id="mapView" style="height: 450px; border-radius: 2rem;" class="border-4 border-gray-50 shadow-inner"></div>
             </div>
-            <div class="p-6 bg-gray-50 flex justify-end">
-                <button onclick="closeModal('modalLocation')" class="px-8 py-3 bg-[#6C5DD3] text-white font-bold rounded-xl shadow-lg hover:bg-[#5b4eb8] transition">
+            <div class="p-8 bg-gray-50 flex justify-end gap-3">
+                <button onclick="closeModal('modalLocation')" class="px-8 py-3 bg-white text-gray-500 font-bold rounded-2xl border border-gray-200 hover:bg-gray-50 transition">
                     Tutup
                 </button>
+                <a id="locationNavBtn" href="#" target="_blank" class="px-10 py-3 bg-[#6C5DD3] text-white font-bold rounded-2xl shadow-xl shadow-purple-100 hover:bg-[#5b4eb8] transition flex items-center gap-2">
+                    <i class="fas fa-directions"></i> Buka Navigasi
+                </a>
             </div>
         </div>
     </div>
@@ -338,9 +571,91 @@
 <script>
     let viewMap;
     let viewMarker;
+    let currentUserData = {};
+
+    function showUserInfo(row) {
+        const d = row.dataset;
+        currentUserData = d;
+        
+        const ctx = '<%= request.getContextPath() %>';
+        const fotoUrl = (d.foto && d.foto !== 'null' && d.foto !== 'default_avatar.png') 
+                        ? ctx + '/file/profil/' + d.foto 
+                        : 'https://ui-avatars.com/api/?name=' + d.nama + '&background=6C5DD3&color=fff&size=128';
+        
+        document.getElementById('infoFoto').src = fotoUrl;
+        document.getElementById('infoNama').innerText = d.nama;
+        document.getElementById('infoRoleBadge').innerText = d.role;
+        document.getElementById('infoJawatan').innerText = d.jawatan;
+        document.getElementById('infoKP').innerText = d.kp;
+        document.getElementById('infoTel').innerText = d.tel;
+        document.getElementById('infoWA').href = "https://wa.me/6" + d.tel.replace(/\D/g, '');
+        document.getElementById('infoEmail').innerText = d.email;
+        document.getElementById('infoStatusK').innerText = d.statusk;
+        document.getElementById('infoKerja').innerText = d.pekerjaan;
+        
+        const income = (d.pendapatan && d.pendapatan !== 'null') ? parseFloat(d.pendapatan) : 0;
+        document.getElementById('infoGaji').innerText = "RM " + income.toLocaleString('ms-MY', {minimumFractionDigits: 2});
+        document.getElementById('infoAlamat').innerText = d.jalan;
+        document.getElementById('infoPoskodBandar').innerText = d.poskod + " " + d.bandar;
+        document.getElementById('infoNegeri').innerText = d.negeri;
+        
+        // Handle Family Info
+        const famContainer = document.getElementById('infoFamilyContainer');
+        famContainer.innerHTML = '';
+        if (d.family && d.family !== '') {
+            const members = d.family.split(';;');
+            members.forEach(m => {
+                const parts = m.split('::');
+                const div = document.createElement('div');
+                div.className = 'bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-3 group/fam hover:border-green-200 transition-all';
+                div.innerHTML = `
+                    <div class="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center text-xs font-bold">
+                        \${parts[1].charAt(0)}
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-gray-800">\${parts[0]}</p>
+                        <p class="text-[10px] text-gray-400 font-medium uppercase">\${parts[1]} • \${parts[2]} Thn</p>
+                    </div>
+                `;
+                famContainer.appendChild(div);
+            });
+        } else {
+            famContainer.innerHTML = `
+                <div class="md:col-span-2 text-center py-6 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">
+                    <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest">Tiada Maklumat Ahli Keluarga</p>
+                </div>
+            `;
+        }
+        
+        // Navigation Link
+        const navUrl = `https://www.google.com/maps/search/?api=1&query=\${d.lat},\${d.lon}`;
+        document.getElementById('infoNav').href = navUrl;
+
+        document.getElementById('infoBtnEdit').onclick = () => {
+            closeModal('modalInfoUser');
+            openEditModal(d.id, d.nama, d.kp, d.tel, d.jalan, d.bandar, d.poskod, d.negeri, d.tarikh, d.statusk);
+        };
+
+        openModal('modalInfoUser');
+    }
+
+    function zoomProfilePic() {
+        const src = document.getElementById('infoFoto').src;
+        document.getElementById('zoomImage').src = src;
+        openModal('modalZoom');
+    }
+
+    function viewLocationFromModal() {
+        if (!currentUserData.lat || currentUserData.lat === 'null') {
+            alert('Koordinat GPS tidak tersedia untuk penduduk ini.');
+            return;
+        }
+        viewLocation(currentUserData.nama, currentUserData.lat, currentUserData.lon);
+    }
 
     function viewLocation(nama, lat, lon) {
         document.getElementById('locationTitle').innerText = "Lokasi: " + nama;
+        document.getElementById('locationNavBtn').href = `https://www.google.com/maps/search/?api=1&query=\${lat},\${lon}`;
         openModal('modalLocation');
         
         setTimeout(() => {
@@ -358,8 +673,6 @@
             viewMap.invalidateSize();
         }, 300);
     }
-
-    // openModal centralized in footer.jsp
 
     function switchTab(tabName) {
         document.querySelectorAll('nav button').forEach(btn => {
@@ -396,10 +709,8 @@
         document.getElementById('editTarikhLahir').value = (tarikh === 'null' || tarikh === '-') ? '' : tarikh;
         document.getElementById('editStatusKeluarga').value = (statusKeluarga === 'null' || statusKeluarga === '-') ? 'Bujang' : statusKeluarga;
         
-        document.getElementById('modalEdit').classList.remove('hidden');
+        openModal('modalEdit');
     }
-
-    // closeModal centralized in footer.jsp
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>

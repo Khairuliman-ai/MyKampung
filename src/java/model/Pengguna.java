@@ -2,10 +2,13 @@ package model;
 
 import java.util.Date;
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.ArrayList;
 
 public class Pengguna {
 
     private int id_pengguna;
+    private List<AhliKeluarga> senaraiAhliKeluarga = new ArrayList<>();
     private String nama_penuh;
     private String nombor_kp;
     private String nombor_telefon;
@@ -262,5 +265,13 @@ public class Pengguna {
 
     public void setFoto_profil(String foto_profil) {
         this.foto_profil = foto_profil;
+    }
+
+    public List<AhliKeluarga> getSenaraiAhliKeluarga() {
+        return senaraiAhliKeluarga;
+    }
+
+    public void setSenaraiAhliKeluarga(List<AhliKeluarga> senaraiAhliKeluarga) {
+        this.senaraiAhliKeluarga = senaraiAhliKeluarga;
     }
 }

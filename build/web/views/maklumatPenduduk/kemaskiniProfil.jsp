@@ -1,4 +1,4 @@
-<%@ page import="model.Pengguna, model.ActivityLog, java.util.List" %>
+<%@ page import="model.Pengguna, model.ActivityLog, model.AhliKeluarga, java.util.List" %>
 <%
     // 1. Dapatkan objek user dari session
     Pengguna pDetail = (Pengguna) session.getAttribute("currentUser");
@@ -283,6 +283,92 @@
                     </div>
                 </div>
 
+                <%-- Section 2.5: Ahli Keluarga --%>
+                <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-500 flex flex-col lg:col-span-2">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                        <div class="flex items-center gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center text-green-600 shadow-inner">
+                                <i class="fas fa-users-medical text-xl"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-lg font-bold text-gray-900">Maklumat Ahli Keluarga</h4>
+                                <p class="text-xs text-gray-500 font-medium tracking-wide uppercase">Senarai tanggungan & isi rumah</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="addFamilyMember()" class="flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-green-500/20 active:scale-95">
+                            <i class="fas fa-plus"></i>
+                            Tambah Ahli
+                        </button>
+                    </div>
+
+                    <div id="familyContainer" class="space-y-4">
+                        <%-- Existing Family Members --%>
+                        <%
+                            List<AhliKeluarga> family = pDetail.getSenaraiAhliKeluarga();
+                            if (family != null && !family.isEmpty()) {
+                                for (AhliKeluarga ak : family) {
+                        %>
+                        <div class="family-row group relative grid grid-cols-1 md:grid-cols-6 gap-4 p-6 bg-gray-50/50 rounded-2xl border border-gray-100 hover:bg-white hover:border-green-200 transition-all animate-in fade-in duration-300">
+                            <div class="md:col-span-2">
+                                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Nama Penuh</label>
+                                <input type="text" name="f_nama[]" value="<%= ak.getNama_penuh() %>" placeholder="Nama Penuh" class="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-green-500/20 text-xs font-semibold">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">No. KP</label>
+                                <input type="text" name="f_kp[]" value="<%= ak.getNombor_kp() %>" 
+                                    oninput="formatIC(this)" maxlength="14" placeholder="000000-00-0000" 
+                                    class="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-green-500/20 text-xs font-semibold">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">No. Tel</label>
+                                <input type="text" name="f_tel[]" value="<%= ak.getNombor_telefon() %>" 
+                                    oninput="formatPhoneNumber(this)" maxlength="13" placeholder="012-3456789" 
+                                    class="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-green-500/20 text-xs font-semibold">
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Umur</label>
+                                    <input type="number" name="f_umur[]" value="<%= ak.getUmur() %>" class="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-xs font-semibold">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Hubungan</label>
+                                    <select name="f_hubungan[]" class="w-full px-2 py-2.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold">
+                                        <option value="Suami" <%= "Suami".equals(ak.getHubungan()) ? "selected" : "" %>>Suami</option>
+                                        <option value="Isteri" <%= "Isteri".equals(ak.getHubungan()) ? "selected" : "" %>>Isteri</option>
+                                        <option value="Anak" <%= "Anak".equals(ak.getHubungan()) ? "selected" : "" %>>Anak</option>
+                                        <option value="Ibu" <%= "Ibu".equals(ak.getHubungan()) ? "selected" : "" %>>Ibu</option>
+                                        <option value="Bapa" <%= "Bapa".equals(ak.getHubungan()) ? "selected" : "" %>>Bapa</option>
+                                        <option value="Adik-beradik" <%= "Adik-beradik".equals(ak.getHubungan()) ? "selected" : "" %>>Adik-beradik</option>
+                                        <option value="Lain-lain" <%= "Lain-lain".equals(ak.getHubungan()) ? "selected" : "" %>>Lain-lain</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="flex items-center justify-between gap-4">
+                                <div class="flex-1">
+                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Tanggungan?</label>
+                                    <select name="f_tanggungan[]" class="w-full px-2 py-2.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold">
+                                        <option value="Ya" <%= "Ya".equals(ak.getStatus_tanggungan()) ? "selected" : "" %>>Ya</option>
+                                        <option value="Tidak" <%= "Tidak".equals(ak.getStatus_tanggungan()) ? "selected" : "" %>>Tidak</option>
+                                    </select>
+                                </div>
+                                <button type="button" onclick="removeFamilyRow(this)" class="mt-4 w-10 h-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center">
+                                    <i class="fas fa-trash-alt"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <%      }
+                            } else { %>
+                            <div id="emptyFamily" class="text-center py-10 bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-200">
+                                <div class="w-12 h-12 rounded-full bg-white mx-auto flex items-center justify-center text-gray-300 mb-3">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Tiada Maklumat Ahli Keluarga</p>
+                                <p class="text-[10px] text-gray-400 mt-1">Sila klik "Tambah Ahli" untuk mula mengisi.</p>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+
                 <%-- Section 3: Alamat --%>
                 <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-500 lg:col-span-2">
                     <div class="flex items-center gap-4 mb-8">
@@ -563,6 +649,80 @@
     }
     function hideChangePassModal() {
         document.getElementById('changePassModal').classList.add('hidden');
+    }
+
+    function addFamilyMember() {
+        const container = document.getElementById('familyContainer');
+        const emptyMsg = document.getElementById('emptyFamily');
+        if (emptyMsg) emptyMsg.remove();
+
+        const row = document.createElement('div');
+        row.className = 'family-row group relative grid grid-cols-1 md:grid-cols-6 gap-4 p-6 bg-gray-50/50 rounded-2xl border border-gray-100 hover:bg-white hover:border-green-200 transition-all animate-in slide-in-from-right-4 duration-300';
+        row.innerHTML = `
+            <div class="md:col-span-2">
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Nama Penuh</label>
+                <input type="text" name="f_nama[]" placeholder="Nama Penuh" required class="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-green-500/20 text-xs font-semibold">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">No. KP</label>
+                <input type="text" name="f_kp[]" oninput="formatIC(this)" maxlength="14" placeholder="000000-00-0000" class="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-green-500/20 text-xs font-semibold">
+            </div>
+            <div>
+                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">No. Tel</label>
+                <input type="text" name="f_tel[]" oninput="formatPhoneNumber(this)" maxlength="13" placeholder="012-3456789" class="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-green-500/20 text-xs font-semibold">
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Umur</label>
+                    <input type="number" name="f_umur[]" placeholder="0" class="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-xs font-semibold">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Hubungan</label>
+                    <select name="f_hubungan[]" class="w-full px-2 py-2.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold">
+                        <option value="Suami">Suami</option>
+                        <option value="Isteri">Isteri</option>
+                        <option value="Anak">Anak</option>
+                        <option value="Ibu">Ibu</option>
+                        <option value="Bapa">Bapa</option>
+                        <option value="Adik-beradik">Adik-beradik</option>
+                        <option value="Lain-lain">Lain-lain</option>
+                    </select>
+                </div>
+            </div>
+            <div class="flex items-center justify-between gap-4">
+                <div class="flex-1">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Tanggungan?</label>
+                    <select name="f_tanggungan[]" class="w-full px-2 py-2.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold">
+                        <option value="Ya">Ya</option>
+                        <option value="Tidak">Tidak</option>
+                    </select>
+                </div>
+                <button type="button" onclick="removeFamilyRow(this)" class="mt-4 w-10 h-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center">
+                    <i class="fas fa-trash-alt"></i>
+                </button>
+            </div>
+        `;
+        container.appendChild(row);
+    }
+
+    function removeFamilyRow(btn) {
+        const row = btn.closest('.family-row');
+        row.classList.add('fade-out', 'scale-95');
+        setTimeout(() => {
+            row.remove();
+            const container = document.getElementById('familyContainer');
+            if (container.children.length === 0) {
+                container.innerHTML = `
+                    <div id="emptyFamily" class="text-center py-10 bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-200">
+                        <div class="w-12 h-12 rounded-full bg-white mx-auto flex items-center justify-center text-gray-300 mb-3">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Tiada Maklumat Ahli Keluarga</p>
+                        <p class="text-[10px] text-gray-400 mt-1">Sila klik "Tambah Ahli" untuk mula mengisi.</p>
+                    </div>
+                `;
+            }
+        }, 300);
     }
 
     (function () {

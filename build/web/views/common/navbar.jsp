@@ -216,7 +216,7 @@
 
 </aside>
 
-<main class="flex-1 flex flex-col xl:flex-row overflow-y-auto xl:overflow-hidden relative bg-[#F7F7F9]">
+<main class="flex-1 flex flex-col lg:flex-row overflow-y-auto lg:overflow-hidden relative bg-[#F7F7F9]">
     <!-- Mobile Sidebar Backdrop -->
     <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[55] hidden md:hidden" onclick="toggleSidebar()"></div>
 

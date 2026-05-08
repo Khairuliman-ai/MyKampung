@@ -34,19 +34,23 @@ public class ProfileServlet extends HttpServlet {
             throws ServletException, IOException {
         
         HttpSession session = request.getSession();
-        // Gunakan 'currentUser' supaya selaras dengan LoginServlet anda
         Pengguna user = (Pengguna) session.getAttribute("currentUser");
 
         if (user != null) {
             try (Connection conn = DBUtil.getConnection()) {
+                // Fetch Activity Logs
                 ActivityLogDAO logDAO = new ActivityLogDAO(conn);
                 List<ActivityLog> logs = logDAO.getLogsByResidentId(user.getId_pengguna());
                 request.setAttribute("activityLogs", logs);
+
+                // --- FETCH AHLI KELUARGA ---
+                dao.AhliKeluargaDAO ahliDao = new dao.AhliKeluargaDAO(conn);
+                user.setSenaraiAhliKeluarga(ahliDao.getByPenggunaId(user.getId_pengguna()));
+                session.setAttribute("currentUser", user);
+                
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            // Dalam DB v2, maklumat profil sudah ada dalam objek user di session.
-            // Kita cuma perlu forward ke JSP yang betul.
             request.getRequestDispatcher("/views/maklumatPenduduk/kemaskiniProfil.jsp").forward(request, response);
         } else {
             response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp");
@@ -67,6 +71,7 @@ public class ProfileServlet extends HttpServlet {
                 // --- TUKAR KATA LALUAN ---
                 String action = request.getParameter("action");
                 if ("changePassword".equals(action)) {
+                    // ... (password change logic remains unchanged)
                     String oldPass = request.getParameter("oldPassword");
                     String newPass = request.getParameter("newPassword");
                     
@@ -139,22 +144,66 @@ public class ProfileServlet extends HttpServlet {
                 }
 
                 // --- PROSES MUAT NAIK FOTO PROFIL ---
-                String fotoName = FileUploadUtil.saveFile(
-                    request.getPart("foto_profil"), AppConfig.DIR_FOTO_PROFIL, "profil_" + currentUser.getId_pengguna() + "_");
-                if (fotoName != null) currentUser.setFoto_profil(fotoName);
+                Part fotoPart = request.getPart("foto_profil");
+                if (fotoPart != null && fotoPart.getSize() > 0) {
+                    String fotoName = FileUploadUtil.saveFile(
+                        fotoPart, AppConfig.DIR_FOTO_PROFIL, "profil_" + currentUser.getId_pengguna() + "_");
+                    if (fotoName != null) currentUser.setFoto_profil(fotoName);
+                }
 
+                // --- PROSES AHLI KELUARGA ---
+                String[] fNama = request.getParameterValues("f_nama[]");
+                String[] fKp = request.getParameterValues("f_kp[]");
+                String[] fTel = request.getParameterValues("f_tel[]");
+                String[] fUmur = request.getParameterValues("f_umur[]");
+                String[] fHubungan = request.getParameterValues("f_hubungan[]");
+                String[] fTanggungan = request.getParameterValues("f_tanggungan[]");
 
-                // C. Simpan ke Database
-                PenggunaDAO pDao = new PenggunaDAO(conn);
-                
-                boolean success = pDao.updateProfil(currentUser); // Anda perlu cipta method ini di DAO
-                
-                if (success) {
-                    // Update session dengan data baru
-                    session.setAttribute("currentUser", currentUser);
-                    response.sendRedirect(request.getContextPath() + "/profil/view?status=success");
-                } else {
-                    response.sendRedirect(request.getContextPath() + "/profil/view?status=error");
+                List<model.AhliKeluarga> senaraiBaru = new java.util.ArrayList<>();
+                if (fNama != null) {
+                    for (int i = 0; i < fNama.length; i++) {
+                        if (fNama[i] == null || fNama[i].trim().isEmpty()) continue;
+                        
+                        model.AhliKeluarga ak = new model.AhliKeluarga();
+                        ak.setId_pengguna(currentUser.getId_pengguna());
+                        ak.setNama_penuh(fNama[i]);
+                        ak.setNombor_kp(fKp != null && i < fKp.length ? fKp[i] : "");
+                        ak.setNombor_telefon(fTel != null && i < fTel.length ? fTel[i] : "");
+                        try {
+                            ak.setUmur(fUmur != null && i < fUmur.length && !fUmur[i].isEmpty() ? Integer.parseInt(fUmur[i]) : 0);
+                        } catch (Exception e) { ak.setUmur(0); }
+                        ak.setHubungan(fHubungan != null && i < fHubungan.length ? fHubungan[i] : "");
+                        ak.setStatus_tanggungan(fTanggungan != null && i < fTanggungan.length ? fTanggungan[i] : "Tidak");
+                        senaraiBaru.add(ak);
+                    }
+                }
+
+                // C. Simpan ke Database (Gunakan Transaction)
+                conn.setAutoCommit(false);
+                try {
+                    PenggunaDAO pDao = new PenggunaDAO(conn);
+                    boolean pSuccess = pDao.updateProfil(currentUser);
+                    
+                    if (pSuccess) {
+                        dao.AhliKeluargaDAO akDao = new dao.AhliKeluargaDAO(conn);
+                        akDao.deleteByPenggunaId(currentUser.getId_pengguna());
+                        for (model.AhliKeluarga ak : senaraiBaru) {
+                            akDao.addAhliKeluarga(ak);
+                        }
+                        conn.commit();
+                        
+                        currentUser.setSenaraiAhliKeluarga(senaraiBaru);
+                        session.setAttribute("currentUser", currentUser);
+                        response.sendRedirect(request.getContextPath() + "/profil/view?status=success");
+                    } else {
+                        conn.rollback();
+                        response.sendRedirect(request.getContextPath() + "/profil/view?status=error");
+                    }
+                } catch (Exception e) {
+                    conn.rollback();
+                    throw e;
+                } finally {
+                    conn.setAutoCommit(true);
                 }
                 
             } catch (Exception e) {

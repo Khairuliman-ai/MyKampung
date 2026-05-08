@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 04, 2026 at 10:24 PM
+-- Generation Time: May 07, 2026 at 10:06 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -70,6 +70,24 @@ INSERT INTO `aduan` (`id_aduan`, `id_pengguna`, `id_kategori_aduan`, `tajuk`, `k
 (17, 4, 1, 'Test6', 'fewf', 'RESOLVED', NULL, NULL, '2026-04-28 00:27:33', '2026-04-28 00:29:33', NULL, 10, 'SEDERHANA', NULL, 'fewf', NULL),
 (18, 4, 1, 'Test2', 'few', 'CLOSED', NULL, NULL, '2026-04-28 00:34:30', '2026-04-28 00:36:53', NULL, 10, 'SEDERHANA', NULL, 'fwq', 'fwq'),
 (19, 4, 1, 'test 7', 'vds', 'CLOSED', NULL, NULL, '2026-04-28 00:37:14', '2026-04-28 00:38:40', NULL, 10, 'SEDERHANA', NULL, 'vds', 'vds');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `ahli_keluarga`
+--
+
+CREATE TABLE `ahli_keluarga` (
+  `id_ahli` int(11) NOT NULL,
+  `id_pengguna` int(11) NOT NULL,
+  `nama_penuh` varchar(150) NOT NULL,
+  `nombor_kp` varchar(14) DEFAULT NULL,
+  `nombor_telefon` varchar(20) DEFAULT NULL,
+  `umur` int(3) DEFAULT NULL,
+  `hubungan` varchar(50) DEFAULT NULL,
+  `status_tanggungan` varchar(10) DEFAULT 'Tidak',
+  `dibuat_pada` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -141,7 +159,9 @@ INSERT INTO `bantuan` (`id_bantuan`, `nama_bantuan`, `jenis_bantuan`, `peruntuka
 (20, 'SUMBANGAN IPT - FISABILILLAH', 'RASMI', 0.00, NULL, 'AKTIF', '2026-04-22 10:42:49', '2026-04-22 10:42:49', NULL),
 (21, 'Test 2', 'KOMUNITI', 10.00, NULL, 'AKTIF', '2026-04-23 00:30:54', '2026-04-23 00:30:54', NULL),
 (998, 'LAIN-LAIN (KOMUNITI)', 'KOMUNITI', 0.00, 'Sila lampirkan dokumen sokongan yang berkaitan.', 'AKTIF', '2026-05-04 17:18:42', '2026-05-04 17:18:42', NULL),
-(999, 'LAIN-LAIN', 'RASMI', 0.00, 'Tiada', 'AKTIF', '2026-05-04 16:52:53', '2026-05-04 16:54:40', NULL);
+(999, 'LAIN-LAIN', 'RASMI', 0.00, 'Tiada', 'AKTIF', '2026-05-04 16:52:53', '2026-05-04 16:54:40', NULL),
+(1000, 'Test A', 'RASMI', 0.00, 'Sijil Nikah', 'AKTIF', '2026-05-05 05:36:22', '2026-05-05 05:36:22', NULL),
+(1001, 'Test B', 'KOMUNITI', 1000.00, 'Surat Nikah', 'AKTIF', '2026-05-05 05:38:19', '2026-05-05 05:38:19', NULL);
 
 -- --------------------------------------------------------
 
@@ -156,6 +176,29 @@ CREATE TABLE `bantuan_lampiran` (
   `jenis_lampiran` varchar(50) DEFAULT 'PEMOHON',
   `dimuat_naik_pada` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `bantuan_lampiran`
+--
+
+INSERT INTO `bantuan_lampiran` (`id_lampiran`, `id_permohonan`, `nama_fail`, `jenis_lampiran`, `dimuat_naik_pada`) VALUES
+(1, 32, '1777926944486_Lab_report5_s71383_cybersecurity.pdf', 'PEMOHON', '2026-05-04 20:35:44'),
+(2, 32, '1777926944487_2112.10920v1.pdf', 'PEMOHON', '2026-05-04 20:35:44'),
+(3, 32, '1777926944489_Assignment_Guidelines_260405_081555.pdf', 'PEMOHON', '2026-05-04 20:35:44'),
+(4, 33, '1777927073154_Lab_report5_s71383_cybersecurity.pdf', 'PEMOHON', '2026-05-04 20:37:53'),
+(5, 33, '1777927073159_2112.10920v1.pdf', 'PEMOHON', '2026-05-04 20:37:53'),
+(6, 33, '1777927073161_Assignment_Guidelines_260405_081555.pdf', 'PEMOHON', '2026-05-04 20:37:53'),
+(8, 34, '1777927520110_2112.10920v1.pdf', 'PEMOHON', '2026-05-04 20:45:20'),
+(9, 34, '1777927520111_Assignment_Guidelines_260405_081555.pdf', 'PEMOHON', '2026-05-04 20:45:20'),
+(10, 35, '1777928178734_Lab_report5_s71383_cybersecurity.pdf', 'PEMOHON', '2026-05-04 20:56:18'),
+(11, 36, '1777928734684_Lab_report5_s71383_cybersecurity.pdf', 'PEMOHON', '2026-05-04 21:05:34'),
+(12, 36, '1777928734686_2112.10920v1.pdf', 'PEMOHON', '2026-05-04 21:05:34'),
+(13, 37, '1777960629949_Week4_(1).pdf', 'PEMOHON', '2026-05-05 05:57:09'),
+(14, 37, '1777960629951_Week4.pdf', 'PEMOHON', '2026-05-05 05:57:09'),
+(15, 37, '1777960629951_2112.10920v1_-_Copy.pdf', 'PEMOHON', '2026-05-05 05:57:09'),
+(16, 36, 'KETUA_1777964948379_Lab_report5_s71383_cybersecurity_-_Copy.pdf', 'PENTADBIR', '2026-05-05 07:09:08'),
+(17, 36, 'KETUA_1777964948387_Lab_report5_s71383_cybersecurity.pdf', 'PENTADBIR', '2026-05-05 07:09:08'),
+(18, 38, '1778154790290_Lab_report5_s71383_cybersecurity_-_Copy.pdf', 'PEMOHON', '2026-05-07 11:53:10');
 
 -- --------------------------------------------------------
 
@@ -290,7 +333,8 @@ INSERT INTO `jawatan_ajk` (`id_jawatan`, `nama_jawatan`) VALUES
 (9, 'Biro Kebajikan & Sosial'),
 (10, 'Biro Ekonomi & Usahawan'),
 (11, 'Biro Hebahan'),
-(12, 'Test last');
+(12, 'Test last'),
+(13, 'Test 5');
 
 -- --------------------------------------------------------
 
@@ -438,7 +482,7 @@ CREATE TABLE `pengguna` (
 
 INSERT INTO `pengguna` (`id_pengguna`, `nama_penuh`, `nombor_kp`, `nombor_telefon`, `tarikh_lahir`, `kata_laluan`, `status`, `status_keluarga`, `pekerjaan`, `pendapatan`, `nama_jalan`, `daerah`, `nombor_poskod`, `bandar`, `negeri`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`, `lampiran_pengesahan`, `reset_token`, `token_expiry`, `email`, `latitude`, `longitude`, `foto_profil`) VALUES
 (1, 'Ahmad bin Ali', '800101031234', '012-3456 5353', '1980-01-01', '$2a$10$4REPQtKXDeP/GXdC2d06SuFynGXcEkMfbsfRUQZ09L7itoiobVi/C', 1, 'Bujang', 'CEO', 1200.09, 'Jalan Mawar 11', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-23 00:51:58', NULL, NULL, NULL, NULL, 'khairuliman736@gmail.com', 6.03112933, 102.29697188, 'profil_1_1776905518169.jpg'),
-(2, 'Siti binti Abuyal', '850202035566', '011-1101 3816', '1985-02-02', '$2a$12$NUn7qK.c4bD4scgC8fG7/ucy.iqtBLxkoqIR7.b1s0nXhM88UNPa6', 1, 'Bujang', 'Petani', 1000.00, 'Jalan Melati 2', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-23 00:54:03', NULL, NULL, NULL, NULL, 'siti@gmail.com', 6.03130217, 102.29371122, 'profil_2_1776905643592.jpg'),
+(2, 'Siti binti Abuyal', '850202035566', '011-1101 3816', '1985-02-02', '$2a$12$NUn7qK.c4bD4scgC8fG7/ucy.iqtBLxkoqIR7.b1s0nXhM88UNPa6', 1, 'Bujang', 'Petani', 1000.00, 'Jalan Melati 2', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-05-07 19:44:17', NULL, NULL, NULL, NULL, 'siti@gmail.com', 6.03099062, 102.29372263, 'profil_2_1776905643592.jpg'),
 (3, 'Muthu a/l Samy', '900303037788', '014-5678 901', '1990-03-03', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', 'Peniaga', 3999.99, 'Jalan Kenanga', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-23 00:52:40', NULL, NULL, NULL, NULL, 's71383@ocean.umt.edu.my', 6.03130217, 102.29371122, 'profil_3_1776905560441.jpg'),
 (4, 'Chong Wei Ming', '750404039911', '016-6789 011', '1975-04-04', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', 'Guru', 3000.01, 'Jalan Teratai', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-28 09:15:22', NULL, NULL, NULL, NULL, 'khayxstyle@gmail.com', 5.92294100, 102.31455260, 'profil_4_1776905581340.jpg'),
 (5, 'Aminah binti Hassan', '650505032233', '017-7890123', '1965-05-05', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Ibu Tunggal', 'Pesara', 1200.00, 'Jalan Orkid', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-23 00:53:46', NULL, NULL, NULL, NULL, 'aminah@gmail.com', 6.03130217, 102.29371122, 'profil_5_1776905626958.jpg'),
@@ -534,7 +578,6 @@ CREATE TABLE `permohonan_bantuan` (
   `penyata_bank` varchar(255) DEFAULT NULL,
   `catatan_pemohon` text DEFAULT NULL,
   `catatan_pentadbir` text DEFAULT NULL,
-  `dokumen_pemohon` varchar(255) DEFAULT NULL,
   `dokumen_pentadbir` varchar(255) DEFAULT NULL,
   `dibuat_pada` timestamp NOT NULL DEFAULT current_timestamp(),
   `dikemaskini_pada` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -545,33 +588,40 @@ CREATE TABLE `permohonan_bantuan` (
 -- Dumping data for table `permohonan_bantuan`
 --
 
-INSERT INTO `permohonan_bantuan` (`id_permohonan`, `id_pengguna`, `id_bantuan`, `status`, `nama_bank`, `nombor_akaun`, `penyata_bank`, `catatan_pemohon`, `catatan_pentadbir`, `dokumen_pemohon`, `dokumen_pentadbir`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`) VALUES
-(1, 5, 4, 'DILULUSKAN', NULL, NULL, NULL, 'Mohon bantuan kewangan sara anak.', NULL, NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(2, 8, 6, 'DIKEMBALIKAN', NULL, NULL, NULL, 'Mohon baja untuk kebun.', 'kabur', NULL, NULL, '2026-03-13 19:52:27', '2026-04-21 06:41:50', NULL),
-(3, 7, 5, 'MENUNGGU', NULL, NULL, NULL, 'Anak 3 orang akan masuk sekolah.', NULL, NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(4, 4, 9, 'DILULUSKAN', NULL, NULL, NULL, 'Mohon bantuan modal niaga.', NULL, NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(5, 2, 5, 'LULUS', NULL, NULL, NULL, 'Mohon bantuan pakaian sekolah anak.', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, NULL, '2026-03-13 19:52:27', '2026-04-22 12:34:05', NULL),
-(6, 10, 3, 'MENUNGGU', NULL, NULL, NULL, 'Rumah dimasuki air sedalam 1 meter.', NULL, NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(7, 5, 7, 'DITOLAK', NULL, NULL, NULL, 'Atap zink bocor teruk.', NULL, NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(8, 6, 10, 'DILULUSKAN', NULL, NULL, NULL, 'Adik dapat 5A SPM.', NULL, NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(9, 9, 1, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'Kos sara hidup meningkat.', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, NULL, '2026-03-13 19:52:27', '2026-05-04 11:28:55', NULL),
-(10, 3, 9, 'DITOLAK', NULL, NULL, NULL, 'Mohon tambah gerai.', NULL, NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
-(11, 2, 1, 'MENUNGGU_KETUA', NULL, NULL, NULL, NULL, 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, NULL, '2026-04-22 10:17:39', '2026-05-04 11:28:57', NULL),
-(12, 2, 2, 'MENUNGGU_KETUA', NULL, NULL, NULL, NULL, 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, NULL, '2026-04-22 10:29:15', '2026-05-04 11:29:00', NULL),
-(13, 2, 1, 'LULUS', NULL, NULL, NULL, 'Test2', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', '1776854721715_Case_Study_1.pdf', NULL, '2026-04-22 10:45:21', '2026-04-22 12:32:35', NULL),
-(14, 2, 9, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'test2', 'Disemak oleh JKKK: Dokumen Lengkap.', '1776854828765_Week4_(1).pdf', NULL, '2026-04-22 10:47:08', '2026-05-04 11:29:02', NULL),
-(15, 2, 6, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'test3', 'Disemak oleh JKKK: Dokumen Lengkap.', '1776854986603_Week4.pdf', NULL, '2026-04-22 10:49:46', '2026-05-04 11:29:05', NULL),
-(16, 2, 2, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'Test4', 'Disemak oleh JKKK: Dokumen Lengkap.', '1776855498368_Week4.pdf', NULL, '2026-04-22 10:58:18', '2026-05-04 11:29:07', NULL),
-(17, 2, 10, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'Test6', 'Disemak oleh JKKK: Dokumen Lengkap.', '1776855550838_Week4.pdf', NULL, '2026-04-22 10:59:10', '2026-05-04 11:29:10', NULL),
-(18, 2, 9, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'Test7', 'Disemak oleh JKKK: Dokumen Lengkap.', '1776855843312_Week4.pdf', NULL, '2026-04-22 11:04:03', '2026-05-04 11:29:12', NULL),
-(20, 2, 11, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'Test11', 'Disemak oleh JKKK: Dokumen Lengkap.', '1776856311135_SME_Paper_2.pdf', NULL, '2026-04-22 11:11:51', '2026-05-04 11:29:15', NULL),
-(21, 4, 6, 'LULUS', NULL, NULL, NULL, 'Test terakhir 1.1.1', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', '1776864686216_Assignment_SME.pdf', NULL, '2026-04-22 13:17:55', '2026-04-23 02:11:37', NULL),
-(22, 2, 7, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'test10', 'Disemak oleh JKKK: Dokumen Lengkap.', '1776920160559_thesis.pdf', NULL, '2026-04-23 04:56:00', '2026-04-23 04:58:50', NULL),
-(23, 4, 1, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'maklumat telah dikemaskini', 'Disemak oleh JKKK: Dokumen Lengkap.', '1777339517075_thesis_(1).pdf', NULL, '2026-04-28 01:25:17', '2026-05-01 12:26:35', NULL),
-(24, 2, 1, 'DITOLAK', 'Bank Islam', '042414255253533', 'BANK_1777893645011_Lab_report5_s71383_cybersecurity.pdf', 'Test A', 'DITOLAK oleh Ketua Kampung: dw', '1777893645009_Assignment_Guidelines_260405_081555.pdf', NULL, '2026-05-04 11:20:45', '2026-05-04 16:37:10', NULL),
-(26, 2, 11, 'LULUS', NULL, NULL, NULL, 'lai', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', '1777913041917_Lab_report5_s71383_cybersecurity.pdf', NULL, '2026-05-04 16:44:01', '2026-05-04 16:58:50', NULL),
-(30, 2, 999, 'DIKEMBALIKAN', NULL, NULL, NULL, 'LAIN-LAIN: Biasiswa Yayasan | test', 'IC Kabur', '1777914761664_Lab_report5_s71383_cybersecurity.pdf', NULL, '2026-05-04 17:12:41', '2026-05-04 20:09:03', NULL),
-(31, 2, 1, 'BARU', 'e', 'ge', 'BANK_1777925546990_Lab_report5_s71383_cybersecurity.pdf', 'fe', NULL, '1777925546989_Lab_report5_s71383_cybersecurity.pdf', NULL, '2026-05-04 20:12:26', '2026-05-04 20:12:26', NULL);
+INSERT INTO `permohonan_bantuan` (`id_permohonan`, `id_pengguna`, `id_bantuan`, `status`, `nama_bank`, `nombor_akaun`, `penyata_bank`, `catatan_pemohon`, `catatan_pentadbir`, `dokumen_pentadbir`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`) VALUES
+(1, 5, 4, 'DILULUSKAN', NULL, NULL, NULL, 'Mohon bantuan kewangan sara anak.', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(2, 8, 6, 'DIKEMBALIKAN', NULL, NULL, NULL, 'Mohon baja untuk kebun.', 'kabur', NULL, '2026-03-13 19:52:27', '2026-04-21 06:41:50', NULL),
+(3, 7, 5, 'MENUNGGU', NULL, NULL, NULL, 'Anak 3 orang akan masuk sekolah.', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(4, 4, 9, 'DILULUSKAN', NULL, NULL, NULL, 'Mohon bantuan modal niaga.', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(5, 2, 5, 'LULUS', NULL, NULL, NULL, 'Mohon bantuan pakaian sekolah anak.', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, '2026-03-13 19:52:27', '2026-04-22 12:34:05', NULL),
+(6, 10, 3, 'MENUNGGU', NULL, NULL, NULL, 'Rumah dimasuki air sedalam 1 meter.', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(7, 5, 7, 'DITOLAK', NULL, NULL, NULL, 'Atap zink bocor teruk.', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(8, 6, 10, 'DILULUSKAN', NULL, NULL, NULL, 'Adik dapat 5A SPM.', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(9, 9, 1, 'LULUS', NULL, NULL, NULL, 'Kos sara hidup meningkat.', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, '2026-03-13 19:52:27', '2026-05-04 21:42:33', NULL),
+(10, 3, 9, 'DITOLAK', NULL, NULL, NULL, 'Mohon tambah gerai.', NULL, NULL, '2026-03-13 19:52:27', '2026-03-13 19:52:27', NULL),
+(11, 2, 1, 'MENUNGGU_KETUA', NULL, NULL, NULL, NULL, 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 10:17:39', '2026-05-04 11:28:57', NULL),
+(12, 2, 2, 'MENUNGGU_KETUA', NULL, NULL, NULL, NULL, 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 10:29:15', '2026-05-04 11:29:00', NULL),
+(13, 2, 1, 'LULUS', NULL, NULL, NULL, 'Test2', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, '2026-04-22 10:45:21', '2026-04-22 12:32:35', NULL),
+(14, 2, 9, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'test2', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 10:47:08', '2026-05-04 11:29:02', NULL),
+(15, 2, 6, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'test3', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 10:49:46', '2026-05-04 11:29:05', NULL),
+(16, 2, 2, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'Test4', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 10:58:18', '2026-05-04 11:29:07', NULL),
+(17, 2, 10, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'Test6', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 10:59:10', '2026-05-04 11:29:10', NULL),
+(18, 2, 9, 'LULUS', NULL, NULL, NULL, 'Test7', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, '2026-04-22 11:04:03', '2026-05-07 12:33:33', NULL),
+(20, 2, 11, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'Test11', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 11:11:51', '2026-05-04 11:29:15', NULL),
+(21, 4, 6, 'LULUS', NULL, NULL, NULL, 'Test terakhir 1.1.1', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, '2026-04-22 13:17:55', '2026-04-23 02:11:37', NULL),
+(22, 2, 7, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'test10', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-23 04:56:00', '2026-04-23 04:58:50', NULL),
+(23, 4, 1, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'maklumat telah dikemaskini', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-28 01:25:17', '2026-05-01 12:26:35', NULL),
+(24, 2, 1, 'DITOLAK', 'Bank Islam', '042414255253533', 'BANK_1777893645011_Lab_report5_s71383_cybersecurity.pdf', 'Test A', 'DITOLAK oleh Ketua Kampung: dw', NULL, '2026-05-04 11:20:45', '2026-05-04 16:37:10', NULL),
+(26, 2, 11, 'LULUS', NULL, NULL, NULL, 'lai', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, '2026-05-04 16:44:01', '2026-05-04 16:58:50', NULL),
+(30, 2, 999, 'DIKEMBALIKAN', NULL, NULL, NULL, 'LAIN-LAIN: Biasiswa Yayasan | test', 'IC Kabur', NULL, '2026-05-04 17:12:41', '2026-05-04 20:09:03', NULL),
+(31, 2, 1, 'DIKEMBALIKAN', 'e', 'ge', 'BANK_1777925546990_Lab_report5_s71383_cybersecurity.pdf', 'fe', 'fe', NULL, '2026-05-04 20:12:26', '2026-05-04 21:28:56', NULL),
+(32, 2, 1, 'BARU', 'ik', '22444', 'BANK_1777926944490_Lab_report5_s71383_cybersecurity.pdf', 'test b', 'Cuba Lagi', NULL, '2026-05-04 20:35:44', '2026-05-05 05:40:54', NULL),
+(33, 2, 2, 'BARU', 'ihi', '22444', 'BANK_1777927073162_Lab_report5_s71383_cybersecurity.pdf', 'ef', NULL, NULL, '2026-05-04 20:37:53', '2026-05-04 20:37:53', NULL),
+(34, 2, 4, 'BARU', 'wf', '22444', 'BANK_1777927520112_Lab_report5_s71383_cybersecurity.pdf', 'Test 10', NULL, NULL, '2026-05-04 20:45:20', '2026-05-04 20:53:43', NULL),
+(35, 2, 3, 'BARU', 'fef', '22444', 'BANK_1777928178734_Lab_report5_s71383_cybersecurity.pdf', 'Test Baru', 'IC Kabur', NULL, '2026-05-04 20:56:18', '2026-05-07 12:56:20', NULL),
+(36, 2, 17, 'LULUS', NULL, NULL, NULL, 'Test AB', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, '2026-05-04 21:05:34', '2026-05-05 07:09:08', NULL),
+(37, 2, 11, 'BARU', NULL, NULL, NULL, 'Test X', NULL, NULL, '2026-05-05 05:57:09', '2026-05-05 05:57:09', NULL),
+(38, 2, 1, 'MENUNGGU_KETUA', 'wf', '22444', 'BANK_1778154790290_mykampung_v2_db_(1).pdf', 'Test tak tau', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-05-07 11:53:10', '2026-05-07 11:54:07', NULL);
 
 -- --------------------------------------------------------
 
@@ -638,6 +688,13 @@ ALTER TABLE `aduan`
   ADD KEY `id_pengguna` (`id_pengguna`),
   ADD KEY `id_kategori_aduan` (`id_kategori_aduan`),
   ADD KEY `aduan_ibfk_pengendali` (`id_pengendali`);
+
+--
+-- Indexes for table `ahli_keluarga`
+--
+ALTER TABLE `ahli_keluarga`
+  ADD PRIMARY KEY (`id_ahli`),
+  ADD KEY `id_pengguna` (`id_pengguna`);
 
 --
 -- Indexes for table `ajk_jawatan`
@@ -760,16 +817,22 @@ ALTER TABLE `aduan`
   MODIFY `id_aduan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
+-- AUTO_INCREMENT for table `ahli_keluarga`
+--
+ALTER TABLE `ahli_keluarga`
+  MODIFY `id_ahli` int(11) NOT NULL AUTO_INCREMENT;
+
+--
 -- AUTO_INCREMENT for table `bantuan`
 --
 ALTER TABLE `bantuan`
-  MODIFY `id_bantuan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1000;
+  MODIFY `id_bantuan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=1002;
 
 --
 -- AUTO_INCREMENT for table `bantuan_lampiran`
 --
 ALTER TABLE `bantuan_lampiran`
-  MODIFY `id_lampiran` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_lampiran` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
 
 --
 -- AUTO_INCREMENT for table `fasiliti`
@@ -799,7 +862,7 @@ ALTER TABLE `hebahan`
 -- AUTO_INCREMENT for table `jawatan_ajk`
 --
 ALTER TABLE `jawatan_ajk`
-  MODIFY `id_jawatan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id_jawatan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 
 --
 -- AUTO_INCREMENT for table `kategori_aduan`
@@ -835,7 +898,7 @@ ALTER TABLE `peranan`
 -- AUTO_INCREMENT for table `permohonan_bantuan`
 --
 ALTER TABLE `permohonan_bantuan`
-  MODIFY `id_permohonan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=32;
+  MODIFY `id_permohonan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
 
 --
 -- AUTO_INCREMENT for table `tempahan_fasiliti`
@@ -854,6 +917,12 @@ ALTER TABLE `aduan`
   ADD CONSTRAINT `aduan_ibfk_1` FOREIGN KEY (`id_pengguna`) REFERENCES `pengguna` (`id_pengguna`),
   ADD CONSTRAINT `aduan_ibfk_2` FOREIGN KEY (`id_kategori_aduan`) REFERENCES `kategori_aduan` (`id_kategori_aduan`),
   ADD CONSTRAINT `aduan_ibfk_pengendali` FOREIGN KEY (`id_pengendali`) REFERENCES `pengguna` (`id_pengguna`);
+
+--
+-- Constraints for table `ahli_keluarga`
+--
+ALTER TABLE `ahli_keluarga`
+  ADD CONSTRAINT `ahli_keluarga_ibfk_1` FOREIGN KEY (`id_pengguna`) REFERENCES `pengguna` (`id_pengguna`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `ajk_jawatan`
