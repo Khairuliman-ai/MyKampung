@@ -427,6 +427,23 @@
                         </div>
                     </div>
 
+                    <div class="mb-6">
+                        <div class="relative group">
+                            <span class="absolute inset-y-0 left-0 pl-5 flex items-center text-gray-400 group-focus-within:text-[#6C5DD3] transition-colors">
+                                <i class="fas fa-search"></i>
+                            </span>
+                            <input type="text" id="mapSearchInput" placeholder="Cari nama jalan, taman atau mercu tanda di sini..." 
+                                class="w-full pl-12 pr-28 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:ring-4 focus:ring-purple-100 focus:border-[#6C5DD3] text-sm font-bold shadow-sm transition-all outline-none"
+                                onkeydown="handleMapSearch(event)">
+                            <div class="absolute inset-y-0 right-0 flex items-center pr-2">
+                                <button type="button" onclick="performMapSearch()" class="px-5 py-2.5 bg-[#6C5DD3] text-white text-xs font-black rounded-xl hover:bg-[#5b4eb8] transition-all shadow-lg shadow-purple-200 active:scale-95 flex items-center gap-2">
+                                    <i class="fas fa-search-location"></i>
+                                    <span>Cari</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="relative rounded-3xl overflow-hidden border-4 border-gray-50 shadow-inner group">
                         <div id="mapProfil" style="height: 400px; z-index: 0;" class="w-full transition-transform duration-700"></div>
                         <div class="absolute bottom-4 left-4 right-4 flex gap-4 pointer-events-none">
@@ -442,16 +459,16 @@
                 </div>
             </div>
 
-            <%-- Action Bar --%>
-            <div class="sticky bottom-4 z-20">
-                <div class="bg-white/80 backdrop-blur-md p-4 rounded-3xl border border-white shadow-2xl flex flex-col md:flex-row gap-4 items-center justify-between max-w-4xl mx-auto ring-1 ring-black/5">
-                    <div class="flex items-center gap-3 px-4 py-2 bg-gray-50 rounded-2xl">
+            <%-- Action Bar (Moved to bottom of flow) --%>
+            <div class="mt-12 mb-8">
+                <div class="flex flex-col md:flex-row gap-6 items-center justify-between bg-white/50 backdrop-blur-sm p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
+                    <div class="flex items-center gap-4 px-6 py-3 bg-white rounded-2xl border border-gray-50 shadow-sm">
                         <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                        <span class="text-xs font-bold text-gray-500">Auto-save sedia ada</span>
+                        <span class="text-xs font-bold text-gray-500">Sedia untuk disimpan</span>
                     </div>
-                    <button type="submit" class="w-full md:w-auto px-10 py-4 bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] hover:shadow-lg hover:shadow-purple-500/30 text-white font-bold rounded-2xl transition-all duration-300 flex items-center justify-center gap-3 active:scale-[0.98]">
-                        <i class="fas fa-save text-lg"></i>
-                        <span>Simpan Semua Perubahan</span>
+                    <button type="submit" class="w-full md:w-auto px-12 py-5 bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] hover:shadow-2xl hover:shadow-purple-500/40 text-white font-black rounded-2xl transition-all duration-300 flex items-center justify-center gap-4 transform hover:-translate-y-1 active:scale-[0.98]">
+                        <i class="fas fa-save text-xl"></i>
+                        <span class="tracking-wide">SIMPAN SEMUA PERUBAHAN</span>
                     </button>
                 </div>
             </div>
@@ -529,37 +546,41 @@
         </div>
 
         <%-- Activity Logs --%>
-        <div class="flex-1">
+        <div class="flex-1 flex flex-col min-h-0">
             <h3 class="font-extrabold text-sm text-gray-900 uppercase tracking-widest mb-6 flex items-center gap-2">
                 <span class="w-1.5 h-4 bg-orange-500 rounded-full"></span>
                 Sejarah Aktiviti
             </h3>
             
-            <div class="space-y-4">
-                <%
-                    List<ActivityLog> logs = (List<ActivityLog>) request.getAttribute("activityLogs");
-                    if (logs != null && !logs.isEmpty()) {
-                        for (ActivityLog log : logs) {
-                %>
-                <div class="relative pl-6 pb-2 border-l-2 border-gray-100 group">
-                    <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-gray-200 group-hover:border-[#6C5DD3] transition-colors"></div>
-                    <div class="bg-gray-50 rounded-2xl p-4 border border-transparent hover:border-gray-200 hover:bg-white transition-all">
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="text-[10px] font-bold text-[#6C5DD3] bg-purple-50 px-2 py-0.5 rounded-md">ADMIN</span>
-                            <span class="text-[9px] font-bold text-gray-400"><%= new java.text.SimpleDateFormat("dd MMM yyyy").format(log.getDibuat_pada())%></span>
+            <div class="relative flex-1 min-h-0">
+                <div class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar pb-12">
+                    <%
+                        List<ActivityLog> logs = (List<ActivityLog>) request.getAttribute("activityLogs");
+                        if (logs != null && !logs.isEmpty()) {
+                            for (ActivityLog log : logs) {
+                    %>
+                    <div class="relative pl-6 pb-2 border-l-2 border-gray-100 group">
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-gray-200 group-hover:border-[#6C5DD3] transition-colors"></div>
+                        <div class="bg-gray-50 rounded-2xl p-4 border border-transparent hover:border-gray-200 hover:bg-white transition-all">
+                            <div class="flex justify-between items-center mb-1">
+                                <span class="text-[10px] font-bold text-[#6C5DD3] bg-purple-50 px-2 py-0.5 rounded-md">ADMIN</span>
+                                <span class="text-[9px] font-bold text-gray-400"><%= new java.text.SimpleDateFormat("dd MMM yyyy").format(log.getDibuat_pada())%></span>
+                            </div>
+                            <p class="text-[11px] font-semibold text-gray-700 leading-snug"><%= log.getKeterangan_tindakan()%></p>
                         </div>
-                        <p class="text-[11px] font-semibold text-gray-700 leading-snug"><%= log.getKeterangan_tindakan()%></p>
                     </div>
-                </div>
-                <%      }
-                } else { %>
-                <div class="text-center py-12 bg-gray-50 rounded-[2rem] border-2 border-dashed border-gray-200">
-                    <div class="w-12 h-12 rounded-full bg-white mx-auto flex items-center justify-center text-gray-300 mb-3 shadow-sm">
-                        <i class="fas fa-history"></i>
+                    <%      }
+                    } else { %>
+                    <div class="text-center py-12 bg-gray-50 rounded-[2rem] border-2 border-dashed border-gray-200">
+                        <div class="w-12 h-12 rounded-full bg-white mx-auto flex items-center justify-center text-gray-300 mb-3 shadow-sm">
+                            <i class="fas fa-history"></i>
+                        </div>
+                        <p class="text-[11px] text-gray-400 font-bold italic tracking-wide uppercase">Tiada Rekod Aktiviti</p>
                     </div>
-                    <p class="text-[11px] text-gray-400 font-bold italic tracking-wide uppercase">Tiada Rekod Aktiviti</p>
+                    <% }%>
                 </div>
-                <% }%>
+                <%-- Fade Effect Overlay --%>
+                <div class="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"></div>
             </div>
         </div>
     </aside>
@@ -753,6 +774,8 @@
         }, 300);
     }
 
+    let mainMap, mainMarker;
+
     (function () {
         var defaultLat = 6.0289, defaultLon = 102.2935;
         var latElement = document.getElementById('latInput');
@@ -764,15 +787,15 @@
         var initLat = latElement.value ? parseFloat(latElement.value) : defaultLat;
         var initLon = lonElement.value ? parseFloat(lonElement.value) : defaultLon;
 
-        var map = L.map('mapProfil', { zoomControl: false }).setView([initLat, initLon], latElement.value ? 17 : 14);
+        mainMap = L.map('mapProfil', { zoomControl: false }).setView([initLat, initLon], latElement.value ? 17 : 14);
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '© OpenStreetMap',
             className: 'map-tiles'
-        }).addTo(map);
+        }).addTo(mainMap);
         
-        L.control.zoom({ position: 'topright' }).addTo(map);
+        L.control.zoom({ position: 'topright' }).addTo(mainMap);
 
-        var marker = L.marker([initLat, initLon], { draggable: true }).addTo(map);
+        mainMarker = L.marker([initLat, initLon], { draggable: true }).addTo(mainMap);
         
         if (latElement.value && lonElement.value) {
             updateDisplay({ lat: initLat, lng: initLon });
@@ -784,10 +807,104 @@
             errorMessage: 'Lokasi tidak dijumpai.' 
         }).on('markgeocode', function(e) { 
             var latlng = e.geocode.center; 
-            marker.setLatLng(latlng); 
-            map.setView(latlng, 17); 
+            mainMarker.setLatLng(latlng); 
+            mainMap.setView(latlng, 17); 
             updateInputs(latlng); 
-        }).addTo(map);
+        }).addTo(mainMap);
+
+        window.handleMapSearch = function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                performMapSearch();
+                return false;
+            }
+        };
+
+        window.performMapSearch = function() {
+            const btn = document.querySelector('button[onclick="performMapSearch()"]');
+            const input = document.getElementById('mapSearchInput');
+            const query = input.value.trim();
+            
+            if (!query) return;
+
+            // Loading state
+            const originalContent = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-circle-notch fa-spin"></i>';
+            btn.disabled = true;
+
+            // Optimasi carian
+            let searchContext = query;
+            if (!query.toLowerCase().includes("kelantan")) {
+                searchContext += ", Pasir Puteh, Kelantan, Malaysia";
+            }
+
+            const url = `https://nominatim.openstreetmap.org/search?format=json&q=\${encodeURIComponent(searchContext)}&limit=1`;
+
+            fetch(url, {
+                headers: {
+                    'Accept-Language': 'ms,en'
+                }
+            })
+            .then(response => {
+                if (!response.ok) throw new Error('Network response was not ok');
+                return response.json();
+            })
+            .then(data => {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+
+                if (data && data.length > 0) {
+                    const r = data[0];
+                    const latlng = { lat: parseFloat(r.lat), lng: parseFloat(r.lon) };
+                    
+                    mainMarker.setLatLng(latlng);
+                    mainMap.setView(latlng, 17);
+                    updateInputs(latlng);
+                    
+                    const Toast = Swal.mixin({
+                        toast: true,
+                        position: 'top-end',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
+                    Toast.fire({
+                        icon: 'success',
+                        title: 'Lokasi ditemui: ' + r.display_name.split(',')[0]
+                    });
+                } else {
+                    // Cuba carian tanpa konteks tambahan jika gagal
+                    return fetch(`https://nominatim.openstreetmap.org/search?format=json&q=\${encodeURIComponent(query)}&limit=1`)
+                        .then(res => res.json())
+                        .then(secondData => {
+                            if (secondData && secondData.length > 0) {
+                                const r = secondData[0];
+                                const latlng = { lat: parseFloat(r.lat), lng: parseFloat(r.lon) };
+                                mainMarker.setLatLng(latlng);
+                                mainMap.setView(latlng, 17);
+                                updateInputs(latlng);
+                            } else {
+                                throw new Error('No results');
+                            }
+                        });
+                }
+            })
+            .catch(err => {
+                btn.innerHTML = originalContent;
+                btn.disabled = false;
+                
+                Swal.fire({
+                    title: 'Carian Gagal',
+                    text: 'Lokasi "' + query + '" tidak ditemui. Sila cuba alamat yang lebih umum atau gerakkan penanda secara manual.',
+                    icon: 'warning',
+                    confirmButtonColor: '#6C5DD3',
+                    customClass: {
+                        popup: 'rounded-[2rem]',
+                        confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                    }
+                });
+            });
+        };
 
         function updateInputs(latlng) {
             latElement.value = latlng.lat.toFixed(8);
@@ -801,13 +918,13 @@
             }
         }
 
-        marker.on('dragend', function (e) { updateInputs(e.target.getLatLng()); });
-        map.on('click', function (e) {
-            marker.setLatLng(e.latlng);
+        mainMarker.on('dragend', function (e) { updateInputs(e.target.getLatLng()); });
+        mainMap.on('click', function (e) {
+            mainMarker.setLatLng(e.latlng);
             updateInputs(e.latlng);
         });
         
-        setTimeout(function () { map.invalidateSize(); }, 300);
+        setTimeout(function () { mainMap.invalidateSize(); }, 300);
     })();
 </script>
 
