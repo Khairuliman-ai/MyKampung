@@ -34,6 +34,11 @@ public class AduanServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        /*
+         * =========================
+         * 1. SESSION & AUTH CHECK
+         * =========================
+         */
         HttpSession session = request.getSession();
         Pengguna user = (Pengguna) session.getAttribute("currentUser");
         if (user == null) {
@@ -41,11 +46,21 @@ public class AduanServlet extends HttpServlet {
             return;
         }
 
+        /*
+         * =========================
+         * 2. INITIALIZE DAOS
+         * =========================
+         */
         String pathInfo = request.getPathInfo();
         AduanDAO aduanDAO = new AduanDAO();
         KategoriAduanDAO kategoriDAO = new KategoriAduanDAO();
 
         try {
+            /*
+             * =========================
+             * 3. ROUTE: LIST COMPLAINTS
+             * =========================
+             */
             if (pathInfo == null || "/".equals(pathInfo) || "/list".equals(pathInfo)) {
                 String role = user.getNama_peranan();
                 List<Aduan> list;
@@ -68,7 +83,13 @@ public class AduanServlet extends HttpServlet {
                 } else {
                     response.sendRedirect(request.getContextPath() + "/dashboard");
                 }
-            } else if ("/detail".equals(pathInfo)) {
+            } 
+            /*
+             * =========================
+             * 4. ROUTE: COMPLAINT DETAIL
+             * =========================
+             */
+            else if ("/detail".equals(pathInfo)) {
                 int id = Integer.parseInt(request.getParameter("id"));
                 Aduan aduan = aduanDAO.getById(id);
                 LogAduanDAO logDAO = new LogAduanDAO();
@@ -88,6 +109,11 @@ public class AduanServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
+        /*
+         * =========================
+         * 1. SESSION & AUTH CHECK
+         * =========================
+         */
         HttpSession session = request.getSession();
         Pengguna user = (Pengguna) session.getAttribute("currentUser");
         if (user == null) {
@@ -95,12 +121,22 @@ public class AduanServlet extends HttpServlet {
             return;
         }
 
+        /*
+         * =========================
+         * 2. INITIALIZE DAOS
+         * =========================
+         */
         String pathInfo = request.getPathInfo();
         AduanDAO aduanDAO = new AduanDAO();
         LogAduanDAO logDAO = new LogAduanDAO();
 
         try {
 
+            /*
+             * =========================
+             * 3. ACTION: SUBMIT COMPLAINT
+             * =========================
+             */
             if ("/submit".equals(pathInfo)) {
                 String tajuk = request.getParameter("tajuk");
                 int idKategori = Integer.parseInt(request.getParameter("id_kategori"));
@@ -128,7 +164,13 @@ public class AduanServlet extends HttpServlet {
                 } else {
                     response.sendRedirect(request.getContextPath() + "/aduan/list?status=error");
                 }
-            } else if ("/updateStatus".equals(pathInfo)) {
+            } 
+            /*
+             * =========================
+             * 4. ACTION: UPDATE STATUS
+             * =========================
+             */
+            else if ("/updateStatus".equals(pathInfo)) {
                 int idAduan = Integer.parseInt(request.getParameter("id_aduan"));
                 String currentStatus = request.getParameter("current_status");
                 String nextStatus = request.getParameter("next_status");
