@@ -73,7 +73,7 @@ public class LoginServlet extends HttpServlet {
              */
 
             if (user.getStatus() != 1) {
-                request.setAttribute("errorMessage", "Akaun anda belum diaktifkan.");
+                request.setAttribute("errorMessage", "Akaun anda belum diaktifkan. Sila semak emel anda untuk jika Setiausaha telah meluluskan atau menolak pendaftaran anda.");
                 request.getRequestDispatcher("/views/auth/auth.jsp").forward(request, response);
                 return;
             }

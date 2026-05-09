@@ -10,6 +10,7 @@ import dao.ActivityLogDAO;
 import model.Pengguna;
 import model.ActivityLog;
 import util.DBUtil;
+import util.EmailUtil;
 import java.sql.Connection;
 import java.math.BigDecimal;
 
@@ -187,14 +188,32 @@ public class UrusPendudukServlet extends HttpServlet {
             // 4. LOGIC APPROVE
             else if ("/penduduk/approve".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("idPengguna"));
-                penggunaDAO.updateStatus(id, 1); 
+                Pengguna p = penggunaDAO.getPenggunaById(id);
+                
+                if (penggunaDAO.updateStatus(id, 1)) {
+                    // Hantar emel di background thread
+                    if (p != null && p.getEmail() != null) {
+                        new Thread(() -> {
+                            EmailUtil.sendRegistrationStatusEmail(p.getEmail(), p.getNama_penuh(), true);
+                        }).start();
+                    }
+                }
                 response.sendRedirect(request.getContextPath() + "/penduduk/urus?status=approved");
             }
 
             // 5. LOGIC REJECT
             else if ("/penduduk/reject".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("idPengguna"));
-                penggunaDAO.updateStatus(id, 0); 
+                Pengguna p = penggunaDAO.getPenggunaById(id);
+                
+                if (penggunaDAO.updateStatus(id, 0)) {
+                    // Hantar emel di background thread
+                    if (p != null && p.getEmail() != null) {
+                        new Thread(() -> {
+                            EmailUtil.sendRegistrationStatusEmail(p.getEmail(), p.getNama_penuh(), false);
+                        }).start();
+                    }
+                }
                 response.sendRedirect(request.getContextPath() + "/penduduk/urus?status=rejected");
             }
 
