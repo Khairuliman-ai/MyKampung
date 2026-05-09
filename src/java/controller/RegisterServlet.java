@@ -7,7 +7,7 @@ import util.FileUploadUtil;
 import util.DBUtil;
 
 
-import org.mindrot.jbcrypt.BCrypt; // 1. IMPORT PENTING
+import org.mindrot.jbcrypt.BCrypt;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
@@ -34,7 +34,13 @@ public class RegisterServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         try {
-            // 1. Ambil Data Teks
+
+            /*
+             * ============================================
+             * 1. TAKE INPUTS FROM REGISTER FORM IN auth.jsp
+             * ============================================
+             */
+            
             String nama_penuh = request.getParameter("nama_penuh");
             String nombor_kp = request.getParameter("nombor_kp");
             String nombor_telefon = request.getParameter("nombor_telefon");
@@ -46,23 +52,33 @@ public class RegisterServlet extends HttpServlet {
             String bandar = request.getParameter("bandar");
             String negeri = request.getParameter("negeri");
 
-            // 2. PROSES BCRYPT: Tukar password mentah kepada Hash
-            // Kod ini akan menghasilkan string panjang bermula dengan $2a$
+            /*
+             * ===========================
+             * 2. HASHING PASSWORD (bcrypt)
+             * ===========================
+             */
             String hashedPassword = BCrypt.hashpw(kata_laluan_mentah, BCrypt.gensalt());
 
-            // 3. Proses Muat Naik Fail PDF (Kekalkan kod sedia ada)
+            /*
+             * =========================
+             * 3. UPLOAD PDF
+             * =========================
+             */
             String fileName = FileUploadUtil.saveFile(
                 request.getPart("bukti_pdf"), AppConfig.DIR_LAMPIRAN_PENGGUNA, "bukti_" + nombor_kp + "_");
             if (fileName == null) fileName = "";
 
-
-            // 4. Set Data ke Model Pengguna
+            /*
+             * =========================
+             * 4. SET DATA TO MODEL
+             * =========================
+             */
             Pengguna p = new Pengguna();
             p.setNama_penuh(nama_penuh);
             p.setNombor_kp(nombor_kp);
             p.setNombor_telefon(nombor_telefon);
             p.setEmail(email);
-            p.setKata_laluan(hashedPassword); // SIMPAN HASH, BUKAN MENTAH
+            p.setKata_laluan(hashedPassword); 
             p.setNama_jalan(nama_jalan);
             p.setDaerah(daerah);
             p.setNombor_poskod(nombor_poskod);
@@ -71,7 +87,7 @@ public class RegisterServlet extends HttpServlet {
             p.setLampiran_pengesahan(fileName);
             p.setStatus(2); // Pending
 
-            // Extract Tarikh Lahir (Kekalkan kod sedia ada)
+            // Extract Tarikh Lahir
             if (nombor_kp != null && nombor_kp.length() >= 6) {
                 try {
                     String datePart = nombor_kp.substring(0, 6);
@@ -82,7 +98,11 @@ public class RegisterServlet extends HttpServlet {
                 }
             }
 
-            // 5. Simpan ke Database
+            /*
+             * =========================
+             * 5. SAVE TO DATABASE
+             * =========================
+             */
             try (Connection conn = DBUtil.getConnection()) {
                 PenggunaDAO pDao = new PenggunaDAO(conn);
                 boolean isSuccess = pDao.daftarPengguna(p);

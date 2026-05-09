@@ -2,10 +2,10 @@ package controller;
 
 import java.io.IOException;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet; // Tambah import ini
+import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
-@WebServlet("/logout") // <--- WAJIB TAMBAH INI
+@WebServlet("/logout")
 public class LogoutServlet extends HttpServlet {
 
     @Override
