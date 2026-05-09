@@ -115,7 +115,7 @@
         </div>
         <% } %>
 
-        <form action="<%= request.getContextPath()%>/profil/update" method="post" enctype="multipart/form-data" class="w-full space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000">
+        <form action="<%= request.getContextPath()%>/profil/update" method="post" enctype="multipart/form-data" class="w-full space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000" onsubmit="return confirmAction(event, 'Simpan Perubahan?', 'Adakah anda pasti mahu menyimpan maklumat profil yang baharu?', 'Ya, Simpan!', '#6C5DD3')">
 
             <%-- Profile Header Card --%>
             <div class="relative group">
@@ -602,7 +602,7 @@
             <p class="text-gray-500 text-sm mt-1 font-medium">Sila pastikan kata laluan anda kukuh.</p>
         </div>
 
-        <form action="<%= request.getContextPath()%>/profil/update?action=changePassword" method="post" class="space-y-6">
+        <form action="<%= request.getContextPath()%>/profil/update?action=changePassword" method="post" class="space-y-6" onsubmit="return confirmAction(event, 'Tukar Kata Laluan?', 'Tindakan ini akan menukar akses akaun anda. Adakah anda pasti?', 'Ya, Tukar!', '#3B82F6')">
             <div class="space-y-4">
                 <div class="group">
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Kata Laluan Lama</label>
@@ -635,6 +635,34 @@
 </div>
 
 <script>
+    function confirmAction(e, title, text, confirmButtonText, confirmButtonColor) {
+        e.preventDefault();
+        const form = e.target;
+        
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: confirmButtonColor,
+            cancelButtonColor: '#9CA3AF',
+            confirmButtonText: confirmButtonText,
+            cancelButtonText: 'Batal',
+            border: 'none',
+            borderRadius: '2rem',
+            customClass: {
+                popup: 'rounded-[2rem]',
+                confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold',
+                cancelButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+        return false;
+    }
+
     function previewImage(input) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();

@@ -462,7 +462,7 @@
                 </button>
             </div>
             
-            <form action="<%= request.getContextPath() %>/ketua/lantik" method="post" class="p-8 space-y-6">
+            <form action="<%= request.getContextPath() %>/ketua/lantik" method="post" class="p-8 space-y-6" onsubmit="return confirmAction(event, 'Sahkan Pelantikan?', 'Adakah anda mahu melantik penduduk ini sebagai AJK?', 'Ya, Sahkan', '#6C5DD3')">
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Calon Pemimpin</label>
                     <div class="relative">
@@ -542,7 +542,7 @@
                 </button>
             </div>
             
-            <form action="<%= request.getContextPath() %>/ketua/tambahJawatan" method="post" class="p-8 space-y-6">
+            <form action="<%= request.getContextPath() %>/ketua/tambahJawatan" method="post" class="p-8 space-y-6" onsubmit="return confirmAction(event, 'Tambah Jawatan?', 'Adakah anda mahu menambah jawatan baru ke dalam sistem?', 'Ya, Tambah', '#4F46E5')">
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nama Jawatan / Biro</label>
                     <input type="text" name="namaJawatan" required placeholder="Contoh: Biro Inovasi Komuniti" 
@@ -580,7 +580,7 @@
     <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity" onclick="closeModal('modalEdit')"></div>
     <div class="flex min-h-full items-center justify-center p-4">
         <div class="relative transform overflow-hidden rounded-[2.5rem] bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-3xl border border-white/20 flex flex-col max-h-[90vh]">
-            <form action="<%= request.getContextPath() %>/ketua/update" method="post" class="flex flex-col h-full">
+            <form action="<%= request.getContextPath() %>/ketua/update" method="post" class="flex flex-col h-full" onsubmit="return confirmAction(event, 'Simpan Perubahan?', 'Adakah anda mahu menyimpan maklumat profil yang dikemaskini?', 'Ya, Simpan', '#6C5DD3')">
                 <input type="hidden" name="idPengguna" id="editId">
                 
                 <!-- Header Modal -->
@@ -804,7 +804,7 @@
                 <button onclick="closeModal('modalInfoUser')" class="text-gray-400 hover:text-gray-600 font-bold text-sm transition order-2 md:order-1">Tutup Profil</button>
                 <div class="flex gap-3 order-1 md:order-2 w-full md:w-auto">
                     <!-- Drop/Gugurkan Form (Only for AJK) -->
-                    <form id="infoFormGugurkan" action="<%= request.getContextPath() %>/ketua/gugurkan" method="post" onsubmit="return confirm('Adakah anda pasti untuk menggugurkan Jawatan Ahli AJK ini?')" class="m-0 hidden">
+                    <form id="infoFormGugurkan" action="<%= request.getContextPath() %>/ketua/gugurkan" method="post" onsubmit="return confirmAction(event, 'Gugurkan Jawatan?', 'Adakah anda pasti untuk menggugurkan Jawatan Ahli AJK ini?', 'Ya, Gugurkan', '#EF4444')" class="m-0 hidden">
                         <input type="hidden" name="idPengguna" id="infoIdGugur">
                         <input type="hidden" name="idJawatan" id="infoIdJawatanGugur">
                         <button type="submit" class="w-full md:w-auto px-8 py-3 bg-red-50 text-red-500 border border-red-100 rounded-2xl font-bold text-sm hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2">
@@ -860,6 +860,34 @@
     let viewMap;
     let viewMarker;
     let currentUserData = {};
+
+    function confirmAction(e, title, text, confirmButtonText, confirmButtonColor) {
+        e.preventDefault();
+        const form = e.target;
+        
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: confirmButtonColor,
+            cancelButtonColor: '#9CA3AF',
+            confirmButtonText: confirmButtonText,
+            cancelButtonText: 'Batal',
+            border: 'none',
+            borderRadius: '2rem',
+            customClass: {
+                popup: 'rounded-[2rem]',
+                confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold',
+                cancelButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+        return false;
+    }
 
     function showUserInfo(row) {
         const d = row.dataset;
