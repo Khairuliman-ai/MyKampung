@@ -71,7 +71,23 @@
                 <tbody class="divide-y divide-gray-100">
                     <% if (!listBaharu.isEmpty()) { 
                         for (Aduan a : listBaharu) { %>
-                    <tr class="hover:bg-purple-50/30 transition cursor-pointer" onclick="location.href='<%= request.getContextPath() %>/aduan/detail?id=<%= a.getId_aduan() %>'">
+                    <tr class="hover:bg-purple-50/30 transition cursor-pointer" 
+                        onclick="showAduanDetail(this)"
+                        data-id="<%= a.getId_aduan() %>"
+                        data-tajuk="<%= a.getTajuk().replace("\"", "&quot;") %>"
+                        data-keterangan="<%= a.getKeterangan().replace("\"", "&quot;") %>"
+                        data-pengadu="<%= a.getNama_penuh() %>"
+                        data-tarikh="<%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %>"
+                        data-kategori="<%= a.getNama_kategori() %>"
+                        data-status="<%= a.getStatus() %>"
+                        data-status-label="<%= a.getStatusLabel() %>"
+                        data-status-class="<%= a.getStatusBadgeClass() %>"
+                        data-priority="<%= a.getKeutamaan() %>"
+                        data-priority-class="<%= a.getKeutamaanBadge() %>"
+                        data-catatan-ajk="<%= a.getCatatan_ajk() != null ? a.getCatatan_ajk().replace("\"", "&quot;") : "" %>"
+                        data-catatan-ketua="<%= a.getCatatan_ketua() != null ? a.getCatatan_ketua().replace("\"", "&quot;") : "" %>"
+                        data-gambar="<%= a.getGambar_aduan() != null ? a.getGambar_aduan() : "" %>"
+                        >
                         <td class="p-4 text-sm font-bold text-[#6C5DD3]">#<%= a.getId_aduan() %></td>
                         <td class="p-4 text-sm text-gray-600"><%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %></td>
                         <td class="p-4">
@@ -125,7 +141,23 @@
                 <tbody class="divide-y divide-gray-100">
                     <% if (!listTindakan.isEmpty()) { 
                         for (Aduan a : listTindakan) { %>
-                    <tr class="hover:bg-purple-50/30 transition cursor-pointer" onclick="location.href='<%= request.getContextPath() %>/aduan/detail?id=<%= a.getId_aduan() %>'">
+                    <tr class="hover:bg-purple-50/30 transition cursor-pointer" 
+                        onclick="showAduanDetail(this)"
+                        data-id="<%= a.getId_aduan() %>"
+                        data-tajuk="<%= a.getTajuk().replace("\"", "&quot;") %>"
+                        data-keterangan="<%= a.getKeterangan().replace("\"", "&quot;") %>"
+                        data-pengadu="<%= a.getNama_penuh() %>"
+                        data-tarikh="<%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %>"
+                        data-kategori="<%= a.getNama_kategori() %>"
+                        data-status="<%= a.getStatus() %>"
+                        data-status-label="<%= a.getStatusLabel() %>"
+                        data-status-class="<%= a.getStatusBadgeClass() %>"
+                        data-priority="<%= a.getKeutamaan() %>"
+                        data-priority-class="<%= a.getKeutamaanBadge() %>"
+                        data-catatan-ajk="<%= a.getCatatan_ajk() != null ? a.getCatatan_ajk().replace("\"", "&quot;") : "" %>"
+                        data-catatan-ketua="<%= a.getCatatan_ketua() != null ? a.getCatatan_ketua().replace("\"", "&quot;") : "" %>"
+                        data-gambar="<%= a.getGambar_aduan() != null ? a.getGambar_aduan() : "" %>"
+                        >
                         <td class="p-4 text-sm font-bold text-[#6C5DD3]">#<%= a.getId_aduan() %></td>
                         <td class="p-4 text-sm text-gray-600"><%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %></td>
                         <td class="p-4">
@@ -179,7 +211,23 @@
                 <tbody class="divide-y divide-gray-100">
                     <% if (!listSejarah.isEmpty()) { 
                         for (Aduan a : listSejarah) { %>
-                    <tr class="hover:bg-purple-50/30 transition cursor-pointer" onclick="location.href='<%= request.getContextPath() %>/aduan/detail?id=<%= a.getId_aduan() %>'">
+                    <tr class="hover:bg-purple-50/30 transition cursor-pointer" 
+                        onclick="showAduanDetail(this)"
+                        data-id="<%= a.getId_aduan() %>"
+                        data-tajuk="<%= a.getTajuk().replace("\"", "&quot;") %>"
+                        data-keterangan="<%= a.getKeterangan().replace("\"", "&quot;") %>"
+                        data-pengadu="<%= a.getNama_penuh() %>"
+                        data-tarikh="<%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %>"
+                        data-kategori="<%= a.getNama_kategori() %>"
+                        data-status="<%= a.getStatus() %>"
+                        data-status-label="<%= a.getStatusLabel() %>"
+                        data-status-class="<%= a.getStatusBadgeClass() %>"
+                        data-priority="<%= a.getKeutamaan() %>"
+                        data-priority-class="<%= a.getKeutamaanBadge() %>"
+                        data-catatan-ajk="<%= a.getCatatan_ajk() != null ? a.getCatatan_ajk().replace("\"", "&quot;") : "" %>"
+                        data-catatan-ketua="<%= a.getCatatan_ketua() != null ? a.getCatatan_ketua().replace("\"", "&quot;") : "" %>"
+                        data-gambar="<%= a.getGambar_aduan() != null ? a.getGambar_aduan() : "" %>"
+                        >
                         <td class="p-4 text-sm font-bold text-[#6C5DD3]">#<%= a.getId_aduan() %></td>
                         <td class="p-4 text-sm text-gray-600"><%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %></td>
                         <td class="p-4">
@@ -306,6 +354,8 @@
         </div>
     </div>
 </div>
+
+<%@ include file="/views/aduan/modalDetailAduan.jsp" %>
 
 <script>
     function switchTab(name) {

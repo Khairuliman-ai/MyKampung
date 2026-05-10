@@ -99,6 +99,30 @@ public class AduanServlet extends HttpServlet {
                 request.setAttribute("logList", logList);
                 request.getRequestDispatcher("/views/aduan/detailAduan.jsp").forward(request, response);
             }
+            else if ("/getLogs".equals(pathInfo)) {
+                int id = Integer.parseInt(request.getParameter("id"));
+                LogAduanDAO logDAO = new LogAduanDAO();
+                List<LogAduan> logList = logDAO.getByAduan(id);
+                
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                
+                StringBuilder json = new StringBuilder("[");
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM, hh:mm a");
+                for (int i = 0; i < logList.size(); i++) {
+                    model.LogAduan l = logList.get(i);
+                    json.append("{")
+                        .append("\"id\":").append(l.getId_log_aduan()).append(",")
+                        .append("\"status_baru\":\"").append(l.getStatus_baru()).append("\",")
+                        .append("\"catatan\":\"").append(l.getCatatan() != null ? l.getCatatan().replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "") : "").append("\",")
+                        .append("\"nama_pelaku\":\"").append(l.getNama_pelaku()).append("\",")
+                        .append("\"tarikh\":\"").append(sdf.format(l.getDibuat_pada())).append("\"")
+                        .append("}");
+                    if (i < logList.size() - 1) json.append(",");
+                }
+                json.append("]");
+                response.getWriter().write(json.toString());
+            }
         } catch (Exception e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

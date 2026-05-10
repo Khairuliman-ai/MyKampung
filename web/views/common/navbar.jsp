@@ -98,9 +98,9 @@
 
             <a href="<%= contextPath %>/ketua/urus" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
-               <%= (currentPath.contains("/ketua/") || (currentPath.contains("urus") && !currentPath.contains("bantuan"))) ? activeClass : inactiveClass %>">
+               <%= (currentPath.contains("urus") && !currentPath.contains("bantuan") && !currentPath.contains("aduan") && !currentPath.contains("hebahan")) ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-users <%= (currentPath.contains("/ketua/") || (currentPath.contains("urus") && !currentPath.contains("bantuan"))) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-users <%= (currentPath.contains("urus") && !currentPath.contains("bantuan") && !currentPath.contains("aduan") && !currentPath.contains("hebahan")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
                 </div>
                 <span class="font-medium text-sm">Direktori Penduduk</span>
             </a>
@@ -149,9 +149,9 @@
             <% if ("Setiausaha".equals(biro)) { %>
             <a href="<%= contextPath %>/penduduk/urus" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
-               <%= (currentPath.contains("/penduduk/") || (currentPath.contains("urus") && !currentPath.contains("bantuan"))) ? activeClass : inactiveClass %>">
+               <%= (currentPath.contains("urus") && !currentPath.contains("bantuan") && !currentPath.contains("aduan") && !currentPath.contains("hebahan")) ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-user-cog <%= (currentPath.contains("/penduduk/") || (currentPath.contains("urus") && !currentPath.contains("bantuan"))) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-user-cog <%= (currentPath.contains("urus") && !currentPath.contains("bantuan") && !currentPath.contains("aduan") && !currentPath.contains("hebahan")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
                 </div>
                 <span class="font-medium text-sm">Pendaftaran & Data</span>
             </a>
