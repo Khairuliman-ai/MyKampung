@@ -29,27 +29,8 @@
     
     <%
         List<Pengguna> listAJK = (List<Pengguna>) request.getAttribute("listAJK");
-        List<Pengguna> listPenduduk = (List<Pengguna>) request.getAttribute("listPenduduk");
-        List<Pengguna> semuaPenduduk = new java.util.ArrayList<>();
-        
-        // Combine all to show total transparency
-        if (listAJK != null) semuaPenduduk.addAll(listAJK);
-        if (listPenduduk != null) semuaPenduduk.addAll(listPenduduk);
-        
-        // If Ketua Kampung is not in the list, add current user if role is Ketua Kampung
-        Pengguna curUser = (Pengguna) session.getAttribute("currentUser");
-        boolean ketuaInList = false;
-        if (curUser != null) {
-            for (Pengguna p : semuaPenduduk) {
-                if (p.getId_pengguna() == curUser.getId_pengguna()) {
-                    ketuaInList = true;
-                    break;
-                }
-            }
-            if (!ketuaInList && "Ketua Kampung".equals(curUser.getNama_peranan())) {
-                semuaPenduduk.add(curUser);
-            }
-        }
+        List<Pengguna> listPenduduk = (List<Pengguna>) request.getAttribute("listPenduduk"); // Now contains ALL active users
+        List<Pengguna> semuaPenduduk = (listPenduduk != null) ? listPenduduk : new java.util.ArrayList<>();
     %>
 
     <% if (request.getParameter("status") != null) { %>

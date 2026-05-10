@@ -33,7 +33,7 @@ public class UrusPendudukServlet extends HttpServlet {
             dao.JawatanDAO jawatanDAO = new dao.JawatanDAO();
 
             if ("/penduduk/urus".equals(action)) {
-                List<Pengguna> activeList = penggunaDAO.getAllActivePenduduk();
+                List<Pengguna> activeList = penggunaDAO.getAllActiveUsers();
                 List<Pengguna> pendingList = penggunaDAO.getPendingPenduduk();
                 request.setAttribute("pendingList", pendingList);
                 request.setAttribute("activeList", activeList);
@@ -41,7 +41,7 @@ public class UrusPendudukServlet extends HttpServlet {
             } 
             else if ("/ketua/urus".equals(action)) {
                 List<Pengguna> listAJK = penggunaDAO.getAllAJK();
-                List<Pengguna> listPenduduk = penggunaDAO.getAllActivePenduduk();
+                List<Pengguna> listPenduduk = penggunaDAO.getAllActiveUsers();
                 List<Pengguna> listJawatan = jawatanDAO.getJawatanHolders();
 
                 request.setAttribute("listAJK", listAJK);

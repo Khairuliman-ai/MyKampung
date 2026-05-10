@@ -209,6 +209,31 @@ public class PenggunaDAO {
         return senarai;
     }
 
+    /**
+     * Mengambil SEMUA pengguna yang aktif (status = 1) tanpa menapis peranan.
+     * Digunakan untuk paparan Senarai Penduduk yang lengkap di dashboard AJK/Ketua.
+     */
+    public List<Pengguna> getAllActiveUsers() {
+        List<Pengguna> senarai = new ArrayList<>();
+        String sql = "SELECT p.*, r.nama_peranan, j.nama_jawatan, aj.id_jawatan FROM pengguna p "
+                   + "JOIN pengguna_peranan pp ON p.id_pengguna = pp.id_pengguna "
+                   + "JOIN peranan r ON pp.id_peranan = r.id_peranan "
+                   + "LEFT JOIN ajk_jawatan aj ON p.id_pengguna = aj.id_pengguna "
+                   + "LEFT JOIN jawatan_ajk j ON aj.id_jawatan = j.id_jawatan "
+                   + "WHERE p.status = 1 "
+                   + "ORDER BY r.id_peranan ASC, p.nama_penuh ASC";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql); 
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                senarai.add(mapResultSetToPengguna(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return senarai;
+    }
+
     public List<Pengguna> getAllAJK() {
         List<Pengguna> senarai = new ArrayList<>();
         String sql = "SELECT p.*, r.nama_peranan, j.nama_jawatan, aj.id_jawatan FROM pengguna p "

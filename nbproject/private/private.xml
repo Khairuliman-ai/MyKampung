@@ -14,25 +14,21 @@
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/controller/ForgotPassServlet.java</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/web/views/fasiliti/paparanFasiliti.jsp</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/controller/StatsServlet.java</file>
-            <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/web/views/maklumatPenduduk/semakanPendudukJKKK.jsp</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/model/Fasiliti.java</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/web/views/maklumatPenduduk/kemaskiniProfil.jsp</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/controller/UpdatePasswordServlet.java</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/model/Peranan.java</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/controller/UrusFasilitiServlet.java</file>
-            <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/web/views/dashboard/dKetuaKampung.jsp</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/controller/LogoutServlet.java</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/model/Pengguna.java</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/web/views/bantuan/urusBantuanAJK.jsp</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/dao/FasilitiDAO.java</file>
-            <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/web/views/dashboard/dJKKK.jsp</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/dao/TempahanFasilitiDAO.java</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/web/views/bantuan/jenisBantuan.jsp</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/model/TempahanFasiliti.java</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/controller/LoginServlet.java</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/controller/RegisterServlet.java</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/util/DBUtil.java</file>
-            <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/web/views/dashboard/dPenduduk.jsp</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/web/views/fasiliti/urusFasiliti.jsp</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/web/views/bantuan/bantuanKom.jsp</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/controller/AduanServlet.java</file>
@@ -46,7 +42,6 @@
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/controller/TempahanServlet.java</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/web/views/common/header.jsp</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/controller/UrusPendudukServlet.java</file>
-            <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/web/views/maklumatPenduduk/urusPendudukJKKK.jsp</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/web/views/auth/auth.jsp</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/web/views/bantuan/bantuanRas.jsp</file>
             <file>file:/C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampung_V2/src/java/model/AJK_Jawatan.java</file>

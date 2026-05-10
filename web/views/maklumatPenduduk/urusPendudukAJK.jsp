@@ -197,13 +197,13 @@
                             data-statusk="<%= (p.getStatus_keluarga() != null) ? p.getStatus_keluarga() : "-" %>"
                             data-lat="<%= p.getLatitude() %>"
                             data-lon="<%= p.getLongitude() %>"
-                            data-jawatan="Penduduk"
+                            data-jawatan="<%= (p.getNama_jawatan() != null) ? p.getNama_jawatan() : p.getNama_peranan() %>"
                             data-pekerjaan="<%= (p.getPekerjaan() != null) ? p.getPekerjaan() : "Tiada" %>"
                             data-pendapatan="<%= p.getPendapatan() %>"
                             data-email="<%= (p.getEmail() != null) ? p.getEmail() : "Tiada" %>"
                             data-foto="<%= (p.getFoto_profil() != null) ? p.getFoto_profil() : "default_avatar.png" %>"
                             data-family="<%= sbFam.toString() %>"
-                            data-role="Penduduk">
+                            data-role="<%= p.getNama_peranan() %>">
                             <td class="p-5 text-sm text-gray-400 font-medium"><%= countActive++ %></td>
                             <td class="p-5">
                                 <div class="flex items-center gap-4">
@@ -212,8 +212,13 @@
                                     </div>
                                     <div>
                                         <div class="text-sm font-bold text-gray-800 search-col"><%= p.getNama_penuh() %></div>
-                                        <div class="text-[11px] text-gray-400 font-medium mt-0.5 search-col">
+                                        <div class="text-[11px] text-gray-400 font-medium mt-0.5 search-col flex items-center gap-2">
                                             <i class="fas fa-id-card text-[10px]"></i> <%= p.getNombor_kp() %>
+                                            <% if (!"Penduduk".equals(p.getNama_peranan())) { %>
+                                                <span class="px-2 py-0.5 rounded-md bg-indigo-50 text-indigo-600 text-[9px] font-black uppercase tracking-tighter border border-indigo-100">
+                                                    <%= p.getNama_peranan() %>
+                                                </span>
+                                            <% } %>
                                         </div>
                                     </div>
                                 </div>
