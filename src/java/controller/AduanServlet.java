@@ -7,6 +7,7 @@ import dao.PenggunaDAO;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
+import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
@@ -110,13 +111,22 @@ public class AduanServlet extends HttpServlet {
                 StringBuilder json = new StringBuilder("[");
                 SimpleDateFormat sdf = new SimpleDateFormat("dd MMM, hh:mm a");
                 for (int i = 0; i < logList.size(); i++) {
-                    model.LogAduan l = logList.get(i);
+                    LogAduan l = logList.get(i);
+                    String tarikhStr = (l.getDibuat_pada() != null) ? sdf.format(l.getDibuat_pada()) : "-";
+                    String namaPelaku = (l.getNama_pelaku() != null) ? l.getNama_pelaku() : "Sistem";
+                    
+                    // Simple JSON escape for strings
+                    String catatan = (l.getCatatan() != null) ? l.getCatatan() : "";
+                    catatan = catatan.replace("\\", "\\\\").replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "");
+                    String namaP = namaPelaku.replace("\\", "\\\\").replace("\"", "\\\"");
+                    String statusB = (l.getStatus_baru() != null ? l.getStatus_baru() : "").replace("\\", "\\\\").replace("\"", "\\\"");
+
                     json.append("{")
                         .append("\"id\":").append(l.getId_log_aduan()).append(",")
-                        .append("\"status_baru\":\"").append(l.getStatus_baru()).append("\",")
-                        .append("\"catatan\":\"").append(l.getCatatan() != null ? l.getCatatan().replace("\"", "\\\"").replace("\n", "\\n").replace("\r", "") : "").append("\",")
-                        .append("\"nama_pelaku\":\"").append(l.getNama_pelaku()).append("\",")
-                        .append("\"tarikh\":\"").append(sdf.format(l.getDibuat_pada())).append("\"")
+                        .append("\"status_baru\":\"").append(statusB).append("\",")
+                        .append("\"catatan\":\"").append(catatan).append("\",")
+                        .append("\"nama_pelaku\":\"").append(namaP).append("\",")
+                        .append("\"tarikh\":\"").append(tarikhStr).append("\"")
                         .append("}");
                     if (i < logList.size() - 1) json.append(",");
                 }

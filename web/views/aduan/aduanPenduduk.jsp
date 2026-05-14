@@ -194,9 +194,9 @@
             </form>
         </div>
     </div>
+</div>
 
 <%@ include file="/views/aduan/modalDetailAduan.jsp" %>
-</div>
 
 <script>
     // Functions now centralized in footer.jsp

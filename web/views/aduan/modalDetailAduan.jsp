@@ -148,6 +148,7 @@
         
         try {
             const response = await fetch('<%= request.getContextPath() %>/aduan/getLogs?id=' + id);
+            if (!response.ok) throw new Error('HTTP status ' + response.status);
             const logs = await response.json();
             
             container.innerHTML = '';
@@ -170,7 +171,11 @@
                 });
             }
         } catch (error) {
-            container.innerHTML = '<p class="text-xs text-red-500 italic pl-8">Gagal memuatkan log.</p>';
+            console.error('Error fetching logs:', error);
+            container.innerHTML = `<div class="text-center py-4">
+                <p class="text-[10px] text-red-500 font-bold uppercase tracking-widest">Ralat Teknikal</p>
+                <p class="text-[9px] text-gray-400 mt-1 italic">\${error.message}</p>
+            </div>`;
         }
     }
 </script>
