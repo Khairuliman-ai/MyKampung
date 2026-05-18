@@ -7,3 +7,6 @@ nbproject/private/
 # Abaikan fail sistem
 .DS_Store
 Thumbs.db
+
+# Abaikan fail konfigurasi sensitif
+src/java/config.properties

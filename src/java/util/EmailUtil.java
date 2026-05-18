@@ -36,10 +36,26 @@ public class EmailUtil {
         return isSuccess;
     }
 
-    // 3. Method untuk HANTAR EMEL (Guna App Password Google awak)
+    // Helper method untuk memuatkan konfigurasi emel daripada config.properties
+    private static Properties loadEmailConfig() {
+        Properties config = new Properties();
+        try (java.io.InputStream input = EmailUtil.class.getClassLoader().getResourceAsStream("config.properties")) {
+            if (input != null) {
+                config.load(input);
+            } else {
+                System.err.println("Fail config.properties tidak dijumpai dalam classpath! Sila pastikan fail wujud.");
+            }
+        } catch (java.io.IOException e) {
+            System.err.println("Ralat membaca fail config.properties: " + e.getMessage());
+        }
+        return config;
+    }
+
+    // 3. Method untuk HANTAR EMEL (Guna App Password Google awak secara selamat)
     public static void sendResetEmail(String recipientEmail, String token) {
-        final String myEmail = "khairulworkmoney@gmail.com"; // GANTI EMEL AWAK
-        final String appPassword = "qqxriajykuxyxiqp"; // GANTI 16 DIGIT APP PASSWORD
+        Properties emailConfig = loadEmailConfig();
+        final String myEmail = emailConfig.getProperty("smtp.email", "YOUR_EMAIL_HERE");
+        final String appPassword = emailConfig.getProperty("smtp.password", "YOUR_APP_PASSWORD_HERE");
 
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com");
@@ -76,8 +92,9 @@ public class EmailUtil {
      * Method untuk hantar notifikasi status pendaftaran (Lulus/Tolak)
      */
     public static void sendRegistrationStatusEmail(String recipientEmail, String namaPenuh, boolean isApproved) {
-        final String myEmail = "khairulworkmoney@gmail.com"; 
-        final String appPassword = "qqxriajykuxyxiqp"; 
+        Properties emailConfig = loadEmailConfig();
+        final String myEmail = emailConfig.getProperty("smtp.email", "YOUR_EMAIL_HERE");
+        final String appPassword = emailConfig.getProperty("smtp.password", "YOUR_APP_PASSWORD_HERE");
 
         Properties props = new Properties();
         props.put("mail.smtp.host", "smtp.gmail.com");
