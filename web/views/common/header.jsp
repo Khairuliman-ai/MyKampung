@@ -41,7 +41,10 @@
                     },
                     colors: {
                         brand: {
-                            purple: '#6C5DD3', /* Warna Utama seperti dalam gambar */
+                            purple: 'var(--brand-color)',
+                            purpleHover: 'var(--brand-color-hover)',
+                            secondary: 'var(--brand-secondary)',
+                            accent: 'var(--brand-accent)',
                             light: '#F7F7F9'
                         }
                     }
@@ -51,6 +54,27 @@
     </script>
 
     <style>
+        /* Dynamic Theme Variable berdasarkan Peranan Pengguna */
+        <%
+            String navRole = (currentUser != null) ? currentUser.getNama_peranan() : "Penduduk";
+            boolean isAJK = "Ketua Kampung".equalsIgnoreCase(navRole) || "AJK".equalsIgnoreCase(navRole);
+            
+            // Resident (Penduduk): Emerald Teal & Mint
+            // Admin (AJK / Ketua / Setiausaha): Deep Slate & Steel
+            String primaryColor = isAJK ? "#0F172A" : "#0D9488"; 
+            String hoverColor = isAJK ? "#1E293B" : "#0F766E";
+            String secondaryColor = isAJK ? "#475569" : "#2DD4BF";
+            String accentColor = isAJK ? "#F1F5F9" : "#F0FDFA";
+            String shadowColor = isAJK ? "rgba(15, 23, 42, 0.2)" : "rgba(13, 148, 136, 0.2)";
+        %>
+        :root {
+            --brand-color: <%= primaryColor %>;
+            --brand-color-hover: <%= hoverColor %>;
+            --brand-secondary: <%= secondaryColor %>;
+            --brand-accent: <%= accentColor %>;
+            --brand-shadow: <%= shadowColor %>;
+        }
+
         /* CSS Reset Minimal */
         body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #F7F7F9; }
         

@@ -22,14 +22,14 @@
         <div class="flex items-center gap-4">
             <div class="relative min-w-[160px]">
                 <form action="${pageContext.request.contextPath}/hebahan/list" method="get" id="sortForm">
-                    <select name="sort" onchange="this.form.submit()" class="w-full pl-4 pr-10 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm appearance-none cursor-pointer font-bold text-gray-600 shadow-sm transition-all">
+                    <select name="sort" onchange="this.form.submit()" class="w-full pl-4 pr-10 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-2 focus:ring-brand-purple text-sm appearance-none cursor-pointer font-bold text-gray-600 shadow-sm transition-all">
                         <option value="DESC" <%= "DESC".equals(request.getParameter("sort")) ? "selected" : "" %>>Terbaru</option>
                         <option value="ASC" <%= "ASC".equals(request.getParameter("sort")) ? "selected" : "" %>>Terlama</option>
                     </select>
                     <i class="fas fa-sort-amount-down absolute right-4 top-1/2 -translate-y-1/2 text-brand-purple pointer-events-none"></i>
                 </form>
             </div>
-            <button onclick="openAddModal()" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-6 py-3 rounded-2xl font-bold text-sm transition shadow-lg shadow-purple-100 flex items-center gap-2">
+            <button onclick="openAddModal()" class="bg-brand-purple hover:bg-brand-purpleHover text-white px-6 py-3 rounded-2xl font-bold text-sm transition shadow-lg shadow-purple-100 flex items-center gap-2">
                 <i class="fas fa-plus-circle"></i> Tambah Hebahan Baru
             </button>
         </div>
@@ -63,7 +63,7 @@
                     <img src="${pageContext.request.contextPath}/file/hebahan/<%= h.getGambar_poster() %>"
                          class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                 <% } else { %>
-                    <div class="w-full h-full bg-gradient-to-br from-[#6C5DD3] to-[#8B7EE0] flex items-center justify-center">
+                    <div class="w-full h-full bg-gradient-to-br from-brand-purple to-[#8B7EE0] flex items-center justify-center">
                         <i class="<%= h.getKategoriIcon() %> text-white text-5xl opacity-30"></i>
                     </div>
                 <% } %>
@@ -211,7 +211,7 @@
                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Jumlah Hebahan</p>
                 <h4 class="font-bold text-xl text-gray-800"><%= list != null ? list.size() : 0 %></h4>
             </div>
-            <div class="w-10 h-10 rounded-xl bg-purple-100 text-[#6C5DD3] flex items-center justify-center">
+            <div class="w-10 h-10 rounded-xl bg-purple-100 text-brand-purple flex items-center justify-center">
                 <i class="fas fa-bullhorn"></i>
             </div>
         </div>
@@ -223,7 +223,7 @@
             <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-gray-100"></div>
             
             <div class="relative pl-10">
-                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-[#6C5DD3] flex items-center justify-center font-bold text-xs border-2 border-[#6C5DD3] z-10">1</div>
+                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-brand-purple flex items-center justify-center font-bold text-xs border-2 border-brand-purple z-10">1</div>
                 <h4 class="font-bold text-xs text-gray-800 uppercase">Draf atau Terbit</h4>
                 <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Gunakan status 'Draft' jika maklumat belum muktamad.</p>
             </div>
@@ -248,7 +248,7 @@
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur-sm" onclick="closeModal('modalHebahan')"></div>
     <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
         <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-            <div class="bg-[#6C5DD3] px-6 py-4 flex justify-between items-center">
+            <div class="bg-brand-purple px-6 py-4 flex justify-between items-center">
                 <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fas fa-bullhorn"></i> <span id="modalTitle">Hebahan Baru</span></h3>
                 <button class="text-white hover:text-gray-200" onclick="closeModal('modalHebahan')"><i class="fas fa-times"></i></button>
             </div>
@@ -257,16 +257,16 @@
                 <div class="bg-white px-8 py-6 space-y-4 max-h-[70vh] overflow-y-auto">
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tajuk Hebahan</label>
-                        <input type="text" name="tajuk" id="tajuk" required maxlength="50" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm transition">
+                        <input type="text" name="tajuk" id="tajuk" required maxlength="50" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-brand-purple text-sm transition">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Kandungan</label>
-                        <textarea name="kandungan" id="kandungan" rows="4" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm transition"></textarea>
+                        <textarea name="kandungan" id="kandungan" rows="4" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-brand-purple text-sm transition"></textarea>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Kategori</label>
-                            <select name="kategori" id="kategori" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm transition">
+                            <select name="kategori" id="kategori" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-brand-purple text-sm transition">
                                 <option value="Umum">Umum</option>
                                 <option value="Aktiviti">Aktiviti</option>
                                 <option value="Kecemasan">Kecemasan</option>
@@ -274,7 +274,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Status</label>
-                            <select name="status_hebahan" id="status_hebahan" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm transition">
+                            <select name="status_hebahan" id="status_hebahan" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-brand-purple text-sm transition">
                                 <option value="Draft">Draft</option>
                                 <option value="Published">Published</option>
                             </select>
@@ -314,7 +314,7 @@
                                 <input type="file" name="gambar_poster" id="gambar_poster" accept="image/*" onchange="handleFileSelect(this)" 
                                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
                                 <div class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 text-sm flex items-center gap-3 text-gray-400 group-hover:border-purple-200 transition">
-                                    <i class="fas fa-image text-[#6C5DD3]"></i>
+                                    <i class="fas fa-image text-brand-purple"></i>
                                     <span id="fileNameLabel">Pilih atau Seret Gambar Poster</span>
                                 </div>
                             </div>
@@ -322,7 +322,7 @@
                     </div>
                 </div>
                 <div class="bg-gray-50 px-8 py-4 flex flex-row-reverse gap-3">
-                    <button type="submit" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-8 py-2.5 rounded-xl font-bold text-sm transition shadow-lg shadow-purple-100">Simpan</button>
+                    <button type="submit" class="bg-brand-purple hover:bg-brand-purpleHover text-white px-8 py-2.5 rounded-xl font-bold text-sm transition shadow-lg shadow-purple-100">Simpan</button>
                     <button type="button" onclick="closeModal('modalHebahan')" class="bg-white hover:bg-gray-50 text-gray-500 px-6 py-2.5 rounded-xl font-bold text-sm border border-gray-100 transition">Batal</button>
                 </div>
             </form>
@@ -336,7 +336,7 @@
     <div class="flex min-h-screen items-center justify-center p-4">
         <div class="relative bg-white rounded-[2.5rem] shadow-2xl w-full max-w-4xl overflow-hidden transform transition-all">
             <!-- Header -->
-            <div class="bg-[#6C5DD3] px-8 py-5 flex justify-between items-center">
+            <div class="bg-brand-purple px-8 py-5 flex justify-between items-center">
                 <div>
                     <h3 class="text-lg font-bold text-white">Laraskan & Potong Poster</h3>
                     <p class="text-purple-100 text-[10px] uppercase font-bold tracking-widest">Suaikan mengikut bingkai yang disediakan</p>
@@ -378,7 +378,7 @@
 
             <!-- Footer -->
             <div class="bg-gray-50 px-8 py-6 flex flex-row-reverse gap-3">
-                <button type="button" onclick="saveCroppedImage()" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-8 py-3 rounded-2xl font-bold text-sm transition shadow-lg shadow-purple-100 flex items-center gap-2">
+                <button type="button" onclick="saveCroppedImage()" class="bg-brand-purple hover:bg-brand-purpleHover text-white px-8 py-3 rounded-2xl font-bold text-sm transition shadow-lg shadow-purple-100 flex items-center gap-2">
                     <i class="fas fa-check-circle"></i> Gunakan Gambar Ini
                 </button>
                 <button type="button" onclick="closeCropModal()" class="bg-white hover:bg-gray-100 text-gray-500 px-6 py-3 rounded-2xl font-bold text-sm border border-gray-100 transition">Batal</button>
@@ -459,7 +459,7 @@
             grad.classList.remove('hidden');
         } else {
             img.classList.add('hidden');
-            imgContainer.className = 'h-64 md:h-96 overflow-hidden relative bg-gradient-to-br from-[#6C5DD3] to-[#8B7EE0] flex items-center justify-center';
+            imgContainer.className = 'h-64 md:h-96 overflow-hidden relative bg-gradient-to-br from-brand-purple to-[#8B7EE0] flex items-center justify-center';
             grad.classList.add('hidden');
             const icon = document.createElement('i');
             icon.className = data.icon + ' text-white text-9xl opacity-20';

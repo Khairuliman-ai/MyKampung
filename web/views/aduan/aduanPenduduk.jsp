@@ -21,7 +21,7 @@
             <h2 class="text-2xl font-bold text-gray-800">Aduan & Cadangan</h2>
             <p class="text-gray-500 text-sm">Laporkan isu atau beri cadangan untuk kesejahteraan kampung.</p>
         </div>
-        <button onclick="openModal('modalAduanBaru')" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-6 py-3 rounded-2xl font-bold text-sm transition shadow-lg shadow-purple-100 flex items-center gap-2">
+        <button onclick="openModal('modalAduanBaru')" class="bg-brand-purple hover:bg-brand-purpleHover text-white px-6 py-3 rounded-2xl font-bold text-sm transition shadow-lg shadow-purple-100 flex items-center gap-2">
             <i class="fas fa-plus-circle"></i> Hantar Aduan Baru
         </button>
     </div>
@@ -31,12 +31,12 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-purple-50 border-b border-purple-100">
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">No. Aduan</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Tarikh</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Tajuk</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Kategori</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Status</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider text-center">Tindakan</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">No. Aduan</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Tarikh</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Tajuk</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Kategori</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Status</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider text-center">Tindakan</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -59,7 +59,7 @@
                         data-catatan-ketua="<%= a.getCatatan_ketua() != null ? a.getCatatan_ketua().replace("\"", "&quot;") : "" %>"
                         data-gambar="<%= a.getGambar_aduan() != null ? a.getGambar_aduan() : "" %>"
                         >
-                        <td class="p-4 text-sm font-bold text-[#6C5DD3]">#<%= a.getId_aduan() %></td>
+                        <td class="p-4 text-sm font-bold text-brand-purple">#<%= a.getId_aduan() %></td>
                         <td class="p-4 text-sm text-gray-600"><%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %></td>
                         <td class="p-4">
                             <div class="flex flex-col">
@@ -78,7 +78,7 @@
                             </span>
                         </td>
                         <td class="p-4 text-center" onclick="event.stopPropagation()">
-                            <button onclick="showAduanDetail(this.closest('tr'))" class="text-gray-400 hover:text-[#6C5DD3] transition">
+                            <button onclick="showAduanDetail(this.closest('tr'))" class="text-gray-400 hover:text-brand-purple transition">
                                 <i class="fas fa-chevron-right"></i>
                             </button>
                         </td>
@@ -138,7 +138,7 @@
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalAduanBaru')"></div>
     <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
         <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
-            <div class="bg-[#6C5DD3] px-6 py-4 flex justify-between items-center">
+            <div class="bg-brand-purple px-6 py-4 flex justify-between items-center">
                 <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fas fa-pen-nib"></i> Borang Aduan Baru</h3>
                 <button class="text-white hover:text-gray-200" onclick="closeModal('modalAduanBaru')"><i class="fas fa-times"></i></button>
             </div>
@@ -146,12 +146,12 @@
                 <div class="bg-white px-8 py-8 space-y-6">
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Tajuk Aduan</label>
-                        <input type="text" name="tajuk" required placeholder="Contoh: Jalan Berlubang di Lorong 4" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm transition">
+                        <input type="text" name="tajuk" required placeholder="Contoh: Jalan Berlubang di Lorong 4" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-brand-purple text-sm transition">
                     </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Kategori</label>
-                            <select name="id_kategori" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm transition">
+                            <select name="id_kategori" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-brand-purple text-sm transition">
                                 <% if (kategoriList != null) { 
                                     for (KategoriAduan k : kategoriList) { %>
                                     <option value="<%= k.getId_kategori_aduan() %>"><%= k.getNama_kategori() %></option>
@@ -160,7 +160,7 @@
                         </div>
                         <div>
                             <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Keutamaan</label>
-                            <select name="keutamaan" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm transition">
+                            <select name="keutamaan" required class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-brand-purple text-sm transition">
                                 <option value="RENDAH">RENDAH</option>
                                 <option value="SEDERHANA" selected>SEDERHANA</option>
                                 <option value="TINGGI">TINGGI</option>
@@ -170,15 +170,15 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Keterangan Terperinci</label>
-                        <textarea name="keterangan" rows="4" required placeholder="Sila jelaskan isu atau cadangan anda..." class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm transition"></textarea>
+                        <textarea name="keterangan" rows="4" required placeholder="Sila jelaskan isu atau cadangan anda..." class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-brand-purple text-sm transition"></textarea>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Gambar Bukti (Jika Ada)</label>
-                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-100 border-dashed rounded-xl hover:border-[#6C5DD3] transition cursor-pointer" onclick="document.getElementById('fileInput').click()">
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-100 border-dashed rounded-xl hover:border-brand-purple transition cursor-pointer" onclick="document.getElementById('fileInput').click()">
                             <div class="space-y-1 text-center">
                                 <i class="fas fa-image text-gray-400 text-3xl mb-2"></i>
                                 <div class="flex text-sm text-gray-600">
-                                    <span class="font-bold text-[#6C5DD3]">Muat Naik Fail</span>
+                                    <span class="font-bold text-brand-purple">Muat Naik Fail</span>
                                     <p class="pl-1">atau seret dan lepas</p>
                                 </div>
                                 <p class="text-xs text-gray-500">PNG, JPG, JPEG sehingga 5MB</p>
@@ -188,7 +188,7 @@
                     </div>
                 </div>
                 <div class="bg-gray-50 px-8 py-4 flex flex-row-reverse gap-3">
-                    <button type="submit" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-8 py-2.5 rounded-xl font-bold text-sm transition shadow-lg shadow-purple-100">Hantar Aduan</button>
+                    <button type="submit" class="bg-brand-purple hover:bg-brand-purpleHover text-white px-8 py-2.5 rounded-xl font-bold text-sm transition shadow-lg shadow-purple-100">Hantar Aduan</button>
                     <button type="button" onclick="closeModal('modalAduanBaru')" class="bg-white hover:bg-gray-50 text-gray-500 px-6 py-2.5 rounded-xl font-bold text-sm border border-gray-100 transition">Batal</button>
                 </div>
             </form>

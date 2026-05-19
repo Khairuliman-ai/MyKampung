@@ -74,7 +74,7 @@
             </div>
         </div>
 
-        <div class="bg-gradient-to-br from-brand-purple to-[#8B7EF8] p-7 rounded-[2.5rem] shadow-lg shadow-purple-100 flex items-center gap-6 group hover:shadow-purple-200 transition-all duration-500 relative overflow-hidden">
+        <div class="bg-gradient-to-br from-brand-purple to-brand-secondary p-7 rounded-[2.5rem] shadow-lg shadow-purple-100 flex items-center gap-6 group hover:shadow-md transition-all duration-500 relative overflow-hidden">
             <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-colors"></div>
             <div class="w-16 h-16 bg-white/20 backdrop-blur-md text-white rounded-3xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500">
                 <i class="fas fa-clock-rotate-left"></i>
@@ -300,7 +300,7 @@
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6C5DD3; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--brand-color); }
 
         @keyframes fade-in-up {
             from { opacity: 0; transform: translateY(20px); }
@@ -316,7 +316,7 @@
         }
         
         .brand-gradient {
-            background: linear-gradient(135deg, #6C5DD3 0%, #8B7EF8 100%);
+            background: linear-gradient(135deg, var(--brand-color) 0%, var(--brand-secondary) 100%);
         }
     </style>
 

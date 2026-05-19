@@ -26,7 +26,7 @@
                 <i class="fas fa-search"></i>
             </span>
             <input type="text" 
-                   class="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#6C5DD3] shadow-sm text-sm placeholder-gray-400" 
+                   class="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border-none focus:ring-2 focus:ring-brand-purple shadow-sm text-sm placeholder-gray-400" 
                    placeholder="Cari permohonan, bantuan, atau asnaf...">
         </div>
     </header>
@@ -86,7 +86,7 @@
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="p-6 border-b border-gray-50 flex justify-between items-center">
                 <h3 class="font-bold text-gray-800">Permohonan Menunggu Pengesahan</h3>
-                <a href="<%= request.getContextPath() %>/views/bantuan/urusBantuanAJK.jsp" class="text-xs text-[#6C5DD3] font-bold">Lihat Semua</a>
+                <a href="<%= request.getContextPath() %>/views/bantuan/urusBantuanAJK.jsp" class="text-xs text-brand-purple font-bold">Lihat Semua</a>
             </div>
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
@@ -94,7 +94,7 @@
                         <tr class="hover:bg-gray-50/50 transition">
                             <td class="p-4">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 rounded-full bg-purple-100 text-[#6C5DD3] flex items-center justify-center font-bold text-xs">A</div>
+                                    <div class="w-8 h-8 rounded-full bg-purple-100 text-brand-purple flex items-center justify-center font-bold text-xs">A</div>
                                     <div>
                                         <p class="text-sm font-bold text-gray-700">Aminah Hassan</p>
                                         <p class="text-[10px] text-gray-400">Bantuan Sara Hidup</p>
@@ -125,8 +125,8 @@
             <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
                 <h3 class="font-bold text-gray-800 mb-4">Navigasi Pantas</h3>
                 <div class="grid grid-cols-2 gap-4">
-                    <a href="<%= request.getContextPath() %>/profil/view" class="p-4 rounded-2xl bg-gray-50 hover:bg-[#6C5DD3] hover:text-white transition group">
-                        <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-[#6C5DD3] mb-3 group-hover:bg-white/20 group-hover:text-white">
+                    <a href="<%= request.getContextPath() %>/profil/view" class="p-4 rounded-2xl bg-gray-50 hover:bg-brand-purple hover:text-white transition group">
+                        <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-brand-purple mb-3 group-hover:bg-white/20 group-hover:text-white">
                             <i class="fas fa-user-edit"></i>
                         </div>
                         <p class="text-sm font-bold">Kemaskini Profil</p>
@@ -150,7 +150,7 @@
     
     <div class="flex justify-between items-start mb-10">
         <h3 class="font-bold text-lg text-gray-800">Profil Biro</h3>
-        <a href="<%= request.getContextPath() %>/profil/view" class="text-gray-400 hover:text-[#6C5DD3] transition"><i class="fas fa-edit"></i></a>
+        <a href="<%= request.getContextPath() %>/profil/view" class="text-gray-400 hover:text-brand-purple transition"><i class="fas fa-edit"></i></a>
     </div>
 
     <div class="text-center mb-10">

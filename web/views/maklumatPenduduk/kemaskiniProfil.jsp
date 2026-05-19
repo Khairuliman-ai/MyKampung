@@ -34,14 +34,14 @@
         <header class="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-4 animate-in fade-in slide-in-from-top-4 duration-700">
             <div>
                 <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight flex items-center gap-3">
-                    <span class="bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] bg-clip-text text-transparent">Profil Saya</span>
-                    <i class="fas fa-user-circle text-[#6C5DD3] text-2xl"></i>
+                    <span class="bg-gradient-to-r from-brand-purple to-brand-secondary bg-clip-text text-transparent">Profil Saya</span>
+                    <i class="fas fa-user-circle text-brand-purple text-2xl"></i>
                 </h2>
                 <p class="text-gray-500 mt-1 font-medium">Urus maklumat peribadi dan tetapan akaun anda di sini.</p>
             </div>
             
             <div class="flex items-center gap-2 text-xs font-bold text-gray-400 bg-white px-4 py-2 rounded-full shadow-sm border border-gray-100">
-                <i class="fas fa-calendar-alt text-[#6C5DD3]"></i>
+                <i class="fas fa-calendar-alt text-brand-purple"></i>
                 <span id="currentDateDisplay"><%= new java.text.SimpleDateFormat("dd MMM yyyy").format(new java.util.Date()) %></span>
             </div>
         </header>
@@ -115,11 +115,11 @@
         </div>
         <% } %>
 
-        <form action="<%= request.getContextPath()%>/profil/update" method="post" enctype="multipart/form-data" class="w-full space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000" onsubmit="return confirmAction(event, 'Simpan Perubahan?', 'Adakah anda pasti mahu menyimpan maklumat profil yang baharu?', 'Ya, Simpan!', '#6C5DD3')">
+        <form action="<%= request.getContextPath()%>/profil/update" method="post" enctype="multipart/form-data" class="w-full space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000" onsubmit="return confirmAction(event, 'Simpan Perubahan?', 'Adakah anda pasti mahu menyimpan maklumat profil yang baharu?', 'Ya, Simpan!', '<%= primaryColor %>')">
 
             <%-- Profile Header Card --%>
             <div class="relative group">
-                <div class="absolute -inset-1 bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] rounded-[2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
+                <div class="absolute -inset-1 bg-gradient-to-r from-brand-purple to-brand-secondary rounded-[2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
                 <div class="relative bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-8 overflow-hidden">
                     <%-- Decorative Background Pattern --%>
                     <div class="absolute top-0 right-0 w-64 h-full opacity-[0.03] pointer-events-none">
@@ -134,15 +134,15 @@
                     </div>
 
                     <div class="relative">
-                        <div class="w-36 h-36 rounded-full p-1.5 bg-gradient-to-tr from-[#6C5DD3] to-[#8B7EF8] shadow-2xl relative">
-                            <div class="w-full h-full rounded-full bg-white overflow-hidden flex items-center justify-center text-5xl font-bold text-[#6C5DD3]">
+                        <div class="w-36 h-36 rounded-full p-1.5 bg-gradient-to-tr from-brand-purple to-brand-secondary shadow-2xl relative">
+                            <div class="w-full h-full rounded-full bg-white overflow-hidden flex items-center justify-center text-5xl font-bold text-brand-purple">
                                 <% if (pDetail.getFoto_profil() != null && !pDetail.getFoto_profil().isEmpty() && !pDetail.getFoto_profil().equals("default_avatar.png")) {%>
                                 <img id="previewFoto" src="<%= request.getContextPath()%>/file/profil/<%= pDetail.getFoto_profil()%>" class="w-full h-full object-cover">
                                 <% } else {%>
                                 <img id="previewFoto" src="https://ui-avatars.com/api/?name=<%= pDetail.getNama_penuh()%>&background=6C5DD3&color=fff&size=128" class="w-full h-full object-cover">
                                 <% }%>
                             </div>
-                            <label for="fotoInput" class="absolute bottom-2 right-2 w-11 h-11 bg-white text-[#6C5DD3] rounded-full flex items-center justify-center cursor-pointer shadow-xl border border-gray-100 hover:scale-110 active:scale-95 transition-all z-10">
+                            <label for="fotoInput" class="absolute bottom-2 right-2 w-11 h-11 bg-white text-brand-purple rounded-full flex items-center justify-center cursor-pointer shadow-xl border border-gray-100 hover:scale-110 active:scale-95 transition-all z-10">
                                 <i class="fas fa-camera text-base"></i>
                                 <input type="file" id="fotoInput" name="foto_profil" class="hidden" accept="image/*" onchange="previewImage(this)">
                             </label>
@@ -152,12 +152,12 @@
                     <div class="text-center md:text-left flex-1">
                         <div class="flex flex-col md:flex-row md:items-center gap-3 mb-2">
                             <h3 class="text-3xl font-extrabold text-gray-900 tracking-tight"><%= pDetail.getNama_penuh()%></h3>
-                            <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-purple-100 text-[#6C5DD3] uppercase tracking-widest border border-purple-200 w-fit mx-auto md:mx-0">
+                            <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-purple-100 text-brand-purple uppercase tracking-widest border border-purple-200 w-fit mx-auto md:mx-0">
                                 <%= pDetail.getNama_peranan()%>
                             </span>
                         </div>
                         <p class="text-gray-500 font-medium flex items-center justify-center md:justify-start gap-2 mb-4">
-                            <i class="far fa-id-card text-[#6C5DD3]"></i>
+                            <i class="far fa-id-card text-brand-purple"></i>
                             <%= pDetail.getNombor_kp()%>
                         </p>
                         
@@ -181,7 +181,7 @@
                 <%-- Section 1: Peribadi --%>
                 <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-500 flex flex-col">
                     <div class="flex items-center gap-4 mb-8">
-                        <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-[#6C5DD3] shadow-inner">
+                        <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-brand-purple shadow-inner">
                             <i class="fas fa-user-edit text-xl"></i>
                         </div>
                         <div>
@@ -194,9 +194,9 @@
                         <div class="group">
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Nama Penuh</label>
                             <div class="relative">
-                                <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#6C5DD3] transition-colors"></i>
+                                <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-brand-purple transition-colors"></i>
                                 <input type="text" name="nama_penuh" value="<%= pDetail.getNama_penuh()%>" required 
-                                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3] text-gray-800 text-sm font-semibold transition-all">
+                                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple text-gray-800 text-sm font-semibold transition-all">
                             </div>
                         </div>
 
@@ -217,9 +217,9 @@
                             <div class="group">
                                 <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">No. Telefon</label>
                                 <div class="relative">
-                                    <i class="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#6C5DD3] transition-colors"></i>
+                                    <i class="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-brand-purple transition-colors"></i>
                                     <input type="text" name="nombor_telefon" value="<%= pDetail.getNombor_telefon()%>" required oninput="formatPhoneNumber(this)" maxlength="13" 
-                                        class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3] text-gray-800 text-sm font-semibold transition-all">
+                                        class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple text-gray-800 text-sm font-semibold transition-all">
                                 </div>
                             </div>
                         </div>
@@ -227,9 +227,9 @@
                         <div class="group">
                             <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Alamat Emel</label>
                             <div class="relative">
-                                <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#6C5DD3] transition-colors"></i>
+                                <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-brand-purple transition-colors"></i>
                                 <input type="email" name="email" value="<%= (pDetail.getEmail() != null) ? pDetail.getEmail() : ""%>" required 
-                                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3] text-gray-800 text-sm font-semibold transition-all">
+                                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple text-gray-800 text-sm font-semibold transition-all">
                             </div>
                         </div>
                     </div>
@@ -429,14 +429,14 @@
 
                     <div class="mb-6">
                         <div class="relative group">
-                            <span class="absolute inset-y-0 left-0 pl-5 flex items-center text-gray-400 group-focus-within:text-[#6C5DD3] transition-colors">
+                            <span class="absolute inset-y-0 left-0 pl-5 flex items-center text-gray-400 group-focus-within:text-brand-purple transition-colors">
                                 <i class="fas fa-search"></i>
                             </span>
                             <input type="text" id="mapSearchInput" placeholder="Cari nama jalan, taman atau mercu tanda di sini..." 
-                                class="w-full pl-12 pr-28 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:ring-4 focus:ring-purple-100 focus:border-[#6C5DD3] text-sm font-bold shadow-sm transition-all outline-none"
+                                class="w-full pl-12 pr-28 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:ring-4 focus:ring-purple-100 focus:border-brand-purple text-sm font-bold shadow-sm transition-all outline-none"
                                 onkeydown="handleMapSearch(event)">
                             <div class="absolute inset-y-0 right-0 flex items-center pr-2">
-                                <button type="button" onclick="performMapSearch()" class="px-5 py-2.5 bg-[#6C5DD3] text-white text-xs font-black rounded-xl hover:bg-[#5b4eb8] transition-all shadow-lg shadow-purple-200 active:scale-95 flex items-center gap-2">
+                                <button type="button" onclick="performMapSearch()" class="px-5 py-2.5 bg-brand-purple text-white text-xs font-black rounded-xl hover:bg-brand-purpleHover transition-all shadow-lg shadow-md active:scale-95 flex items-center gap-2">
                                     <i class="fas fa-search-location"></i>
                                     <span>Cari</span>
                                 </button>
@@ -448,7 +448,7 @@
                         <div id="mapProfil" style="height: 400px; z-index: 0;" class="w-full transition-transform duration-700"></div>
                         <div class="absolute bottom-4 left-4 right-4 flex gap-4 pointer-events-none">
                             <div class="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg border border-gray-100 pointer-events-auto flex items-center gap-3">
-                                <i class="fas fa-crosshairs text-[#6C5DD3] animate-pulse"></i>
+                                <i class="fas fa-crosshairs text-brand-purple animate-pulse"></i>
                                 <span class="text-[10px] font-bold text-gray-600 tracking-tight" id="coord-display">Sila pilih lokasi</span>
                             </div>
                         </div>
@@ -466,7 +466,7 @@
                         <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
                         <span class="text-xs font-bold text-gray-500">Sedia untuk disimpan</span>
                     </div>
-                    <button type="submit" class="w-full md:w-auto px-12 py-5 bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] hover:shadow-2xl hover:shadow-purple-500/40 text-white font-black rounded-2xl transition-all duration-300 flex items-center justify-center gap-4 transform hover:-translate-y-1 active:scale-[0.98]">
+                    <button type="submit" class="w-full md:w-auto px-12 py-5 bg-gradient-to-r from-brand-purple to-brand-secondary hover:shadow-2xl hover:shadow-purple-500/40 text-white font-black rounded-2xl transition-all duration-300 flex items-center justify-center gap-4 transform hover:-translate-y-1 active:scale-[0.98]">
                         <i class="fas fa-save text-xl"></i>
                         <span class="tracking-wide">SIMPAN SEMUA PERUBAHAN</span>
                     </button>
@@ -483,13 +483,13 @@
         <%-- Quick Stats --%>
         <div class="mb-10">
             <h3 class="font-extrabold text-sm text-gray-900 uppercase tracking-widest mb-6 flex items-center gap-2">
-                <span class="w-1.5 h-4 bg-[#6C5DD3] rounded-full"></span>
+                <span class="w-1.5 h-4 bg-brand-purple rounded-full"></span>
                 Status Profil
             </h3>
             
             <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-6 text-white shadow-xl relative overflow-hidden group">
                 <%-- Abstract Decor --%>
-                <div class="absolute -top-10 -right-10 w-32 h-32 bg-[#6C5DD3] rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                <div class="absolute -top-10 -right-10 w-32 h-32 bg-brand-purple rounded-full blur-3xl opacity-20 group-hover:opacity-40 transition-opacity"></div>
                 
                 <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-1">Kelengkapan Data</p>
                 <%
@@ -504,7 +504,7 @@
                 </div>
                 
                 <div class="relative w-full h-2.5 bg-white/10 rounded-full overflow-hidden mb-6">
-                    <div style="width: <%= progress%>%" class="absolute top-0 left-0 h-full bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] rounded-full transition-all duration-1000"></div>
+                    <div style="width: <%= progress%>%" class="absolute top-0 left-0 h-full bg-gradient-to-r from-brand-purple to-brand-secondary rounded-full transition-all duration-1000"></div>
                 </div>
                 
                 <div class="space-y-3">
@@ -560,10 +560,10 @@
                             for (ActivityLog log : logs) {
                     %>
                     <div class="relative pl-6 pb-2 border-l-2 border-gray-100 group">
-                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-gray-200 group-hover:border-[#6C5DD3] transition-colors"></div>
+                        <div class="absolute -left-[9px] top-0 w-4 h-4 rounded-full bg-white border-2 border-gray-200 group-hover:border-brand-purple transition-colors"></div>
                         <div class="bg-gray-50 rounded-2xl p-4 border border-transparent hover:border-gray-200 hover:bg-white transition-all">
                             <div class="flex justify-between items-center mb-1">
-                                <span class="text-[10px] font-bold text-[#6C5DD3] bg-purple-50 px-2 py-0.5 rounded-md">ADMIN</span>
+                                <span class="text-[10px] font-bold text-brand-purple bg-purple-50 px-2 py-0.5 rounded-md">ADMIN</span>
                                 <span class="text-[9px] font-bold text-gray-400"><%= new java.text.SimpleDateFormat("dd MMM yyyy").format(log.getDibuat_pada())%></span>
                             </div>
                             <p class="text-[11px] font-semibold text-gray-700 leading-snug"><%= log.getKeterangan_tindakan()%></p>
@@ -600,7 +600,7 @@
     .custom-scrollbar::-webkit-scrollbar { width: 5px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 10px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #6C5DD3; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: var(--brand-color); }
 
     /* Map Custom Styling */
     .leaflet-container { font-family: inherit; }
@@ -628,23 +628,23 @@
                 <div class="group">
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Kata Laluan Lama</label>
                     <div class="relative">
-                        <i class="fas fa-lock-open absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#6C5DD3] transition-colors"></i>
+                        <i class="fas fa-lock-open absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-brand-purple transition-colors"></i>
                         <input type="password" name="oldPassword" required 
-                            class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3] text-sm font-semibold transition-all">
+                            class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple text-sm font-semibold transition-all">
                     </div>
                 </div>
                 <div class="group">
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Kata Laluan Baharu</label>
                     <div class="relative">
-                        <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-[#6C5DD3] transition-colors"></i>
+                        <i class="fas fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-brand-purple transition-colors"></i>
                         <input type="password" name="newPassword" required minlength="6" 
-                            class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3] text-sm font-semibold transition-all">
+                            class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple text-sm font-semibold transition-all">
                     </div>
                 </div>
             </div>
             
             <div class="flex flex-col gap-3 pt-4">
-                <button type="submit" class="w-full py-4 bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] text-white font-bold rounded-2xl shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                <button type="submit" class="w-full py-4 bg-gradient-to-r from-brand-purple to-brand-secondary text-white font-bold rounded-2xl shadow-lg shadow-purple-500/20 hover:scale-[1.02] active:scale-95 transition-all">
                     Kemaskini Kata Laluan
                 </button>
                 <button type="button" onclick="hideChangePassModal()" class="w-full py-4 text-gray-500 font-bold hover:text-gray-700 transition">
@@ -897,7 +897,7 @@
                     title: 'Carian Gagal',
                     text: 'Lokasi "' + query + '" tidak ditemui. Sila cuba alamat yang lebih umum atau gerakkan penanda secara manual.',
                     icon: 'warning',
-                    confirmButtonColor: '#6C5DD3',
+                    confirmButtonColor: '<%= primaryColor %>',
                     customClass: {
                         popup: 'rounded-[2rem]',
                         confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold'

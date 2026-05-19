@@ -46,16 +46,16 @@
             <div class="relative">
                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                 <input type="text" id="searchPemohon" onkeyup="filterData()" placeholder="Cari pemohon/ID..." 
-                       class="pl-9 pr-4 py-2 bg-gray-50 border-none rounded-xl text-xs focus:ring-2 focus:ring-[#6C5DD3] w-48">
+                       class="pl-9 pr-4 py-2 bg-gray-50 border-none rounded-xl text-xs focus:ring-2 focus:ring-brand-purple w-48">
             </div>
             
-            <select id="filterKategori" onchange="filterData()" class="bg-gray-50 border-none rounded-xl text-xs focus:ring-2 focus:ring-[#6C5DD3] py-2 px-3 pr-8">
+            <select id="filterKategori" onchange="filterData()" class="bg-gray-50 border-none rounded-xl text-xs focus:ring-2 focus:ring-brand-purple py-2 px-3 pr-8">
                 <option value="ALL">Semua Kategori</option>
                 <option value="RASMI">Bantuan Rasmi</option>
                 <option value="KOMUNITI">Bantuan Komuniti</option>
             </select>
 
-            <div class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-xl border border-transparent focus-within:border-[#6C5DD3]/30 transition">
+            <div class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-xl border border-transparent focus-within:border-brand-purple/30 transition">
                 <i class="fas fa-calendar-alt text-gray-400 text-[10px]"></i>
                 <input type="date" id="filterDateStart" onchange="filterData()" class="bg-transparent border-none p-0 text-[10px] focus:ring-0">
                 <span class="text-gray-300">-</span>
@@ -81,7 +81,7 @@
     <div class="mb-8 border-b border-gray-200">
         <nav class="flex gap-8" aria-label="Tabs">
             <button onclick="switchTab('baru')" id="tab-baru" 
-                    class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-[#6C5DD3] text-[#6C5DD3]">
+                    class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-brand-purple text-brand-purple">
                 <i class="fas fa-clipboard-list"></i> Permohonan Baharu
                 <% if (!listBaru.isEmpty()) { %>
                     <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><%= listBaru.size() %></span>
@@ -160,7 +160,7 @@
                             onclick="viewDetail(this)">
                             <td class="p-4 text-sm text-gray-400 font-medium"><%= noBaru++ %></td>
                             <td class="p-4 text-sm text-gray-500"><%= dateDisplay %></td>
-                            <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-[#6C5DD3] transition-colors"><%= (pb.getNama_penuh() != null) ? pb.getNama_penuh() : "TIADA NAMA" %></td>
+                            <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-brand-purple transition-colors"><%= (pb.getNama_penuh() != null) ? pb.getNama_penuh() : "TIADA NAMA" %></td>
                             <td class="p-4 text-sm text-gray-600"><%= namaBantuanDisplay %></td>
                             <td class="p-4 text-center">
                                 <% if ("RASMI".equalsIgnoreCase(pb.getJenis_bantuan())) { %>
@@ -239,7 +239,7 @@
                             onclick="viewDetail(this)">
                             <td class="p-4 text-sm text-gray-400 font-medium"><%= noSejarah++ %></td>
                             <td class="p-4 text-sm text-gray-500"><%= sdf.format(pb.getDibuat_pada()) %></td>
-                            <td class="p-4 text-sm font-bold text-gray-700 group-hover:text-[#6C5DD3] transition-colors"><%= pb.getNama_penuh() %></td>
+                            <td class="p-4 text-sm font-bold text-gray-700 group-hover:text-brand-purple transition-colors"><%= pb.getNama_penuh() %></td>
                             <td class="p-4 text-sm text-gray-600"><%= pb.getNama_bantuan() %></td>
                             <td class="p-4 text-center">
                                 <% if ("RASMI".equalsIgnoreCase(pb.getJenis_bantuan())) { %>
@@ -295,7 +295,7 @@
                         %>
                             <a href="?page=<%= i %>" 
                                class="w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold transition-all
-                                      <%= (i == currentPage) ? "bg-[#6C5DD3] text-white shadow-lg shadow-purple-100" : "bg-white text-gray-500 hover:bg-gray-50 border border-gray-100" %>">
+                                      <%= (i == currentPage) ? "bg-brand-purple text-white shadow-lg shadow-purple-100" : "bg-white text-gray-500 hover:bg-gray-50 border border-gray-100" %>">
                                 <%= i %>
                             </a>
                         <% } %>
@@ -319,7 +319,7 @@
     <div id="content-jenis" class="hidden">
         <div class="flex justify-between items-center mb-4">
             <h3 class="font-bold text-lg text-gray-800">Senarai Konfigurasi Bantuan</h3>
-            <button onclick="openModal('modalTambahBantuan')" class="bg-[#6C5DD3] text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md">
+            <button onclick="openModal('modalTambahBantuan')" class="bg-brand-purple text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md">
                 <i class="fas fa-plus"></i> Tambah Bantuan
             </button>
         </div>
@@ -341,7 +341,7 @@
                         for (Bantuan b : senaraiBantuan) { %>
                     <tr class="hover:bg-gray-50/50 transition group">
                         <td class="p-4 text-sm text-gray-400 font-medium"><%= noJenis++ %></td>
-                        <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-[#6C5DD3] transition-colors"><%= b.getNama_bantuan() %></td>
+                        <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-brand-purple transition-colors"><%= b.getNama_bantuan() %></td>
                         <td class="p-4">
                             <% if ("RASMI".equalsIgnoreCase(b.getJenis_bantuan())) { %>
                                 <span class="px-2 py-1 rounded-lg text-[9px] font-bold bg-blue-50 text-blue-600 border border-blue-100">RASMI</span>
@@ -390,7 +390,7 @@
                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Perlu Semakan</p>
                 <h4 class="font-bold text-xl text-gray-800"><%= listBaru.size() %></h4>
             </div>
-            <div class="w-10 h-10 rounded-xl bg-purple-100 text-[#6C5DD3] flex items-center justify-center">
+            <div class="w-10 h-10 rounded-xl bg-purple-100 text-brand-purple flex items-center justify-center">
                 <i class="fas fa-clipboard-check"></i>
             </div>
         </div>
@@ -420,7 +420,7 @@
             <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-gray-100"></div>
             
             <div class="relative pl-10">
-                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-[#6C5DD3] flex items-center justify-center font-bold text-xs border-2 border-[#6C5DD3] z-10">1</div>
+                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-brand-purple flex items-center justify-center font-bold text-xs border-2 border-brand-purple z-10">1</div>
                 <h4 class="font-bold text-xs text-gray-800 uppercase">Semak Dokumen</h4>
                 <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Pastikan semua lampiran PDF yang dihantar oleh penduduk adalah lengkap dan sahih.</p>
             </div>
@@ -439,9 +439,9 @@
         </div>
     </div>
 
-    <div class="p-6 bg-[#6C5DD3]/5 rounded-3xl border border-[#6C5DD3]/10">
+    <div class="p-6 bg-brand-purple/5 rounded-3xl border border-brand-purple/10">
         <div class="flex items-center gap-3 mb-3">
-            <div class="w-8 h-8 rounded-lg bg-[#6C5DD3] text-white flex items-center justify-center">
+            <div class="w-8 h-8 rounded-lg bg-brand-purple text-white flex items-center justify-center">
                 <i class="fas fa-info-circle"></i>
             </div>
             <h4 class="font-bold text-xs text-gray-800">Nota Integriti</h4>
@@ -458,7 +458,7 @@
     <div class="flex min-h-screen items-center justify-center p-4">
         <div class="relative w-full max-w-3xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 flex flex-col max-h-[90vh]">
             <!-- Modal Header with Gradient (Fixed) -->
-            <div class="bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] px-8 py-6 text-white relative shrink-0">
+            <div class="bg-gradient-to-r from-brand-purple to-brand-secondary px-8 py-6 text-white relative shrink-0">
                 <div class="absolute top-0 right-0 p-6 opacity-10">
                     <i class="fas fa-file-invoice text-8xl rotate-12"></i>
                 </div>
@@ -483,11 +483,11 @@
                             <h4 id="detPemohon" class="text-2xl font-extrabold text-gray-800">-</h4>
                             <div class="flex flex-wrap gap-4 mt-2">
                                 <div class="flex items-center gap-2 text-sm text-gray-500">
-                                    <i class="far fa-id-card text-[#6C5DD3]"></i>
+                                    <i class="far fa-id-card text-brand-purple"></i>
                                     <span id="detIC" class="font-medium">-</span>
                                 </div>
                                 <div class="flex items-center gap-2 text-sm text-gray-500">
-                                    <i class="fas fa-phone-alt text-[#6C5DD3]"></i>
+                                    <i class="fas fa-phone-alt text-brand-purple"></i>
                                     <span id="detPhone" class="font-medium">-</span>
                                 </div>
                             </div>
@@ -589,7 +589,7 @@
 
                     <!-- Admin Documents Section -->
                     <div id="detAdminDokSection" class="space-y-4 pt-4 border-t border-gray-100 hidden">
-                        <label class="block text-[10px] font-bold text-[#6C5DD3] uppercase tracking-widest mb-2">Dokumen Maklum Balas (Ketua Kampung)</label>
+                        <label class="block text-[10px] font-bold text-brand-purple uppercase tracking-widest mb-2">Dokumen Maklum Balas (Ketua Kampung)</label>
                         <div id="dokumenAdminList" class="flex flex-wrap gap-2">
                             <!-- Dynamic Admin Files -->
                         </div>
@@ -621,34 +621,34 @@
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeModal('modalTambahBantuan')"></div>
     <div class="flex min-h-full items-center justify-center p-4">
         <div class="relative bg-white rounded-3xl shadow-xl w-full max-w-lg overflow-hidden">
-            <div class="bg-[#6C5DD3] p-4 text-white font-bold flex justify-between items-center">
+            <div class="bg-brand-purple p-4 text-white font-bold flex justify-between items-center">
                 <span>Tambah Jenis Bantuan</span>
                 <button onclick="closeModal('modalTambahBantuan')"><i class="fas fa-times"></i></button>
             </div>
             <form action="<%= request.getContextPath() %>/bantuan/tambahJenisBantuan" method="post" class="p-6 space-y-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nama Bantuan</label>
-                    <input type="text" name="namaBantuan" required class="w-full px-4 py-2 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-[#6C5DD3] outline-none transition">
+                    <input type="text" name="namaBantuan" required class="w-full px-4 py-2 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-brand-purple outline-none transition">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Kategori</label>
-                    <select name="jenisBantuan" class="w-full px-4 py-2 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-[#6C5DD3] outline-none transition">
+                    <select name="jenisBantuan" class="w-full px-4 py-2 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-brand-purple outline-none transition">
                         <option value="KOMUNITI">KOMUNITI</option>
                         <option value="RASMI">RASMI</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Peruntukan (RM)</label>
-                    <input type="number" step="0.01" name="peruntukan" required class="w-full px-4 py-2 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-[#6C5DD3] outline-none transition">
+                    <input type="number" step="0.01" name="peruntukan" required class="w-full px-4 py-2 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-brand-purple outline-none transition">
                 </div>
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Syarat Dokumen Wajib</label>
-                    <textarea name="syaratDokumen" rows="3" placeholder="Contoh: Salinan IC, Penyata Gaji, Sijil Kematian..." class="w-full px-4 py-2 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-[#6C5DD3] outline-none transition text-sm"></textarea>
+                    <textarea name="syaratDokumen" rows="3" placeholder="Contoh: Salinan IC, Penyata Gaji, Sijil Kematian..." class="w-full px-4 py-2 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-brand-purple outline-none transition text-sm"></textarea>
                     <p class="text-[10px] text-gray-400 mt-1 italic">Pisahkan setiap syarat dengan koma (,).</p>
                 </div>
                 <div class="flex justify-end gap-2 pt-4">
                     <button type="button" onclick="closeModal('modalTambahBantuan')" class="px-4 py-2 text-sm font-bold text-gray-500">Batal</button>
-                    <button type="submit" class="px-6 py-2 bg-[#6C5DD3] text-white rounded-xl font-bold shadow-md hover:bg-[#5b4eb8] transition">Simpan</button>
+                    <button type="submit" class="px-6 py-2 bg-brand-purple text-white rounded-xl font-bold shadow-md hover:bg-brand-purpleHover transition">Simpan</button>
                 </div>
             </form>
         </div>
@@ -660,7 +660,7 @@
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeModal('modalEditBantuan')"></div>
     <div class="flex min-h-full items-center justify-center p-4">
         <div class="relative bg-white rounded-3xl shadow-xl w-full max-w-lg overflow-hidden">
-            <div class="bg-[#6C5DD3] p-4 text-white font-bold flex justify-between items-center">
+            <div class="bg-brand-purple p-4 text-white font-bold flex justify-between items-center">
                 <span>Kemaskini Jenis Bantuan</span>
                 <button onclick="closeModal('modalEditBantuan')"><i class="fas fa-times"></i></button>
             </div>
@@ -687,7 +687,7 @@
                 </div>
                 <div class="flex justify-end gap-2 pt-4">
                     <button type="button" onclick="closeModal('modalEditBantuan')" class="px-4 py-2 text-sm font-bold text-gray-500">Batal</button>
-                    <button type="submit" class="px-6 py-2 bg-[#6C5DD3] text-white rounded-xl font-bold shadow-md transition">Kemaskini</button>
+                    <button type="submit" class="px-6 py-2 bg-brand-purple text-white rounded-xl font-bold shadow-md transition">Kemaskini</button>
                 </div>
             </form>
         </div>
@@ -760,10 +760,10 @@
 
     function switchTab(tabName) {
         document.querySelectorAll('nav button').forEach(btn => {
-            btn.classList.remove('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');
+            btn.classList.remove('border-brand-purple', 'text-brand-purple', 'font-bold');
             btn.classList.add('border-transparent', 'text-gray-500', 'font-medium');
         });
-        document.getElementById('tab-' + tabName).classList.add('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');
+        document.getElementById('tab-' + tabName).classList.add('border-brand-purple', 'text-brand-purple', 'font-bold');
         document.getElementById('content-baru').classList.add('hidden');
         document.getElementById('content-sejarah').classList.add('hidden');
         document.getElementById('content-jenis').classList.add('hidden');
@@ -934,7 +934,7 @@
                     newLink.id = "";
                     newLink.classList.remove('hidden');
                     newLink.classList.replace('bg-red-50', 'bg-purple-50');
-                    newLink.classList.replace('text-red-600', 'text-[#6C5DD3]');
+                    newLink.classList.replace('text-red-600', 'text-brand-purple');
                     newLink.classList.replace('border-red-100', 'border-purple-100');
                     newLink.href = ctx + "/file/bantuan/" + f;
                     newLink.innerHTML = '<i class="fas fa-check-circle"></i> ' + decodeURIComponent(f).split('_').slice(2).join('_');

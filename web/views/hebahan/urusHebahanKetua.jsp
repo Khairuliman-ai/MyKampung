@@ -19,7 +19,7 @@
         </div>
         <div class="relative min-w-[160px]">
             <form action="${pageContext.request.contextPath}/hebahan/list" method="get" id="sortForm">
-                <select name="sort" onchange="this.form.submit()" class="w-full pl-4 pr-10 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm appearance-none cursor-pointer font-bold text-gray-600 shadow-sm transition-all">
+                <select name="sort" onchange="this.form.submit()" class="w-full pl-4 pr-10 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-2 focus:ring-brand-purple text-sm appearance-none cursor-pointer font-bold text-gray-600 shadow-sm transition-all">
                     <option value="DESC" <%= "DESC".equals(request.getParameter("sort")) ? "selected" : "" %>>Terbaru</option>
                     <option value="ASC" <%= "ASC".equals(request.getParameter("sort")) ? "selected" : "" %>>Terlama</option>
                 </select>
@@ -64,11 +64,11 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-purple-50 border-b border-purple-100">
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Tajuk</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Pencipta</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Kategori</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Status</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider text-center">Tindakan</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Tajuk</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Pencipta</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Kategori</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Status</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider text-center">Tindakan</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -138,7 +138,7 @@
             <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-gray-100"></div>
             
             <div class="relative pl-10">
-                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-[#6C5DD3] flex items-center justify-center font-bold text-xs border-2 border-[#6C5DD3] z-10">1</div>
+                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-brand-purple flex items-center justify-center font-bold text-xs border-2 border-brand-purple z-10">1</div>
                 <h4 class="font-bold text-xs text-gray-800 uppercase">Pantau Kandungan</h4>
                 <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Pastikan semua hebahan adalah tepat dan tidak mengelirukan penduduk.</p>
             </div>

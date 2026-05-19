@@ -26,7 +26,7 @@
                 <i class="fas fa-search"></i>
             </span>
             <input type="text" 
-                   class="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#6C5DD3] shadow-sm text-sm placeholder-gray-400" 
+                   class="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border-none focus:ring-2 focus:ring-brand-purple shadow-sm text-sm placeholder-gray-400" 
                    placeholder="Cari penduduk, fail, atau aduan...">
         </div>
     </header>
@@ -51,7 +51,7 @@
     <%-- Statistik Ringkas --%>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="bg-white p-5 rounded-2xl shadow-sm hover:shadow-md transition border border-gray-50 flex items-center gap-4">
-            <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-[#6C5DD3] text-xl">
+            <div class="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center text-brand-purple text-xl">
                 <i class="fas fa-users"></i>
             </div>
             <div>
@@ -83,7 +83,7 @@
 
     <div class="flex justify-between items-end mb-6">
         <h3 class="font-bold text-xl text-gray-800">Perlu Tindakan Segera</h3>
-        <a href="#" class="text-sm text-[#6C5DD3] font-medium hover:underline">Lihat Semua</a>
+        <a href="#" class="text-sm text-brand-purple font-medium hover:underline">Lihat Semua</a>
     </div>
 
     <%-- Jadual Permohonan --%>
@@ -147,7 +147,7 @@
         </div>
         
         <h2 class="text-xl font-bold text-gray-800"><%= user.getNama_penuh() %></h2>
-        <p class="text-xs font-bold text-[#6C5DD3] bg-purple-50 px-3 py-1 rounded-full inline-block mt-1">
+        <p class="text-xs font-bold text-brand-purple bg-purple-50 px-3 py-1 rounded-full inline-block mt-1">
             <%= (user.getNama_jawatan() != null) ? user.getNama_jawatan() : "AJK Kampung" %>
         </p>
 
@@ -177,7 +177,7 @@
                 </div>
             </div>
             <div class="w-full bg-gray-200 rounded-full h-1.5 mt-2">
-                <div class="bg-[#6C5DD3] h-1.5 rounded-full" style="width: 65%"></div>
+                <div class="bg-brand-purple h-1.5 rounded-full" style="width: 65%"></div>
             </div>
             <p class="text-[10px] text-gray-400 mt-2 text-right">Sasaran: RM 7,000</p>
         </div>

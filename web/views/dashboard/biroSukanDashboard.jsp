@@ -27,7 +27,7 @@
     </header>
 
     <!-- Welcome Card -->
-    <div class="relative bg-gradient-to-r from-[#6C5DD3] to-[#8E82EF] rounded-3xl p-8 text-white mb-8 shadow-xl shadow-indigo-100 overflow-hidden">
+    <div class="relative bg-gradient-to-r from-brand-purple to-[#8E82EF] rounded-3xl p-8 text-white mb-8 shadow-xl shadow-indigo-100 overflow-hidden">
         <div class="relative z-10 max-w-lg">
             <span class="bg-white/20 text-xs font-bold px-3 py-1 rounded-full backdrop-blur-sm text-indigo-100"><%= user.getNama_jawatan().toUpperCase() %></span>
             <h1 class="text-3xl font-bold mt-4 mb-2 leading-tight">Selamat Datang, <%= user.getNama_penuh() %>!</h1>

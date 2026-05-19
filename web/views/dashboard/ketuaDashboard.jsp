@@ -26,7 +26,7 @@
                 <i class="fas fa-search"></i>
             </span>
             <input type="text" 
-                   class="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#6C5DD3] shadow-sm text-sm placeholder-gray-400" 
+                   class="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border-none focus:ring-2 focus:ring-brand-purple shadow-sm text-sm placeholder-gray-400" 
                    placeholder="Cari pemohon atau fail...">
         </div>
     </header>
@@ -87,7 +87,7 @@
                         <td class="p-4 text-sm font-bold">Abu Bakar</td>
                         <td class="p-4 text-sm text-gray-500">Bantuan Bencana Alam</td>
                         <td class="p-4 text-center">
-                            <button class="text-[#6C5DD3] text-xs font-bold px-3 py-1.5 rounded-lg border border-purple-200">Semak</button>
+                            <button class="text-brand-purple text-xs font-bold px-3 py-1.5 rounded-lg border border-purple-200">Semak</button>
                         </td>
                     </tr>
                 </tbody>

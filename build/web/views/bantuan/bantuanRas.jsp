@@ -52,7 +52,7 @@
             <p class="text-gray-500 text-sm">Pantau status permohonan bantuan kerajaan dan sokongan penghulu.</p>
         </div>
         <div>
-            <button onclick="openWizard()" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-md shadow-purple-200 flex items-center gap-2">
+            <button onclick="openWizard()" class="bg-brand-purple hover:bg-brand-purpleHover text-white px-5 py-2.5 rounded-xl font-bold text-sm transition shadow-md shadow-md flex items-center gap-2">
                 <i class="fas fa-plus"></i> Mohon Baru
             </button>
         </div>
@@ -87,10 +87,10 @@
     <div class="mb-8 border-b border-gray-200">
         <nav class="flex gap-8" aria-label="Tabs">
             <button onclick="switchTab('proses')" id="tab-proses" 
-                    class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-[#6C5DD3] text-[#6C5DD3]">
+                    class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-brand-purple text-brand-purple">
                 <i class="fas fa-sync-alt"></i> Sedang Diproses
                 <% if (!listProses.isEmpty()) { %>
-                    <span class="bg-[#6C5DD3] text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><%= listProses.size() %></span>
+                    <span class="bg-brand-purple text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><%= listProses.size() %></span>
                 <% } %>
             </button>
             <button onclick="switchTab('sejarah')" id="tab-sejarah" 
@@ -147,7 +147,7 @@
                             onclick="openDetailModal('<%= jsNama %>', '<%= displayDate %>', '<%= status %>', '<%= jsCatatan %>', '<%= jsUlasan %>', '<%= jsBank %>', '<%= jsAkaun %>', '<%= jsPenyata %>', '<%= jsDokumen %>')">
                             <td class="p-4 text-sm text-gray-400 font-medium"><%= noP++ %></td>
                             <td class="p-4 text-sm text-gray-600"><%= displayDate %></td>
-                            <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-[#6C5DD3]"><%= pb.getNama_bantuan() %></td>
+                            <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-brand-purple"><%= pb.getNama_bantuan() %></td>
                             <td class="p-4 text-center">
                                 <% if ("DIKEMBALIKAN".equalsIgnoreCase(status)) { %> 
                                     <span class="px-3 py-1 rounded-full bg-orange-500 text-white text-[10px] font-bold uppercase whitespace-nowrap">Kembali</span>
@@ -192,7 +192,7 @@
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
                         <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Nama bantuan, keterangan..." 
-                               class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm transition-all">
+                               class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-purple text-gray-800 text-sm transition-all">
                     </div>
                 </div>
                 <div>
@@ -200,13 +200,13 @@
                     <div class="relative">
                         <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="far fa-calendar-alt"></i></span>
                         <input type="date" id="dateFilter" onchange="filterData()"
-                               class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm transition-all">
+                               class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-purple text-gray-800 text-sm transition-all">
                     </div>
                 </div>
                  <div>
                     <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Status Sejarah</label>
                     <div class="relative">
-                        <select id="statusFilter" onchange="filterData()" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-[#6C5DD3] text-gray-800 text-sm appearance-none">
+                        <select id="statusFilter" onchange="filterData()" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-purple text-gray-800 text-sm appearance-none">
                             <option value="all">Semua Status</option>
                             <option value="LULUS">Lulus (Disokong)</option>
                             <option value="DITOLAK">Ditolak</option>
@@ -267,7 +267,7 @@
                         onclick="openDetailModal('<%= jsNama %>', '<%= displayDate %>', '<%= sStatus %>', '<%= jsCatatan %>', '<%= jsUlasan %>', '<%= jsBank %>', '<%= jsAkaun %>', '<%= jsPenyata %>', '<%= jsDokumen %>', '<%= jsDokumenAdmin %>')">
                         <td class="p-4 text-sm text-gray-400 font-medium"><%= noS++ %></td>
                         <td class="p-4 text-sm text-gray-500 whitespace-nowrap"><%= displayDate %></td>
-                        <td class="p-4 text-sm font-bold text-gray-700 group-hover:text-[#6C5DD3] search-col"><%= pb.getNama_bantuan() %></td>
+                        <td class="p-4 text-sm font-bold text-gray-700 group-hover:text-brand-purple search-col"><%= pb.getNama_bantuan() %></td>
                         <td class="p-4 text-center">
                             <% if ("LULUS".equalsIgnoreCase(sStatus)) { %> 
                                 <span class="px-3 py-1 rounded-full bg-green-500 text-white text-[10px] font-bold uppercase whitespace-nowrap">Disokong</span>
@@ -292,7 +292,7 @@
         <div class="relative w-full max-w-4xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 flex flex-col max-h-[90vh]">
             
             <!-- Modal Header (Matching Admin Design) -->
-            <div class="bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] px-8 py-6 text-white relative shrink-0">
+            <div class="bg-gradient-to-r from-brand-purple to-brand-secondary px-8 py-6 text-white relative shrink-0">
                 <div class="absolute top-0 right-0 p-6 opacity-10">
                     <i class="fas fa-tasks text-8xl rotate-12"></i>
                 </div>
@@ -314,7 +314,7 @@
                     <!-- LEFT COLUMN: VERTICAL PROGRESS TRACKER (STATIC) -->
                     <div class="lg:col-span-4 border-r border-gray-100 pr-8">
                         <h5 class="text-[11px] font-bold text-gray-400 uppercase tracking-widest mb-8 flex items-center gap-2">
-                            <i class="fas fa-stream text-[#6C5DD3]"></i> Status Semasa
+                            <i class="fas fa-stream text-brand-purple"></i> Status Semasa
                         </h5>
                         
                         <div class="space-y-0 relative">
@@ -430,7 +430,7 @@
 
             <!-- Modal Footer -->
             <div class="bg-slate-50 p-8 flex justify-end border-t border-slate-100 shrink-0">
-                <button type="button" class="px-10 py-3 bg-[#6C5DD3] text-white font-bold rounded-2xl hover:bg-[#5b4eb8] transition shadow-lg shadow-purple-100" onclick="closeModal('modalDetail')">
+                <button type="button" class="px-10 py-3 bg-brand-purple text-white font-bold rounded-2xl hover:bg-brand-purpleHover transition shadow-lg shadow-purple-100" onclick="closeModal('modalDetail')">
                     Tutup
                 </button>
             </div>
@@ -445,7 +445,7 @@
 
     <div class="space-y-6">
         <div class="flex gap-4">
-            <div class="w-10 h-10 rounded-full bg-purple-50 text-[#6C5DD3] flex-shrink-0 flex items-center justify-center font-bold text-lg"><i class="fas fa-id-card"></i></div>
+            <div class="w-10 h-10 rounded-full bg-purple-50 text-brand-purple flex-shrink-0 flex items-center justify-center font-bold text-lg"><i class="fas fa-id-card"></i></div>
             <div>
                 <h4 class="font-bold text-sm text-gray-800">Salinan Dokumen</h4>
                 <p class="text-xs text-gray-500 mt-1 leading-relaxed">Pastikan salinan Kad Pengenalan dan Slip Gaji disahkan oleh Pegawai Kerajaan Kumpulan A atau Penghulu.</p>
@@ -487,14 +487,14 @@
                 <input type="hidden" name="bantuanSource" value="rasmi">
                 
                 <!-- Wizard Header -->
-                <div class="bg-[#6C5DD3] p-6 text-white">
+                <div class="bg-brand-purple p-6 text-white">
                     <div class="flex justify-between items-center mb-6">
                         <h3 class="font-bold text-xl flex items-center gap-2"><i class="fas fa-file-signature"></i> Borang Bantuan Rasmi</h3>
                         <button type="button" onclick="closeWizard()" class="text-white/70 hover:text-white"><i class="fas fa-times"></i></button>
                     </div>
                     <div class="flex items-center gap-4">
                         <div class="flex items-center gap-2">
-                            <div id="w-step-1" class="w-8 h-8 rounded-full bg-white text-[#6C5DD3] flex items-center justify-center font-bold text-sm">1</div>
+                            <div id="w-step-1" class="w-8 h-8 rounded-full bg-white text-brand-purple flex items-center justify-center font-bold text-sm">1</div>
                             <span class="text-xs font-bold uppercase tracking-wider">Kategori</span>
                         </div>
                         <div class="flex-1 h-px bg-white/20"></div>
@@ -517,22 +517,22 @@
                                    data-syarat="<%= (b.getSyarat_dokumen() != null) ? b.getSyarat_dokumen() : "Tiada syarat khusus." %>"
                                    class="hidden peer" required onchange="goToStep(2)">
                             <div class="flex-1">
-                                <p class="font-bold text-gray-700 group-hover:text-[#6C5DD3]"><%= b.getNama_bantuan() %></p>
+                                <p class="font-bold text-gray-700 group-hover:text-brand-purple"><%= b.getNama_bantuan() %></p>
                                 <p class="text-[10px] text-gray-400">Kategori: <%= b.getJenis_bantuan() %></p>
                             </div>
                             <div class="text-right">
-                                <p class="text-sm font-bold text-[#6C5DD3]"><%= b.getJumlahBantuanFormatted() %></p>
+                                <p class="text-sm font-bold text-brand-purple"><%= b.getJumlahBantuanFormatted() %></p>
                                 <p class="text-[9px] text-gray-300">Sedia Dimohon</p>
                             </div>
-                            <div class="absolute inset-0 border-2 border-[#6C5DD3] rounded-2xl opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"></div>
+                            <div class="absolute inset-0 border-2 border-brand-purple rounded-2xl opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none"></div>
                         </label>
                         <% } } %>
                         <!-- Lain-lain option -->
                         <label class="relative flex items-center p-4 bg-gray-50 border-2 border-transparent hover:border-purple-200 rounded-2xl cursor-pointer group transition">
                             <input type="radio" name="jenisBantuan" value="999" data-name="Lain-lain" data-syarat="Sila lampirkan dokumen sokongan yang berkaitan." class="hidden peer" onchange="goToStep(2)">
-                            <div class="flex-1"><p class="font-bold text-gray-700 group-hover:text-[#6C5DD3]">Lain-lain Bantuan</p></div>
-                            <i class="fas fa-plus text-gray-300 group-hover:text-[#6C5DD3]"></i>
-                            <div class="absolute inset-0 border-2 border-[#6C5DD3] rounded-2xl opacity-0 peer-checked:opacity-100 transition-opacity"></div>
+                            <div class="flex-1"><p class="font-bold text-gray-700 group-hover:text-brand-purple">Lain-lain Bantuan</p></div>
+                            <i class="fas fa-plus text-gray-300 group-hover:text-brand-purple"></i>
+                            <div class="absolute inset-0 border-2 border-brand-purple rounded-2xl opacity-0 peer-checked:opacity-100 transition-opacity"></div>
                         </label>
                     </div>
                 </div>
@@ -569,18 +569,18 @@
 
                         <!-- Application Details -->
                         <div class="space-y-4">
-                            <h5 class="text-xs font-bold text-[#6C5DD3] uppercase tracking-widest border-b pb-1">Butiran Permohonan</h5>
+                            <h5 class="text-xs font-bold text-brand-purple uppercase tracking-widest border-b pb-1">Butiran Permohonan</h5>
                             <div id="lainInputDiv" class="hidden">
                                 <label class="text-[10px] text-purple-500 uppercase font-bold">Jenis Bantuan (Nyatakan)</label>
                                 <input type="text" name="jenisBantuanLain" id="inLain" class="w-full bg-purple-50 border-purple-100 border rounded-xl text-sm font-bold px-4 py-2 mt-1">
                             </div>
                             <div>
                                 <label class="text-[10px] text-gray-400 uppercase font-bold">Sebab / Keterangan</label>
-                                <textarea name="keterangan" required rows="2" class="w-full bg-gray-50 border rounded-xl text-sm px-4 py-2 mt-1 outline-none focus:ring-2 focus:ring-[#6C5DD3] transition"></textarea>
+                                <textarea name="keterangan" required rows="2" class="w-full bg-gray-50 border rounded-xl text-sm px-4 py-2 mt-1 outline-none focus:ring-2 focus:ring-brand-purple transition"></textarea>
                             </div>
                             <div>
                                 <label class="text-[10px] text-gray-400 uppercase font-bold">Lampiran Dokumen (PDF)</label>
-                                <input type="file" name="dokumenSokongan" accept="application/pdf" multiple required class="block w-full text-[10px] text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-purple-100 file:text-[#6C5DD3] mt-1">
+                                <input type="file" name="dokumenSokongan" accept="application/pdf" multiple required class="block w-full text-[10px] text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-purple-100 file:text-brand-purple mt-1">
                                 <p class="text-[8px] text-blue-500 mt-1 italic font-bold">Sila sertakan Borang Permohonan dan dokumen yang perlu dicop (Slip Gaji, Salinan IC dan etc.)</p>
                             </div>
                         </div>
@@ -596,7 +596,7 @@
                     <div id="step-1-footer" class="flex-1 text-right">
                         <span class="text-[10px] text-gray-400 font-bold mr-4 italic">Pilih satu untuk teruskan...</span>
                     </div>
-                    <button type="submit" id="btnSubmit" class="hidden bg-[#6C5DD3] text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-[#5b4eb8] transition">
+                    <button type="submit" id="btnSubmit" class="hidden bg-brand-purple text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-brand-purpleHover transition">
                         Hantar Permohonan <i class="fas fa-paper-plane ml-2"></i>
                     </button>
                 </div>
@@ -610,13 +610,13 @@
     function switchTab(tabName) {
         // Reset Tabs Style
         document.querySelectorAll('nav button').forEach(btn => {
-            btn.classList.remove('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');
+            btn.classList.remove('border-brand-purple', 'text-brand-purple', 'font-bold');
             btn.classList.add('border-transparent', 'text-gray-500', 'font-medium');
         });
 
         // Active Tab Style
         const activeTab = document.getElementById('tab-' + tabName);
-        activeTab.classList.add('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');
+        activeTab.classList.add('border-brand-purple', 'text-brand-purple', 'font-bold');
         activeTab.classList.remove('border-transparent', 'text-gray-500', 'font-medium');
 
         // Toggle Content
@@ -703,7 +703,7 @@
             }
         });
 
-        const setStepActive = (idx, color = "bg-[#6C5DD3]", title = "Sedang Diproses", desc = "") => {
+        const setStepActive = (idx, color = "bg-brand-purple", title = "Sedang Diproses", desc = "") => {
             const el = document.getElementById('vStep' + idx);
             if(el) {
                 el.className = `absolute left-0 top-0 w-8 h-8 rounded-full \${color} text-white flex items-center justify-center font-bold text-xs border-4 border-white shadow-sm z-10`;
@@ -723,10 +723,10 @@
         };
 
         if (status === "BARU") {
-            setStepActive(2, "bg-[#6C5DD3]", "Semakan Biro Kebajikan", "Dokumen anda sedang disemak oleh AJK.");
+            setStepActive(2, "bg-brand-purple", "Semakan Biro Kebajikan", "Dokumen anda sedang disemak oleh AJK.");
         } else if (status === "MENUNGGU_KETUA") {
             setStepDone(2);
-            setStepActive(3, "bg-[#6C5DD3]", "Pengesahan Ketua Kampung", "Telah disokong oleh AJK. Menunggu kelulusan Ketua Kampung.");
+            setStepActive(3, "bg-brand-purple", "Pengesahan Ketua Kampung", "Telah disokong oleh AJK. Menunggu kelulusan Ketua Kampung.");
         } else if (status === "DIKEMBALIKAN") {
             setStepActive(2, "bg-orange-500", "Perlu Kemaskini", "Sila semak maklum balas dan hantar semula dokumen.");
             const step2 = document.getElementById('vStep2');
@@ -771,7 +771,7 @@
             btnBack.classList.add('hidden');
             btnSubmit.classList.add('hidden');
             
-            w1.className = "w-8 h-8 rounded-full bg-white text-[#6C5DD3] flex items-center justify-center font-bold text-sm";
+            w1.className = "w-8 h-8 rounded-full bg-white text-brand-purple flex items-center justify-center font-bold text-sm";
             w2.className = "w-8 h-8 rounded-full bg-[#8E82EF] text-white/50 flex items-center justify-center font-bold text-sm border border-white/20";
             l2.className = "text-xs font-bold uppercase tracking-wider text-white/50";
         } else {
@@ -783,7 +783,7 @@
             
             w1.className = "w-8 h-8 rounded-full bg-emerald-400 text-white flex items-center justify-center font-bold text-sm";
             w1.innerHTML = "✓";
-            w2.className = "w-8 h-8 rounded-full bg-white text-[#6C5DD3] flex items-center justify-center font-bold text-sm";
+            w2.className = "w-8 h-8 rounded-full bg-white text-brand-purple flex items-center justify-center font-bold text-sm";
             l2.className = "text-xs font-bold uppercase tracking-wider text-white";
 
             // Get selected aid info

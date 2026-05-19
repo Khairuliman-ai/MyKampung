@@ -209,7 +209,7 @@
     <form action="${pageContext.request.contextPath}/LoginServlet" method="post">
 
         <div class="brand-logo mb-3 text-center">
-            <i class="bi bi-houses-fill" style="font-size: 2rem; color: #6C5DD3;"></i>
+            <i class="bi bi-houses-fill" style="font-size: 2rem; color: #0D9488;"></i>
         </div>
 
         <h4 class="fw-bold text-center">Log Masuk</h4>
@@ -222,7 +222,7 @@
                     icon: 'error',
                     title: 'Ralat',
                     text: '<%= request.getAttribute("error") %>',
-                    confirmButtonColor: '#6C5DD3'
+                    confirmButtonColor: '#0D9488'
                 });
             </script>
         <% } %>
@@ -257,15 +257,15 @@
 
         <div class="d-flex justify-content-between align-items-center mb-4 px-1">
           
-            <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal" class="text-decoration-none small fw-bold" style="color: #6C5DD3;">Lupa Kata Laluan?</a>
+            <a href="#" data-bs-toggle="modal" data-bs-target="#forgotPasswordModal" class="text-decoration-none small fw-bold" style="color: #0D9488;">Lupa Kata Laluan?</a>
         </div>
 
-        <button type="submit" class="btn btn-primary w-100 mt-2" style="background-color: #6C5DD3; border: none;">
+        <button type="submit" class="btn btn-primary w-100 mt-2" style="background-color: #0D9488; border: none;">
             Log Masuk
         </button>
 
         <div class="text-center mt-3 small">
-            Belum ada akaun? <a href="#" id="linkSignUp" class="fw-bold" style="color: #6C5DD3; text-decoration: none;">Daftar Sekarang</a>
+            Belum ada akaun? <a href="#" id="linkSignUp" class="fw-bold" style="color: #0D9488; text-decoration: none;">Daftar Sekarang</a>
         </div>
     </form>
 </div>
@@ -356,7 +356,7 @@
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content" style="border-radius: 25px; border: none; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);">
             <div class="modal-header border-0 pb-0 px-4 pt-4">
-                <h5 class="modal-title fw-bold" id="forgotPasswordModalLabel" style="color: #6C5DD3;">Set Semula Kata Laluan</h5>
+                <h5 class="modal-title fw-bold" id="forgotPasswordModalLabel" style="color: #0D9488;">Set Semula Kata Laluan</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" onclick="resetForgotModal()"></button>
             </div>
             
@@ -401,7 +401,7 @@
                     
                     <div class="text-center mt-3">
                         <span class="text-muted small">Tidak terima kod?</span>
-                        <button type="button" id="btn-resend" onclick="handleResendOTP()" class="btn btn-link p-0 ms-1 text-decoration-none small fw-bold" style="color: #6C5DD3;">Hantar Semula</button>
+                        <button type="button" id="btn-resend" onclick="handleResendOTP()" class="btn btn-link p-0 ms-1 text-decoration-none small fw-bold" style="color: #0D9488;">Hantar Semula</button>
                         <span id="countdown-text" class="text-muted small d-none">(Tunggu <span id="timer">120</span>s)</span>
                     </div>
 
@@ -434,9 +434,9 @@
 
 <style>
     .step-dot { width: 30%; height: 6px; background: #e2e8f0; border-radius: 10px; transition: all 0.3s ease; }
-    .step-dot.active { background: #6C5DD3; box-shadow: 0 0 10px rgba(108, 93, 211, 0.3); }
+    .step-dot.active { background: #0D9488; box-shadow: 0 0 10px rgba(13, 148, 136, 0.3); }
     .custom-input { background: #f8fafc; border-radius: 15px; padding: 12px 18px; font-size: 0.9rem; border: 1px solid #e2e8f0; }
-    .brand-btn { background-color: #6C5DD3; border: none; border-radius: 15px; font-weight: 700; transition: all 0.3s ease; }
+    .brand-btn { background-color: #0D9488; border: none; border-radius: 15px; font-weight: 700; transition: all 0.3s ease; }
     .brand-btn:hover { background-color: #5a4db8; transform: translateY(-2px); }
 </style>
 
@@ -657,7 +657,7 @@
                 icon: 'error',
                 title: 'Log Masuk Gagal',
                 text: errorMsg,
-                confirmButtonColor: '#6C5DD3',
+                confirmButtonColor: '#0D9488',
                 timer: 4000
             });
         }

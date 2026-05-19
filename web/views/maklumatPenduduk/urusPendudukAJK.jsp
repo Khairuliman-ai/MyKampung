@@ -46,7 +46,7 @@
     <div class="mb-6 border-b border-gray-200">
         <nav class="flex gap-6" aria-label="Tabs">
             <button onclick="switchTab('pending')" id="tab-pending" 
-                    class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-[#6C5DD3] text-[#6C5DD3]">
+                    class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-brand-purple text-brand-purple">
                 <i class="fas fa-user-plus"></i> Permohonan Baru
                 <% if(pendingList != null && !pendingList.isEmpty()) { %>
                     <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><%= pendingList.size() %></span>
@@ -151,7 +151,7 @@
                     <i class="fas fa-search text-sm"></i>
                 </span>
                 <input type="text" id="searchActive" placeholder="Cari nama, No. KP atau alamat penduduk..." 
-                       class="w-full pl-11 pr-4 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-4 focus:ring-purple-100 focus:border-[#6C5DD3] text-sm shadow-sm transition-all outline-none">
+                       class="w-full pl-11 pr-4 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-4 focus:ring-purple-100 focus:border-brand-purple text-sm shadow-sm transition-all outline-none">
             </div>
         </div>
 
@@ -305,7 +305,7 @@
     <div class="flex min-h-full items-center justify-center p-4">
         <div class="relative transform overflow-hidden rounded-[2.5rem] bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-3xl border border-white/20 flex flex-col max-h-[90vh]">
             <!-- Header Modal -->
-            <div class="bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] px-8 py-10 text-white relative shrink-0">
+            <div class="bg-gradient-to-r from-brand-purple to-brand-secondary px-8 py-10 text-white relative shrink-0">
                 <div class="absolute top-0 right-0 p-8 opacity-10">
                     <i class="fas fa-user-circle text-8xl"></i>
                 </div>
@@ -425,7 +425,7 @@
             <div class="p-8 bg-gray-50 border-t border-gray-100 shrink-0 flex flex-col md:flex-row justify-between items-center gap-4">
                 <button onclick="closeModal('modalInfoUser')" class="text-gray-400 hover:text-gray-600 font-bold text-sm transition order-2 md:order-1">Tutup Profil</button>
                 <div class="flex gap-3 order-1 md:order-2 w-full md:w-auto">
-                    <button id="infoBtnEdit" class="flex-1 md:flex-none px-10 py-3 bg-[#6C5DD3] text-white rounded-2xl font-bold text-sm shadow-lg shadow-purple-100 hover:bg-[#5b4eb8] transition-all flex items-center justify-center gap-2">
+                    <button id="infoBtnEdit" class="flex-1 md:flex-none px-10 py-3 bg-brand-purple text-white rounded-2xl font-bold text-sm shadow-lg shadow-purple-100 hover:bg-brand-purpleHover transition-all flex items-center justify-center gap-2">
                         <i class="fas fa-user-edit"></i> Kemaskini Profil
                     </button>
                 </div>
@@ -438,7 +438,7 @@
     <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity" onclick="closeModal('modalEdit')"></div>
     <div class="flex min-h-full items-center justify-center p-4">
         <div class="relative transform overflow-hidden rounded-[2.5rem] bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-3xl border border-white/20 flex flex-col max-h-[90vh]">
-            <form action="<%= request.getContextPath() %>/penduduk/update" method="post" class="flex flex-col h-full" onsubmit="return confirmAction(event, 'Simpan Perubahan?', 'Adakah anda mahu menyimpan maklumat profil yang dikemaskini?', 'Ya, Simpan', '#6C5DD3')">
+            <form action="<%= request.getContextPath() %>/penduduk/update" method="post" class="flex flex-col h-full" onsubmit="return confirmAction(event, 'Simpan Perubahan?', 'Adakah anda mahu menyimpan maklumat profil yang dikemaskini?', 'Ya, Simpan', '<%= primaryColor %>')">
                 <input type="hidden" name="idPengguna" id="editId">
                 
                 <!-- Header Modal -->
@@ -478,7 +478,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">No. Telefon</label>
-                                    <input type="text" name="nomborTelefon" id="editTel" required class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3] text-sm font-semibold transition-all">
+                                    <input type="text" name="nomborTelefon" id="editTel" required class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple text-sm font-semibold transition-all">
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1">Tarikh Lahir (Kekal)</label>
@@ -495,7 +495,7 @@
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">Status Keluarga</label>
-                                    <select name="statusKeluarga" id="editStatusKeluarga" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold appearance-none focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3]">
+                                    <select name="statusKeluarga" id="editStatusKeluarga" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold appearance-none focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple">
                                         <option value="Bujang">Bujang</option>
                                         <option value="Berkahwin">Berkahwin</option>
                                         <option value="Ibu Tunggal">Ibu Tunggal</option>
@@ -505,21 +505,21 @@
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">Alamat Rumah (Jalan)</label>
-                                    <input type="text" name="namaJalan" id="editJalan" required class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3]">
+                                    <input type="text" name="namaJalan" id="editJalan" required class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple">
                                 </div>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">Bandar</label>
-                                        <input type="text" name="bandar" id="editBandar" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3]">
+                                        <input type="text" name="bandar" id="editBandar" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple">
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">Poskod</label>
-                                        <input type="text" name="nomborPoskod" id="editPoskod" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3]">
+                                        <input type="text" name="nomborPoskod" id="editPoskod" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple">
                                     </div>
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">Negeri</label>
-                                    <input type="text" name="negeri" id="editNegeri" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3]">
+                                    <input type="text" name="negeri" id="editNegeri" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple">
                                 </div>
                             </div>
                         </div>
@@ -546,7 +546,7 @@
     <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onclick="closeModal('modalLocation')"></div>
     <div class="relative min-h-screen flex items-center justify-center p-4">
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all border border-white/20">
-            <div class="bg-[#6C5DD3] p-8 text-white flex justify-between items-center relative overflow-hidden">
+            <div class="bg-brand-purple p-8 text-white flex justify-between items-center relative overflow-hidden">
                 <div class="absolute -right-4 -top-4 opacity-10">
                     <i class="fas fa-map-marker-alt text-8xl"></i>
                 </div>
@@ -565,7 +565,7 @@
                 <button onclick="closeModal('modalLocation')" class="px-8 py-3 bg-white text-gray-500 font-bold rounded-2xl border border-gray-200 hover:bg-gray-50 transition">
                     Tutup
                 </button>
-                <a id="locationNavBtn" href="#" target="_blank" class="px-10 py-3 bg-[#6C5DD3] text-white font-bold rounded-2xl shadow-xl shadow-purple-100 hover:bg-[#5b4eb8] transition flex items-center gap-2">
+                <a id="locationNavBtn" href="#" target="_blank" class="px-10 py-3 bg-brand-purple text-white font-bold rounded-2xl shadow-xl shadow-purple-100 hover:bg-brand-purpleHover transition flex items-center gap-2">
                     <i class="fas fa-directions"></i> Buka Navigasi
                 </a>
             </div>
@@ -709,10 +709,10 @@
 
     function switchTab(tabName) {
         document.querySelectorAll('nav button').forEach(btn => {
-            btn.classList.remove('border-[#6C5DD3]', 'text-[#6C5DD3]');
+            btn.classList.remove('border-brand-purple', 'text-brand-purple');
             btn.classList.add('border-transparent', 'text-gray-500');
         });
-        document.getElementById('tab-' + tabName).classList.add('border-[#6C5DD3]', 'text-[#6C5DD3]');
+        document.getElementById('tab-' + tabName).classList.add('border-brand-purple', 'text-brand-purple');
         document.getElementById('tab-' + tabName).classList.remove('border-transparent', 'text-gray-500');
 
         document.getElementById('content-pending').classList.add('hidden');

@@ -22,9 +22,9 @@
     String constructionPage = contextPath + "/views/common/dalamPembangunan.jsp";
     boolean isConstruction = currentPath.contains("dalampembangunan");
 
-    // 4. Style CSS
-    String activeClass = "bg-[#6C5DD3] text-white shadow-md shadow-purple-200 group";
-    String inactiveClass = "text-gray-500 hover:bg-gray-50 hover:text-[#6C5DD3] group";
+    // 4. Style CSS (Menggunakan dynamic brand colors dari header.jsp)
+    String activeClass = "bg-brand-purple text-white shadow-md group";
+    String inactiveClass = "text-gray-500 hover:bg-gray-50 hover:text-brand-purple group";
 %>
 
 <aside id="mainSidebar" class="w-64 bg-white fixed inset-y-0 left-0 z-[60] flex flex-col border-r border-gray-100 flex-shrink-0 h-full justify-between transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:relative md:inset-auto md:z-0">
@@ -35,7 +35,7 @@
     
     <div class="flex flex-col flex-1 overflow-hidden">
         <div class="p-8 flex items-center gap-3 flex-shrink-0">
-            <div class="w-10 h-10 bg-brand-purple rounded-xl flex items-center justify-center text-white text-xl shadow-lg shadow-purple-200">
+            <div class="w-10 h-10 bg-brand-purple rounded-xl flex items-center justify-center text-white text-xl shadow-lg">
                 <i class="fas fa-village"></i>
             </div>
             <div>

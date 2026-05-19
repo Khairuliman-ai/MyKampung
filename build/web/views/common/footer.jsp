@@ -21,6 +21,9 @@
     }
 </script>
 
+<%-- Include KampungBot Floating Chat Widget --%>
+<%@ include file="/views/common/chatWidget.jsp" %>
+
 <%-- Menutup tag <main> yang dibuka di dalam navbar.jsp --%>
 </main> 
 

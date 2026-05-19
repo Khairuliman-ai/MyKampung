@@ -40,6 +40,15 @@
         <url-pattern>/hebahan/*</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>ChatbotServlet</servlet-name>
+        <servlet-class>controller.ChatbotServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ChatbotServlet</servlet-name>
+        <url-pattern>/chatbot/*</url-pattern>
+    </servlet-mapping>
+
     <welcome-file-list>
         <welcome-file>home</welcome-file>
     </welcome-file-list>

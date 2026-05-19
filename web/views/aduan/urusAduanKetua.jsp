@@ -39,7 +39,7 @@
 
     <div class="mb-8 border-b border-gray-200">
         <nav class="flex gap-8">
-            <button onclick="switchTab('dimajukan')" id="tab-dimajukan" class="py-4 px-1 border-b-2 font-bold text-sm border-[#6C5DD3] text-[#6C5DD3]">
+            <button onclick="switchTab('dimajukan')" id="tab-dimajukan" class="py-4 px-1 border-b-2 font-bold text-sm border-brand-purple text-brand-purple">
                 Aduan Dimajukan (<%= listDimajukan.size() %>)
             </button>
             <button onclick="switchTab('tindakan')" id="tab-tindakan" class="py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700">
@@ -57,12 +57,12 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-purple-50 border-b border-purple-100">
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">No.</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Tarikh</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Pengadu / Tajuk</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Pengendali AJK</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Status</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider text-center">Tindakan</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">No.</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Tarikh</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Pengadu / Tajuk</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Pengendali AJK</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Status</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider text-center">Tindakan</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -85,7 +85,7 @@
                         data-catatan-ketua="<%= a.getCatatan_ketua() != null ? a.getCatatan_ketua().replace("\"", "&quot;") : "" %>"
                         data-gambar="<%= a.getGambar_aduan() != null ? a.getGambar_aduan() : "" %>"
                         >
-                        <td class="p-4 text-sm font-bold text-[#6C5DD3]">#<%= a.getId_aduan() %></td>
+                        <td class="p-4 text-sm font-bold text-brand-purple">#<%= a.getId_aduan() %></td>
                         <td class="p-4 text-sm text-gray-600"><%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %></td>
                         <td class="p-4">
                             <div class="flex flex-col">
@@ -106,7 +106,7 @@
                             String s1 = a.getStatus();
                             if ("ESCALATED_TO_KETUA".equals(s1) || "UNDER_REVIEW_KETUA".equals(s1) || "IN_PROGRESS_HIGH_LEVEL".equals(s1) || "RESOLVED".equals(s1) || "REJECTED".equals(s1)) { 
                             %>
-                            <button onclick="event.stopPropagation(); openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" class="p-2 text-gray-400 hover:text-[#6C5DD3] transition">
+                            <button onclick="event.stopPropagation(); openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" class="p-2 text-gray-400 hover:text-brand-purple transition">
                                 <i class="fas fa-tasks"></i>
                             </button>
                             <% } else { %>
@@ -128,12 +128,12 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-purple-50 border-b border-purple-100">
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">No.</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Tarikh</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Pengadu / Tajuk</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Pengendali AJK</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Status</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider text-center">Tindakan</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">No.</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Tarikh</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Pengadu / Tajuk</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Pengendali AJK</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Status</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider text-center">Tindakan</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -156,7 +156,7 @@
                         data-catatan-ketua="<%= a.getCatatan_ketua() != null ? a.getCatatan_ketua().replace("\"", "&quot;") : "" %>"
                         data-gambar="<%= a.getGambar_aduan() != null ? a.getGambar_aduan() : "" %>"
                         >
-                        <td class="p-4 text-sm font-bold text-[#6C5DD3]">#<%= a.getId_aduan() %></td>
+                        <td class="p-4 text-sm font-bold text-brand-purple">#<%= a.getId_aduan() %></td>
                         <td class="p-4 text-sm text-gray-600"><%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %></td>
                         <td class="p-4">
                             <div class="flex flex-col">
@@ -177,7 +177,7 @@
                             String s2 = a.getStatus();
                             if ("ESCALATED_TO_KETUA".equals(s2) || "UNDER_REVIEW_KETUA".equals(s2) || "IN_PROGRESS_HIGH_LEVEL".equals(s2) || "RESOLVED".equals(s2) || "REJECTED".equals(s2)) { 
                             %>
-                            <button onclick="event.stopPropagation(); openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" class="p-2 text-gray-400 hover:text-[#6C5DD3] transition">
+                            <button onclick="event.stopPropagation(); openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" class="p-2 text-gray-400 hover:text-brand-purple transition">
                                 <i class="fas fa-tasks"></i>
                             </button>
                             <% } else { %>
@@ -199,12 +199,12 @@
             <table class="w-full text-left border-collapse">
                 <thead>
                     <tr class="bg-purple-50 border-b border-purple-100">
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">No.</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Tarikh</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Pengadu / Tajuk</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Pengendali AJK</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider">Status</th>
-                        <th class="p-4 text-xs font-bold text-[#6C5DD3] uppercase tracking-wider text-center">Tindakan</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">No.</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Tarikh</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Pengadu / Tajuk</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Pengendali AJK</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Status</th>
+                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider text-center">Tindakan</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
@@ -227,7 +227,7 @@
                         data-catatan-ketua="<%= a.getCatatan_ketua() != null ? a.getCatatan_ketua().replace("\"", "&quot;") : "" %>"
                         data-gambar="<%= a.getGambar_aduan() != null ? a.getGambar_aduan() : "" %>"
                         >
-                        <td class="p-4 text-sm font-bold text-[#6C5DD3]">#<%= a.getId_aduan() %></td>
+                        <td class="p-4 text-sm font-bold text-brand-purple">#<%= a.getId_aduan() %></td>
                         <td class="p-4 text-sm text-gray-600"><%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %></td>
                         <td class="p-4">
                             <div class="flex flex-col">
@@ -248,7 +248,7 @@
                             String s3 = a.getStatus();
                             if ("ESCALATED_TO_KETUA".equals(s3) || "UNDER_REVIEW_KETUA".equals(s3) || "IN_PROGRESS_HIGH_LEVEL".equals(s3) || "RESOLVED".equals(s3) || "REJECTED".equals(s3)) { 
                             %>
-                            <button onclick="event.stopPropagation(); openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" class="p-2 text-gray-400 hover:text-[#6C5DD3] transition">
+                            <button onclick="event.stopPropagation(); openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" class="p-2 text-gray-400 hover:text-brand-purple transition">
                                 <i class="fas fa-tasks"></i>
                             </button>
                             <% } else { %>
@@ -279,7 +279,7 @@
                 <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Perlu Keputusan</p>
                 <h4 class="font-bold text-xl text-gray-800"><%= listDimajukan.size() %></h4>
             </div>
-            <div class="w-10 h-10 rounded-xl bg-purple-100 text-[#6C5DD3] flex items-center justify-center">
+            <div class="w-10 h-10 rounded-xl bg-purple-100 text-brand-purple flex items-center justify-center">
                 <i class="fas fa-gavel"></i>
             </div>
         </div>
@@ -300,7 +300,7 @@
             <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-gray-100"></div>
             
             <div class="relative pl-10">
-                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-[#6C5DD3] flex items-center justify-center font-bold text-xs border-2 border-[#6C5DD3] z-10">1</div>
+                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-brand-purple flex items-center justify-center font-bold text-xs border-2 border-brand-purple z-10">1</div>
                 <h4 class="font-bold text-xs text-gray-800 uppercase">Keputusan Akhir</h4>
                 <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Gunakan ulasan untuk memberi arahan kepada AJK atau memberi maklum balas kepada pengadu.</p>
             </div>
@@ -319,7 +319,7 @@
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalStatus')"></div>
     <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
         <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-md">
-            <div class="bg-[#6C5DD3] px-6 py-4">
+            <div class="bg-brand-purple px-6 py-4">
                 <h3 class="text-lg font-bold text-white">Keputusan Ketua Kampung</h3>
             </div>
             <form action="<%= request.getContextPath() %>/aduan/updateStatus" method="post">
@@ -332,16 +332,16 @@
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Keputusan Baru</label>
-                        <select name="next_status" id="modal-next" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm">
+                        <select name="next_status" id="modal-next" class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-brand-purple text-sm">
                         </select>
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-500 uppercase tracking-wider mb-2">Ulasan Ketua</label>
-                        <textarea name="catatan" rows="3" required placeholder="Sila berikan arahan atau sebab..." class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm"></textarea>
+                        <textarea name="catatan" rows="3" required placeholder="Sila berikan arahan atau sebab..." class="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-100 focus:ring-2 focus:ring-brand-purple text-sm"></textarea>
                     </div>
                 </div>
                 <div class="bg-gray-50 px-8 py-4 flex flex-row-reverse gap-3">
-                    <button type="submit" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-8 py-2.5 rounded-xl font-bold text-sm transition shadow-lg shadow-purple-100">Sahkan Keputusan</button>
+                    <button type="submit" class="bg-brand-purple hover:bg-brand-purpleHover text-white px-8 py-2.5 rounded-xl font-bold text-sm transition shadow-lg shadow-purple-100">Sahkan Keputusan</button>
                     <button type="button" onclick="closeModal('modalStatus')" class="bg-white hover:bg-gray-50 text-gray-500 px-6 py-2.5 rounded-xl font-bold text-sm border border-gray-100">Batal</button>
                 </div>
             </form>
@@ -355,11 +355,11 @@
     function switchTab(name) {
         ['dimajukan', 'tindakan', 'semua'].forEach(t => {
             document.getElementById('content-' + t).classList.add('hidden');
-            document.getElementById('tab-' + t).classList.remove('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');
+            document.getElementById('tab-' + t).classList.remove('border-brand-purple', 'text-brand-purple', 'font-bold');
             document.getElementById('tab-' + t).classList.add('border-transparent', 'text-gray-500', 'font-medium');
         });
         document.getElementById('content-' + name).classList.remove('hidden');
-        document.getElementById('tab-' + name).classList.add('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');
+        document.getElementById('tab-' + name).classList.add('border-brand-purple', 'text-brand-purple', 'font-bold');
         document.getElementById('tab-' + name).classList.remove('border-transparent', 'text-gray-500', 'font-medium');
     }
 

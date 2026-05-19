@@ -17,10 +17,10 @@
     <div class="max-w-3xl mx-auto bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
         
         <div class="bg-purple-50 px-8 py-6 border-b border-purple-100 flex items-center gap-3">
-            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-[#6C5DD3] shadow-sm">
+            <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center text-brand-purple shadow-sm">
                 <i class="fas fa-edit"></i>
             </div>
-            <h3 class="text-lg font-bold text-[#6C5DD3]">Borang Kemaskini</h3>
+            <h3 class="text-lg font-bold text-brand-purple">Borang Kemaskini</h3>
         </div>
 
         <div class="p-8">
@@ -154,9 +154,9 @@
                     </div>
 
                     <div class="bg-purple-50/50 p-4 rounded-2xl border border-purple-100 border-dashed">
-                        <label class="block text-[10px] font-bold text-[#6C5DD3] uppercase mb-2">Tambah Dokumen Baru</label>
+                        <label class="block text-[10px] font-bold text-brand-purple uppercase mb-2">Tambah Dokumen Baru</label>
                         <input type="file" name="dokumenSokongan" accept="application/pdf" multiple
-                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-[#6C5DD3] file:text-white hover:file:bg-[#5b4eb8] transition cursor-pointer">
+                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-brand-purple file:text-white hover:file:bg-brand-purpleHover transition cursor-pointer">
                         <p class="text-[9px] text-gray-400 mt-2 italic">Boleh pilih lebih dari satu fail baru untuk ditambah.</p>
                     </div>
                 </div>
@@ -206,7 +206,7 @@
                     <a href="<%= request.getContextPath() %>/bantuan/list" class="px-6 py-3 rounded-xl bg-gray-100 text-gray-600 font-bold text-sm hover:bg-gray-200 transition">
                         Batal
                     </a>
-                    <button type="submit" class="px-6 py-3 rounded-xl bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white font-bold text-sm shadow-md shadow-purple-200 flex items-center gap-2 transition">
+                    <button type="submit" class="px-6 py-3 rounded-xl bg-brand-purple hover:bg-brand-purpleHover text-white font-bold text-sm shadow-md shadow-md flex items-center gap-2 transition">
                         <i class="fas fa-save"></i> Simpan Perubahan
                     </button>
                 </div>

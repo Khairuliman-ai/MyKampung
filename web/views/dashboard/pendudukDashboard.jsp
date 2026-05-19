@@ -61,7 +61,7 @@
                         <div class="absolute inset-0 bg-cover bg-center transition-transform duration-[10s] ease-linear slide-zoom" style="background-image: url('<%= bgImage %>')"></div>
                         <div class="absolute inset-0 bg-gradient-to-r from-gray-900 via-gray-900/60 to-transparent"></div>
                     <% } else { %>
-                        <div class="absolute inset-0 bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8]"></div>
+                        <div class="absolute inset-0 bg-gradient-to-r from-brand-purple to-brand-secondary"></div>
                     <% } %>
 
                     <!-- Content -->
@@ -72,7 +72,7 @@
                             <%= h.getKandungan() %>
                         </p>
                         <div class="flex gap-4">
-                            <a href="<%= request.getContextPath() %>/hebahan/list" class="bg-white text-[#6C5DD3] px-8 py-3.5 rounded-2xl font-bold text-sm hover:shadow-xl hover:-translate-y-1 transition-all shadow-md flex items-center gap-2">
+                            <a href="<%= request.getContextPath() %>/hebahan/list" class="bg-white text-brand-purple px-8 py-3.5 rounded-2xl font-bold text-sm hover:shadow-xl hover:-translate-y-1 transition-all shadow-md flex items-center gap-2">
                                 Baca Selengkapnya <i class="fas fa-arrow-right text-xs"></i>
                             </a>
                         </div>
@@ -80,7 +80,7 @@
                 </div>
             <% } } else { %>
                 <!-- Default Slide if no data -->
-                <div class="absolute inset-0 bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] flex flex-col justify-center px-12 md:px-16">
+                <div class="absolute inset-0 bg-gradient-to-r from-brand-purple to-brand-secondary flex flex-col justify-center px-12 md:px-16">
                     <span class="bg-white/20 text-[10px] font-bold px-4 py-1.5 rounded-full backdrop-blur-md border border-white/10 uppercase tracking-widest w-max mb-6">SELAMAT DATANG</span>
                     <h1 class="text-4xl font-bold text-white mb-4 leading-tight">Selamat Datang, <%= user.getNama_penuh() %>!</h1>
                     <p class="text-purple-100 mb-8 text-sm opacity-90">Tiada hebahan baru buat masa ini. Sila semak profil anda untuk maklumat terkini.</p>
@@ -151,7 +151,7 @@
 
     <div class="flex justify-between items-end mb-6">
         <h3 class="font-bold text-xl text-gray-800">Aktiviti Terkini</h3>
-        <a href="#" class="text-sm text-[#6C5DD3] font-medium hover:underline">Lihat Semua</a>
+        <a href="#" class="text-sm text-brand-purple font-medium hover:underline">Lihat Semua</a>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-8">
@@ -224,10 +224,10 @@
         <p class="text-sm text-gray-500 mb-6"><%= user.getNama_jalan() %>, <%= user.getBandar() %></p>
 
         <div class="flex justify-center gap-4">
-            <button class="w-10 h-10 rounded-full bg-gray-50 text-gray-500 hover:bg-[#6C5DD3] hover:text-white transition flex items-center justify-center">
+            <button class="w-10 h-10 rounded-full bg-gray-50 text-gray-500 hover:bg-brand-purple hover:text-white transition flex items-center justify-center">
                 <i class="fas fa-envelope"></i>
             </button>
-            <button class="w-10 h-10 rounded-full bg-gray-50 text-gray-500 hover:bg-[#6C5DD3] hover:text-white transition flex items-center justify-center">
+            <button class="w-10 h-10 rounded-full bg-gray-50 text-gray-500 hover:bg-brand-purple hover:text-white transition flex items-center justify-center">
                 <i class="fas fa-bell"></i>
             </button>
         </div>

@@ -6,7 +6,7 @@
             <!-- Header -->
             <div class="bg-white border-b border-gray-100 px-8 py-5 flex justify-between items-center">
                 <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 rounded-xl bg-purple-50 text-[#6C5DD3] flex items-center justify-center">
+                    <div class="w-10 h-10 rounded-xl bg-purple-50 text-brand-purple flex items-center justify-center">
                         <i class="fas fa-file-alt"></i>
                     </div>
                     <div>
@@ -35,9 +35,9 @@
                         <div>
                             <h2 id="det-tajuk" class="text-2xl font-black text-gray-900 leading-tight mb-4">Tajuk Aduan</h2>
                             <div class="flex flex-wrap gap-4 text-[11px] text-gray-400 font-bold uppercase tracking-wider">
-                                <div class="flex items-center gap-2"><i class="far fa-calendar-alt text-[#6C5DD3]"></i> <span id="det-tarikh">-</span></div>
-                                <div class="flex items-center gap-2"><i class="fas fa-tag text-[#6C5DD3]"></i> <span id="det-kategori">-</span></div>
-                                <div class="flex items-center gap-2"><i class="fas fa-user text-[#6C5DD3]"></i> <span id="det-pengadu">-</span></div>
+                                <div class="flex items-center gap-2"><i class="far fa-calendar-alt text-brand-purple"></i> <span id="det-tarikh">-</span></div>
+                                <div class="flex items-center gap-2"><i class="fas fa-tag text-brand-purple"></i> <span id="det-kategori">-</span></div>
+                                <div class="flex items-center gap-2"><i class="fas fa-user text-brand-purple"></i> <span id="det-pengadu">-</span></div>
                             </div>
                         </div>
 
@@ -71,7 +71,7 @@
                     <!-- Column 2: Timeline -->
                     <div class="bg-gray-50/50 rounded-3xl p-6 border border-gray-100">
                         <h4 class="text-sm font-black text-gray-900 mb-6 flex items-center gap-2">
-                            <i class="fas fa-history text-[#6C5DD3]"></i> Log Aktiviti
+                            <i class="fas fa-history text-brand-purple"></i> Log Aktiviti
                         </h4>
                         
                         <div id="det-logs" class="relative space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-gray-200">
@@ -159,7 +159,7 @@
                     const logEl = document.createElement('div');
                     logEl.className = 'relative pl-8';
                     logEl.innerHTML = `
-                        <div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-white border-4 border-[#6C5DD3] z-10"></div>
+                        <div class="absolute left-0 top-1 w-6 h-6 rounded-full bg-white border-4 border-brand-purple z-10"></div>
                         <div class="flex flex-col">
                             <span class="text-[10px] font-black text-gray-400 uppercase tracking-tighter">\${l.tarikh}</span>
                             <span class="text-xs font-black text-gray-900 mt-0.5">\${l.status_baru}</span>

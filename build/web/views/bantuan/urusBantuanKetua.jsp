@@ -22,16 +22,16 @@
             <div class="relative">
                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                 <input type="text" id="searchPemohon" onkeyup="filterData()" placeholder="Cari pemohon/ID..." 
-                       class="pl-9 pr-4 py-2 bg-gray-50 border-none rounded-xl text-xs focus:ring-2 focus:ring-[#6C5DD3] w-48">
+                       class="pl-9 pr-4 py-2 bg-gray-50 border-none rounded-xl text-xs focus:ring-2 focus:ring-brand-purple w-48">
             </div>
             
-            <select id="filterKategori" onchange="filterData()" class="bg-gray-50 border-none rounded-xl text-xs focus:ring-2 focus:ring-[#6C5DD3] py-2 px-3 pr-8">
+            <select id="filterKategori" onchange="filterData()" class="bg-gray-50 border-none rounded-xl text-xs focus:ring-2 focus:ring-brand-purple py-2 px-3 pr-8">
                 <option value="ALL">Semua Kategori</option>
                 <option value="RASMI">Bantuan Rasmi</option>
                 <option value="KOMUNITI">Bantuan Komuniti</option>
             </select>
 
-            <div class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-xl border border-transparent focus-within:border-[#6C5DD3]/30 transition">
+            <div class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-xl border border-transparent focus-within:border-brand-purple/30 transition">
                 <i class="fas fa-calendar-alt text-gray-400 text-[10px]"></i>
                 <input type="date" id="filterDateStart" onchange="filterData()" class="bg-transparent border-none p-0 text-[10px] focus:ring-0">
                 <span class="text-gray-300">-</span>
@@ -89,7 +89,7 @@
     <div class="mb-8 border-b border-gray-200">
         <nav class="flex gap-8" aria-label="Tabs">
             <button onclick="switchTab('pending')" id="tab-pending" 
-                    class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-[#6C5DD3] text-[#6C5DD3]">
+                    class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-brand-purple text-brand-purple">
                 <i class="fas fa-hourglass-half"></i> Menunggu Tindakan
                 <% if (listPending != null && !listPending.isEmpty()) { %>
                     <span class="bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><%= listPending.size() %></span>
@@ -159,7 +159,7 @@
                             onclick="viewDetail(this)">
                             <td class="p-4 text-sm text-gray-400 font-medium"><%= noP++ %></td>
                             <td class="p-4 text-sm text-gray-500 whitespace-nowrap"><%= displayDate %></td>
-                            <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-[#6C5DD3] transition-colors"><%= pb.getNama_penuh() %></td>
+                            <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-brand-purple transition-colors"><%= pb.getNama_penuh() %></td>
                             <td class="p-4 text-sm text-gray-600"><%= namaBantuan %></td>
                             <td class="p-4 text-center">
                                 <% if ("RASMI".equalsIgnoreCase(pb.getJenis_bantuan())) { %>
@@ -245,7 +245,7 @@
                             onclick="viewDetail(this)">
                             <td class="p-4 text-sm text-gray-400 font-medium"><%= noS++ %></td>
                             <td class="p-4 text-sm text-gray-500 whitespace-nowrap"><%= displayDate %></td>
-                            <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-[#6C5DD3] transition-colors"><%= pb.getNama_penuh() %></td>
+                            <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-brand-purple transition-colors"><%= pb.getNama_penuh() %></td>
                             <td class="p-4 text-sm text-gray-600"><%= namaBantuan %></td>
                             <td class="p-4 text-center">
                                 <% if ("RASMI".equalsIgnoreCase(pb.getJenis_bantuan())) { %>
@@ -297,7 +297,7 @@
 
     <div class="mt-auto bg-purple-50 rounded-2xl p-6 relative overflow-hidden">
         <div class="absolute -right-4 -top-4 w-16 h-16 bg-purple-200 rounded-full opacity-50"></div>
-        <h4 class="font-bold text-[#6C5DD3] mb-2 relative z-10 text-sm">Panduan Kelulusan</h4>
+        <h4 class="font-bold text-brand-purple mb-2 relative z-10 text-sm">Panduan Kelulusan</h4>
         <p class="text-xs text-gray-600 leading-relaxed relative z-10 mb-2">
             1. Semak maklumat pemohon.
         </p>
@@ -316,7 +316,7 @@
         <div class="flex min-h-screen items-center justify-center p-4">
             <div class="relative w-full max-w-3xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 flex flex-col max-h-[90vh]">
                 <!-- Modal Header -->
-                <div class="bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] px-8 py-6 text-white relative shrink-0">
+                <div class="bg-gradient-to-r from-brand-purple to-brand-secondary px-8 py-6 text-white relative shrink-0">
                     <div class="absolute top-0 right-0 p-6 opacity-10">
                         <i class="fas fa-file-invoice text-8xl rotate-12"></i>
                     </div>
@@ -341,11 +341,11 @@
                                 <h4 id="detPemohon" class="text-2xl font-extrabold text-gray-800">-</h4>
                                 <div class="flex flex-wrap gap-4 mt-2">
                                     <div class="flex items-center gap-2 text-sm text-gray-500">
-                                        <i class="far fa-id-card text-[#6C5DD3]"></i>
+                                        <i class="far fa-id-card text-brand-purple"></i>
                                         <span id="detIC" class="font-medium">-</span>
                                     </div>
                                     <div class="flex items-center gap-2 text-sm text-gray-500">
-                                        <i class="fas fa-phone-alt text-[#6C5DD3]"></i>
+                                        <i class="fas fa-phone-alt text-brand-purple"></i>
                                         <span id="detPhone" class="font-medium">-</span>
                                     </div>
                                 </div>
@@ -424,7 +424,7 @@
                                 </div>
                                 <!-- New Section for Admin Documents -->
                                 <div id="detAdminDokSection" class="space-y-4 pt-4 border-t border-gray-100 hidden">
-                                    <label class="block text-[10px] font-bold text-[#6C5DD3] uppercase tracking-widest mb-2">Dokumen Maklum Balas (Ketua Kampung)</label>
+                                    <label class="block text-[10px] font-bold text-brand-purple uppercase tracking-widest mb-2">Dokumen Maklum Balas (Ketua Kampung)</label>
                                     <div id="dokumenAdminList" class="flex flex-wrap gap-2">
                                         <!-- Dynamic Content -->
                                     </div>
@@ -497,12 +497,12 @@
                         </div>
                         <label id="uploadLabel" class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest mb-2">Muat Naik Dokumen Sokongan (Pilihan)</label>
                         <input type="file" name="dokumenBalas" accept="application/pdf" id="dokumenBalas" multiple
-                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-[#6C5DD3] hover:file:bg-purple-100">
+                               class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-purple-50 file:text-brand-purple hover:file:bg-purple-100">
                     </div>
 
                     <div class="px-8 pb-8 flex gap-3">
                         <button type="button" onclick="closeModal('modalKeputusan')" class="flex-1 py-3 bg-gray-100 text-gray-500 rounded-2xl font-bold text-sm hover:bg-gray-200 transition">Batal</button>
-                        <button type="submit" id="actSubmitBtn" class="flex-2 py-3 px-8 bg-[#6C5DD3] text-white rounded-2xl font-bold text-sm shadow-lg hover:bg-[#5a4cb3] transition">Sahkan & Hantar</button>
+                        <button type="submit" id="actSubmitBtn" class="flex-2 py-3 px-8 bg-brand-purple text-white rounded-2xl font-bold text-sm shadow-lg hover:bg-[#5a4cb3] transition">Sahkan & Hantar</button>
                     </div>
                 </form>
             </div>
@@ -545,13 +545,13 @@
     function switchTab(name) {
         // Reset Tabs Style
         document.querySelectorAll('nav button').forEach(btn => {
-            btn.classList.remove('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');
+            btn.classList.remove('border-brand-purple', 'text-brand-purple', 'font-bold');
             btn.classList.add('border-transparent', 'text-gray-500', 'font-medium');
         });
 
         // Active Tab Style
         const activeTab = document.getElementById('tab-' + name);
-        activeTab.classList.add('border-[#6C5DD3]', 'text-[#6C5DD3]', 'font-bold');
+        activeTab.classList.add('border-brand-purple', 'text-brand-purple', 'font-bold');
         activeTab.classList.remove('border-transparent', 'text-gray-500', 'font-medium');
 
         // Toggle Content
@@ -667,7 +667,7 @@
                 newLink.id = ""; // Remove ID to prevent collisions
                 newLink.classList.remove('hidden');
                 newLink.classList.replace('bg-red-50', 'bg-purple-50');
-                newLink.classList.replace('text-red-600', 'text-[#6C5DD3]');
+                newLink.classList.replace('text-red-600', 'text-brand-purple');
                 newLink.classList.replace('border-red-100', 'border-purple-100');
                 newLink.href = ctx + "/file/bantuan/" + f;
                 newLink.innerHTML = '<i class="fas fa-check-circle"></i> ' + decodeURIComponent(f).split('_').slice(2).join('_');

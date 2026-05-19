@@ -26,7 +26,7 @@
                 <i class="fas fa-search"></i>
             </span>
             <input type="text" 
-                   class="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border-none focus:ring-2 focus:ring-[#6C5DD3] shadow-sm text-sm placeholder-gray-400" 
+                   class="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border-none focus:ring-2 focus:ring-brand-purple shadow-sm text-sm placeholder-gray-400" 
                    placeholder="Cari aduan, laporan, atau aktiviti...">
         </div>
     </header>
@@ -86,8 +86,8 @@
         <div class="bg-white rounded-3xl p-6 shadow-sm border border-gray-100">
             <h3 class="font-bold text-gray-800 mb-4">Akses Pantas</h3>
             <div class="grid grid-cols-2 gap-4">
-                <a href="<%= request.getContextPath() %>/aduan/list" class="p-4 rounded-2xl bg-gray-50 hover:bg-[#6C5DD3] hover:text-white transition group">
-                    <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-[#6C5DD3] mb-3 group-hover:bg-white/20 group-hover:text-white">
+                <a href="<%= request.getContextPath() %>/aduan/list" class="p-4 rounded-2xl bg-gray-50 hover:bg-brand-purple hover:text-white transition group">
+                    <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-brand-purple mb-3 group-hover:bg-white/20 group-hover:text-white">
                         <i class="fas fa-list-ul"></i>
                     </div>
                     <p class="text-sm font-bold">Senarai Aduan</p>

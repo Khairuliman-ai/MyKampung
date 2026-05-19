@@ -23,18 +23,18 @@
             <div class="flex-1 relative">
                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                 <input type="text" name="q" placeholder="Cari hebahan..." value="<%= keyword != null ? keyword : "" %>"
-                    class="w-full pl-12 pr-4 py-3 rounded-xl bg-white border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm transition-all">
+                    class="w-full pl-12 pr-4 py-3 rounded-xl bg-white border border-gray-100 focus:ring-2 focus:ring-brand-purple text-sm transition-all">
             </div>
             
             <div class="relative min-w-[160px]">
-                <select name="sort" onchange="this.form.submit()" class="w-full px-4 py-3 rounded-xl bg-white border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3] text-sm appearance-none cursor-pointer">
+                <select name="sort" onchange="this.form.submit()" class="w-full px-4 py-3 rounded-xl bg-white border border-gray-100 focus:ring-2 focus:ring-brand-purple text-sm appearance-none cursor-pointer">
                     <option value="DESC" <%= "DESC".equals(request.getParameter("sort")) ? "selected" : "" %>>Terbaru</option>
                     <option value="ASC" <%= "ASC".equals(request.getParameter("sort")) ? "selected" : "" %>>Terlama</option>
                 </select>
                 <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[10px]"></i>
             </div>
 
-            <button type="submit" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-8 py-3 rounded-xl font-bold text-sm transition shadow-lg shadow-purple-100 flex items-center gap-2">
+            <button type="submit" class="bg-brand-purple hover:bg-brand-purpleHover text-white px-8 py-3 rounded-xl font-bold text-sm transition shadow-lg shadow-purple-100 flex items-center gap-2">
                 Cari
             </button>
         </form>
@@ -42,7 +42,7 @@
 
     <!-- Category Filter Pills -->
     <div class="flex gap-2 mb-6">
-        <a href="${pageContext.request.contextPath}/hebahan/list" class="px-4 py-2 rounded-full text-xs font-bold bg-[#6C5DD3] text-white">Semua</a>
+        <a href="${pageContext.request.contextPath}/hebahan/list" class="px-4 py-2 rounded-full text-xs font-bold bg-brand-purple text-white">Semua</a>
         <a href="?kategori=Kecemasan" class="px-4 py-2 rounded-full text-xs font-bold bg-red-50 text-red-600 border border-red-100">Kecemasan</a>
         <a href="?kategori=Aktiviti" class="px-4 py-2 rounded-full text-xs font-bold bg-blue-50 text-blue-600 border border-blue-100">Aktiviti</a>
         <a href="?kategori=Umum" class="px-4 py-2 rounded-full text-xs font-bold bg-green-50 text-green-600 border border-green-100">Umum</a>
@@ -81,7 +81,7 @@
                     <img src="${pageContext.request.contextPath}/file/hebahan/<%= h.getGambar_poster() %>"
                          class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                 <% } else { %>
-                    <div class="w-full h-full bg-gradient-to-br from-[#6C5DD3] to-[#8B7EE0] flex items-center justify-center">
+                    <div class="w-full h-full bg-gradient-to-br from-brand-purple to-[#8B7EE0] flex items-center justify-center">
                         <i class="<%= h.getKategoriIcon() %> text-white text-5xl opacity-30"></i>
                     </div>
                 <% } %>
@@ -226,7 +226,7 @@
             grad.classList.remove('hidden');
         } else {
             img.classList.add('hidden');
-            imgContainer.className = 'h-64 md:h-96 overflow-hidden relative bg-gradient-to-br from-[#6C5DD3] to-[#8B7EE0] flex items-center justify-center';
+            imgContainer.className = 'h-64 md:h-96 overflow-hidden relative bg-gradient-to-br from-brand-purple to-[#8B7EE0] flex items-center justify-center';
             grad.classList.add('hidden');
             // Add icon if no image
             const icon = document.createElement('i');
@@ -259,7 +259,7 @@
         <p class="text-xs text-gray-400">Sentiasa peka dengan info kampung</p>
     </div>
 
-    <div class="bg-gradient-to-br from-[#6C5DD3] to-[#8B7EE0] rounded-3xl p-6 text-white shadow-lg shadow-purple-100 mb-10">
+    <div class="bg-gradient-to-br from-brand-purple to-[#8B7EE0] rounded-3xl p-6 text-white shadow-lg shadow-purple-100 mb-10">
         <h4 class="font-bold text-sm mb-3">Ada Berita Menarik?</h4>
         <p class="text-[10px] text-purple-100 leading-relaxed mb-4">
             Hubungi Biro Hebahan jika anda mempunyai maklumat aktiviti untuk dikongsi bersama penduduk.

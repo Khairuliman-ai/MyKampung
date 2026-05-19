@@ -18,12 +18,12 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- Card Urus Hebahan -->
             <a href="<%= request.getContextPath() %>/hebahan/list" class="bg-white p-8 rounded-[32px] border border-gray-100 shadow-sm hover:shadow-md transition group">
-                <div class="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center text-[#6C5DD3] text-2xl mb-6 group-hover:scale-110 transition">
+                <div class="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center text-brand-purple text-2xl mb-6 group-hover:scale-110 transition">
                     <i class="fas fa-bullhorn"></i>
                 </div>
                 <h3 class="text-xl font-bold text-gray-800 mb-2">Urus Hebahan</h3>
                 <p class="text-gray-400 text-sm mb-6">Cipta, kemaskini, dan terbitkan pengumuman baru untuk penduduk.</p>
-                <span class="text-[#6C5DD3] font-bold text-sm flex items-center gap-2">
+                <span class="text-brand-purple font-bold text-sm flex items-center gap-2">
                     Pergi ke Pengurusan <i class="fas fa-arrow-right"></i>
                 </span>
             </a>
@@ -46,7 +46,7 @@
             <h3 class="text-lg font-bold text-gray-800 mb-6">Aktiviti Terkini</h3>
             <div class="space-y-6">
                 <div class="flex items-start gap-4">
-                    <div class="w-2 h-2 rounded-full bg-[#6C5DD3] mt-2"></div>
+                    <div class="w-2 h-2 rounded-full bg-brand-purple mt-2"></div>
                     <div>
                         <p class="text-sm font-bold text-gray-800">Modul Hebahan Baru Dilancarkan</p>
                         <p class="text-xs text-gray-400">Anda kini boleh mula menguruskan pengumuman rasmi.</p>
@@ -62,7 +62,7 @@
 <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
     <div class="flex justify-between items-start mb-10">
         <h3 class="font-bold text-lg text-gray-800">Profil Biro</h3>
-        <a href="<%= request.getContextPath() %>/profil/view" class="text-gray-400 hover:text-[#6C5DD3] transition"><i class="fas fa-edit"></i></a>
+        <a href="<%= request.getContextPath() %>/profil/view" class="text-gray-400 hover:text-brand-purple transition"><i class="fas fa-edit"></i></a>
     </div>
 
     <div class="text-center mb-10">
@@ -78,12 +78,12 @@
         </div>
         
         <h2 class="text-xl font-bold text-gray-800"><%= user.getNama_penuh() %></h2>
-        <p class="text-xs font-bold text-[#6C5DD3] bg-purple-50 px-4 py-1.5 rounded-full inline-block mt-2 uppercase tracking-tight">
+        <p class="text-xs font-bold text-brand-purple bg-purple-50 px-4 py-1.5 rounded-full inline-block mt-2 uppercase tracking-tight">
             <%= (user.getNama_jawatan() != null) ? user.getNama_jawatan() : "Biro Hebahan" %>
         </p>
     </div>
 
-    <div class="bg-[#6C5DD3] p-8 rounded-[32px] text-white shadow-lg shadow-purple-100 mb-8">
+    <div class="bg-brand-purple p-8 rounded-[32px] text-white shadow-lg shadow-purple-100 mb-8">
         <h3 class="text-lg font-bold mb-4">Tips Hebahan</h3>
         <p class="text-purple-100 text-sm leading-relaxed mb-6">
             Pastikan maklumat kecemasan menggunakan kategori <strong>Kecemasan</strong> supaya ia dipaparkan di bahagian paling atas untuk penduduk.

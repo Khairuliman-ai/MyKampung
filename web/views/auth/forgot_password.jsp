@@ -36,7 +36,7 @@
         </form>
 
         <br>
-        <a href="views/auth/auth.jsp" style="text-decoration: none; color: #6C5DD3;">Kembali ke Log Masuk</a>
+        <a href="views/auth/auth.jsp" style="text-decoration: none; color: #0D9488;">Kembali ke Log Masuk</a>
     </div>
 
 </body>

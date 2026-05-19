@@ -20,7 +20,7 @@
                 <i class="fas fa-briefcase text-gray-400 group-hover:text-brand-purple transition-colors"></i> 
                 <span>Tambah Jawatan</span>
             </button>
-            <button onclick="openModal('modalLantik')" class="bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white px-6 py-2.5 rounded-2xl font-bold text-sm transition-all duration-200 shadow-lg shadow-purple-200 flex items-center gap-2 transform hover:-translate-y-0.5">
+            <button onclick="openModal('modalLantik')" class="bg-brand-purple hover:bg-brand-purpleHover text-white px-6 py-2.5 rounded-2xl font-bold text-sm transition-all duration-200 shadow-lg shadow-md flex items-center gap-2 transform hover:-translate-y-0.5">
                 <i class="fas fa-user-plus"></i>
                 <span>Lantik AJK Baharu</span>
             </button>
@@ -65,7 +65,7 @@
     <div class="mb-6 border-b border-gray-200">
         <nav class="flex gap-6" aria-label="Tabs">
             <button onclick="switchTab('ajk')" id="tab-ajk" 
-                    class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-[#6C5DD3] text-[#6C5DD3]">
+                    class="py-4 px-1 border-b-2 font-bold text-sm flex items-center gap-2 transition-colors border-brand-purple text-brand-purple">
                 <i class="fas fa-id-badge"></i> Senarai AJK
             </button>
             <button onclick="switchTab('penduduk')" id="tab-penduduk" 
@@ -82,7 +82,7 @@
                     <i class="fas fa-search text-sm"></i>
                 </span>
                 <input type="text" id="searchAJK" placeholder="Cari nama atau jawatan AJK..." 
-                       class="w-full pl-11 pr-4 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-4 focus:ring-purple-100 focus:border-[#6C5DD3] text-sm shadow-sm transition-all outline-none">
+                       class="w-full pl-11 pr-4 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-4 focus:ring-purple-100 focus:border-brand-purple text-sm shadow-sm transition-all outline-none">
             </div>
         </div>
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
@@ -138,7 +138,7 @@
                             <td class="p-5 text-sm text-gray-400 font-medium"><%= countAJK++ %></td>
                             <td class="p-5">
                                 <div class="flex items-center gap-4">
-                                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-100 to-indigo-50 text-[#6C5DD3] flex items-center justify-center text-sm font-bold shadow-inner group-hover:scale-110 transition-transform">
+                                    <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-purple-100 to-indigo-50 text-brand-purple flex items-center justify-center text-sm font-bold shadow-inner group-hover:scale-110 transition-transform">
                                         <%= (p.getNama_penuh() != null) ? p.getNama_penuh().substring(0,1).toUpperCase() : "U" %>
                                     </div>
                                     <div>
@@ -151,7 +151,7 @@
                             </td>
                             <td class="p-5">
                                 <div class="flex flex-col gap-1.5">
-                                    <span class="w-fit px-3 py-1 rounded-lg bg-purple-50 text-[#6C5DD3] text-[10px] font-extrabold uppercase border border-purple-100 search-col-ajk tracking-tight">
+                                    <span class="w-fit px-3 py-1 rounded-lg bg-purple-50 text-brand-purple text-[10px] font-extrabold uppercase border border-purple-100 search-col-ajk tracking-tight">
                                         <%= (p.getNama_jawatan() != null) ? p.getNama_jawatan() : "Tiada Jawatan" %>
                                     </span>
                                     <div class="flex items-center gap-2 text-[10px] text-gray-400">
@@ -196,7 +196,7 @@
                     <i class="fas fa-search text-sm"></i>
                 </span>
                 <input type="text" id="searchPenduduk" placeholder="Cari nama, No. KP atau alamat penduduk..." 
-                       class="w-full pl-11 pr-4 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-4 focus:ring-purple-100 focus:border-[#6C5DD3] text-sm shadow-sm transition-all outline-none">
+                       class="w-full pl-11 pr-4 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-4 focus:ring-purple-100 focus:border-brand-purple text-sm shadow-sm transition-all outline-none">
             </div>
         </div>
 
@@ -313,7 +313,7 @@
         <!-- Statistik Utama -->
         <div class="grid grid-cols-2 gap-3">
             <div class="bg-gradient-to-br from-purple-50 to-indigo-50 p-4 rounded-[2rem] border border-purple-100/50">
-                <div class="w-8 h-8 bg-white/80 rounded-xl flex items-center justify-center text-[#6C5DD3] shadow-sm mb-3">
+                <div class="w-8 h-8 bg-white/80 rounded-xl flex items-center justify-center text-brand-purple shadow-sm mb-3">
                     <i class="fas fa-user-shield text-xs"></i>
                 </div>
                 <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wide">Ahli AJK</p>
@@ -432,7 +432,7 @@
     <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-md transition-opacity" onclick="closeModal('modalLantik')"></div>
     <div class="relative min-h-screen flex items-center justify-center p-4">
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden transform transition-all border border-white/20">
-            <div class="bg-gradient-to-r from-[#6C5DD3] to-[#8676FF] p-8 text-white relative">
+            <div class="bg-gradient-to-r from-brand-purple to-[#8676FF] p-8 text-white relative">
                 <div class="absolute top-0 right-0 p-8 opacity-10">
                     <i class="fas fa-user-shield text-6xl"></i>
                 </div>
@@ -443,11 +443,11 @@
                 </button>
             </div>
             
-            <form action="<%= request.getContextPath() %>/ketua/lantik" method="post" class="p-8 space-y-6" onsubmit="return confirmAction(event, 'Sahkan Pelantikan?', 'Adakah anda mahu melantik penduduk ini sebagai AJK?', 'Ya, Sahkan', '#6C5DD3')">
+            <form action="<%= request.getContextPath() %>/ketua/lantik" method="post" class="p-8 space-y-6" onsubmit="return confirmAction(event, 'Sahkan Pelantikan?', 'Adakah anda mahu melantik penduduk ini sebagai AJK?', 'Ya, Sahkan', '<%= primaryColor %>')">
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Calon Pemimpin</label>
                     <div class="relative">
-                        <select name="idPengguna" required class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-purple-100 focus:border-[#6C5DD3] text-sm font-bold transition-all appearance-none cursor-pointer">
+                        <select name="idPengguna" required class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-purple-100 focus:border-brand-purple text-sm font-bold transition-all appearance-none cursor-pointer">
                             <option value="">Pilih daripada senarai penduduk...</option>
                             <% 
                                 List<Pengguna> listPendudukSelection = (List<Pengguna>) request.getAttribute("listPenduduk");
@@ -469,7 +469,7 @@
                 <div class="space-y-2">
                     <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Jawatan & Biro</label>
                     <div class="relative">
-                        <select name="idJawatan" required class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-purple-100 focus:border-[#6C5DD3] text-sm font-bold transition-all appearance-none cursor-pointer">
+                        <select name="idJawatan" required class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-purple-100 focus:border-brand-purple text-sm font-bold transition-all appearance-none cursor-pointer">
                             <option value="">Pilih jawatan kosong...</option>
                             <% 
                                 List<Pengguna> listJawatanSelection = (List<Pengguna>) request.getAttribute("listJawatan");
@@ -490,7 +490,7 @@
                         </div>
                     </div>
                     <div class="flex items-center gap-2 px-1">
-                        <i class="fas fa-info-circle text-[#6C5DD3] text-[10px]"></i>
+                        <i class="fas fa-info-circle text-brand-purple text-[10px]"></i>
                         <p class="text-[10px] text-gray-400 font-medium italic">Jawatan yang diisi perlu dikosongkan dahulu.</p>
                     </div>
                 </div>
@@ -501,7 +501,7 @@
                         Batal
                     </button>
                     <button type="submit" 
-                            class="flex-[2] px-6 py-4 bg-[#6C5DD3] text-white font-black rounded-2xl shadow-xl shadow-purple-100 hover:bg-[#5b4eb8] transition-all transform hover:-translate-y-1">
+                            class="flex-[2] px-6 py-4 bg-brand-purple text-white font-black rounded-2xl shadow-xl shadow-purple-100 hover:bg-brand-purpleHover transition-all transform hover:-translate-y-1">
                         Sahkan Pelantikan
                     </button>
                 </div>
@@ -561,7 +561,7 @@
     <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity" onclick="closeModal('modalEdit')"></div>
     <div class="flex min-h-full items-center justify-center p-4">
         <div class="relative transform overflow-hidden rounded-[2.5rem] bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-3xl border border-white/20 flex flex-col max-h-[90vh]">
-            <form action="<%= request.getContextPath() %>/ketua/update" method="post" class="flex flex-col h-full" onsubmit="return confirmAction(event, 'Simpan Perubahan?', 'Adakah anda mahu menyimpan maklumat profil yang dikemaskini?', 'Ya, Simpan', '#6C5DD3')">
+            <form action="<%= request.getContextPath() %>/ketua/update" method="post" class="flex flex-col h-full" onsubmit="return confirmAction(event, 'Simpan Perubahan?', 'Adakah anda mahu menyimpan maklumat profil yang dikemaskini?', 'Ya, Simpan', '<%= primaryColor %>')">
                 <input type="hidden" name="idPengguna" id="editId">
                 
                 <!-- Header Modal -->
@@ -601,7 +601,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">No. Telefon</label>
-                                    <input type="text" name="nomborTelefon" id="editTel" required class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3] text-sm font-semibold transition-all">
+                                    <input type="text" name="nomborTelefon" id="editTel" required class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple text-sm font-semibold transition-all">
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1">Tarikh Lahir (Kekal)</label>
@@ -618,7 +618,7 @@
                             <div class="space-y-4">
                                 <div>
                                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">Status Keluarga</label>
-                                    <select name="statusKeluarga" id="editStatusKeluarga" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold appearance-none focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3]">
+                                    <select name="statusKeluarga" id="editStatusKeluarga" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold appearance-none focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple">
                                         <option value="Bujang">Bujang</option>
                                         <option value="Berkahwin">Berkahwin</option>
                                         <option value="Ibu Tunggal">Ibu Tunggal</option>
@@ -628,16 +628,16 @@
                                 </div>
                                 <div>
                                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">Alamat Rumah (Jalan)</label>
-                                    <input type="text" name="namaJalan" id="editJalan" required class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3]">
+                                    <input type="text" name="namaJalan" id="editJalan" required class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple">
                                 </div>
                                 <div class="grid grid-cols-2 gap-4">
                                     <div>
                                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">Bandar</label>
-                                        <input type="text" name="bandar" id="editBandar" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3]">
+                                        <input type="text" name="bandar" id="editBandar" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple">
                                     </div>
                                     <div>
                                         <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2 px-1 text-brand-purple">Poskod</label>
-                                        <input type="text" name="nomborPoskod" id="editPoskod" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-[#6C5DD3]/20 focus:border-[#6C5DD3]">
+                                        <input type="text" name="nomborPoskod" id="editPoskod" class="w-full px-5 py-3 rounded-2xl bg-white border border-gray-100 text-sm font-semibold focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple">
                                     </div>
                                 </div>
                             </div>
@@ -664,7 +664,7 @@
     <div class="flex min-h-full items-center justify-center p-4">
         <div class="relative transform overflow-hidden rounded-[2.5rem] bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-3xl border border-white/20 flex flex-col max-h-[90vh]">
             <!-- Header Modal -->
-            <div class="bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] px-8 py-10 text-white relative shrink-0">
+            <div class="bg-gradient-to-r from-brand-purple to-brand-secondary px-8 py-10 text-white relative shrink-0">
                 <div class="absolute top-0 right-0 p-8 opacity-10">
                     <i class="fas fa-user-circle text-8xl"></i>
                 </div>
@@ -793,7 +793,7 @@
                         </button>
                     </form>
                     
-                    <button id="infoBtnEdit" class="flex-1 md:flex-none px-10 py-3 bg-[#6C5DD3] text-white rounded-2xl font-bold text-sm shadow-lg shadow-purple-100 hover:bg-[#5b4eb8] transition-all flex items-center justify-center gap-2">
+                    <button id="infoBtnEdit" class="flex-1 md:flex-none px-10 py-3 bg-brand-purple text-white rounded-2xl font-bold text-sm shadow-lg shadow-purple-100 hover:bg-brand-purpleHover transition-all flex items-center justify-center gap-2">
                         <i class="fas fa-user-edit"></i> Kemaskini Profil
                     </button>
                 </div>
@@ -810,7 +810,7 @@
     <div class="absolute inset-0 bg-black bg-opacity-50 backdrop-blur-sm" onclick="closeModal('modalLocation')"></div>
     <div class="relative min-h-screen flex items-center justify-center p-4">
         <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-2xl overflow-hidden transform transition-all border border-white/20">
-            <div class="bg-[#6C5DD3] p-8 text-white flex justify-between items-center relative overflow-hidden">
+            <div class="bg-brand-purple p-8 text-white flex justify-between items-center relative overflow-hidden">
                 <div class="absolute -right-4 -top-4 opacity-10">
                     <i class="fas fa-map-marker-alt text-8xl"></i>
                 </div>
@@ -829,7 +829,7 @@
                 <button onclick="closeModal('modalLocation')" class="px-8 py-3 bg-white text-gray-500 font-bold rounded-2xl border border-gray-200 hover:bg-gray-50 transition">
                     Tutup
                 </button>
-                <a id="locationNavBtn" href="#" target="_blank" class="px-10 py-3 bg-[#6C5DD3] text-white font-bold rounded-2xl shadow-xl shadow-purple-100 hover:bg-[#5b4eb8] transition flex items-center gap-2">
+                <a id="locationNavBtn" href="#" target="_blank" class="px-10 py-3 bg-brand-purple text-white font-bold rounded-2xl shadow-xl shadow-purple-100 hover:bg-brand-purpleHover transition flex items-center gap-2">
                     <i class="fas fa-directions"></i> Buka Navigasi
                 </a>
             </div>
@@ -983,10 +983,10 @@
 
     function switchTab(tabName) {
         document.querySelectorAll('nav button').forEach(btn => {
-            btn.classList.remove('border-[#6C5DD3]', 'text-[#6C5DD3]');
+            btn.classList.remove('border-brand-purple', 'text-brand-purple');
             btn.classList.add('border-transparent', 'text-gray-500');
         });
-        document.getElementById('tab-' + tabName).classList.add('border-[#6C5DD3]', 'text-[#6C5DD3]');
+        document.getElementById('tab-' + tabName).classList.add('border-brand-purple', 'text-brand-purple');
         document.getElementById('tab-' + tabName).classList.remove('border-transparent', 'text-gray-500');
         document.getElementById('content-ajk').classList.add('hidden');
         document.getElementById('content-penduduk').classList.add('hidden');
