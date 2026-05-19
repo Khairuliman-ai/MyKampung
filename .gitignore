@@ -10,3 +10,7 @@ Thumbs.db
 
 # Abaikan fail konfigurasi sensitif
 src/java/config.properties
+
+# Abaikan fail pengujian mengandungi maklumat sensitif (Public Repo Security)
+docs/roles_list.md
+docs/roles_list.pdf
