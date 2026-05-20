@@ -57,7 +57,7 @@
         /* Dynamic Theme Variable berdasarkan Peranan Pengguna */
         <%
             String navRole = (currentUser != null) ? currentUser.getNama_peranan() : "Penduduk";
-            boolean isAJK = "Ketua Kampung".equalsIgnoreCase(navRole) || "AJK".equalsIgnoreCase(navRole);
+            boolean isAJK = "Ketua Kampung".equalsIgnoreCase(navRole) || "AJK".equalsIgnoreCase(navRole) || "AJK Kampung".equalsIgnoreCase(navRole);
             
             // Resident (Penduduk): Emerald Teal & Mint
             // Admin (AJK / Ketua / Setiausaha): Deep Slate & Steel

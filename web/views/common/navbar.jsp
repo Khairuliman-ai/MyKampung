@@ -15,9 +15,19 @@
     String biro = userNav.getNama_jawatan(); // Diambil dari table 'jawatan_ajk'
     
     // 3. Normalize Path & Query String
-    String currentPath = request.getRequestURI().toLowerCase();
+    // IMPORTANT: After RequestDispatcher.forward(), request.getRequestURI() returns the
+    // forwarded JSP path (e.g. /views/aduan/urusAduanAJK.jsp), NOT the original servlet path
+    // (/aduan/list). We use the javax.servlet.forward.request_uri attribute instead, which
+    // preserves the original URL the user navigated to, so active nav highlights work correctly.
+    String forwardedUri = (String) request.getAttribute("javax.servlet.forward.request_uri");
+    String currentPath = (forwardedUri != null ? forwardedUri : request.getRequestURI()).toLowerCase();
     String contextPath = request.getContextPath();
     String query = (request.getQueryString() != null) ? request.getQueryString().toLowerCase() : "";
+    // Also check the forwarded query string if present
+    String forwardedQuery = (String) request.getAttribute("javax.servlet.forward.query_string");
+    if (forwardedQuery != null && !forwardedQuery.isEmpty()) {
+        query = forwardedQuery.toLowerCase();
+    }
 
     String constructionPage = contextPath + "/views/common/dalamPembangunan.jsp";
     boolean isConstruction = currentPath.contains("dalampembangunan");
