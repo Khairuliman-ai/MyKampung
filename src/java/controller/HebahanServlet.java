@@ -62,15 +62,24 @@ public class HebahanServlet extends HttpServlet {
                 } else if ("Ketua Kampung".equalsIgnoreCase(role)) {
                     List<Hebahan> list = dao.getAll(sort);
                     req.setAttribute("hebahanList", list);
-                    req.setAttribute("totalPublished", dao.countByStatus("Published"));
-                    req.setAttribute("totalDraft", dao.countByStatus("Draft"));
-                    req.setAttribute("totalArchived", dao.countByStatus("Archived"));
-                    req.getRequestDispatcher("/views/hebahan/urusHebahanKetua.jsp").forward(req, resp);
+                    req.getRequestDispatcher("/views/hebahan/urusHebahanAJK.jsp").forward(req, resp);
                 } else {
                     List<Hebahan> list = dao.getPublished(sort);
                     req.setAttribute("hebahanList", list);
                     req.getRequestDispatcher("/views/hebahan/hebahanPenduduk.jsp").forward(req, resp);
                 }
+            } else if ("/penduduk".equals(path)) {
+                String sort = req.getParameter("sort");
+                if (sort == null || sort.isEmpty()) sort = "DESC";
+                String keyword = req.getParameter("q");
+                List<Hebahan> list;
+                if (keyword != null && !keyword.trim().isEmpty()) {
+                    list = dao.searchPublished(keyword.trim(), sort);
+                } else {
+                    list = dao.getPublished(sort);
+                }
+                req.setAttribute("hebahanList", list);
+                req.getRequestDispatcher("/views/hebahan/hebahanPenduduk.jsp").forward(req, resp);
             } else if ("/detail".equals(path)) {
                 int id = Integer.parseInt(req.getParameter("id"));
                 Hebahan h = dao.getById(id);

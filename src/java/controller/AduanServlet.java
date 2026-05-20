@@ -85,6 +85,13 @@ public class AduanServlet extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/dashboard");
                 }
             } 
+            else if ("/penduduk".equals(pathInfo)) {
+                List<Aduan> list = aduanDAO.getByPenduduk(user.getId_pengguna());
+                List<KategoriAduan> kategoriList = kategoriDAO.getAll();
+                request.setAttribute("aduanList", list);
+                request.setAttribute("kategoriList", kategoriList);
+                request.getRequestDispatcher("/views/aduan/aduanPenduduk.jsp").forward(request, response);
+            } 
             /*
              * =========================
              * 4. ROUTE: COMPLAINT DETAIL

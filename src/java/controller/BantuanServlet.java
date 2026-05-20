@@ -103,6 +103,17 @@ public class BantuanServlet extends HttpServlet {
                 } else {
                     response.sendRedirect(request.getContextPath() + "/dashboard?error=invalid_role");
                 }
+            } // ================== MOHON (ALL ROLES RESIDENT VIEW) ==================
+            else if ("/mohon".equals(action)) {
+                if (isPendudukOrStaff(user)) {
+                    PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
+                    List<PermohonanBantuan> list = pbDao.getByPenduduk(user.getId_pengguna());
+                    request.setAttribute("permohonanList", list);
+                    request.getRequestDispatcher("/views/bantuan/jenisBantuan.jsp")
+                            .forward(request, response);
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/dashboard?error=invalid_role");
+                }
             } // ================== EDIT ==================
             else if ("/edit".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
@@ -121,7 +132,7 @@ public class BantuanServlet extends HttpServlet {
                 }
             } // ================== RASMI ==================
             else if ("/rasmi".equals(action)) {
-                if (!"Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
+                if (!isPendudukOrStaff(user)) {
                     response.sendRedirect(request.getContextPath() + "/dashboard");
                     return;
                 }
@@ -137,7 +148,7 @@ public class BantuanServlet extends HttpServlet {
                 request.getRequestDispatcher("/views/bantuan/bantuanRas.jsp")
                         .forward(request, response);
             } else if ("/komuniti".equals(action)) {
-                if (!"Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
+                if (!isPendudukOrStaff(user)) {
                     response.sendRedirect(request.getContextPath() + "/dashboard");
                     return;
                 }
@@ -154,7 +165,7 @@ public class BantuanServlet extends HttpServlet {
                 
                 request.getRequestDispatcher("/views/bantuan/bantuanKom.jsp").forward(request, response);
             } else if ("/delete".equals(action)) {
-                if ("Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
+                if (isPendudukOrStaff(user)) {
                     PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
                     int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
 
@@ -180,7 +191,7 @@ public class BantuanServlet extends HttpServlet {
                 } else {
                     response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?error=denied");
                 }
-            } else if ("/deleteAttachment".equals(action) && "Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
+            } else if ("/deleteAttachment".equals(action) && isPendudukOrStaff(user)) {
                 int idLampiran = Integer.parseInt(request.getParameter("idLampiran"));
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 
@@ -224,7 +235,7 @@ public class BantuanServlet extends HttpServlet {
             PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
 
             // ===================== 1. APPLY (PENDUDUK) =====================
-            if ("/apply".equals(action) && "Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
+            if ("/apply".equals(action) && isPendudukOrStaff(user)) {
 
                 BantuanLampiranDAO lampiranDao = new BantuanLampiranDAO();
                 Collection<Part> parts = request.getParts();
@@ -327,7 +338,7 @@ public class BantuanServlet extends HttpServlet {
                 pbDao.updateInfo(idPermohonan, catatan, fileName);
                 response.sendRedirect(request.getContextPath() + "/bantuan/list");
             } 
-            else if ("/updateMyRequest".equals(action) && "Penduduk".equalsIgnoreCase(user.getNama_peranan())) {
+            else if ("/updateMyRequest".equals(action) && isPendudukOrStaff(user)) {
 
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 String oldPenyata = request.getParameter("oldPenyataBank");
@@ -505,5 +516,14 @@ public class BantuanServlet extends HttpServlet {
             e.printStackTrace();
             throw new ServletException(e);
         }
+    }
+
+    private boolean isPendudukOrStaff(Pengguna user) {
+        if (user == null) return false;
+        String role = user.getNama_peranan();
+        return "Penduduk".equalsIgnoreCase(role) 
+            || "AJK".equalsIgnoreCase(role) 
+            || "AJK Kampung".equalsIgnoreCase(role) 
+            || "Ketua Kampung".equalsIgnoreCase(role);
     }
 }
