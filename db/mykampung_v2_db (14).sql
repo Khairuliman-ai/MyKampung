@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 07, 2026 at 10:06 PM
+-- Generation Time: May 21, 2026 at 04:53 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -69,7 +69,8 @@ INSERT INTO `aduan` (`id_aduan`, `id_pengguna`, `id_kategori_aduan`, `tajuk`, `k
 (16, 4, 1, 'Test6', 'fefoew', NULL, NULL, NULL, '2026-04-28 00:23:02', '2026-04-28 00:24:52', NULL, 10, 'SEDERHANA', NULL, 'ewfwf', NULL),
 (17, 4, 1, 'Test6', 'fewf', 'RESOLVED', NULL, NULL, '2026-04-28 00:27:33', '2026-04-28 00:29:33', NULL, 10, 'SEDERHANA', NULL, 'fewf', NULL),
 (18, 4, 1, 'Test2', 'few', 'CLOSED', NULL, NULL, '2026-04-28 00:34:30', '2026-04-28 00:36:53', NULL, 10, 'SEDERHANA', NULL, 'fwq', 'fwq'),
-(19, 4, 1, 'test 7', 'vds', 'CLOSED', NULL, NULL, '2026-04-28 00:37:14', '2026-04-28 00:38:40', NULL, 10, 'SEDERHANA', NULL, 'vds', 'vds');
+(19, 4, 1, 'test 7', 'vds', 'CLOSED', NULL, NULL, '2026-04-28 00:37:14', '2026-04-28 00:38:40', NULL, 10, 'SEDERHANA', NULL, 'vds', 'vds'),
+(20, 2, 1, 'test 4', 'test 4', 'UNDER_REVIEW_AJK', NULL, NULL, '2026-05-10 12:52:16', '2026-05-10 12:59:18', NULL, 10, 'SEDERHANA', NULL, 'test4', NULL);
 
 -- --------------------------------------------------------
 
@@ -88,6 +89,13 @@ CREATE TABLE `ahli_keluarga` (
   `status_tanggungan` varchar(10) DEFAULT 'Tidak',
   `dibuat_pada` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `ahli_keluarga`
+--
+
+INSERT INTO `ahli_keluarga` (`id_ahli`, `id_pengguna`, `nama_penuh`, `nombor_kp`, `nombor_telefon`, `umur`, `hubungan`, `status_tanggungan`, `dibuat_pada`) VALUES
+(3, 1, 'Ammar', '234341-24-1242', '012-3244 3315', 20, 'Lain-lain', 'Ya', '2026-05-20 11:49:53');
 
 -- --------------------------------------------------------
 
@@ -198,7 +206,8 @@ INSERT INTO `bantuan_lampiran` (`id_lampiran`, `id_permohonan`, `nama_fail`, `je
 (15, 37, '1777960629951_2112.10920v1_-_Copy.pdf', 'PEMOHON', '2026-05-05 05:57:09'),
 (16, 36, 'KETUA_1777964948379_Lab_report5_s71383_cybersecurity_-_Copy.pdf', 'PENTADBIR', '2026-05-05 07:09:08'),
 (17, 36, 'KETUA_1777964948387_Lab_report5_s71383_cybersecurity.pdf', 'PENTADBIR', '2026-05-05 07:09:08'),
-(18, 38, '1778154790290_Lab_report5_s71383_cybersecurity_-_Copy.pdf', 'PEMOHON', '2026-05-07 11:53:10');
+(18, 38, '1778154790290_Lab_report5_s71383_cybersecurity_-_Copy.pdf', 'PEMOHON', '2026-05-07 11:53:10'),
+(19, 39, '1779279938690_Individual_Assignment.pdf', 'PEMOHON', '2026-05-20 12:25:38');
 
 -- --------------------------------------------------------
 
@@ -261,8 +270,29 @@ CREATE TABLE `fasiliti_slot` (
   `id_fasiliti` int(11) NOT NULL,
   `masa_mula` time NOT NULL,
   `masa_tamat` time NOT NULL,
-  `durasi` int(11) NOT NULL
+  `durasi` varchar(20) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Dumping data for table `fasiliti_slot`
+--
+
+INSERT INTO `fasiliti_slot` (`id_slot`, `id_fasiliti`, `masa_mula`, `masa_tamat`, `durasi`) VALUES
+(1, 1, '08:00:00', '10:00:00', '2'),
+(2, 1, '10:00:00', '12:00:00', '2'),
+(3, 1, '12:00:00', '14:00:00', '2'),
+(4, 1, '14:00:00', '16:00:00', '2'),
+(5, 1, '16:00:00', '18:00:00', '2'),
+(6, 1, '18:00:00', '20:00:00', '2'),
+(7, 1, '20:00:00', '22:00:00', '2'),
+(8, 1, '22:00:00', '23:59:59', '2'),
+(9, 1, '08:00:00', '14:00:00', 'HalfDay'),
+(10, 1, '08:00:00', '22:00:00', 'FullDay'),
+(11, 2, '08:00:00', '10:00:00', '2'),
+(12, 2, '10:00:00', '12:00:00', '2'),
+(13, 2, '16:00:00', '18:00:00', '2'),
+(14, 2, '20:00:00', '22:00:00', '2'),
+(15, 2, '08:00:00', '22:00:00', 'FullDay');
 
 -- --------------------------------------------------------
 
@@ -334,7 +364,8 @@ INSERT INTO `jawatan_ajk` (`id_jawatan`, `nama_jawatan`) VALUES
 (10, 'Biro Ekonomi & Usahawan'),
 (11, 'Biro Hebahan'),
 (12, 'Test last'),
-(13, 'Test 5');
+(13, 'Test 5'),
+(14, 'Test 6');
 
 -- --------------------------------------------------------
 
@@ -412,7 +443,8 @@ INSERT INTO `log_aduan` (`id_log_aduan`, `id_aduan`, `id_pelaku`, `status_lama`,
 (21, 19, 1, 'ESCALATED_TO_KETUA', 'UNDER_REVIEW_KETUA', 'dv', '2026-04-28 00:38:12'),
 (22, 19, 1, 'UNDER_REVIEW_KETUA', 'IN_PROGRESS_HIGH_LEVEL', 'vd', '2026-04-28 00:38:22'),
 (23, 19, 1, 'IN_PROGRESS_HIGH_LEVEL', 'RESOLVED', 'vd', '2026-04-28 00:38:31'),
-(24, 19, 1, 'RESOLVED', 'CLOSED', 'vds', '2026-04-28 00:38:40');
+(24, 19, 1, 'RESOLVED', 'CLOSED', 'vds', '2026-04-28 00:38:40'),
+(25, 20, 10, 'SUBMITTED', 'UNDER_REVIEW_AJK', 'test4', '2026-05-10 12:59:18');
 
 -- --------------------------------------------------------
 
@@ -440,7 +472,8 @@ INSERT INTO `log_aktiviti` (`id_log`, `id_pengguna`, `id_admin`, `jenis_tindakan
 (4, 2, 3, 'KEMASKINI_PROFIL', 'Admin mengemaskini: Status Keluarga (Berkahwin -> Ibu Tunggal). ', '2026-04-19 13:19:18'),
 (5, 3, 1, 'KEMASKINI_PROFIL', 'Admin mengemaskini: Status Keluarga (Bujang -> Berkahwin). ', '2026-04-19 13:21:52'),
 (6, 3, 1, 'KEMASKINI_PROFIL', 'Admin mengemaskini: Status Keluarga (Berkahwin -> Duda). ', '2026-04-20 12:22:13'),
-(7, 2, 3, 'KEMASKINI_PROFIL', 'Admin mengemaskini: Alamat (Bandar: - -> Pasir Puteh; Poskod: - -> 16810; Negeri: - -> Kelantan; ). ', '2026-04-22 09:21:47');
+(7, 2, 3, 'KEMASKINI_PROFIL', 'Admin mengemaskini: Alamat (Bandar: - -> Pasir Puteh; Poskod: - -> 16810; Negeri: - -> Kelantan; ). ', '2026-04-22 09:21:47'),
+(8, 2, 3, 'KEMASKINI_PROFIL', 'Admin mengemaskini: Status Keluarga (Bujang -> Berkahwin). ', '2026-05-09 12:03:05');
 
 -- --------------------------------------------------------
 
@@ -481,8 +514,8 @@ CREATE TABLE `pengguna` (
 --
 
 INSERT INTO `pengguna` (`id_pengguna`, `nama_penuh`, `nombor_kp`, `nombor_telefon`, `tarikh_lahir`, `kata_laluan`, `status`, `status_keluarga`, `pekerjaan`, `pendapatan`, `nama_jalan`, `daerah`, `nombor_poskod`, `bandar`, `negeri`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`, `lampiran_pengesahan`, `reset_token`, `token_expiry`, `email`, `latitude`, `longitude`, `foto_profil`) VALUES
-(1, 'Ahmad bin Ali', '800101031234', '012-3456 5353', '1980-01-01', '$2a$10$4REPQtKXDeP/GXdC2d06SuFynGXcEkMfbsfRUQZ09L7itoiobVi/C', 1, 'Bujang', 'CEO', 1200.09, 'Jalan Mawar 11', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-23 00:51:58', NULL, NULL, NULL, NULL, 'khairuliman736@gmail.com', 6.03112933, 102.29697188, 'profil_1_1776905518169.jpg'),
-(2, 'Siti binti Abuyal', '850202035566', '011-1101 3816', '1985-02-02', '$2a$12$NUn7qK.c4bD4scgC8fG7/ucy.iqtBLxkoqIR7.b1s0nXhM88UNPa6', 1, 'Bujang', 'Petani', 1000.00, 'Jalan Melati 2', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-05-07 19:44:17', NULL, NULL, NULL, NULL, 'siti@gmail.com', 6.03099062, 102.29372263, 'profil_2_1776905643592.jpg'),
+(1, 'Ahmad bin Ali', '800101031234', '012-3456 5353', '1980-01-01', '$2a$10$4REPQtKXDeP/GXdC2d06SuFynGXcEkMfbsfRUQZ09L7itoiobVi/C', 1, 'Bujang', 'CEO', 1200.09, 'Jalan Mawar 11', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-05-20 11:49:53', NULL, NULL, NULL, NULL, 'khairuliman736@gmail.com', 6.03112933, 102.29697188, 'profil_1_1779277793710_professional-profile-pictures-1080-x-1080-460wjhrkbwdcp1ig.jpg'),
+(2, 'Siti binti Abuyal', '850202035566', '011-1101 3816', '1985-02-02', '$2a$12$NUn7qK.c4bD4scgC8fG7/ucy.iqtBLxkoqIR7.b1s0nXhM88UNPa6', 1, 'Berkahwin', 'Petani', 1000.00, 'Jalan Melati 2', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-05-09 12:25:28', NULL, NULL, NULL, NULL, 'siti@gmail.com', 5.92294100, 102.31455260, 'profil_2_1776905643592.jpg'),
 (3, 'Muthu a/l Samy', '900303037788', '014-5678 901', '1990-03-03', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', 'Peniaga', 3999.99, 'Jalan Kenanga', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-23 00:52:40', NULL, NULL, NULL, NULL, 's71383@ocean.umt.edu.my', 6.03130217, 102.29371122, 'profil_3_1776905560441.jpg'),
 (4, 'Chong Wei Ming', '750404039911', '016-6789 011', '1975-04-04', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Bujang', 'Guru', 3000.01, 'Jalan Teratai', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-28 09:15:22', NULL, NULL, NULL, NULL, 'khayxstyle@gmail.com', 5.92294100, 102.31455260, 'profil_4_1776905581340.jpg'),
 (5, 'Aminah binti Hassan', '650505032233', '017-7890123', '1965-05-05', '$2a$12$GIGxqxu1FHhiZkKGkhSAGerrvcl4hXyp1uO3Qk3iu.mJVhv4ZMarm', 1, 'Ibu Tunggal', 'Pesara', 1200.00, 'Jalan Orkid', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-03-13 19:52:27', '2026-04-23 00:53:46', NULL, NULL, NULL, NULL, 'aminah@gmail.com', 6.03130217, 102.29371122, 'profil_5_1776905626958.jpg'),
@@ -498,7 +531,10 @@ INSERT INTO `pengguna` (`id_pengguna`, `nama_penuh`, `nombor_kp`, `nombor_telefo
 (21, 'MUHAMAD AMIR BIN RUSLI', '042304034506', '01111013816', '2005-11-04', '$2a$10$PWjG2khEQHBAx8sDwadOqe1OHEc.ZK0JV5CGmSllfNIGnSYKDeld.', 1, NULL, NULL, NULL, 'Lot. 98 Kg Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-17 04:10:48', '2026-04-19 13:56:08', NULL, 'bukti_042304034506_1776399048381.pdf', NULL, NULL, 'amir123@gmail.com', 6.03130217, 102.29371122, 'default_avatar.png'),
 (22, 'MUHAMMD AIMAN BIN SAMAD', '010302030441', '01120034344', '2001-03-02', '$2a$10$.l7X.UGDpzKRG47QQ76YbOsKx18VRpxslYVWinUWw6xuY6ucAbqHS', 2, NULL, NULL, NULL, 'Lot 67, Kampung Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-18 05:48:01', '2026-04-20 12:31:10', NULL, 'bukti_010302030441_1776491281745.pdf', NULL, NULL, 'khayxstyle@gmail.com', 6.03130217, 102.29371122, 'default_avatar.png'),
 (23, 'HAIKAL DANIAL BIN MOHD ROHAIZA', '040503030441', '03222004245', '2004-05-03', '$2a$10$ej9jvSZ9UH43oocQg1jBEudAbFyN0UBVVUPWDRF9oUr6moMw6CTOi', 1, NULL, NULL, NULL, 'Kg Danan', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-20 12:33:29', '2026-04-23 04:51:27', NULL, 'bukti_040503030441_1776688409125.pdf', NULL, NULL, 's70622@ocean.umt.edu.my', NULL, NULL, 'default_avatar.png'),
-(24, 'HARIZ FARHAN BIN AHMAD', '440303020441', '01433056007', '2044-03-03', '$2a$10$.48PBQFJgEqH8mwRyYIEMeUYIpoKizcpjXhhYKrGJY6q69dkWr5Ue', 1, NULL, NULL, NULL, 'Lot 55, Kampung Dana', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-23 00:55:38', '2026-04-23 00:57:36', NULL, 'bukti_440303020441_1776905738539.pdf', NULL, NULL, 'hariz@gmail.com', NULL, NULL, 'default_avatar.png');
+(24, 'HARIZ FARHAN BIN AHMAD', '440303020441', '01433056007', '2044-03-03', '$2a$10$.48PBQFJgEqH8mwRyYIEMeUYIpoKizcpjXhhYKrGJY6q69dkWr5Ue', 1, NULL, NULL, NULL, 'Lot 55, Kampung Dana', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-04-23 00:55:38', '2026-05-08 02:15:53', NULL, 'bukti_440303020441_1776905738539.pdf', NULL, NULL, 'hariz@gmail.com', NULL, NULL, 'default_avatar.png'),
+(25, 'asma bin husna', '032405040332', '01111012333', '2004-12-05', '$2a$10$LGUWSbgq.R0HKUr1H5IJruri1UJcDUffLsjiOoYH0EGZBq3Mshd.G', 2, NULL, NULL, NULL, 'LOT96, KG DANAN', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-05-08 02:17:11', '2026-05-09 12:02:38', NULL, 'bukti_032405040332_1778206631690_Lab_report5_s71383_cybersecurity.pdf', NULL, NULL, 'asma@gmail.com', NULL, NULL, 'default_avatar.png'),
+(26, 'MUHAMMAD AIDIL BIN HAMAT', '590202030441', '01230546604', '1959-02-02', '$2a$10$1IxcVyVhhNwEiEt04kq1E.9kpORrYqZ6dHxjmqvxFuVsbe5k./LGi', 1, NULL, NULL, NULL, 'No 12, Jalan Melati', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-05-09 11:29:59', '2026-05-09 11:36:11', NULL, 'bukti_590202030441_1778326199302_Lab_report5_s71383_cybersecurity.pdf', NULL, NULL, 'khairuliman736@gmail.com', NULL, NULL, 'default_avatar.png'),
+(27, 'Muthu a/l Samya', '800101-03-1235', '01111013817', '1980-01-01', '$2a$10$n54Z3XAhvzWz6QJbTulxJefaU0MUaTblkq/9NiN43pubcNFPypRHG', 1, NULL, NULL, NULL, 'kampong pok jin Terengganu', 'Selising', '16810', 'Pasir Puteh', 'Kelantan', '2026-05-18 08:37:46', '2026-05-18 08:39:10', NULL, 'bukti_800101-03-1235_1779093466254_Internship_for_Computer___IT_Students_Job_in_Kuala_Lumpur_-_Jobstreet.pdf', NULL, NULL, 's70810@ocean.umt.edu.my', NULL, NULL, 'default_avatar.png');
 
 -- --------------------------------------------------------
 
@@ -533,7 +569,10 @@ INSERT INTO `pengguna_peranan` (`id_pengguna`, `id_peranan`) VALUES
 (21, 3),
 (22, 3),
 (23, 4),
-(24, 3);
+(24, 3),
+(25, 4),
+(26, 4),
+(27, 4);
 
 -- --------------------------------------------------------
 
@@ -621,7 +660,8 @@ INSERT INTO `permohonan_bantuan` (`id_permohonan`, `id_pengguna`, `id_bantuan`, 
 (35, 2, 3, 'BARU', 'fef', '22444', 'BANK_1777928178734_Lab_report5_s71383_cybersecurity.pdf', 'Test Baru', 'IC Kabur', NULL, '2026-05-04 20:56:18', '2026-05-07 12:56:20', NULL),
 (36, 2, 17, 'LULUS', NULL, NULL, NULL, 'Test AB', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, '2026-05-04 21:05:34', '2026-05-05 07:09:08', NULL),
 (37, 2, 11, 'BARU', NULL, NULL, NULL, 'Test X', NULL, NULL, '2026-05-05 05:57:09', '2026-05-05 05:57:09', NULL),
-(38, 2, 1, 'MENUNGGU_KETUA', 'wf', '22444', 'BANK_1778154790290_mykampung_v2_db_(1).pdf', 'Test tak tau', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-05-07 11:53:10', '2026-05-07 11:54:07', NULL);
+(38, 2, 1, 'MENUNGGU_KETUA', 'wf', '22444', 'BANK_1778154790290_mykampung_v2_db_(1).pdf', 'Test tak tau', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-05-07 11:53:10', '2026-05-07 11:54:07', NULL),
+(39, 5, 1, 'MENUNGGU_KETUA', 'gwgwege', '042414255253533', 'BANK_1779279938693_Backend_Software_Engineer_Intern___Ant_International___LinkedIn.pdf', 'fsa', 'Disemak oleh AJK: Dokumen Lengkap.', NULL, '2026-05-20 12:25:38', '2026-05-21 04:11:01', NULL);
 
 -- --------------------------------------------------------
 
@@ -674,7 +714,8 @@ INSERT INTO `tempahan_fasiliti` (`id_tempahan`, `id_fasiliti`, `id_pengguna`, `t
 (22, 2, 2, '2026-04-23', '08:00:00', '22:00:00', 'MENUNGGU', 'test112', NULL, '2026-04-23 05:09:42', '2026-04-23 05:09:42', NULL, NULL),
 (23, 1, 4, '2026-04-28', '18:00:00', '20:00:00', 'LULUS', '', NULL, '2026-04-28 09:38:42', '2026-04-28 09:38:42', NULL, NULL),
 (24, 1, 4, '2026-04-28', '08:00:00', '14:00:00', 'MENUNGGU', 's', NULL, '2026-04-28 14:16:41', '2026-04-28 14:16:41', NULL, NULL),
-(25, 2, 4, '2026-04-29', '20:00:00', '22:00:00', 'LULUS', '', NULL, '2026-04-29 11:50:00', '2026-04-29 11:50:00', NULL, NULL);
+(25, 2, 4, '2026-04-29', '20:00:00', '22:00:00', 'LULUS', '', NULL, '2026-04-29 11:50:00', '2026-04-29 11:50:00', NULL, NULL),
+(26, 2, 2, '2026-05-09', '08:00:00', '10:00:00', 'LULUS', '', NULL, '2026-05-08 19:36:45', '2026-05-08 19:36:45', NULL, NULL);
 
 --
 -- Indexes for dumped tables
@@ -814,13 +855,13 @@ ALTER TABLE `tempahan_fasiliti`
 -- AUTO_INCREMENT for table `aduan`
 --
 ALTER TABLE `aduan`
-  MODIFY `id_aduan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id_aduan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
 
 --
 -- AUTO_INCREMENT for table `ahli_keluarga`
 --
 ALTER TABLE `ahli_keluarga`
-  MODIFY `id_ahli` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_ahli` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT for table `bantuan`
@@ -832,7 +873,7 @@ ALTER TABLE `bantuan`
 -- AUTO_INCREMENT for table `bantuan_lampiran`
 --
 ALTER TABLE `bantuan_lampiran`
-  MODIFY `id_lampiran` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=19;
+  MODIFY `id_lampiran` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
 
 --
 -- AUTO_INCREMENT for table `fasiliti`
@@ -850,7 +891,7 @@ ALTER TABLE `fasiliti_sekatan`
 -- AUTO_INCREMENT for table `fasiliti_slot`
 --
 ALTER TABLE `fasiliti_slot`
-  MODIFY `id_slot` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id_slot` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=16;
 
 --
 -- AUTO_INCREMENT for table `hebahan`
@@ -862,7 +903,7 @@ ALTER TABLE `hebahan`
 -- AUTO_INCREMENT for table `jawatan_ajk`
 --
 ALTER TABLE `jawatan_ajk`
-  MODIFY `id_jawatan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id_jawatan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
 
 --
 -- AUTO_INCREMENT for table `kategori_aduan`
@@ -874,19 +915,19 @@ ALTER TABLE `kategori_aduan`
 -- AUTO_INCREMENT for table `log_aduan`
 --
 ALTER TABLE `log_aduan`
-  MODIFY `id_log_aduan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id_log_aduan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 
 --
 -- AUTO_INCREMENT for table `log_aktiviti`
 --
 ALTER TABLE `log_aktiviti`
-  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
 
 --
 -- AUTO_INCREMENT for table `pengguna`
 --
 ALTER TABLE `pengguna`
-  MODIFY `id_pengguna` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=25;
+  MODIFY `id_pengguna` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `peranan`
@@ -898,13 +939,13 @@ ALTER TABLE `peranan`
 -- AUTO_INCREMENT for table `permohonan_bantuan`
 --
 ALTER TABLE `permohonan_bantuan`
-  MODIFY `id_permohonan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=39;
+  MODIFY `id_permohonan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `tempahan_fasiliti`
 --
 ALTER TABLE `tempahan_fasiliti`
-  MODIFY `id_tempahan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id_tempahan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
 
 --
 -- Constraints for dumped tables
