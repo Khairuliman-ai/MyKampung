@@ -2,6 +2,8 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Log Masuk / Daftar | Kampung Danan</title>
 
     <!-- Bootstrap & Icons -->
@@ -151,21 +153,78 @@
 
         /* ===== MOBILE ===== */
         @media (max-width: 768px) {
+            body {
+                align-items: flex-start;
+                padding: 16px 12px;
+            }
+
             .auth-container {
                 flex-direction: column;
                 min-height: auto;
+                border-radius: 16px;
+                margin: 20px auto;
+                width: 100%;
+                max-width: 480px;
             }
 
             .overlay-container {
                 display: none;
             }
 
-            .form-container,
-            .sign-up-container {
+            .form-container {
                 width: 100%;
+                padding: 28px 20px;
+                transition: none;
+            }
+
+            .form-container form {
+                max-width: 100%;
+                margin: 0 auto;
+            }
+
+            .sign-in-container {
+                display: block;
+            }
+
+            .sign-up-container {
+                display: none;
                 position: relative;
-                transform: none !important;
-                opacity: 1 !important;
+                left: auto;
+                width: 100%;
+                height: auto;
+                min-height: auto;
+                padding: 28px 20px;
+                overflow-y: visible;
+                opacity: 1;
+                z-index: 1;
+            }
+
+            .auth-container.sign-up-mode .sign-in-container {
+                display: none;
+            }
+
+            .auth-container.sign-up-mode .sign-up-container {
+                display: block;
+                transform: none;
+            }
+
+            .auth-container.sign-up-mode .sign-in-container {
+                transform: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 12px 8px;
+            }
+
+            .form-container {
+                padding: 20px 16px;
+            }
+
+            .row.g-2 {
+                --bs-gutter-x: 0.5rem;
+                --bs-gutter-y: 0.5rem;
             }
         }
     </style>
@@ -336,12 +395,12 @@
             <input type="password" name="kata_laluan" class="form-control" placeholder="Gunakan gabungan huruf dan nombor" required>
         </div>
 
-        <button type="submit" class="btn btn-success w-100 mt-2 shadow-sm py-2" style="background:#10b981; border:none; font-weight: bold;">
+        <button type="submit" class="btn btn-success w-100 mt-2 shadow-sm py-2" style="background:#0D9488; border:none; font-weight: bold;">
             Hantar Pendaftaran <i class="fas fa-paper-plane ms-2"></i>
         </button>
 
         <div class="text-center mt-3 small">
-            Sudah ada akaun? <a href="#" id="linkSignIn" class="fw-bold" style="color: #10b981; text-decoration: none;">Log Masuk</a>
+            Sudah ada akaun? <a href="#" id="linkSignIn" class="fw-bold" style="color: #0D9488; text-decoration: none;">Log Masuk</a>
         </div>
     </form>
 </div>
