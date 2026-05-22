@@ -280,6 +280,25 @@
                             </div>
                             <p class="text-[10px] text-gray-400 mt-2 italic px-1">* Digunakan untuk penentuan kelayakan bantuan.</p>
                         </div>
+
+                        <div class="group">
+                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Pengesahan Pendapatan (Slip Gaji / Dokumen Sokongan)</label>
+                            <div class="relative flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                                <div class="relative flex-1">
+                                    <i class="fas fa-file-invoice-dollar absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors"></i>
+                                    <input type="file" name="pengesahan_pendapatan" accept=".pdf,.png,.jpg,.jpeg" 
+                                        class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-gray-800 text-xs font-semibold transition-all file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-blue-100 file:text-blue-600 hover:file:bg-blue-200 file:cursor-pointer">
+                                </div>
+                                <% if (pDetail.getPengesahan_pendapatan() != null && !pDetail.getPengesahan_pendapatan().isEmpty()) { %>
+                                <a href="<%= request.getContextPath() %>/file/pendapatan/<%= pDetail.getPengesahan_pendapatan() %>" target="_blank" 
+                                    class="px-5 py-4 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center gap-2 text-xs font-black shadow-sm transition-all whitespace-nowrap active:scale-95">
+                                    <i class="fas fa-eye text-sm"></i>
+                                    <span>Lihat Fail</span>
+                                </a>
+                                <% } %>
+                            </div>
+                            <p class="text-[10px] text-gray-400 mt-2 italic px-1">* Format dibenarkan: PDF, PNG, JPG, JPEG (Max 10MB).</p>
+                        </div>
                     </div>
                 </div>
 
@@ -295,7 +314,7 @@
                                 <p class="text-xs text-gray-500 font-medium tracking-wide uppercase">Senarai tanggungan & isi rumah</p>
                             </div>
                         </div>
-                        <button type="button" onclick="addFamilyMember()" class="flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-green-500/20 active:scale-95">
+                        <button type="button" onclick="showAddFamilyModal()" class="flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-green-500/20 active:scale-95">
                             <i class="fas fa-plus"></i>
                             Tambah Ahli
                         </button>
@@ -305,66 +324,114 @@
                         <%-- Existing Family Members --%>
                         <%
                             List<AhliKeluarga> family = pDetail.getSenaraiAhliKeluarga();
+                            int famIndex = 0;
                             if (family != null && !family.isEmpty()) {
                                 for (AhliKeluarga ak : family) {
+                                    String relation = ak.getHubungan();
+                                    String iconClass = "fa-user-friends text-green-600";
+                                    if ("Suami".equalsIgnoreCase(relation) || "Bapa".equalsIgnoreCase(relation)) {
+                                        iconClass = "fa-user-tie text-blue-600";
+                                    } else if ("Isteri".equalsIgnoreCase(relation) || "Ibu".equalsIgnoreCase(relation)) {
+                                        iconClass = "fa-user-nurse text-pink-600";
+                                    } else if ("Anak".equalsIgnoreCase(relation)) {
+                                        iconClass = "fa-child text-amber-600";
+                                    } else if ("Adik-beradik".equalsIgnoreCase(relation)) {
+                                        iconClass = "fa-people-arrows text-purple-600";
+                                    }
                         %>
-                        <div class="family-row group relative grid grid-cols-1 md:grid-cols-6 gap-4 p-6 bg-gray-50/50 rounded-2xl border border-gray-100 hover:bg-white hover:border-green-200 transition-all animate-in fade-in duration-300">
-                            <div class="md:col-span-2">
-                                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Nama Penuh</label>
-                                <input type="text" name="f_nama[]" value="<%= ak.getNama_penuh() %>" placeholder="Nama Penuh" class="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-green-500/20 text-xs font-semibold">
+                        <div id="familyCard_<%= famIndex %>" class="family-row group relative bg-white hover:bg-green-50/10 rounded-3xl p-6 border border-gray-150 shadow-sm hover:shadow-md hover:border-green-300 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center gap-6 animate-in fade-in duration-300">
+                            <!-- Hidden Fields to submit with main form -->
+                            <input type="hidden" name="f_index[]" class="f-index" value="<%= famIndex %>">
+                            <input type="hidden" name="f_nama[]" class="f-nama" value="<%= ak.getNama_penuh() %>">
+                            <input type="hidden" name="f_kp[]" class="f-kp" value="<%= ak.getNombor_kp() %>">
+                            <input type="hidden" name="f_tel[]" class="f-tel" value="<%= ak.getNombor_telefon() %>">
+                            <input type="hidden" name="f_umur[]" class="f-umur" value="<%= ak.getUmur() %>">
+                            <input type="hidden" name="f_hubungan[]" class="f-hubungan" value="<%= ak.getHubungan() %>">
+                            <input type="hidden" name="f_pekerjaan[]" class="f-pekerjaan" value="<%= ak.getPekerjaan() != null ? ak.getPekerjaan() : "" %>">
+                            <input type="hidden" name="f_pendapatan[]" class="f-pendapatan" value="<%= ak.getPendapatan() != null ? ak.getPendapatan() : "" %>">
+                            <input type="hidden" name="f_pengesahan_existing[]" class="f-pengesahan-existing" value="<%= ak.getPengesahan_pendapatan() != null ? ak.getPengesahan_pendapatan() : "" %>">
+
+                            <!-- Avatar Icon -->
+                            <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center text-2xl shadow-sm border border-gray-100 group-hover:scale-105 transition-transform shrink-0">
+                                <i class="card-icon fas <%= iconClass %>"></i>
                             </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">No. KP</label>
-                                <input type="text" name="f_kp[]" value="<%= ak.getNombor_kp() %>" 
-                                    oninput="formatIC(this)" maxlength="14" placeholder="000000-00-0000" 
-                                    class="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-green-500/20 text-xs font-semibold">
-                            </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">No. Tel</label>
-                                <input type="text" name="f_tel[]" value="<%= ak.getNombor_telefon() %>" 
-                                    oninput="formatPhoneNumber(this)" maxlength="13" placeholder="012-3456789" 
-                                    class="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-green-500/20 text-xs font-semibold">
-                            </div>
-                            <div class="grid grid-cols-2 gap-2">
-                                <div>
-                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Umur</label>
-                                    <input type="number" name="f_umur[]" value="<%= ak.getUmur() %>" class="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-xs font-semibold">
+
+                            <!-- Details -->
+                            <div class="flex-1 min-w-0">
+                                <div class="flex flex-wrap items-center gap-2 mb-2">
+                                    <h5 class="card-display-nama text-sm font-extrabold text-gray-900 truncate"><%= ak.getNama_penuh() %></h5>
+                                    <span class="card-display-hubungan inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-700 border border-green-200">
+                                        <%= ak.getHubungan() %>
+                                    </span>
+                                    <span class="card-display-umur inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gray-50 text-gray-600 border border-gray-200">
+                                        <%= ak.getUmur() %> Tahun
+                                    </span>
                                 </div>
-                                <div>
-                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Hubungan</label>
-                                    <select name="f_hubungan[]" class="w-full px-2 py-2.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold">
-                                        <option value="Suami" <%= "Suami".equals(ak.getHubungan()) ? "selected" : "" %>>Suami</option>
-                                        <option value="Isteri" <%= "Isteri".equals(ak.getHubungan()) ? "selected" : "" %>>Isteri</option>
-                                        <option value="Anak" <%= "Anak".equals(ak.getHubungan()) ? "selected" : "" %>>Anak</option>
-                                        <option value="Ibu" <%= "Ibu".equals(ak.getHubungan()) ? "selected" : "" %>>Ibu</option>
-                                        <option value="Bapa" <%= "Bapa".equals(ak.getHubungan()) ? "selected" : "" %>>Bapa</option>
-                                        <option value="Adik-beradik" <%= "Adik-beradik".equals(ak.getHubungan()) ? "selected" : "" %>>Adik-beradik</option>
-                                        <option value="Lain-lain" <%= "Lain-lain".equals(ak.getHubungan()) ? "selected" : "" %>>Lain-lain</option>
-                                    </select>
+
+                                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-semibold text-gray-500">
+                                    <div>
+                                        <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">No. KP</span>
+                                        <span class="card-display-kp text-gray-800"><%= ak.getNombor_kp() != null && !ak.getNombor_kp().isEmpty() ? ak.getNombor_kp() : "-" %></span>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">No. Telefon</span>
+                                        <span class="card-display-tel text-gray-800"><%= ak.getNombor_telefon() != null && !ak.getNombor_telefon().isEmpty() ? ak.getNombor_telefon() : "-" %></span>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Pekerjaan</span>
+                                        <span class="card-display-pekerjaan text-gray-800"><%= ak.getPekerjaan() != null && !ak.getPekerjaan().isEmpty() ? ak.getPekerjaan() : "Tiada" %></span>
+                                    </div>
+                                    <div>
+                                        <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Pendapatan</span>
+                                        <span class="card-display-pendapatan text-gray-800 font-bold text-blue-600">
+                                            <%= ak.getPendapatan() != null ? "RM " + String.format("%.2f", ak.getPendapatan()) : "RM 0.00" %>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                            <div class="flex items-center justify-between gap-4">
-                                <div class="flex-1">
-                                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Tanggungan?</label>
-                                    <select name="f_tanggungan[]" class="w-full px-2 py-2.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold">
-                                        <option value="Ya" <%= "Ya".equals(ak.getStatus_tanggungan()) ? "selected" : "" %>>Ya</option>
-                                        <option value="Tidak" <%= "Tidak".equals(ak.getStatus_tanggungan()) ? "selected" : "" %>>Tidak</option>
-                                    </select>
+
+                            <!-- Document and Actions -->
+                            <div class="flex items-center gap-3 w-full md:w-auto shrink-0 md:justify-end border-t md:border-t-0 pt-4 md:pt-0">
+                                <div class="card-display-dokumen flex items-center shrink-0">
+                                    <% if (ak.getPengesahan_pendapatan() != null && !ak.getPengesahan_pendapatan().isEmpty()) { %>
+                                    <a href="<%= request.getContextPath() %>/file/pendapatan/<%= ak.getPengesahan_pendapatan() %>" target="_blank" 
+                                        class="px-3.5 py-2.5 bg-blue-50 hover:bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center gap-2 text-[11px] font-bold transition-all whitespace-nowrap active:scale-95 shadow-sm">
+                                        <i class="fas fa-file-pdf"></i>
+                                        <span>Lihat Fail</span>
+                                    </a>
+                                    <% } else { %>
+                                    <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-400 text-[10px] font-bold">
+                                        <i class="fas fa-exclamation-circle text-xs"></i>
+                                        Tiada Dokumen
+                                    </span>
+                                    <% } %>
                                 </div>
-                                <button type="button" onclick="removeFamilyRow(this)" class="mt-4 w-10 h-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center">
-                                    <i class="fas fa-trash-alt"></i>
+
+                                <button type="button" onclick="editFamilyMember('familyCard_<%= famIndex %>')" 
+                                    class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shrink-0" 
+                                    title="Kemaskini Ahli Keluarga">
+                                    <i class="fas fa-pencil-alt text-sm"></i>
+                                </button>
+
+                                <button type="button" onclick="removeFamilyRow(this)" 
+                                    class="w-10 h-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shrink-0" 
+                                    title="Hapus Ahli Keluarga">
+                                    <i class="fas fa-trash-alt text-sm"></i>
                                 </button>
                             </div>
                         </div>
-                        <%      }
-                            } else { %>
-                            <div id="emptyFamily" class="text-center py-10 bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-200">
-                                <div class="w-12 h-12 rounded-full bg-white mx-auto flex items-center justify-center text-gray-300 mb-3">
-                                    <i class="fas fa-users"></i>
-                                </div>
-                                <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Tiada Maklumat Ahli Keluarga</p>
-                                <p class="text-[10px] text-gray-400 mt-1">Sila klik "Tambah Ahli" untuk mula mengisi.</p>
+                        <%
+                                    famIndex++;
+                                }
+                            } else {
+                        %>
+                        <div id="emptyFamily" class="text-center py-12 bg-gray-50/50 rounded-3xl border-2 border-dashed border-gray-200 animate-in fade-in duration-300">
+                            <div class="w-14 h-14 rounded-full bg-white mx-auto flex items-center justify-center text-gray-300 mb-3 shadow-inner">
+                                <i class="fas fa-users text-xl"></i>
                             </div>
+                            <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Tiada Maklumat Ahli Keluarga</p>
+                            <p class="text-[10px] text-gray-400 mt-1">Sila klik "+ Tambah Ahli" di atas untuk mula mengisi.</p>
+                        </div>
                         <% } %>
                     </div>
                 </div>
@@ -655,6 +722,101 @@
     </div>
 </div>
 
+<%-- Modal Tambah Ahli Keluarga (Glass Edition) --%>
+<div id="addFamilyModal" class="fixed inset-0 bg-gray-900/40 z-[999] hidden flex items-center justify-center backdrop-blur-md animate-in fade-in duration-300 p-4">
+    <div class="bg-white/95 backdrop-blur-2xl rounded-[3rem] p-8 md:p-10 w-full max-w-2xl shadow-2xl relative border border-white/50 animate-in zoom-in-95 duration-300 max-h-[90vh] overflow-y-auto custom-scrollbar">
+        <button type="button" onclick="hideAddFamilyModal()" class="absolute top-6 right-6 w-10 h-10 rounded-full bg-gray-100 flex items-center justify-center text-gray-400 hover:text-gray-600 transition hover:scale-110 active:scale-95">
+            <i class="fas fa-times"></i>
+        </button>
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 bg-green-50 rounded-2xl flex items-center justify-center text-green-600 text-2xl mx-auto mb-4 shadow-inner">
+                <i class="fas fa-user-plus animate-pulse"></i>
+            </div>
+            <h3 class="text-2xl font-black text-gray-900 tracking-tight">Tambah Ahli Keluarga</h3>
+            <p class="text-gray-500 text-sm mt-1 font-medium">Lengkapkan maklumat ahli keluarga di bawah.</p>
+        </div>
+        <div class="space-y-6">
+            <div class="group">
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Nama Penuh <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-green-600 transition-colors"></i>
+                    <input type="text" id="m_nama" placeholder="Nama penuh ahli keluarga" class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-sm font-semibold transition-all">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="group">
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">No. Kad Pengenalan</label>
+                    <div class="relative">
+                        <i class="fas fa-id-badge absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-green-600 transition-colors"></i>
+                        <input type="text" id="m_kp" oninput="formatIC(this)" maxlength="14" placeholder="000000-00-0000" class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-sm font-semibold transition-all">
+                    </div>
+                </div>
+                <div class="group">
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">No. Telefon</label>
+                    <div class="relative">
+                        <i class="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-green-600 transition-colors"></i>
+                        <input type="text" id="m_tel" oninput="formatPhoneNumber(this)" maxlength="13" placeholder="012-3456789" class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-sm font-semibold transition-all">
+                    </div>
+                </div>
+                <div class="group">
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Umur</label>
+                    <div class="relative">
+                        <i class="fas fa-birthday-cake absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-green-600 transition-colors"></i>
+                        <input type="number" id="m_umur" placeholder="0" min="0" max="150" class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-sm font-semibold transition-all">
+                    </div>
+                </div>
+                <div class="group">
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Hubungan</label>
+                    <div class="relative">
+                        <i class="fas fa-heart absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-green-600 transition-colors z-10"></i>
+                        <select id="m_hubungan" class="w-full pl-12 pr-10 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-gray-800 text-sm font-semibold transition-all appearance-none">
+                            <option value="Suami">Suami</option>
+                            <option value="Isteri">Isteri</option>
+                            <option value="Anak">Anak</option>
+                            <option value="Ibu">Ibu</option>
+                            <option value="Bapa">Bapa</option>
+                            <option value="Adik-beradik">Adik-beradik</option>
+                            <option value="Lain-lain">Lain-lain</option>
+                        </select>
+                        <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-xs"></i>
+                    </div>
+                </div>
+                <div class="group">
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Pekerjaan</label>
+                    <div class="relative">
+                        <i class="fas fa-briefcase absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-green-600 transition-colors"></i>
+                        <input type="text" id="m_pekerjaan" placeholder="Suri Rumah, Pelajar, dll." class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-sm font-semibold transition-all">
+                    </div>
+                </div>
+                <div class="group">
+                    <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Pendapatan Bulanan (RM)</label>
+                    <div class="relative">
+                        <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm group-focus-within:text-green-600 transition-colors">RM</div>
+                        <input type="number" step="0.01" id="m_pendapatan" placeholder="0.00" class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-sm font-semibold transition-all">
+                    </div>
+                </div>
+            </div>
+            <div class="group">
+                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Dokumen Pengesahan Pendapatan</label>
+                <div class="relative" id="modalFileContainer">
+                    <i class="fas fa-file-invoice-dollar absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-green-600 transition-colors"></i>
+                    <input type="file" id="modalFile" accept=".pdf,.png,.jpg,.jpeg" class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-gray-800 text-xs font-semibold transition-all file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-green-100 file:text-green-600 hover:file:bg-green-200 file:cursor-pointer">
+                </div>
+                <p class="text-[10px] text-gray-400 mt-2 italic px-1">* Sila muat naik fail slip gaji atau penyata jika ada (PDF/PNG/JPG/JPEG, Max 10MB).</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-3 pt-6">
+                <button type="button" onclick="saveFamilyMemberFromModal()" class="w-full py-4 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-bold rounded-2xl shadow-lg shadow-green-500/20 hover:scale-[1.02] active:scale-95 transition-all flex items-center justify-center gap-2">
+                    <i class="fas fa-save"></i>
+                    Simpan Ahli Keluarga
+                </button>
+                <button type="button" onclick="hideAddFamilyModal()" class="w-full py-4 text-gray-500 font-bold hover:text-gray-700 transition">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
     function confirmAction(e, title, text, confirmButtonText, confirmButtonColor) {
         e.preventDefault();
@@ -700,58 +862,254 @@
         document.getElementById('changePassModal').classList.add('hidden');
     }
 
-    function addFamilyMember() {
+    let familyCounter = <%= famIndex %>;
+    let editCardId = null;
+
+    function showAddFamilyModal() {
+        editCardId = null;
+        
+        // Reset modal title and button text for add mode
+        document.getElementById('addFamilyModal').querySelector('h3').innerText = 'Tambah Ahli Keluarga';
+        document.getElementById('addFamilyModal').querySelector('button[onclick="saveFamilyMemberFromModal()"]').innerHTML = '<i class="fas fa-save"></i> Simpan Ahli Keluarga';
+
+        document.getElementById('m_nama').value = '';
+        document.getElementById('m_kp').value = '';
+        document.getElementById('m_tel').value = '';
+        document.getElementById('m_umur').value = '';
+        document.getElementById('m_hubungan').value = 'Suami';
+        document.getElementById('m_pekerjaan').value = '';
+        document.getElementById('m_pendapatan').value = '';
+        
+        // Re-create the file input inside modal to clear selection
+        document.getElementById('modalFileContainer').innerHTML = `
+            <i class="fas fa-file-invoice-dollar absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-green-600 transition-colors"></i>
+            <input type="file" id="modalFile" accept=".pdf,.png,.jpg,.jpeg" 
+                class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-gray-800 text-xs font-semibold transition-all file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-green-100 file:text-green-600 hover:file:bg-green-200 file:cursor-pointer">
+        `;
+
+        document.getElementById('addFamilyModal').classList.remove('hidden');
+    }
+
+    function editFamilyMember(cardId) {
+        editCardId = cardId;
+        const card = document.getElementById(cardId);
+        
+        // Set modal title and button text for edit mode
+        document.getElementById('addFamilyModal').querySelector('h3').innerText = 'Kemaskini Ahli Keluarga';
+        document.getElementById('addFamilyModal').querySelector('button[onclick="saveFamilyMemberFromModal()"]').innerHTML = '<i class="fas fa-save"></i> Kemaskini Ahli Keluarga';
+
+        // Load values from hidden fields
+        document.getElementById('m_nama').value = card.querySelector('.f-nama').value;
+        document.getElementById('m_kp').value = card.querySelector('.f-kp').value;
+        document.getElementById('m_tel').value = card.querySelector('.f-tel').value;
+        document.getElementById('m_umur').value = card.querySelector('.f-umur').value;
+        document.getElementById('m_hubungan').value = card.querySelector('.f-hubungan').value;
+        document.getElementById('m_pekerjaan').value = card.querySelector('.f-pekerjaan').value;
+        document.getElementById('m_pendapatan').value = card.querySelector('.f-pendapatan').value;
+
+        // Clear modal file input selection
+        document.getElementById('modalFileContainer').innerHTML = `
+            <i class="fas fa-file-invoice-dollar absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-green-600 transition-colors"></i>
+            <input type="file" id="modalFile" accept=".pdf,.png,.jpg,.jpeg" 
+                class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-gray-800 text-xs font-semibold transition-all file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-green-100 file:text-green-600 hover:file:bg-green-200 file:cursor-pointer">
+        `;
+
+        document.getElementById('addFamilyModal').classList.remove('hidden');
+    }
+
+    function hideAddFamilyModal() {
+        document.getElementById('addFamilyModal').classList.add('hidden');
+    }
+
+    function saveFamilyMemberFromModal() {
+        const nama = document.getElementById('m_nama').value.trim();
+        if (!nama) {
+            Swal.fire({
+                title: 'Ralat',
+                text: 'Sila masukkan Nama Penuh ahli keluarga.',
+                icon: 'warning',
+                confirmButtonColor: '#10B981',
+                customClass: {
+                    popup: 'rounded-[2rem]',
+                    confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                }
+            });
+            return;
+        }
+
+        const kp = document.getElementById('m_kp').value.trim();
+        const tel = document.getElementById('m_tel').value.trim();
+        const umurVal = document.getElementById('m_umur').value;
+        const umur = umurVal ? parseInt(umurVal) : 0;
+        const hubungan = document.getElementById('m_hubungan').value;
+        const pekerjaan = document.getElementById('m_pekerjaan').value.trim();
+        const pendapatanVal = document.getElementById('m_pendapatan').value;
+        const pendapatan = pendapatanVal ? parseFloat(pendapatanVal) : 0.0;
+        const fileInput = document.getElementById('modalFile');
+        const hasFile = fileInput && fileInput.files && fileInput.files.length > 0;
+
+        let iconClass = 'fa-user-friends text-green-600';
+        if (['Suami', 'Bapa'].includes(hubungan)) {
+            iconClass = 'fa-user-tie text-blue-600';
+        } else if (['Isteri', 'Ibu'].includes(hubungan)) {
+            iconClass = 'fa-user-nurse text-pink-600';
+        } else if (hubungan === 'Anak') {
+            iconClass = 'fa-child text-amber-600';
+        } else if (hubungan === 'Adik-beradik') {
+            iconClass = 'fa-people-arrows text-purple-600';
+        }
+
+        const incomeFormatted = 'RM ' + pendapatan.toFixed(2);
+
+        if (editCardId !== null) {
+            // EDIT MODE
+            const card = document.getElementById(editCardId);
+            
+            // Update hidden inputs
+            card.querySelector('.f-nama').value = nama;
+            card.querySelector('.f-kp').value = kp;
+            card.querySelector('.f-tel').value = tel;
+            card.querySelector('.f-umur').value = umur;
+            card.querySelector('.f-hubungan').value = hubungan;
+            card.querySelector('.f-pekerjaan').value = pekerjaan;
+            card.querySelector('.f-pendapatan').value = pendapatan;
+
+            // Update visible fields
+            card.querySelector('.card-icon').className = 'card-icon fas ' + iconClass;
+            card.querySelector('.card-display-nama').innerText = nama;
+            card.querySelector('.card-display-hubungan').innerText = hubungan;
+            card.querySelector('.card-display-umur').innerText = umur + ' Tahun';
+            card.querySelector('.card-display-kp').innerText = kp ? kp : '-';
+            card.querySelector('.card-display-tel').innerText = tel ? tel : '-';
+            card.querySelector('.card-display-pekerjaan').innerText = pekerjaan ? pekerjaan : 'Tiada';
+            card.querySelector('.card-display-pendapatan').innerText = incomeFormatted;
+
+            // Update file if user selected a new one
+            if (hasFile) {
+                // Get f_index[] value
+                const idx = card.querySelector('.f-index').value;
+                
+                // Remove previous file input in card if exists
+                const oldFileInput = card.querySelector('input[type="file"]');
+                if (oldFileInput) oldFileInput.remove();
+                
+                // Clear f_pengesahan_existing value since we are uploading a new file
+                card.querySelector('.f-pengesahan-existing').value = '';
+
+                // Move/append new file input to card
+                fileInput.id = `f_file_\${idx}`;
+                fileInput.name = `f_pengesahan_pendapatan_\${idx}`;
+                fileInput.style.display = 'none';
+                fileInput.className = 'hidden';
+                card.appendChild(fileInput);
+
+                // Update document badge inside card
+                card.querySelector('.card-display-dokumen').innerHTML = `
+                    <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 text-[10px] font-bold animate-in zoom-in-95 duration-200">
+                        <i class="fas fa-file-invoice-dollar text-xs"></i>
+                        Fail Baru Dimuat Naik
+                    </span>
+                `;
+            }
+
+            hideAddFamilyModal();
+            return;
+        }
+
+        // ADD MODE
         const container = document.getElementById('familyContainer');
         const emptyMsg = document.getElementById('emptyFamily');
         if (emptyMsg) emptyMsg.remove();
 
-        const row = document.createElement('div');
-        row.className = 'family-row group relative grid grid-cols-1 md:grid-cols-6 gap-4 p-6 bg-gray-50/50 rounded-2xl border border-gray-100 hover:bg-white hover:border-green-200 transition-all animate-in slide-in-from-right-4 duration-300';
-        row.innerHTML = `
-            <div class="md:col-span-2">
-                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Nama Penuh</label>
-                <input type="text" name="f_nama[]" placeholder="Nama Penuh" required class="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-green-500/20 text-xs font-semibold">
+        const idx = familyCounter++;
+
+        const card = document.createElement('div');
+        card.id = `familyCard_\${idx}`;
+        card.className = 'family-row group relative bg-white hover:bg-green-50/10 rounded-3xl p-6 border border-gray-150 shadow-sm hover:shadow-md hover:border-green-300 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center gap-6 animate-in slide-in-from-bottom-4 duration-300';
+        
+        card.innerHTML = `
+            <input type="hidden" name="f_index[]" class="f-index" value="\${idx}">
+            <input type="hidden" name="f_nama[]" class="f-nama" value="\${escapeHtml(nama)}">
+            <input type="hidden" name="f_kp[]" class="f-kp" value="\${escapeHtml(kp)}">
+            <input type="hidden" name="f_tel[]" class="f-tel" value="\${escapeHtml(tel)}">
+            <input type="hidden" name="f_umur[]" class="f-umur" value="\${umur}">
+            <input type="hidden" name="f_hubungan[]" class="f-hubungan" value="\${escapeHtml(hubungan)}">
+            <input type="hidden" name="f_pekerjaan[]" class="f-pekerjaan" value="\${escapeHtml(pekerjaan)}">
+            <input type="hidden" name="f_pendapatan[]" class="f-pendapatan" value="\${pendapatan}">
+            <input type="hidden" name="f_pengesahan_existing[]" class="f-pengesahan-existing" value="">
+
+            <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center text-2xl shadow-sm border border-gray-100 group-hover:scale-105 transition-transform shrink-0">
+                <i class="card-icon fas \${iconClass}"></i>
             </div>
-            <div>
-                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">No. KP</label>
-                <input type="text" name="f_kp[]" oninput="formatIC(this)" maxlength="14" placeholder="000000-00-0000" class="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-green-500/20 text-xs font-semibold">
-            </div>
-            <div>
-                <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">No. Tel</label>
-                <input type="text" name="f_tel[]" oninput="formatPhoneNumber(this)" maxlength="13" placeholder="012-3456789" class="w-full px-4 py-2.5 rounded-xl bg-white border border-gray-200 focus:ring-2 focus:ring-green-500/20 text-xs font-semibold">
-            </div>
-            <div class="grid grid-cols-2 gap-2">
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Umur</label>
-                    <input type="number" name="f_umur[]" placeholder="0" class="w-full px-3 py-2.5 rounded-xl bg-white border border-gray-200 text-xs font-semibold">
+
+            <div class="flex-1 min-w-0">
+                <div class="flex flex-wrap items-center gap-2 mb-2">
+                    <h5 class="card-display-nama text-sm font-extrabold text-gray-900 truncate">\${escapeHtml(nama)}</h5>
+                    <span class="card-display-hubungan inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-700 border border-green-200">
+                        \${escapeHtml(hubungan)}
+                    </span>
+                    <span class="card-display-umur inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gray-50 text-gray-600 border border-gray-200">
+                        \${umur} Tahun
+                    </span>
                 </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Hubungan</label>
-                    <select name="f_hubungan[]" class="w-full px-2 py-2.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold">
-                        <option value="Suami">Suami</option>
-                        <option value="Isteri">Isteri</option>
-                        <option value="Anak">Anak</option>
-                        <option value="Ibu">Ibu</option>
-                        <option value="Bapa">Bapa</option>
-                        <option value="Adik-beradik">Adik-beradik</option>
-                        <option value="Lain-lain">Lain-lain</option>
-                    </select>
+
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-semibold text-gray-500">
+                    <div>
+                        <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">No. KP</span>
+                        <span class="card-display-kp text-gray-800">\${kp ? escapeHtml(kp) : '-'}</span>
+                    </div>
+                    <div>
+                        <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">No. Telefon</span>
+                        <span class="card-display-tel text-gray-800">\${tel ? escapeHtml(tel) : '-'}</span>
+                    </div>
+                    <div>
+                        <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Pekerjaan</span>
+                        <span class="card-display-pekerjaan text-gray-800">\${pekerjaan ? escapeHtml(pekerjaan) : 'Tiada'}</span>
+                    </div>
+                    <div>
+                        <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Pendapatan</span>
+                        <span class="card-display-pendapatan text-gray-800 font-bold text-blue-600">\${incomeFormatted}</span>
+                    </div>
                 </div>
             </div>
-            <div class="flex items-center justify-between gap-4">
-                <div class="flex-1">
-                    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Tanggungan?</label>
-                    <select name="f_tanggungan[]" class="w-full px-2 py-2.5 rounded-xl bg-white border border-gray-200 text-[10px] font-bold">
-                        <option value="Ya">Ya</option>
-                        <option value="Tidak">Tidak</option>
-                    </select>
+
+            <div class="flex items-center gap-3 w-full md:w-auto shrink-0 md:justify-end border-t md:border-t-0 pt-4 md:pt-0">
+                <div class="card-display-dokumen flex items-center shrink-0">
+                    \${hasFile ? `
+                    <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 text-[10px] font-bold">
+                        <i class="fas fa-file-invoice-dollar text-xs"></i>
+                        Fail Dimuat Naik
+                    </span>` : `
+                    <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-400 text-[10px] font-bold">
+                        <i class="fas fa-exclamation-circle text-xs"></i>
+                        Tiada Dokumen
+                    </span>`}
                 </div>
-                <button type="button" onclick="removeFamilyRow(this)" class="mt-4 w-10 h-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center">
-                    <i class="fas fa-trash-alt"></i>
+
+                <button type="button" onclick="editFamilyMember('familyCard_\${idx}')" 
+                    class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shrink-0" 
+                    title="Kemaskini Ahli Keluarga">
+                    <i class="fas fa-pencil-alt text-sm"></i>
+                </button>
+
+                <button type="button" onclick="removeFamilyRow(this)" 
+                    class="w-10 h-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shrink-0" 
+                    title="Hapus Ahli Keluarga">
+                    <i class="fas fa-trash-alt text-sm"></i>
                 </button>
             </div>
         `;
-        container.appendChild(row);
+
+        if (hasFile) {
+            fileInput.id = `f_file_\${idx}`;
+            fileInput.name = `f_pengesahan_pendapatan_\${idx}`;
+            fileInput.style.display = 'none';
+            fileInput.className = 'hidden';
+            card.appendChild(fileInput);
+        }
+
+        container.appendChild(card);
+        hideAddFamilyModal();
     }
 
     function removeFamilyRow(btn) {
@@ -760,18 +1118,28 @@
         setTimeout(() => {
             row.remove();
             const container = document.getElementById('familyContainer');
-            if (container.children.length === 0) {
+            if (container.querySelectorAll('.family-row').length === 0) {
                 container.innerHTML = `
-                    <div id="emptyFamily" class="text-center py-10 bg-gray-50/50 rounded-2xl border-2 border-dashed border-gray-200">
-                        <div class="w-12 h-12 rounded-full bg-white mx-auto flex items-center justify-center text-gray-300 mb-3">
-                            <i class="fas fa-users"></i>
+                    <div id="emptyFamily" class="text-center py-12 bg-gray-50/50 rounded-3xl border-2 border-dashed border-gray-200 animate-in fade-in duration-300">
+                        <div class="w-14 h-14 rounded-full bg-white mx-auto flex items-center justify-center text-gray-300 mb-3 shadow-inner">
+                            <i class="fas fa-users text-xl"></i>
                         </div>
                         <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Tiada Maklumat Ahli Keluarga</p>
-                        <p class="text-[10px] text-gray-400 mt-1">Sila klik "Tambah Ahli" untuk mula mengisi.</p>
+                        <p class="text-[10px] text-gray-400 mt-1">Sila klik "+ Tambah Ahli" di atas untuk mula mengisi.</p>
                     </div>
                 `;
             }
         }, 300);
+    }
+
+    function escapeHtml(text) {
+        if (!text) return '';
+        return text
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
     }
 
     let mainMap, mainMarker;
@@ -929,4 +1297,3 @@
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>
->

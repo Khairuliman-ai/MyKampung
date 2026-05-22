@@ -1,5 +1,6 @@
 package model;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 public class AhliKeluarga {
@@ -10,7 +11,9 @@ public class AhliKeluarga {
     private String nombor_telefon;
     private int umur;
     private String hubungan;
-    private String status_tanggungan;
+    private String pekerjaan;
+    private BigDecimal pendapatan;
+    private String pengesahan_pendapatan;
     private Date dibuat_pada;
 
     // Constructors
@@ -73,12 +76,28 @@ public class AhliKeluarga {
         this.hubungan = hubungan;
     }
 
-    public String getStatus_tanggungan() {
-        return status_tanggungan;
+    public String getPekerjaan() {
+        return pekerjaan;
     }
 
-    public void setStatus_tanggungan(String status_tanggungan) {
-        this.status_tanggungan = status_tanggungan;
+    public void setPekerjaan(String pekerjaan) {
+        this.pekerjaan = pekerjaan;
+    }
+
+    public BigDecimal getPendapatan() {
+        return pendapatan;
+    }
+
+    public void setPendapatan(BigDecimal pendapatan) {
+        this.pendapatan = pendapatan;
+    }
+
+    public String getPengesahan_pendapatan() {
+        return pengesahan_pendapatan;
+    }
+
+    public void setPengesahan_pendapatan(String pengesahan_pendapatan) {
+        this.pengesahan_pendapatan = pengesahan_pendapatan;
     }
 
     public Date getDibuat_pada() {

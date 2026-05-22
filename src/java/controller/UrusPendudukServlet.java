@@ -8,6 +8,7 @@ import javax.servlet.http.*;
 import dao.PenggunaDAO;
 import dao.ActivityLogDAO;
 import model.Pengguna;
+import model.AhliKeluarga;
 import model.ActivityLog;
 import util.DBUtil;
 import util.EmailUtil;
@@ -31,17 +32,38 @@ public class UrusPendudukServlet extends HttpServlet {
         try (Connection conn = DBUtil.getConnection()) {
             penggunaDAO = new PenggunaDAO(conn);
             dao.JawatanDAO jawatanDAO = new dao.JawatanDAO();
+            dao.AhliKeluargaDAO ahliKeluargaDAO = new dao.AhliKeluargaDAO(conn);
 
             if ("/penduduk/urus".equals(action)) {
                 List<Pengguna> activeList = penggunaDAO.getAllActiveUsers();
+                if (activeList != null) {
+                    for (Pengguna p : activeList) {
+                        p.setSenaraiAhliKeluarga(ahliKeluargaDAO.getByPenggunaId(p.getId_pengguna()));
+                    }
+                }
                 List<Pengguna> pendingList = penggunaDAO.getPendingPenduduk();
+                if (pendingList != null) {
+                    for (Pengguna p : pendingList) {
+                        p.setSenaraiAhliKeluarga(ahliKeluargaDAO.getByPenggunaId(p.getId_pengguna()));
+                    }
+                }
                 request.setAttribute("pendingList", pendingList);
                 request.setAttribute("activeList", activeList);
                 request.getRequestDispatcher("/views/maklumatPenduduk/urusPendudukAJK.jsp").forward(request, response);
             } 
             else if ("/ketua/urus".equals(action)) {
                 List<Pengguna> listAJK = penggunaDAO.getAllAJK();
+                if (listAJK != null) {
+                    for (Pengguna p : listAJK) {
+                        p.setSenaraiAhliKeluarga(ahliKeluargaDAO.getByPenggunaId(p.getId_pengguna()));
+                    }
+                }
                 List<Pengguna> listPenduduk = penggunaDAO.getAllActiveUsers();
+                if (listPenduduk != null) {
+                    for (Pengguna p : listPenduduk) {
+                        p.setSenaraiAhliKeluarga(ahliKeluargaDAO.getByPenggunaId(p.getId_pengguna()));
+                    }
+                }
                 List<Pengguna> listJawatan = jawatanDAO.getJawatanHolders();
 
                 request.setAttribute("listAJK", listAJK);

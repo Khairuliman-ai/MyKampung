@@ -12,6 +12,7 @@ public final class AppConfig {
     public static final String DIR_GAMBAR_FASILITI   = DATA_DIR + "\\gambarFasiliti";
     public static final String DIR_FOTO_PROFIL       = DATA_DIR + "\\fotoProfil";
     public static final String DIR_LAMPIRAN_PENGGUNA = DATA_DIR + "\\lampiranPengguna";
+    public static final String DIR_DOKUMEN_PENDAPATAN = DATA_DIR + "\\dokumenPendapatan";
 
     public static final String AUTH_REDIRECT = "/views/auth/auth.jsp";
 }

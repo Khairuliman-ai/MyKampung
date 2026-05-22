@@ -13,8 +13,8 @@ public class AhliKeluargaDAO {
     }
 
     public boolean addAhliKeluarga(AhliKeluarga a) throws SQLException {
-        String sql = "INSERT INTO ahli_keluarga (id_pengguna, nama_penuh, nombor_kp, nombor_telefon, umur, hubungan, status_tanggungan) "
-                   + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO ahli_keluarga (id_pengguna, nama_penuh, nombor_kp, nombor_telefon, umur, hubungan, pekerjaan, pendapatan, pengesahan_pendapatan) "
+                   + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, a.getId_pengguna());
             ps.setString(2, a.getNama_penuh());
@@ -22,7 +22,9 @@ public class AhliKeluargaDAO {
             ps.setString(4, a.getNombor_telefon());
             ps.setInt(5, a.getUmur());
             ps.setString(6, a.getHubungan());
-            ps.setString(7, a.getStatus_tanggungan());
+            ps.setString(7, a.getPekerjaan());
+            ps.setBigDecimal(8, a.getPendapatan());
+            ps.setString(9, a.getPengesahan_pendapatan());
             return ps.executeUpdate() > 0;
         }
     }
@@ -42,7 +44,9 @@ public class AhliKeluargaDAO {
                     a.setNombor_telefon(rs.getString("nombor_telefon"));
                     a.setUmur(rs.getInt("umur"));
                     a.setHubungan(rs.getString("hubungan"));
-                    a.setStatus_tanggungan(rs.getString("status_tanggungan"));
+                    a.setPekerjaan(rs.getString("pekerjaan"));
+                    a.setPendapatan(rs.getBigDecimal("pendapatan"));
+                    a.setPengesahan_pendapatan(rs.getString("pengesahan_pendapatan"));
                     a.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
                     senarai.add(a);
                 }

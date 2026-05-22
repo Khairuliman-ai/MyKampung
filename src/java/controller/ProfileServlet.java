@@ -151,29 +151,59 @@ public class ProfileServlet extends HttpServlet {
                     if (fotoName != null) currentUser.setFoto_profil(fotoName);
                 }
 
+                // --- PROSES MUAT NAIK PENGESAHAN PENDAPATAN PENDUDUK ---
+                Part pengesahanPart = request.getPart("pengesahan_pendapatan");
+                if (pengesahanPart != null && pengesahanPart.getSize() > 0) {
+                    String fileName = FileUploadUtil.saveFile(
+                        pengesahanPart, AppConfig.DIR_DOKUMEN_PENDAPATAN, "verify_" + currentUser.getId_pengguna() + "_");
+                    if (fileName != null) currentUser.setPengesahan_pendapatan(fileName);
+                }
+
                 // --- PROSES AHLI KELUARGA ---
+                String[] fIndices = request.getParameterValues("f_index[]");
                 String[] fNama = request.getParameterValues("f_nama[]");
                 String[] fKp = request.getParameterValues("f_kp[]");
                 String[] fTel = request.getParameterValues("f_tel[]");
                 String[] fUmur = request.getParameterValues("f_umur[]");
                 String[] fHubungan = request.getParameterValues("f_hubungan[]");
-                String[] fTanggungan = request.getParameterValues("f_tanggungan[]");
+                String[] fPekerjaan = request.getParameterValues("f_pekerjaan[]");
+                String[] fPendapatan = request.getParameterValues("f_pendapatan[]");
+                String[] fPengesahanExisting = request.getParameterValues("f_pengesahan_existing[]");
 
                 List<model.AhliKeluarga> senaraiBaru = new java.util.ArrayList<>();
-                if (fNama != null) {
-                    for (int i = 0; i < fNama.length; i++) {
-                        if (fNama[i] == null || fNama[i].trim().isEmpty()) continue;
+                if (fIndices != null) {
+                    for (int i = 0; i < fIndices.length; i++) {
+                        String idx = fIndices[i];
+                        String name = fNama != null && i < fNama.length ? fNama[i] : "";
+                        if (name == null || name.trim().isEmpty()) continue;
                         
                         model.AhliKeluarga ak = new model.AhliKeluarga();
                         ak.setId_pengguna(currentUser.getId_pengguna());
-                        ak.setNama_penuh(fNama[i]);
+                        ak.setNama_penuh(name);
                         ak.setNombor_kp(fKp != null && i < fKp.length ? fKp[i] : "");
                         ak.setNombor_telefon(fTel != null && i < fTel.length ? fTel[i] : "");
                         try {
                             ak.setUmur(fUmur != null && i < fUmur.length && !fUmur[i].isEmpty() ? Integer.parseInt(fUmur[i]) : 0);
                         } catch (Exception e) { ak.setUmur(0); }
                         ak.setHubungan(fHubungan != null && i < fHubungan.length ? fHubungan[i] : "");
-                        ak.setStatus_tanggungan(fTanggungan != null && i < fTanggungan.length ? fTanggungan[i] : "Tidak");
+                        ak.setPekerjaan(fPekerjaan != null && i < fPekerjaan.length ? fPekerjaan[i] : "");
+                        try {
+                            ak.setPendapatan(fPendapatan != null && i < fPendapatan.length && !fPendapatan[i].isEmpty() ? new BigDecimal(fPendapatan[i]) : BigDecimal.ZERO);
+                        } catch (Exception e) {
+                            ak.setPendapatan(BigDecimal.ZERO);
+                        }
+
+                        // Urus muat naik fail pengesahan pendapatan ahli keluarga secara dinamik menggunakan indeks
+                        Part fPart = request.getPart("f_pengesahan_pendapatan_" + idx);
+                        String fName = null;
+                        if (fPart != null && fPart.getSize() > 0) {
+                            fName = FileUploadUtil.saveFile(
+                                fPart, AppConfig.DIR_DOKUMEN_PENDAPATAN, "verify_fam_" + currentUser.getId_pengguna() + "_");
+                        } else {
+                            fName = (fPengesahanExisting != null && i < fPengesahanExisting.length) ? fPengesahanExisting[i] : "";
+                        }
+                        ak.setPengesahan_pendapatan(fName);
+
                         senaraiBaru.add(ak);
                     }
                 }

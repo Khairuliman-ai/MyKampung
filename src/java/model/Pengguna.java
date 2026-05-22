@@ -17,6 +17,7 @@ public class Pengguna {
     private String status_keluarga;
     private String pekerjaan;
     private BigDecimal pendapatan;
+    private String pengesahan_pendapatan;
     private String lampiran_pengesahan;
     private String email;
     private String foto_profil;
@@ -225,6 +226,14 @@ public class Pengguna {
 
     public void setLampiran_pengesahan(String lampiran_pengesahan) {
         this.lampiran_pengesahan = lampiran_pengesahan;
+    }
+
+    public String getPengesahan_pendapatan() {
+        return pengesahan_pendapatan;
+    }
+
+    public void setPengesahan_pendapatan(String pengesahan_pendapatan) {
+        this.pengesahan_pendapatan = pengesahan_pendapatan;
     }
     
     public String getEmail() {

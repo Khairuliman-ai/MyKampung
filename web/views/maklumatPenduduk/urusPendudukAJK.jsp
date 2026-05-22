@@ -179,7 +179,9 @@
                                         sbFam.append(ak.getNama_penuh()).append("::")
                                              .append(ak.getHubungan()).append("::")
                                              .append(ak.getUmur()).append("::")
-                                             .append(ak.getStatus_tanggungan());
+                                             .append((ak.getPekerjaan() != null) ? ak.getPekerjaan() : "Tiada").append("::")
+                                             .append((ak.getPendapatan() != null) ? ak.getPendapatan() : "0.00").append("::")
+                                             .append((ak.getPengesahan_pendapatan() != null) ? ak.getPengesahan_pendapatan() : "");
                                     }
                                 }
                         %>
@@ -200,6 +202,7 @@
                             data-jawatan="<%= (p.getNama_jawatan() != null) ? p.getNama_jawatan() : p.getNama_peranan() %>"
                             data-pekerjaan="<%= (p.getPekerjaan() != null) ? p.getPekerjaan() : "Tiada" %>"
                             data-pendapatan="<%= p.getPendapatan() %>"
+                            data-pengesahan="<%= (p.getPengesahan_pendapatan() != null) ? p.getPengesahan_pendapatan() : "" %>"
                             data-email="<%= (p.getEmail() != null) ? p.getEmail() : "Tiada" %>"
                             data-foto="<%= (p.getFoto_profil() != null) ? p.getFoto_profil() : "default_avatar.png" %>"
                             data-family="<%= sbFam.toString() %>"
@@ -373,6 +376,25 @@
                             <div class="bg-indigo-50/50 p-4 rounded-2xl border border-indigo-100 shadow-sm flex flex-col gap-1">
                                 <span class="text-[10px] text-indigo-400 font-bold uppercase">Pendapatan Bulanan</span>
                                 <span id="infoGaji" class="text-sm font-black text-indigo-700">-</span>
+                            </div>
+                            <div id="infoBoxPengesahan" class="bg-blue-50/50 p-4 rounded-2xl border border-blue-100 shadow-sm flex flex-col gap-1 hidden">
+                                <span class="text-[10px] text-blue-500 font-bold uppercase">Pengesahan Pendapatan</span>
+                                <div class="flex justify-between items-center mt-1">
+                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-blue-100 border border-blue-200 text-blue-700 text-[10px] font-black uppercase">
+                                        <i class="fas fa-file-invoice-dollar text-[10px]"></i>
+                                        Ada Dokumen
+                                    </span>
+                                    <a id="infoLinkPengesahan" href="#" target="_blank" class="px-3.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-[10px] font-bold transition-all flex items-center gap-1.5 shadow-md shadow-blue-500/10">
+                                        <i class="fas fa-eye"></i> Lihat Fail
+                                    </a>
+                                </div>
+                            </div>
+                            <div id="infoBoxTiadaPengesahan" class="bg-gray-50/50 p-4 rounded-2xl border border-gray-150 shadow-sm flex flex-col gap-1">
+                                <span class="text-[10px] text-gray-400 font-bold uppercase">Pengesahan Pendapatan</span>
+                                <span class="inline-flex items-center gap-1 px-2.5 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-400 text-[10px] font-bold mt-1 w-fit">
+                                    <i class="fas fa-exclamation-circle text-xs"></i>
+                                    Tiada Dokumen Sokongan
+                                </span>
                             </div>
                         </div>
                     </div>
@@ -628,6 +650,22 @@
         
         const income = (d.pendapatan && d.pendapatan !== 'null') ? parseFloat(d.pendapatan) : 0;
         document.getElementById('infoGaji').innerText = "RM " + income.toLocaleString('ms-MY', {minimumFractionDigits: 2});
+        
+        // Handle main resident income verification document
+        const pengesahan = (d.pengesahan && d.pengesahan !== 'null' && d.pengesahan !== '') ? d.pengesahan : '';
+        const boxPengesahan = document.getElementById('infoBoxPengesahan');
+        const boxTiadaPengesahan = document.getElementById('infoBoxTiadaPengesahan');
+        const linkPengesahan = document.getElementById('infoLinkPengesahan');
+        
+        if (pengesahan) {
+            boxPengesahan.classList.remove('hidden');
+            boxTiadaPengesahan.classList.add('hidden');
+            linkPengesahan.href = ctx + '/file/pendapatan/' + pengesahan;
+        } else {
+            boxPengesahan.classList.add('hidden');
+            boxTiadaPengesahan.classList.remove('hidden');
+        }
+        
         document.getElementById('infoAlamat').innerText = d.jalan;
         document.getElementById('infoPoskodBandar').innerText = d.poskod + " " + d.bandar;
         document.getElementById('infoNegeri').innerText = d.negeri;
@@ -640,15 +678,31 @@
             members.forEach(m => {
                 const parts = m.split('::');
                 const div = document.createElement('div');
-                div.className = 'bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-3 group/fam hover:border-green-200 transition-all';
+                div.className = 'bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between gap-3 group/fam hover:border-green-200 transition-all';
+                
+                const docFile = parts[5];
+                const docBadge = (docFile && docFile !== 'null' && docFile !== '')
+                                 ? `<a href="\${ctx}/file/pendapatan/\${docFile}" target="_blank" 
+                                       class="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-200 rounded-xl text-[9px] font-black uppercase tracking-tight transition-all flex items-center gap-1 shrink-0" 
+                                       title="Lihat Pengesahan Pendapatan">
+                                       <i class="fas fa-file-pdf"></i> Fail
+                                    </a>`
+                                 : `<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-gray-50 border border-gray-200 text-gray-400 text-[9px] font-semibold shrink-0">
+                                       <i class="fas fa-exclamation-circle text-[8px]"></i> Tiada
+                                    </span>`;
+                                    
                 div.innerHTML = `
-                    <div class="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center text-xs font-bold">
-                        \${parts[1].charAt(0)}
+                    <div class="flex items-center gap-3 min-w-0">
+                        <div class="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center text-xs font-bold shrink-0">
+                            \${parts[1].charAt(0)}
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-xs font-bold text-gray-800 truncate">\${parts[0]}</p>
+                            <p class="text-[10px] text-gray-400 font-medium uppercase truncate">\${parts[1]} • \${parts[2]} Thn</p>
+                            <p class="text-[10px] text-gray-500 font-semibold truncate mt-0.5">\${parts[3]} • RM \${(parts[4] && !isNaN(parts[4])) ? parseFloat(parts[4]).toLocaleString('ms-MY', {minimumFractionDigits: 2}) : '0.00'}</p>
+                        </div>
                     </div>
-                    <div>
-                        <p class="text-xs font-bold text-gray-800">\${parts[0]}</p>
-                        <p class="text-[10px] text-gray-400 font-medium uppercase">\${parts[1]} • \${parts[2]} Thn</p>
-                    </div>
+                    \${docBadge}
                 `;
                 famContainer.appendChild(div);
             });
