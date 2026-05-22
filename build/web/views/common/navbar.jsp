@@ -124,6 +124,15 @@
                 <span class="font-medium text-sm">Sokongan Bantuan</span>
             </a>
 
+            <a href="<%= contextPath %>/bantuan/config" 
+               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
+               <%= currentPath.contains("/bantuan/config") ? activeClass : inactiveClass %>">
+                <div class="w-6 text-center">
+                    <i class="fas fa-sliders-h <%= currentPath.contains("/bantuan/config") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                </div>
+                <span class="font-medium text-sm">Konfigurasi Kelayakan</span>
+            </a>
+
             <a href="<%= contextPath %>/aduan/list" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/aduan/list") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
@@ -148,10 +157,10 @@
                 <span class="font-medium text-sm">Urus Fasiliti</span>
             </a>
 
-            <a href="<%= constructionPage %>?menu=laporan" 
-               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= (isConstruction && query.contains("menu=laporan")) ? activeClass : inactiveClass %>">
+            <a href="<%= contextPath %>/laporan/view" 
+               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/laporan/") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-chart-pie <%= (isConstruction && query.contains("menu=laporan")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-chart-pie <%= currentPath.contains("/laporan/") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
                 </div>
                 <span class="font-medium text-sm">Laporan & Analitik</span>
             </a>
@@ -220,6 +229,14 @@
                 </div>
                 <span class="font-medium text-sm">Semakan Bantuan</span>
             </a>
+            <a href="<%= contextPath %>/bantuan/config" 
+               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
+               <%= currentPath.contains("/bantuan/config") ? activeClass : inactiveClass %>">
+                <div class="w-6 text-center">
+                    <i class="fas fa-sliders-h <%= currentPath.contains("/bantuan/config") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                </div>
+                <span class="font-medium text-sm">Konfigurasi Kelayakan</span>
+            </a>
             <% } %>
 
             <% if ("Biro Sukan & Riadah".equals(biro)) { %>
@@ -251,6 +268,14 @@
                 <span class="font-medium text-sm">Hebahan Awam</span>
             </a>
             <% } %>
+
+            <a href="<%= contextPath %>/laporan/view" 
+               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/laporan/") ? activeClass : inactiveClass %>">
+                <div class="w-6 text-center">
+                    <i class="fas fa-chart-line <%= currentPath.contains("/laporan/") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                </div>
+                <span class="font-medium text-sm">Laporan Biro</span>
+            </a>
 
             <div class="pt-4 border-t border-gray-100 my-2">
                 <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">Perkhidmatan Penduduk</p>

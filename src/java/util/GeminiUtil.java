@@ -8,6 +8,8 @@ import java.net.URL;
 import java.security.cert.X509Certificate;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Logger;
+import java.util.logging.Level;
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
@@ -17,6 +19,7 @@ import javax.net.ssl.X509TrustManager;
 
 public class GeminiUtil {
 
+    private static final Logger LOGGER = Logger.getLogger(GeminiUtil.class.getName());
     private static String apiKey = null;
     private static String modelName = null;
 
@@ -32,11 +35,13 @@ public class GeminiUtil {
                 config.load(input);
                 apiKey = config.getProperty("gemini.api.key");
                 modelName = config.getProperty("gemini.model", "gemini-1.5-flash");
+                LOGGER.log(Level.INFO, "GeminiUtil - Konfigurasi berjaya dimuatkan. Model: {0}, API Key present: {1}", 
+                        new Object[]{modelName, (apiKey != null && !apiKey.isEmpty())});
             } else {
-                System.err.println("config.properties not found! Gemini will not work.");
+                LOGGER.log(Level.SEVERE, "GeminiUtil - config.properties tidak dijumpai! Gemini AI tidak akan berfungsi.");
             }
         } catch (Exception e) {
-            System.err.println("Error reading config.properties: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "GeminiUtil - Ralat membaca config.properties: " + e.getMessage(), e);
         }
     }
 
@@ -63,8 +68,9 @@ public class GeminiUtil {
                 public boolean verify(String hostname, SSLSession session) { return true; }
             };
             HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+            LOGGER.log(Level.INFO, "GeminiUtil - Pintasan SSL Global berjaya dikonfigurasikan.");
         } catch (Exception e) {
-            System.err.println("Error setting up SSL bypass: " + e.getMessage());
+            LOGGER.log(Level.SEVERE, "GeminiUtil - Ralat semasa menetapkan pintasan SSL Global: " + e.getMessage(), e);
         }
     }
 
@@ -77,6 +83,7 @@ public class GeminiUtil {
      */
     public static String chat(String systemPrompt, List<String[]> history, String userMessage) {
         if (apiKey == null || apiKey.isEmpty()) {
+            LOGGER.log(Level.WARNING, "GeminiUtil [Chat] - Percubaan memanggil Gemini AI gagal: Kunci API tidak dikonfigurasikan.");
             return "Maaf, kunci API Gemini tidak dikonfigurasikan. Sila semak config.properties.";
         }
 
@@ -85,7 +92,27 @@ public class GeminiUtil {
             String urlString = "https://generativelanguage.googleapis.com/v1/models/" + modelName + ":generateContent?key=" + apiKey;
             URL url = new URL(urlString);
             
+            LOGGER.log(Level.INFO, "GeminiUtil [Chat] - Membuka sambungan HTTPS ke: https://generativelanguage.googleapis.com/v1/models/{0}:generateContent", modelName);
             HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+            
+            // Set SSL bypass directly on connection to guarantee it works in Tomcat
+            try {
+                TrustManager[] trustAllCerts = new TrustManager[]{
+                    new X509TrustManager() {
+                        public java.security.cert.X509Certificate[] getAcceptedIssuers() { return null; }
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+                        public void checkServerTrusted(java.security.cert.X509Certificate[] certs, String authType) {}
+                    }
+                };
+                SSLContext sc = SSLContext.getInstance("TLS");
+                sc.init(null, trustAllCerts, new java.security.SecureRandom());
+                conn.setSSLSocketFactory(sc.getSocketFactory());
+                conn.setHostnameVerifier((hostname, session) -> true);
+                LOGGER.log(Level.INFO, "GeminiUtil [Chat] - Pintasan SSL bagi sambungan aktif berjaya ditetapkan.");
+            } catch (Exception sslEx) {
+                LOGGER.log(Level.WARNING, "GeminiUtil [Chat] - Gagal menetapkan pintasan SSL terus pada sambungan: " + sslEx.getMessage(), sslEx);
+            }
+
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json; utf-8");
             conn.setDoOutput(true);
@@ -99,8 +126,6 @@ public class GeminiUtil {
             boolean hasContent = false;
 
             // 1. Inject the System Prompt as the initial turn of conversation.
-            // This is a 100% bulletproof workaround that is fully supported on ALL models, 
-            // ALL endpoints, and ALL API versions (v1 & v1beta), avoiding strict systemInstruction field blocks.
             if (systemPrompt != null && !systemPrompt.trim().isEmpty()) {
                 json.append("{\"role\":\"user\",")
                     .append("\"parts\":[{\"text\":\"SISTEM ARAHAN PERILAKU DAN PENGETAHUAN KAMPUNGBOT:\\n")
@@ -130,6 +155,8 @@ public class GeminiUtil {
 
             json.append("]}");
 
+            LOGGER.log(Level.INFO, "GeminiUtil [Chat] - Mengirim payload JSON (Saiz: {0} aksara)...", json.length());
+
             // Send payload
             try (OutputStream os = conn.getOutputStream()) {
                 byte[] input = json.toString().getBytes("utf-8");
@@ -138,6 +165,8 @@ public class GeminiUtil {
 
             // Get response
             int responseCode = conn.getResponseCode();
+            LOGGER.log(Level.INFO, "GeminiUtil [Chat] - Respon diterima daripada Google API. Kod Status HTTP: {0}", responseCode);
+            
             if (responseCode == HttpURLConnection.HTTP_OK) {
                 try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"))) {
                     StringBuilder response = new StringBuilder();
@@ -145,23 +174,31 @@ public class GeminiUtil {
                     while ((responseLine = br.readLine()) != null) {
                         response.append(responseLine.trim());
                     }
+                    LOGGER.log(Level.INFO, "GeminiUtil [Chat] - Pembacaan respons berjaya. Menyahsulit kandungan...");
                     return extractText(response.toString());
                 }
             } else {
-                // Read error stream for debugging
+                // Read error stream for debugging with safe null check
                 StringBuilder errMsg = new StringBuilder();
-                try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getErrorStream(), "utf-8"))) {
-                    String line;
-                    while ((line = br.readLine()) != null) {
-                        errMsg.append(line.trim());
+                java.io.InputStream errorStream = conn.getErrorStream();
+                if (errorStream != null) {
+                    try (BufferedReader br = new BufferedReader(new InputStreamReader(errorStream, "utf-8"))) {
+                        String line;
+                        while ((line = br.readLine()) != null) {
+                            errMsg.append(line.trim());
+                        }
                     }
+                } else {
+                    errMsg.append("Tiada butiran tambahan dipulangkan oleh API Google.");
                 }
-                System.err.println("Gemini API Error (" + responseCode + "): " + errMsg.toString());
-                return "Maaf, berlaku gangguan semasa menghubungi KampungBot. Sila cuba seketika lagi.";
+                
+                LOGGER.log(Level.SEVERE, "GeminiUtil [Chat] - Gagal memanggil API. Kod HTTP: {0}. Butiran Ralat: {1}", 
+                        new Object[]{responseCode, errMsg.toString()});
+                return "Maaf, berlaku gangguan semasa menghubungi KampungBot (HTTP " + responseCode + "). Sila cuba seketika lagi.";
             }
 
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.log(Level.SEVERE, "GeminiUtil [Chat] - Pengecualian rangkaian / input-output semasa menghubungi Gemini: " + e.getMessage(), e);
             return "Maaf, ralat sambungan rangkaian dikesan: " + e.getMessage();
         }
     }

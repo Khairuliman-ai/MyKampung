@@ -81,6 +81,22 @@ public class BantuanServlet extends HttpServlet {
                     // Ambil list baru (penuh) & sejarah (paginated)
                     List<PermohonanBantuan> listBaru = pbDao.getByStatus("BARU");
                     List<PermohonanBantuan> listSejarah = pbDao.getSejarahPaginated(offset, pageSize);
+
+                    // Recalculate and persist scores dynamically to reflect latest rules & profile updates
+                    service.EligibilityService eligibilityService = new service.EligibilityService();
+                    if (listBaru != null) {
+                        for (PermohonanBantuan pb : listBaru) {
+                            eligibilityService.calculateEligibilityScore(pb);
+                            pbDao.updateEligibilityData(pb.getId_permohonan(), pb.getEligibilityScore(), pb.getEligibilityTier(), pb.getEligibilityFlags());
+                        }
+                    }
+                    if (listSejarah != null) {
+                        for (PermohonanBantuan pb : listSejarah) {
+                            eligibilityService.calculateEligibilityScore(pb);
+                            pbDao.updateEligibilityData(pb.getId_permohonan(), pb.getEligibilityScore(), pb.getEligibilityTier(), pb.getEligibilityFlags());
+                        }
+                    }
+
                     int totalSejarahCount = pbDao.getSejarahCount();
                     int totalPagesSejarah = (int) Math.ceil((double) totalSejarahCount / pageSize);
 
@@ -98,6 +114,14 @@ public class BantuanServlet extends HttpServlet {
 
                 } else if ("Ketua Kampung".equalsIgnoreCase(user.getNama_peranan())) {
                     list = pbDao.getAll();
+                    // Recalculate and persist scores dynamically for Ketua Kampung as well
+                    service.EligibilityService eligibilityService = new service.EligibilityService();
+                    if (list != null) {
+                        for (PermohonanBantuan pb : list) {
+                            eligibilityService.calculateEligibilityScore(pb);
+                            pbDao.updateEligibilityData(pb.getId_permohonan(), pb.getEligibilityScore(), pb.getEligibilityTier(), pb.getEligibilityFlags());
+                        }
+                    }
                     request.setAttribute("permohonanList", list);
                     request.getRequestDispatcher("/views/bantuan/urusBantuanKetua.jsp").forward(request, response);
                 } else {
@@ -204,6 +228,16 @@ public class BantuanServlet extends HttpServlet {
                 }
                 
                 response.sendRedirect(request.getContextPath() + "/bantuan/edit?id=" + idPermohonan + "&status=doc_deleted");
+            } else if ("/config".equals(action)) {
+                String role = user.getNama_peranan();
+                if (!"AJK".equalsIgnoreCase(role) && !"Ketua Kampung".equalsIgnoreCase(role) && !"AJK Kampung".equalsIgnoreCase(role)) {
+                    response.sendRedirect(request.getContextPath() + "/dashboard?error=unauthorized");
+                    return;
+                }
+                service.EligibilityService es = new service.EligibilityService();
+                request.setAttribute("rules", es.getRulesList());
+                request.setAttribute("povertyLine", es.getPovertyLine());
+                request.getRequestDispatcher("/views/bantuan/urusBantuanConfig.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
@@ -283,6 +317,23 @@ public class BantuanServlet extends HttpServlet {
                     pb.setId_bantuan(Integer.parseInt(jenisBantuan));
                     pb.setCatatan_pemohon(keterangan); 
                 }
+
+                // Fetch fresh socioeconomic data of current user for eligibility scoring
+                try (java.sql.Connection conn = util.DBUtil.getConnection()) {
+                    dao.PenggunaDAO uDao = new dao.PenggunaDAO(conn);
+                    Pengguna freshUser = uDao.getPenggunaById(user.getId_pengguna());
+                    if (freshUser != null) {
+                        pb.setPendapatan(freshUser.getPendapatan() != null ? freshUser.getPendapatan().doubleValue() : null);
+                        pb.setStatus_keluarga(freshUser.getStatus_keluarga());
+                        pb.setPekerjaan(freshUser.getPekerjaan());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // Calculate eligibility score automatically
+                service.EligibilityService eligibilityService = new service.EligibilityService();
+                eligibilityService.calculateEligibilityScore(pb);
 
                 int newId = pbDao.insertPermohonan(pb);
                 
@@ -391,6 +442,23 @@ public class BantuanServlet extends HttpServlet {
                     pb.setId_bantuan(Integer.parseInt(jenisBantuan));
                     pb.setCatatan_pemohon(keterangan);
                 }
+
+                // Fetch fresh socioeconomic data for recalculation on edit
+                try (java.sql.Connection conn = util.DBUtil.getConnection()) {
+                    dao.PenggunaDAO uDao = new dao.PenggunaDAO(conn);
+                    Pengguna freshUser = uDao.getPenggunaById(user.getId_pengguna());
+                    if (freshUser != null) {
+                        pb.setPendapatan(freshUser.getPendapatan() != null ? freshUser.getPendapatan().doubleValue() : null);
+                        pb.setStatus_keluarga(freshUser.getStatus_keluarga());
+                        pb.setPekerjaan(freshUser.getPekerjaan());
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // Recalculate scoring
+                service.EligibilityService eligibilityService = new service.EligibilityService();
+                eligibilityService.calculateEligibilityScore(pb);
                 
                 pbDao.updatePermohonan(pb);
 
@@ -411,6 +479,13 @@ public class BantuanServlet extends HttpServlet {
                 String keputusan = request.getParameter("keputusan"); 
                 String ulasanAJK = request.getParameter("ulasan");   
 
+                // State Validation: Enforce that status must be "BARU"
+                PermohonanBantuan currentPb = pbDao.getById(idPermohonan);
+                if (currentPb == null || !"BARU".equalsIgnoreCase(currentPb.getStatus())) {
+                    response.sendRedirect(request.getContextPath() + "/bantuan/list?error=invalid_state");
+                    return;
+                }
+
                 int statusBaru;
                 String catatanSimpan;
 
@@ -430,6 +505,13 @@ public class BantuanServlet extends HttpServlet {
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 String keputusan = request.getParameter("keputusan");
                 String ulasanKetua = request.getParameter("ulasan");
+
+                // State Validation: Enforce that status must be "MENUNGGU_KETUA"
+                PermohonanBantuan currentPb = pbDao.getById(idPermohonan);
+                if (currentPb == null || !"MENUNGGU_KETUA".equalsIgnoreCase(currentPb.getStatus())) {
+                    response.sendRedirect(request.getContextPath() + "/bantuan/list?error=invalid_state");
+                    return;
+                }
 
                 BantuanLampiranDAO lampiranDao = new BantuanLampiranDAO();
                 Collection<Part> parts = request.getParts();
@@ -463,6 +545,61 @@ public class BantuanServlet extends HttpServlet {
 
                 pbDao.updateStatus(idPermohonan, statusBaru, ulasanAdmin, firstFileName);
                 response.sendRedirect(request.getContextPath() + "/bantuan/list?msg=decision_made");
+            }
+            
+            // ===================== CONFIG =====================
+            else if ("/config".equals(action)) {
+                String role = user.getNama_peranan();
+                if (!"AJK".equalsIgnoreCase(role) && !"Ketua Kampung".equalsIgnoreCase(role) && !"AJK Kampung".equalsIgnoreCase(role)) {
+                    response.sendRedirect(request.getContextPath() + "/dashboard?error=unauthorized");
+                    return;
+                }
+                service.EligibilityService es = new service.EligibilityService();
+                request.setAttribute("rules", es.getRulesList());
+                request.setAttribute("povertyLine", es.getPovertyLine());
+                request.getRequestDispatcher("/views/bantuan/urusBantuanConfig.jsp").forward(request, response);
+            }
+            
+            // ===================== CONFIG SAVE =====================
+            else if ("/config/save".equals(action)) {
+                String role = user.getNama_peranan();
+                if (!"AJK".equalsIgnoreCase(role) && !"Ketua Kampung".equalsIgnoreCase(role) && !"AJK Kampung".equalsIgnoreCase(role)) {
+                    response.sendRedirect(request.getContextPath() + "/dashboard?error=unauthorized");
+                    return;
+                }
+                try {
+                    double povertyLine = Double.parseDouble(request.getParameter("povertyLine"));
+                    double wIncome = Double.parseDouble(request.getParameter("weightIncome"));
+                    double wDependent = Double.parseDouble(request.getParameter("weightDependent"));
+                    double wFamily = Double.parseDouble(request.getParameter("weightFamily"));
+                    double wEmployment = Double.parseDouble(request.getParameter("weightEmployment"));
+
+                    // Total weight must equal 100
+                    double total = wIncome + wDependent + wFamily + wEmployment;
+                    if (Math.abs(total - 100.0) > 0.001) {
+                        response.sendRedirect(request.getContextPath() + "/bantuan/config?error=weight_sum");
+                        return;
+                    }
+
+                    service.EligibilityService es = new service.EligibilityService();
+                    es.updatePovertyLine(povertyLine);
+
+                    java.util.Map<String, Double> weights = new java.util.HashMap<>();
+                    weights.put("INCOME_FACTOR", wIncome);
+                    weights.put("DEPENDENT_FACTOR", wDependent);
+                    weights.put("FAMILY_STATUS_FACTOR", wFamily);
+                    weights.put("EMPLOYMENT_STATUS_FACTOR", wEmployment);
+
+                    boolean success = es.updateRuleWeights(weights);
+
+                    if (success) {
+                        response.sendRedirect(request.getContextPath() + "/bantuan/config?status=success");
+                    } else {
+                        response.sendRedirect(request.getContextPath() + "/bantuan/config?error=db");
+                    }
+                } catch (NumberFormatException e) {
+                    response.sendRedirect(request.getContextPath() + "/bantuan/config?error=invalid_input");
+                }
             }
             
             else if ("/tambahJenisBantuan".equals(action) || "/kemaskiniJenisBantuan".equals(action)) {

@@ -232,4 +232,46 @@ public class TempahanFasilitiDAO {
         t.setAlasanPenolakan(rs.getString("alasan_penolakan"));
         return t;
     }
+
+    public java.util.Map<String, Integer> getFasilitiUsageStats() {
+        java.util.Map<String, Integer> stats = new java.util.LinkedHashMap<>();
+        String sql = "SELECT f.nama_fasiliti, COUNT(*) as count " +
+                     "FROM tempahan_fasiliti t " +
+                     "JOIN fasiliti f ON t.id_fasiliti = f.id_fasiliti " +
+                     "WHERE t.status = '" + StatusConstant.TEMPAHAN_LULUS + "' " +
+                     "GROUP BY f.nama_fasiliti";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                stats.put(rs.getString("nama_fasiliti"), rs.getInt("count"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stats;
+    }
+
+    public java.util.Map<String, Integer> getFasilitiStatusStats() {
+        java.util.Map<String, Integer> stats = new java.util.LinkedHashMap<>();
+        stats.put("LULUS", 0);
+        stats.put("MENUNGGU_KELULUSAN", 0);
+        stats.put("TOLAK", 0);
+        stats.put("DIBATALKAN", 0);
+        
+        String sql = "SELECT status, COUNT(*) as count FROM tempahan_fasiliti GROUP BY status";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                String status = rs.getString("status");
+                if (status != null) {
+                    stats.put(status.toUpperCase(), rs.getInt("count"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stats;
+    }
 }

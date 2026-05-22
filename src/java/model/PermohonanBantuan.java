@@ -34,6 +34,20 @@ public class PermohonanBantuan {
     // Multiple Lampiran Support
     private List<BantuanLampiran> senaraiLampiran = new ArrayList<>();
 
+    // Eligibility Fields
+    private Double eligibilityScore = 0.0;
+    private String eligibilityTier = "RENDAH";
+    private List<String> eligibilityFlags = new ArrayList<>();
+
+    public Double getEligibilityScore() { return eligibilityScore; }
+    public void setEligibilityScore(Double eligibilityScore) { this.eligibilityScore = eligibilityScore; }
+
+    public String getEligibilityTier() { return eligibilityTier; }
+    public void setEligibilityTier(String eligibilityTier) { this.eligibilityTier = eligibilityTier; }
+
+    public List<String> getEligibilityFlags() { return eligibilityFlags; }
+    public void setEligibilityFlags(List<String> eligibilityFlags) { this.eligibilityFlags = eligibilityFlags; }
+
     public List<BantuanLampiran> getSenaraiLampiran() { return senaraiLampiran; }
     public void setSenaraiLampiran(List<BantuanLampiran> senaraiLampiran) { this.senaraiLampiran = senaraiLampiran; }
 

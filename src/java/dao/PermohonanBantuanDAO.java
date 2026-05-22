@@ -194,7 +194,18 @@ public class PermohonanBantuanDAO {
     }
     
     public int insertPermohonan(PermohonanBantuan pb) {
-        String sql = "INSERT INTO permohonan_bantuan (id_pengguna, id_bantuan, catatan_pemohon, nama_bank, nombor_akaun, penyata_bank, dibuat_pada, status) VALUES (?, ?, ?, ?, ?, ?, NOW(), 'BARU')";
+        String flagsStr = "[]";
+        if (pb.getEligibilityFlags() != null && !pb.getEligibilityFlags().isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            for (int i = 0; i < pb.getEligibilityFlags().size(); i++) {
+                sb.append("\"").append(pb.getEligibilityFlags().get(i)).append("\"");
+                if (i < pb.getEligibilityFlags().size() - 1) sb.append(",");
+            }
+            sb.append("]");
+            flagsStr = sb.toString();
+        }
+        String sql = "INSERT INTO permohonan_bantuan (id_pengguna, id_bantuan, catatan_pemohon, nama_bank, nombor_akaun, penyata_bank, dibuat_pada, status, eligibility_score, eligibility_tier, eligibility_flags) VALUES (?, ?, ?, ?, ?, ?, NOW(), 'BARU', ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, pb.getId_pengguna());
@@ -203,6 +214,9 @@ public class PermohonanBantuanDAO {
             ps.setString(4, pb.getNama_bank());
             ps.setString(5, pb.getNombor_akaun());
             ps.setString(6, pb.getPenyata_bank());
+            ps.setDouble(7, pb.getEligibilityScore() != null ? pb.getEligibilityScore() : 0.0);
+            ps.setString(8, pb.getEligibilityTier() != null ? pb.getEligibilityTier() : "RENDAH");
+            ps.setString(9, flagsStr);
             
             int affectedRows = ps.executeUpdate();
             if (affectedRows > 0) {
@@ -219,7 +233,18 @@ public class PermohonanBantuanDAO {
     }
 
     public boolean updatePermohonan(PermohonanBantuan pb) {
-        String sql = "UPDATE permohonan_bantuan SET id_bantuan = ?, catatan_pemohon = ?, nama_bank = ?, nombor_akaun = ?, penyata_bank = ?, status = 'BARU', dikemaskini_pada = NOW() WHERE id_permohonan = ? AND id_pengguna = ?";
+        String flagsStr = "[]";
+        if (pb.getEligibilityFlags() != null && !pb.getEligibilityFlags().isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            for (int i = 0; i < pb.getEligibilityFlags().size(); i++) {
+                sb.append("\"").append(pb.getEligibilityFlags().get(i)).append("\"");
+                if (i < pb.getEligibilityFlags().size() - 1) sb.append(",");
+            }
+            sb.append("]");
+            flagsStr = sb.toString();
+        }
+        String sql = "UPDATE permohonan_bantuan SET id_bantuan = ?, catatan_pemohon = ?, nama_bank = ?, nombor_akaun = ?, penyata_bank = ?, status = 'BARU', eligibility_score = ?, eligibility_tier = ?, eligibility_flags = ?, dikemaskini_pada = NOW() WHERE id_permohonan = ? AND id_pengguna = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, pb.getId_bantuan());
@@ -227,8 +252,37 @@ public class PermohonanBantuanDAO {
             ps.setString(3, pb.getNama_bank());
             ps.setString(4, pb.getNombor_akaun());
             ps.setString(5, pb.getPenyata_bank());
-            ps.setInt(6, pb.getId_permohonan_bantuan());
-            ps.setInt(7, pb.getId_pengguna());
+            ps.setDouble(6, pb.getEligibilityScore() != null ? pb.getEligibilityScore() : 0.0);
+            ps.setString(7, pb.getEligibilityTier() != null ? pb.getEligibilityTier() : "RENDAH");
+            ps.setString(8, flagsStr);
+            ps.setInt(9, pb.getId_permohonan_bantuan());
+            ps.setInt(10, pb.getId_pengguna());
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public boolean updateEligibilityData(int idPermohonan, double score, String tier, List<String> flags) {
+        String flagsStr = "[]";
+        if (flags != null && !flags.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("[");
+            for (int i = 0; i < flags.size(); i++) {
+                sb.append("\"").append(flags.get(i)).append("\"");
+                if (i < flags.size() - 1) sb.append(",");
+            }
+            sb.append("]");
+            flagsStr = sb.toString();
+        }
+        String sql = "UPDATE permohonan_bantuan SET eligibility_score = ?, eligibility_tier = ?, eligibility_flags = ? WHERE id_permohonan = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setDouble(1, score);
+            ps.setString(2, tier);
+            ps.setString(3, flagsStr);
+            ps.setInt(4, idPermohonan);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -293,6 +347,25 @@ public class PermohonanBantuanDAO {
         try {
             pb.setJenis_bantuan(rs.getString("jenis_bantuan"));
         } catch (SQLException e) {}
+
+        // Map eligibility fields from DB
+        try { pb.setEligibilityScore(rs.getDouble("eligibility_score")); } catch (SQLException e) {}
+        try { pb.setEligibilityTier(rs.getString("eligibility_tier")); } catch (SQLException e) {}
+        try {
+            String flagsStr = rs.getString("eligibility_flags");
+            List<String> flags = new ArrayList<>();
+            if (flagsStr != null && !flagsStr.isEmpty()) {
+                flagsStr = flagsStr.replace("[", "").replace("]", "").replace("\"", "");
+                for (String f : flagsStr.split(",")) {
+                    String trimmed = f.trim();
+                    if (!trimmed.isEmpty()) {
+                        flags.add(trimmed);
+                    }
+                }
+            }
+            pb.setEligibilityFlags(flags);
+        } catch (SQLException e) {}
+
         return pb;
     }
 
@@ -306,5 +379,84 @@ public class PermohonanBantuanDAO {
             e.printStackTrace();
         }
         return 0;
+    }
+
+    public java.util.Map<String, Integer> getBantuanSummaryStats() {
+        java.util.Map<String, Integer> stats = new java.util.LinkedHashMap<>();
+        stats.put("BARU", 0);
+        stats.put("MENUNGGU_KETUA", 0);
+        stats.put("LULUS", 0);
+        stats.put("DITOLAK", 0);
+        stats.put("DIKEMBALIKAN", 0);
+        
+        String sql = "SELECT status, COUNT(*) as count FROM permohonan_bantuan GROUP BY status";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                String status = rs.getString("status");
+                if (status != null) {
+                    stats.put(status.toUpperCase(), rs.getInt("count"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stats;
+    }
+
+    public java.util.Map<String, Integer> getBantuanTypeRatio() {
+        java.util.Map<String, Integer> ratio = new java.util.LinkedHashMap<>();
+        ratio.put("RASMI", 0);
+        ratio.put("KOMUNITI", 0);
+        
+        String sql = "SELECT b.jenis_bantuan, COUNT(*) as count " +
+                     "FROM permohonan_bantuan pb " +
+                     "JOIN bantuan b ON pb.id_bantuan = b.id_bantuan " +
+                     "GROUP BY b.jenis_bantuan";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                String type = rs.getString("jenis_bantuan");
+                if (type != null) {
+                    ratio.put(type.toUpperCase(), rs.getInt("count"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return ratio;
+    }
+
+    public java.util.Map<String, Integer> getBantuanScoreDistribution() {
+        java.util.Map<String, Integer> dist = new java.util.LinkedHashMap<>();
+        dist.put("0-20%", 0);
+        dist.put("21-40%", 0);
+        dist.put("41-60%", 0);
+        dist.put("61-80%", 0);
+        dist.put("81-100%", 0);
+        
+        String sql = "SELECT " +
+                     "  SUM(CASE WHEN eligibility_score BETWEEN 0 AND 20 THEN 1 ELSE 0 END) as b1, " +
+                     "  SUM(CASE WHEN eligibility_score BETWEEN 21 AND 40 THEN 1 ELSE 0 END) as b2, " +
+                     "  SUM(CASE WHEN eligibility_score BETWEEN 41 AND 60 THEN 1 ELSE 0 END) as b3, " +
+                     "  SUM(CASE WHEN eligibility_score BETWEEN 61 AND 80 THEN 1 ELSE 0 END) as b4, " +
+                     "  SUM(CASE WHEN eligibility_score BETWEEN 81 AND 100 THEN 1 ELSE 0 END) as b5 " +
+                     "FROM permohonan_bantuan";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                dist.put("0-20%", rs.getInt("b1"));
+                dist.put("21-40%", rs.getInt("b2"));
+                dist.put("41-60%", rs.getInt("b3"));
+                dist.put("61-80%", rs.getInt("b4"));
+                dist.put("81-100%", rs.getInt("b5"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return dist;
     }
 }

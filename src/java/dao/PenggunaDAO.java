@@ -340,4 +340,95 @@ public int countAll() {
     return 0;
 }
 
+    public java.util.Map<String, Integer> getAgeDistribution() {
+        java.util.Map<String, Integer> dist = new java.util.LinkedHashMap<>();
+        dist.put("Kanak-kanak (0-17)", 0);
+        dist.put("Belia (18-30)", 0);
+        dist.put("Dewasa (31-45)", 0);
+        dist.put("Pertengahan (46-60)", 0);
+        dist.put("Warga Emas (60+)", 0);
+        
+        String sql = "SELECT " +
+                     "  SUM(CASE WHEN age BETWEEN 0 AND 17 THEN 1 ELSE 0 END) as child, " +
+                     "  SUM(CASE WHEN age BETWEEN 18 AND 30 THEN 1 ELSE 0 END) as youth, " +
+                     "  SUM(CASE WHEN age BETWEEN 31 AND 45 THEN 1 ELSE 0 END) as adult, " +
+                     "  SUM(CASE WHEN age BETWEEN 46 AND 60 THEN 1 ELSE 0 END) as mid, " +
+                     "  SUM(CASE WHEN age > 60 THEN 1 ELSE 0 END) as senior " +
+                     "FROM (" +
+                     "  SELECT TIMESTAMPDIFF(YEAR, tarikh_lahir, CURDATE()) as age " +
+                     "  FROM pengguna WHERE status = 1" +
+                     ") as temp";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                dist.put("Kanak-kanak (0-17)", rs.getInt("child"));
+                dist.put("Belia (18-30)", rs.getInt("youth"));
+                dist.put("Dewasa (31-45)", rs.getInt("adult"));
+                dist.put("Pertengahan (46-60)", rs.getInt("mid"));
+                dist.put("Warga Emas (60+)", rs.getInt("senior"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return dist;
+    }
+
+    public java.util.Map<String, Integer> getIncomeDistribution() {
+        java.util.Map<String, Integer> dist = new java.util.LinkedHashMap<>();
+        dist.put("< RM1,000", 0);
+        dist.put("RM1,000 - RM2,500", 0);
+        dist.put("RM2,500 - RM4,000", 0);
+        dist.put("RM4,000 - RM6,000", 0);
+        dist.put("> RM6,000", 0);
+        
+        String sql = "SELECT " +
+                     "  SUM(CASE WHEN pendapatan < 1000 THEN 1 ELSE 0 END) as r1, " +
+                     "  SUM(CASE WHEN pendapatan BETWEEN 1000 AND 2500 THEN 1 ELSE 0 END) as r2, " +
+                     "  SUM(CASE WHEN pendapatan BETWEEN 2500 AND 4000 THEN 1 ELSE 0 END) as r3, " +
+                     "  SUM(CASE WHEN pendapatan BETWEEN 4000 AND 6000 THEN 1 ELSE 0 END) as r4, " +
+                     "  SUM(CASE WHEN pendapatan > 6000 THEN 1 ELSE 0 END) as r5 " +
+                     "FROM pengguna WHERE status = 1";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                dist.put("< RM1,000", rs.getInt("r1"));
+                dist.put("RM1,000 - RM2,500", rs.getInt("r2"));
+                dist.put("RM2,500 - RM4,000", rs.getInt("r3"));
+                dist.put("RM4,000 - RM6,000", rs.getInt("r4"));
+                dist.put("> RM6,000", rs.getInt("r5"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return dist;
+    }
+
+    public java.util.Map<String, Integer> getFamilyStatusDistribution() {
+        java.util.Map<String, Integer> dist = new java.util.LinkedHashMap<>();
+        String sql = "SELECT status_keluarga, COUNT(*) as count " +
+                     "FROM pengguna WHERE status = 1 AND status_keluarga IS NOT NULL AND status_keluarga != '' " +
+                     "GROUP BY status_keluarga";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                dist.put(rs.getString("status_keluarga"), rs.getInt("count"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return dist;
+    }
+
+    public double getAverageIncome() {
+        String sql = "SELECT AVG(pendapatan) FROM pengguna WHERE status = 1";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getDouble(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0.0;
+    }
 }

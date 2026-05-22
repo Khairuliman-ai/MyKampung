@@ -49,6 +49,15 @@
         <url-pattern>/chatbot/*</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>LaporanServlet</servlet-name>
+        <servlet-class>controller.LaporanServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>LaporanServlet</servlet-name>
+        <url-pattern>/laporan/*</url-pattern>
+    </servlet-mapping>
+
     <welcome-file-list>
         <welcome-file>home</welcome-file>
     </welcome-file-list>

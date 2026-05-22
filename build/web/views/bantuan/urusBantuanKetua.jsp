@@ -11,14 +11,21 @@
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth h-full bg-[#F7F7F9]">
 
-    <header class="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+    <header class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h2 class="text-2xl font-bold text-gray-800">Pengesahan Ketua Kampung</h2>
             <p class="text-gray-500 text-sm">Semak dan luluskan permohonan yang telah disahkan oleh AJK.</p>
         </div>
 
-        <!-- Professional Filter Bar -->
-        <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex flex-wrap items-center gap-3">
+        <div class="flex flex-wrap items-center gap-3">
+            <a href="<%= request.getContextPath() %>/bantuan/config" 
+               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white border border-gray-200 text-gray-700 hover:text-brand-purple hover:border-purple-200 shadow-sm transition-all text-xs font-bold">
+                <i class="fas fa-sliders-h text-brand-purple"></i>
+                Konfigurasi Kelayakan
+            </a>
+
+            <!-- Professional Filter Bar -->
+            <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex flex-wrap items-center gap-3">
             <div class="relative">
                 <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
                 <input type="text" id="searchPemohon" onkeyup="filterData()" placeholder="Cari pemohon/ID..." 
@@ -41,6 +48,7 @@
             <button onclick="resetFilters()" class="p-2 text-gray-400 hover:text-red-500 transition tooltip" title="Reset Tapisan">
                 <i class="fas fa-sync-alt text-xs"></i>
             </button>
+        </div>
         </div>
     </header>
 
@@ -156,6 +164,9 @@
                             data-gaji="<%= pb.getPendapatanFormatted() %>"
                             data-kategori="<%= pb.getJenis_bantuan() %>"
                             data-ulasanajk="<%= (pb.getCatatan_pentadbir() != null ? pb.getCatatan_pentadbir().replace("\"", "&quot;") : "Tiada ulasan.") %>"
+                            data-score="<%= pb.getEligibilityScore() != null ? pb.getEligibilityScore() : 0.0 %>"
+                            data-tier="<%= pb.getEligibilityTier() != null ? pb.getEligibilityTier() : "" %>"
+                            data-flags="<%= pb.getEligibilityFlags() != null ? String.join(",", pb.getEligibilityFlags()) : "" %>"
                             onclick="viewDetail(this)">
                             <td class="p-4 text-sm text-gray-400 font-medium"><%= noP++ %></td>
                             <td class="p-4 text-sm text-gray-500 whitespace-nowrap"><%= displayDate %></td>
@@ -242,6 +253,9 @@
                             data-kategori="<%= pb.getJenis_bantuan() %>"
                             data-ulasanajk="<%= (pb.getCatatan_pentadbir() != null ? pb.getCatatan_pentadbir().replace("\"", "&quot;") : "Tiada ulasan.") %>"
                             data-dokadmin="<%= jsDokumenAdminH %>"
+                            data-score="<%= pb.getEligibilityScore() != null ? pb.getEligibilityScore() : 0.0 %>"
+                            data-tier="<%= pb.getEligibilityTier() != null ? pb.getEligibilityTier() : "" %>"
+                            data-flags="<%= pb.getEligibilityFlags() != null ? String.join(",", pb.getEligibilityFlags()) : "" %>"
                             onclick="viewDetail(this)">
                             <td class="p-4 text-sm text-gray-400 font-medium"><%= noS++ %></td>
                             <td class="p-4 text-sm text-gray-500 whitespace-nowrap"><%= displayDate %></td>
@@ -352,6 +366,35 @@
                             </div>
                         </div>
 
+                        <!-- Eligibility Score Panel -->
+                        <div class="bg-gradient-to-r from-slate-50 to-slate-100/50 p-6 rounded-[2rem] border border-slate-200/60 shadow-sm mb-6 flex flex-col md:flex-row items-center gap-6">
+                            <!-- Score Circle -->
+                            <div class="relative flex items-center justify-center shrink-0">
+                                <div id="detScoreBadge" class="w-24 h-24 rounded-full flex flex-col items-center justify-center border-4 shadow-inner bg-white">
+                                    <span id="detScoreValue" class="text-3xl font-black text-slate-800">0</span>
+                                    <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">SKOR</span>
+                                </div>
+                            </div>
+                            <!-- Score Info & Bar -->
+                            <div class="flex-1 w-full space-y-2">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h5 class="text-sm font-black text-gray-800">Keputusan Skor Kelayakan</h5>
+                                        <p class="text-[10px] text-gray-400 font-medium">Berdasarkan data sosio-ekonomi penduduk semasa.</p>
+                                    </div>
+                                    <span id="detTierBadge" class="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider"></span>
+                                </div>
+                                <!-- Progress Bar -->
+                                <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
+                                    <div id="detScoreProgress" class="h-full rounded-full transition-all duration-500" style="width: 0%"></div>
+                                </div>
+                                <!-- Indicator flags -->
+                                <div id="detFlagsContainer" class="flex flex-wrap gap-2 pt-1">
+                                    <!-- Dynamic Flags -->
+                                </div>
+                            </div>
+                        </div>
+
                         <!-- Main Content Grid -->
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                             <!-- Socio-Economic Card -->
@@ -396,6 +439,26 @@
                                 <p id="detUlasanAJK" class="text-sm text-green-800 leading-relaxed pl-8 font-medium italic">
                                     -
                                 </p>
+                            </div>
+                        </div>
+
+                        <!-- AI Decision Support and Recommendation Box -->
+                        <div id="aiSupportDiv" class="space-y-4 pt-6 border-t border-gray-100">
+                            <h5 class="text-[11px] font-bold text-brand-purple uppercase tracking-widest flex items-center gap-2">
+                                <i class="fas fa-robot"></i> Sokongan Keputusan AI
+                            </h5>
+                            <div class="p-6 rounded-3xl border flex flex-col justify-between" id="aiRecommendCard">
+                                <div>
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="text-xs font-bold text-gray-400 uppercase tracking-wide">Pengesyoran Sistem</span>
+                                        <span id="aiRecommendBadge" class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider"></span>
+                                    </div>
+                                    <h4 class="text-lg font-black text-gray-800" id="aiRecommendTitle">-</h4>
+                                    <p class="text-xs text-gray-500 leading-relaxed mt-2" id="aiRecommendDesc">-</p>
+                                </div>
+                                <div class="mt-4 pt-3 border-t border-gray-100/60 hidden" id="aiAutoRejectionInfo">
+                                    <p class="text-[10px] text-rose-500 font-bold"><i class="fas fa-magic"></i> Templat sebab penolakan automatik telah sedia dijana.</p>
+                                </div>
                             </div>
                         </div>
 
@@ -561,6 +624,125 @@
         document.getElementById('content-' + name).classList.remove('hidden');
     }
 
+    let currentScore = 0;
+
+    function getFlagBadge(flag) {
+        switch (flag) {
+            case 'TIADA_PENDAPATAN':
+                return '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-bold"><i class="fas fa-hand-holding-usd"></i> Tiada Pendapatan</span>';
+            case 'PENDAPATAN_SANGAT_RENDAH':
+                return '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-bold"><i class="fas fa-arrow-down"></i> Pendapatan Sangat Rendah</span>';
+            case 'PENDAPATAN_RENDAH':
+                return '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 text-xs font-bold"><i class="fas fa-arrow-down text-[10px]"></i> Pendapatan Rendah</span>';
+            case 'TANGGUNGAN_SANGAT_RAMAI':
+                return '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-bold"><i class="fas fa-users"></i> Tanggungan Sangat Ramai</span>';
+            case 'TANGGUNGAN_RAMAI':
+                return '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 text-xs font-bold"><i class="fas fa-user-friends"></i> Tanggungan Ramai</span>';
+            case 'IBU_BAPA_TUNGGAL':
+                return '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 border border-purple-200 text-purple-600 text-xs font-bold"><i class="fas fa-child"></i> Ibu/Bapa Tunggal</span>';
+            case 'OKU':
+                return '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-indigo-50 border border-indigo-200 text-indigo-600 text-xs font-bold"><i class="fas fa-wheelchair"></i> OKU</span>';
+            case 'TIADA_KERJA':
+                return '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-red-50 border border-red-200 text-red-600 text-xs font-bold"><i class="fas fa-user-slash"></i> Tiada Pekerjaan</span>';
+            case 'KERJA_SEKTOR_TIDAK_FORMAL':
+                return '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 text-xs font-bold"><i class="fas fa-tools"></i> Sektor Tidak Formal</span>';
+            default:
+                return '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gray-50 border border-gray-200 text-gray-600 text-xs font-bold">' + flag + '</span>';
+        }
+    }
+
+    function populateDecisionSupport(scoreVal, tier, flagsStr) {
+        const flags = flagsStr ? flagsStr.split(',') : [];
+        
+        // 1. Eligibility Score Panel values
+        const detScoreValue = document.getElementById('detScoreValue');
+        const detScoreProgress = document.getElementById('detScoreProgress');
+        const detTierBadge = document.getElementById('detTierBadge');
+        const detScoreBadge = document.getElementById('detScoreBadge');
+        
+        if (detScoreValue && detScoreProgress && detTierBadge && detScoreBadge) {
+            detScoreValue.innerText = scoreVal.toFixed(0);
+            detScoreProgress.style.width = scoreVal + '%';
+            detTierBadge.innerText = tier || 'RENDAH';
+            
+            if (scoreVal >= 80) {
+                detScoreProgress.className = "h-full rounded-full bg-emerald-500 transition-all duration-500";
+                detTierBadge.className = "px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-emerald-50 text-emerald-600 border border-emerald-200";
+                detScoreBadge.className = "w-24 h-24 rounded-full flex flex-col items-center justify-center border-4 border-emerald-500 shadow-inner bg-white";
+            } else if (scoreVal >= 40) {
+                detScoreProgress.className = "h-full rounded-full bg-amber-500 transition-all duration-500";
+                detTierBadge.className = "px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-amber-50 text-amber-600 border border-amber-200";
+                detScoreBadge.className = "w-24 h-24 rounded-full flex flex-col items-center justify-center border-4 border-amber-500 shadow-inner bg-white";
+            } else {
+                detScoreProgress.className = "h-full rounded-full bg-rose-500 transition-all duration-500";
+                detTierBadge.className = "px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider bg-rose-50 text-rose-600 border border-rose-200";
+                detScoreBadge.className = "w-24 h-24 rounded-full flex flex-col items-center justify-center border-4 border-rose-500 shadow-inner bg-white";
+            }
+        }
+        
+        // 2. Flags Container
+        const detFlagsContainer = document.getElementById('detFlagsContainer');
+        if (detFlagsContainer) {
+            detFlagsContainer.innerHTML = '';
+            if (flags.length > 0 && flags[0] !== "") {
+                flags.forEach(f => {
+                    detFlagsContainer.innerHTML += getFlagBadge(f);
+                });
+            } else {
+                detFlagsContainer.innerHTML = '<span class="text-xs text-gray-400 italic">Tiada indikator kelayakan dikesan.</span>';
+            }
+        }
+        
+        // 3. AI Recommendation
+        const aiRecommendCard = document.getElementById('aiRecommendCard');
+        const aiRecommendBadge = document.getElementById('aiRecommendBadge');
+        const aiRecommendTitle = document.getElementById('aiRecommendTitle');
+        const aiRecommendDesc = document.getElementById('aiRecommendDesc');
+        const aiAutoRejectionInfo = document.getElementById('aiAutoRejectionInfo');
+        
+        if (aiRecommendCard && aiRecommendBadge && aiRecommendTitle && aiRecommendDesc) {
+            let syorTitle = '';
+            let syorDesc = '';
+            let syorBadgeText = '';
+            let cardClass = '';
+            let badgeClass = '';
+            
+            if (scoreVal >= 80) {
+                syorBadgeText = 'Cadangan Lulus';
+                syorTitle = 'Sangat Layak Diluluskan';
+                syorDesc = 'Pemohon mempunyai skor kelayakan yang sangat tinggi (' + scoreVal.toFixed(0) + '%). Status sosio-ekonomi berada dalam kumpulan keutamaan tinggi untuk menerima bantuan ini. AJK Kampung telah menyokong penuh permohonan ini.';
+                cardClass = 'bg-emerald-50/40 border-emerald-100 p-6 rounded-3xl border flex flex-col justify-between';
+                badgeClass = 'px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-emerald-100 text-emerald-700';
+                if (aiAutoRejectionInfo) aiAutoRejectionInfo.classList.add('hidden');
+            } else if (scoreVal >= 40) {
+                syorBadgeText = 'Syor Pertimbangan';
+                syorTitle = 'Kelayakan Sederhana';
+                syorDesc = 'Pemohon mempunyai skor kelayakan sederhana (' + scoreVal.toFixed(0) + '%). Status sosio-ekonomi pemohon layak, tetapi dinasihatkan menyemak ulasan AJK di atas sebelum keputusan akhir dibuat.';
+                cardClass = 'bg-amber-50/40 border-amber-100 p-6 rounded-3xl border flex flex-col justify-between';
+                badgeClass = 'px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-amber-100 text-amber-700';
+                if (aiAutoRejectionInfo) aiAutoRejectionInfo.classList.add('hidden');
+            } else {
+                syorBadgeText = 'Cadangan Tolak';
+                syorTitle = 'Tidak Menepati Kriteria';
+                syorDesc = 'Pemohon mempunyai skor kelayakan yang rendah (' + scoreVal.toFixed(0) + '%). Berdasarkan penilaian sistem, status pendapatan berada di atas paras kemiskinan dan pemohon mempunyai keupayaan sara diri yang mencukupi.';
+                cardClass = 'bg-rose-50/40 border-rose-100 p-6 rounded-3xl border flex flex-col justify-between';
+                badgeClass = 'px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-rose-100 text-rose-700';
+                
+                if (scoreVal < 35) {
+                    if (aiAutoRejectionInfo) aiAutoRejectionInfo.classList.remove('hidden');
+                } else {
+                    if (aiAutoRejectionInfo) aiAutoRejectionInfo.classList.add('hidden');
+                }
+            }
+            
+            aiRecommendCard.className = cardClass;
+            aiRecommendBadge.className = badgeClass;
+            aiRecommendBadge.innerText = syorBadgeText;
+            aiRecommendTitle.innerText = syorTitle;
+            aiRecommendDesc.innerText = syorDesc;
+        }
+    }
+
     function viewDetail(row) {
         const d = row.dataset;
         const id = d.id;
@@ -568,6 +750,7 @@
         const kategori = d.kategori;
         const showAction = (d.showaction === "true");
         currentKategori = kategori;
+        currentScore = parseFloat(d.score || 0);
 
         document.getElementById('detId').innerText = "#" + id;
         document.getElementById('detBantuan').innerText = bantuan;
@@ -579,6 +762,8 @@
         document.getElementById('detPendapatan').innerText = (d.gaji && d.gaji !== "null") ? d.gaji : "RM 0.00";
         document.getElementById('detKeterangan').innerText = (d.ket && d.ket !== "null") ? d.ket : "Tiada keterangan tambahan.";
         document.getElementById('detUlasanAJK').innerText = (d.ulasanajk && d.ulasanajk !== "null") ? d.ulasanajk : "Tiada ulasan dari AJK.";
+
+        populateDecisionSupport(currentScore, d.tier, d.flags);
 
         const bank = d.bank;
         const akaun = d.akaun;
@@ -722,6 +907,13 @@
             document.getElementById('actUlasan').required = true; 
             document.getElementById('actUlasan').disabled = false;
             document.getElementById('actUlasanApprove').disabled = true;
+            
+            // Pre-populate rejection template if score is below threshold
+            if (currentScore < 35) {
+                document.getElementById('actUlasan').value = "DITOLAK: Skor kelayakan permohonan (" + currentScore.toFixed(0) + "%) adalah di bawah paras minima kelayakan. Sila hubungi AJK jika maklumat sosio-ekonomi (pendapatan/pekerjaan/ahli keluarga) perlu dikemaskini.";
+            } else {
+                document.getElementById('actUlasan').value = "";
+            }
             
             // For rejection, documents are always optional
             uploadLabel.innerHTML = 'Muat Naik Dokumen Sokongan (Pilihan)';

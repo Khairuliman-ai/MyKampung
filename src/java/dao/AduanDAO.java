@@ -186,4 +186,71 @@ public class AduanDAO {
         a.setNama_pengendali(rs.getString("nama_pengendali"));
         return a;
     }
+
+    public java.util.Map<String, Integer> getAduanSummaryStats() {
+        java.util.Map<String, Integer> stats = new java.util.LinkedHashMap<>();
+        stats.put("SUBMITTED", 0);
+        stats.put("UNDER_REVIEW_AJK", 0);
+        stats.put("IN_PROGRESS_AJK", 0);
+        stats.put("RESOLVED", 0);
+        stats.put("REJECTED", 0);
+        stats.put("CLOSED", 0);
+        
+        String sql = "SELECT status, COUNT(*) as count FROM aduan WHERE dipadam_pada IS NULL GROUP BY status";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                String status = rs.getString("status");
+                if (status != null) {
+                    stats.put(status.toUpperCase(), rs.getInt("count"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stats;
+    }
+
+    public java.util.Map<String, Integer> getAduanCategoryStats() {
+        java.util.Map<String, Integer> stats = new java.util.LinkedHashMap<>();
+        String sql = "SELECT k.nama_kategori, COUNT(*) as count " +
+                     "FROM aduan a " +
+                     "JOIN kategori_aduan k ON a.id_kategori_aduan = k.id_kategori_aduan " +
+                     "WHERE a.dipadam_pada IS NULL " +
+                     "GROUP BY k.nama_kategori";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                stats.put(rs.getString("nama_kategori"), rs.getInt("count"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stats;
+    }
+
+    public java.util.Map<String, Integer> getAduanPriorityStats() {
+        java.util.Map<String, Integer> stats = new java.util.LinkedHashMap<>();
+        stats.put("RENDAH", 0);
+        stats.put("SEDERHANA", 0);
+        stats.put("TINGGI", 0);
+        stats.put("KRITIKAL", 0);
+        
+        String sql = "SELECT keutamaan, COUNT(*) as count FROM aduan WHERE dipadam_pada IS NULL GROUP BY keutamaan";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                String p = rs.getString("keutamaan");
+                if (p != null) {
+                    stats.put(p.toUpperCase(), rs.getInt("count"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return stats;
+    }
 }
