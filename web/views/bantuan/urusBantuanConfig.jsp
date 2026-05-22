@@ -206,8 +206,98 @@
                 </div>
             </div>
         </form>
-    </div>
 </div>
+</div>
+
+<aside class="w-80 bg-white/80 border-l border-slate-100 backdrop-blur-md hidden xl:flex flex-col p-8 overflow-y-auto h-full shrink-0">
+    <div class="mb-8">
+        <h3 class="text-lg font-black text-gray-900 tracking-tight">Ringkasan Enjin Kelayakan</h3>
+        <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-1">Status Aturan Semasa</p>
+    </div>
+
+    <!-- Active Poverty Line Display -->
+    <div class="bg-indigo-50/50 p-5 rounded-[2rem] border border-indigo-100/50 flex flex-col gap-2 mb-6 group hover:bg-indigo-50 transition-all">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center shadow-sm">
+                <i class="fas fa-hand-holding-usd text-lg"></i>
+            </div>
+            <div>
+                <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Garis Kemiskinan Semasa</p>
+                <h4 class="font-black text-xl text-gray-900">RM <%= String.format("%,.2f", povertyLine) %></h4>
+            </div>
+        </div>
+        <div class="mt-2 text-[11px] text-indigo-600 font-medium">
+            * Penduduk dengan pendapatan di bawah had ini diberi skor penuh 100 markah untuk faktor pendapatan.
+        </div>
+    </div>
+
+    <!-- Algorithm Status -->
+    <div class="bg-emerald-50/50 p-5 rounded-[2rem] border border-emerald-100/50 flex flex-col gap-2 mb-6 group hover:bg-emerald-50 transition-all">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 bg-emerald-100 text-emerald-600 rounded-xl flex items-center justify-center shadow-sm">
+                <i class="fas fa-cogs text-lg"></i>
+            </div>
+            <div>
+                <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Enjin Scoring Kelayakan</p>
+                <span class="px-2.5 py-0.5 rounded-full bg-emerald-100 border border-emerald-200 text-emerald-700 text-[10px] font-black uppercase inline-block mt-1">
+                    Aktif & Dinamik
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interactive Guideline Card -->
+    <div class="mt-4 pt-6 border-t border-gray-150">
+        <h4 class="text-[11px] font-black text-gray-400 uppercase tracking-widest mb-4">Panduan Penyelarasan Berat</h4>
+        
+        <div class="space-y-4">
+            <!-- Guideline Item 1 -->
+            <div class="p-4 bg-white/60 border border-slate-100 rounded-2xl flex gap-3 text-xs">
+                <div class="text-blue-500 shrink-0 mt-0.5">
+                    <i class="fas fa-info-circle"></i>
+                </div>
+                <div>
+                    <h5 class="font-bold text-gray-800 mb-0.5">Faktor Pendapatan</h5>
+                    <p class="text-gray-500 leading-relaxed font-medium">Mengukur jurang kemiskinan relatif kepada paras garis kemiskinan (poverty line) yang ditetapkan.</p>
+                </div>
+            </div>
+
+            <!-- Guideline Item 2 -->
+            <div class="p-4 bg-white/60 border border-slate-100 rounded-2xl flex gap-3 text-xs">
+                <div class="text-emerald-500 shrink-0 mt-0.5">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div>
+                    <h5 class="font-bold text-gray-800 mb-0.5">Bilangan Tanggungan</h5>
+                    <p class="text-gray-500 leading-relaxed font-medium">Semakin ramai tanggungan isi rumah, semakin tinggi wajaran merit kelayakan yang diperoleh.</p>
+                </div>
+            </div>
+
+            <!-- Guideline Item 3 -->
+            <div class="p-4 bg-white/60 border border-slate-100 rounded-2xl flex gap-3 text-xs">
+                <div class="text-amber-500 shrink-0 mt-0.5">
+                    <i class="fas fa-heart"></i>
+                </div>
+                <div>
+                    <h5 class="font-bold text-gray-800 mb-0.5">Status Ibu Tunggal / OKU</h5>
+                    <p class="text-gray-500 leading-relaxed font-medium">Memberikan keutamaan merit tambahan kepada golongan rentan secara automatik.</p>
+                </div>
+            </div>
+
+            <!-- Guideline Item 4 -->
+            <div class="p-4 bg-white/60 border border-slate-100 rounded-2xl flex gap-3 text-xs">
+                <div class="text-indigo-500 shrink-0 mt-0.5">
+                    <i class="fas fa-briefcase-slash"></i>
+                </div>
+                <div>
+                    <h5 class="font-bold text-gray-800 mb-0.5">Faktor Pengangguran</h5>
+                    <p class="text-gray-500 leading-relaxed font-medium">Menilai status pekerjaan ketua keluarga untuk menyokong pemohon yang hilang punca pendapatan.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</aside>
+
 
 <script>
     function updateSliders() {

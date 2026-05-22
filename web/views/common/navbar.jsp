@@ -1,5 +1,4 @@
 <%@ page import="model.Pengguna" %>
-<%@ page import="model.Pengguna" %>
 <%
     // 1. Guna nama 'userNav' untuk elak ralat 'Duplicate local variable user'
     // Guna 'currentUser' supaya sepadan dengan LoginServlet anda
@@ -15,15 +14,10 @@
     String biro = userNav.getNama_jawatan(); // Diambil dari table 'jawatan_ajk'
     
     // 3. Normalize Path & Query String
-    // IMPORTANT: After RequestDispatcher.forward(), request.getRequestURI() returns the
-    // forwarded JSP path (e.g. /views/aduan/urusAduanAJK.jsp), NOT the original servlet path
-    // (/aduan/list). We use the javax.servlet.forward.request_uri attribute instead, which
-    // preserves the original URL the user navigated to, so active nav highlights work correctly.
     String forwardedUri = (String) request.getAttribute("javax.servlet.forward.request_uri");
     String currentPath = (forwardedUri != null ? forwardedUri : request.getRequestURI()).toLowerCase();
     String contextPath = request.getContextPath();
     String query = (request.getQueryString() != null) ? request.getQueryString().toLowerCase() : "";
-    // Also check the forwarded query string if present
     String forwardedQuery = (String) request.getAttribute("javax.servlet.forward.query_string");
     if (forwardedQuery != null && !forwardedQuery.isEmpty()) {
         query = forwardedQuery.toLowerCase();
@@ -33,180 +27,285 @@
     boolean isConstruction = currentPath.contains("dalampembangunan");
 
     // 4. Style CSS (Menggunakan dynamic brand colors dari header.jsp)
-    String activeClass = "bg-brand-purple text-white shadow-md group";
-    String inactiveClass = "text-gray-500 hover:bg-gray-50 hover:text-brand-purple group";
+    String activeClass = "bg-gradient-to-r from-[var(--brand-color)] to-[var(--brand-secondary)] text-white shadow-lg shadow-[var(--brand-shadow)] font-bold group transform hover:-translate-y-0.5";
+    String inactiveClass = "text-gray-500 hover:bg-slate-50/50 hover:text-[var(--brand-color)] font-medium group transition-all duration-200";
 %>
 
-<aside id="mainSidebar" class="w-64 bg-white fixed inset-y-0 left-0 z-[60] flex flex-col border-r border-gray-100 flex-shrink-0 h-full justify-between transition-transform duration-300 transform -translate-x-full md:translate-x-0 md:relative md:inset-auto md:z-0">
+<style>
+    /* Collapsible Sidebar Styles & Transitions */
+    #mainSidebar {
+        transition: width 0.35s cubic-bezier(0.4, 0, 0.2, 1), transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), background-color 0.35s ease, backdrop-filter 0.35s ease !important;
+    }
+    
+    #mainSidebar.collapsed {
+        width: 5rem !important; /* 80px */
+    }
+    
+    /* Text fade-out transitions inside sidebar */
+    #mainSidebar .brand-text,
+    #mainSidebar .nav-label,
+    #mainSidebar .menu-section-header,
+    #mainSidebar .other-section-header,
+    #mainSidebar button span:not(.nav-label) {
+        transition: opacity 0.15s ease, visibility 0.15s ease;
+        opacity: 1;
+        visibility: visible;
+    }
+    
+    #mainSidebar.collapsed .brand-text,
+    #mainSidebar.collapsed .nav-label,
+    #mainSidebar.collapsed .menu-section-header,
+    #mainSidebar.collapsed .other-section-header,
+    #mainSidebar.collapsed button span {
+        opacity: 0 !important;
+        visibility: hidden !important;
+        width: 0 !important;
+        height: 0 !important;
+        overflow: hidden !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        display: none !important;
+    }
+    
+    /* Adjust padding when collapsed */
+    #mainSidebar.collapsed .brand-padding {
+        padding: 1.25rem !important;
+    }
+    #mainSidebar.collapsed .nav-padding {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+    #mainSidebar.collapsed .footer-padding {
+        padding: 1.25rem 0.75rem !important;
+    }
+    
+    /* Center nav items and buttons when collapsed */
+    #mainSidebar.collapsed nav a {
+        justify-content: center !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        border-radius: 1.25rem !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+        width: 3.25rem !important;
+        height: 3.25rem !important;
+    }
+    
+    #mainSidebar.collapsed nav a div.w-6 {
+        width: auto !important;
+        text-align: center !important;
+    }
+    
+    #mainSidebar.collapsed nav a i {
+        font-size: 1.25rem !important;
+    }
+    
+    #mainSidebar.collapsed .pt-4.border-t {
+        border-top: none !important;
+        margin: 0 !important;
+        padding-top: 0 !important;
+    }
+    
+    #mainSidebar.collapsed button {
+        justify-content: center !important;
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+        width: 3.25rem !important;
+        height: 3.25rem !important;
+        margin-left: auto !important;
+        margin-right: auto !important;
+    }
+
+    #mainSidebar.collapsed button div.w-6 {
+        width: auto !important;
+    }
+</style>
+
+<aside id="mainSidebar" class="w-64 bg-white/95 backdrop-blur-md fixed inset-y-0 left-0 z-[60] flex flex-col border-r border-slate-100 flex-shrink-0 h-full justify-between transition-all duration-300 transform -translate-x-full md:translate-x-0 md:relative md:inset-auto md:z-0 shadow-sm">
+    <script>
+        // Apply collapsed state immediately before rendering to prevent visual flickering
+        if (localStorage.getItem('sidebarCollapsed') === 'true' && window.innerWidth >= 768) {
+            document.getElementById('mainSidebar').classList.add('collapsed');
+        }
+    </script>
+
+    <!-- Floating Collapse Toggle Button (Desktop Only) -->
+    <button id="sidebarCollapseBtn" onclick="toggleSidebarCollapse()" class="hidden md:flex absolute top-8 -right-3 w-6.5 h-6.5 bg-white border border-slate-200 hover:border-slate-300 text-slate-400 hover:text-slate-600 rounded-full items-center justify-center shadow-sm z-50 transition-all duration-300 focus:outline-none cursor-pointer p-1">
+        <i class="fas fa-chevron-left text-[9px] transition-transform duration-300" id="collapseIcon"></i>
+    </button>
+
     <!-- Mobile Close Button -->
-    <div class="p-4 md:hidden flex justify-end">
-        <button onclick="toggleSidebar()" class="text-gray-400 hover:text-gray-600"><i class="fas fa-times text-xl"></i></button>
+    <div class="p-4 md:hidden flex justify-end shrink-0">
+        <button onclick="toggleSidebar()" class="text-slate-400 hover:text-slate-600"><i class="fas fa-times text-xl"></i></button>
     </div>
     
     <div class="flex flex-col flex-1 overflow-hidden">
-        <div class="p-8 flex items-center gap-3 flex-shrink-0">
-            <div class="w-10 h-10 bg-brand-purple rounded-xl flex items-center justify-center text-white text-xl shadow-lg">
-                <i class="fas fa-village"></i>
+        <!-- Logo Section -->
+        <div class="brand-padding p-8 flex items-center gap-3.5 flex-shrink-0 relative">
+            <div class="w-10 h-10 bg-gradient-to-br from-[var(--brand-color)] to-[var(--brand-secondary)] rounded-2xl flex items-center justify-center text-white text-lg shadow-md shadow-[var(--brand-shadow)] transform hover:scale-105 transition-transform duration-300">
+                <i class="fas fa-house-chimney-window"></i>
             </div>
-            <div>
-                <h1 class="font-bold text-lg tracking-tight text-gray-900 leading-tight">Kampung<br>Danan</h1>
+            <div class="brand-text">
+                <h1 class="font-extrabold text-sm tracking-widest text-slate-800 uppercase leading-none">Kampung Danan</h1>
+                <span class="text-[9px] font-bold text-slate-400 uppercase tracking-widest block mt-1.5">Portal Komuniti</span>
             </div>
         </div>
 
-        <nav class="flex-1 px-6 space-y-2 overflow-y-auto py-4 custom-scrollbar">
+        <!-- Navigation Menu -->
+        <nav class="nav-padding flex-1 px-6 space-y-2 overflow-y-auto py-4 custom-scrollbar">
             
-            <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 px-2">Menu Utama</p>
+            <p class="menu-section-header text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-4 px-3 opacity-80">Menu Utama</p>
 
             <a href="<%= contextPath %>/DashboardServlet" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
                <%= (currentPath.contains("dashboard")) ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-th-large <%= (currentPath.contains("dashboard")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-th-large <%= (currentPath.contains("dashboard")) ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Papan Pemuka</span>
+                <span class="nav-label font-medium text-sm">Papan Pemuka</span>
             </a>
 
             <% if ("Penduduk".equalsIgnoreCase(role)) { %>
                 
                 <a href="<%= contextPath %>/profil/view" 
                    class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 <%= currentPath.contains("profil") ? activeClass : inactiveClass %>">
-                    <div class="w-6 text-center"><i class="fas fa-user <%= currentPath.contains("profil") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i></div>
-                    <span class="font-medium text-sm">Profil Saya</span>
+                    <div class="w-6 text-center"><i class="fas fa-user <%= currentPath.contains("profil") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i></div>
+                    <span class="nav-label font-medium text-sm">Profil Saya</span>
                 </a>
 
                 <a href="<%= contextPath %>/bantuan/list" 
                    class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 <%= currentPath.contains("bantuan") ? activeClass : inactiveClass %>">
-                    <div class="w-6 text-center"><i class="fas fa-hand-holding-heart <%= currentPath.contains("bantuan") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i></div>
-                    <span class="font-medium text-sm">Mohon Bantuan</span>
+                    <div class="w-6 text-center"><i class="fas fa-hand-holding-heart <%= currentPath.contains("bantuan") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i></div>
+                    <span class="nav-label font-medium text-sm">Mohon Bantuan</span>
                 </a>
 
                 <a href="<%= contextPath %>/fasiliti/list" 
                    class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 <%= currentPath.contains("/fasiliti/") ? activeClass : inactiveClass %>">
-                    <div class="w-6 text-center"><i class="fas fa-building-circle-check <%= currentPath.contains("/fasiliti/") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i></div>
-                    <span class="font-medium text-sm">Fasiliti Kampung</span>
+                    <div class="w-6 text-center"><i class="fas fa-building-circle-check <%= currentPath.contains("/fasiliti/") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i></div>
+                    <span class="nav-label font-medium text-sm">Fasiliti Kampung</span>
                 </a>
 
                 <a href="<%= contextPath %>/aduan/list" 
                    class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/aduan/") ? activeClass : inactiveClass %>">
-                    <div class="w-6 text-center"><i class="fas fa-comment-dots <%= currentPath.contains("/aduan/") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i></div>
-                    <span class="font-medium text-sm">Aduan & Cadangan</span>
+                    <div class="w-6 text-center"><i class="fas fa-comment-dots <%= currentPath.contains("/aduan/") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i></div>
+                    <span class="nav-label font-medium text-sm">Aduan & Cadangan</span>
                 </a>
 
                 <a href="<%= contextPath %>/hebahan/list" 
                    class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/hebahan/") ? activeClass : inactiveClass %>">
-                    <div class="w-6 text-center"><i class="fas fa-bullhorn <%= currentPath.contains("/hebahan/") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i></div>
-                    <span class="font-medium text-sm">Info & Hebahan</span>
+                    <div class="w-6 text-center"><i class="fas fa-bullhorn <%= currentPath.contains("/hebahan/") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i></div>
+                    <span class="nav-label font-medium text-sm">Info & Hebahan</span>
                 </a>
 
 <% } else if ("Ketua Kampung".equalsIgnoreCase(role)) { %>
 
             <a href="<%= contextPath %>/profil/view" 
                    class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 <%= currentPath.contains("profil") ? activeClass : inactiveClass %>">
-                    <div class="w-6 text-center"><i class="fas fa-user <%= currentPath.contains("profil") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i></div>
-                    <span class="font-medium text-sm">Profil Saya</span>
+                    <div class="w-6 text-center"><i class="fas fa-user <%= currentPath.contains("profil") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i></div>
+                    <span class="nav-label font-medium text-sm">Profil Saya</span>
                 </a>
 
             <a href="<%= contextPath %>/ketua/urus" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
                <%= (currentPath.contains("/ketua/urus")) ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-users <%= (currentPath.contains("/ketua/urus")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-users <%= (currentPath.contains("/ketua/urus")) ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Direktori Penduduk</span>
+                <span class="nav-label font-medium text-sm">Direktori Penduduk</span>
             </a>
 
             <a href="<%= contextPath %>/bantuan/list" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
                <%= currentPath.contains("/bantuan/list") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-clipboard-check <%= currentPath.contains("/bantuan/list") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-clipboard-check <%= currentPath.contains("/bantuan/list") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Sokongan Bantuan</span>
+                <span class="nav-label font-medium text-sm">Sokongan Bantuan</span>
             </a>
 
             <a href="<%= contextPath %>/bantuan/config" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
                <%= currentPath.contains("/bantuan/config") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-sliders-h <%= currentPath.contains("/bantuan/config") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-sliders-h <%= currentPath.contains("/bantuan/config") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Konfigurasi Kelayakan</span>
+                <span class="nav-label font-medium text-sm">Konfigurasi Kelayakan</span>
             </a>
 
             <a href="<%= contextPath %>/aduan/list" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/aduan/list") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-exclamation-circle <%= currentPath.contains("/aduan/list") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-exclamation-circle <%= currentPath.contains("/aduan/list") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Aduan Komuniti</span>
+                <span class="nav-label font-medium text-sm">Aduan Komuniti</span>
             </a>
 
             <a href="<%= contextPath %>/hebahan/list" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/hebahan/list") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-bullhorn <%= currentPath.contains("/hebahan/list") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-bullhorn <%= currentPath.contains("/hebahan/list") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Urus Hebahan</span>
+                <span class="nav-label font-medium text-sm">Urus Hebahan</span>
             </a>
 
             <a href="<%= contextPath %>/fasiliti/urus" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/fasiliti/urus") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-calendar-check <%= currentPath.contains("/fasiliti/urus") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-calendar-check <%= currentPath.contains("/fasiliti/urus") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Urus Fasiliti</span>
+                <span class="nav-label font-medium text-sm">Urus Fasiliti</span>
             </a>
 
             <a href="<%= contextPath %>/laporan/view" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/laporan/") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-chart-pie <%= currentPath.contains("/laporan/") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-chart-pie <%= currentPath.contains("/laporan/") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Laporan & Analitik</span>
+                <span class="nav-label font-medium text-sm">Laporan & Analitik</span>
             </a>
 
-            <div class="pt-4 border-t border-gray-100 my-2">
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">Perkhidmatan Penduduk</p>
+            <div class="pt-4 border-t border-slate-100 my-2">
+                <p class="menu-section-header text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2 px-3 opacity-80">Perkhidmatan Penduduk</p>
             </div>
 
             <a href="<%= contextPath %>/bantuan/mohon" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 <%= currentPath.contains("/bantuan/mohon") || currentPath.contains("/bantuan/rasmi") || currentPath.contains("/bantuan/komuniti") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-hand-holding-heart <%= currentPath.contains("/bantuan/mohon") || currentPath.contains("/bantuan/rasmi") || currentPath.contains("/bantuan/komuniti") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-hand-holding-heart <%= currentPath.contains("/bantuan/mohon") || currentPath.contains("/bantuan/rasmi") || currentPath.contains("/bantuan/komuniti") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Mohon Bantuan</span>
+                <span class="nav-label font-medium text-sm">Mohon Bantuan</span>
             </a>
 
             <a href="<%= contextPath %>/fasiliti/list" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 <%= currentPath.contains("/fasiliti/list") || (currentPath.contains("/fasiliti/") && !currentPath.contains("/fasiliti/urus")) ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-building-circle-check <%= currentPath.contains("/fasiliti/list") || (currentPath.contains("/fasiliti/") && !currentPath.contains("/fasiliti/urus")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-building-circle-check <%= currentPath.contains("/fasiliti/list") || (currentPath.contains("/fasiliti/") && !currentPath.contains("/fasiliti/urus")) ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Fasiliti Kampung</span>
+                <span class="nav-label font-medium text-sm">Fasiliti Kampung</span>
             </a>
 
             <a href="<%= contextPath %>/aduan/penduduk" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/aduan/penduduk") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-comment-dots <%= currentPath.contains("/aduan/penduduk") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-comment-dots <%= currentPath.contains("/aduan/penduduk") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Aduan & Cadangan</span>
+                <span class="nav-label font-medium text-sm">Aduan & Cadangan</span>
             </a>
 
             <a href="<%= contextPath %>/hebahan/penduduk" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/hebahan/penduduk") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-bullhorn <%= currentPath.contains("/hebahan/penduduk") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-bullhorn <%= currentPath.contains("/hebahan/penduduk") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Info & Hebahan</span>
+                <span class="nav-label font-medium text-sm">Info & Hebahan</span>
             </a>
 
             <% } else if ("AJK Kampung".equalsIgnoreCase(role)) { %>
 
             <a href="<%= contextPath %>/profil/view" 
                    class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 <%= currentPath.contains("profil") ? activeClass : inactiveClass %>">
-                    <div class="w-6 text-center"><i class="fas fa-user <%= currentPath.contains("profil") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i></div>
-                    <span class="font-medium text-sm">Profil Saya</span>
+                    <div class="w-6 text-center"><i class="fas fa-user <%= currentPath.contains("profil") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i></div>
+                    <span class="nav-label font-medium text-sm">Profil Saya</span>
                 </a>
             
             <% if ("Setiausaha".equals(biro)) { %>
@@ -214,9 +313,9 @@
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
                <%= (currentPath.contains("/penduduk/urus")) ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-user-cog <%= (currentPath.contains("/penduduk/urus")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-user-cog <%= (currentPath.contains("/penduduk/urus")) ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Pendaftaran & Data</span>
+                <span class="nav-label font-medium text-sm">Pendaftaran & Data</span>
             </a>
             <% } %>
 
@@ -225,17 +324,17 @@
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
                <%= currentPath.contains("/bantuan/list") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-tasks <%= currentPath.contains("/bantuan/list") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-tasks <%= currentPath.contains("/bantuan/list") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Semakan Bantuan</span>
+                <span class="nav-label font-medium text-sm">Semakan Bantuan</span>
             </a>
             <a href="<%= contextPath %>/bantuan/config" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
                <%= currentPath.contains("/bantuan/config") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-sliders-h <%= currentPath.contains("/bantuan/config") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-sliders-h <%= currentPath.contains("/bantuan/config") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Konfigurasi Kelayakan</span>
+                <span class="nav-label font-medium text-sm">Konfigurasi Kelayakan</span>
             </a>
             <% } %>
 
@@ -243,9 +342,9 @@
             <a href="<%= contextPath %>/fasiliti/urus" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/fasiliti/urus") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-calendar-check <%= currentPath.contains("/fasiliti/urus") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-calendar-check <%= currentPath.contains("/fasiliti/urus") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Urus Fasiliti</span>
+                <span class="nav-label font-medium text-sm">Urus Fasiliti</span>
             </a>
             <% } %>
 
@@ -253,9 +352,9 @@
             <a href="<%= contextPath %>/aduan/list" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/aduan/list") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-clipboard-list <%= currentPath.contains("/aduan/list") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-clipboard-list <%= currentPath.contains("/aduan/list") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Aduan & Laporan</span>
+                <span class="nav-label font-medium text-sm">Aduan & Laporan</span>
             </a>
             <% } %>
 
@@ -263,73 +362,74 @@
             <a href="<%= contextPath %>/hebahan/list" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/hebahan/list") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-bullhorn <%= currentPath.contains("/hebahan/list") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-bullhorn <%= currentPath.contains("/hebahan/list") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Hebahan Awam</span>
+                <span class="nav-label font-medium text-sm">Hebahan Awam</span>
             </a>
             <% } %>
 
             <a href="<%= contextPath %>/laporan/view" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/laporan/") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-chart-line <%= currentPath.contains("/laporan/") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-chart-line <%= currentPath.contains("/laporan/") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Laporan Biro</span>
+                <span class="nav-label font-medium text-sm">Laporan Biro</span>
             </a>
 
-            <div class="pt-4 border-t border-gray-100 my-2">
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2 px-2">Perkhidmatan Penduduk</p>
+            <div class="pt-4 border-t border-slate-100 my-2">
+                <p class="menu-section-header text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-2 px-3 opacity-80">Perkhidmatan Penduduk</p>
             </div>
 
             <a href="<%= contextPath %>/bantuan/mohon" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 <%= currentPath.contains("/bantuan/mohon") || currentPath.contains("/bantuan/rasmi") || currentPath.contains("/bantuan/komuniti") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-hand-holding-heart <%= currentPath.contains("/bantuan/mohon") || currentPath.contains("/bantuan/rasmi") || currentPath.contains("/bantuan/komuniti") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-hand-holding-heart <%= currentPath.contains("/bantuan/mohon") || currentPath.contains("/bantuan/rasmi") || currentPath.contains("/bantuan/komuniti") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Mohon Bantuan</span>
+                <span class="nav-label font-medium text-sm">Mohon Bantuan</span>
             </a>
 
             <a href="<%= contextPath %>/fasiliti/list" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 <%= currentPath.contains("/fasiliti/list") || (currentPath.contains("/fasiliti/") && !currentPath.contains("/fasiliti/urus")) ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-building-circle-check <%= currentPath.contains("/fasiliti/list") || (currentPath.contains("/fasiliti/") && !currentPath.contains("/fasiliti/urus")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-building-circle-check <%= currentPath.contains("/fasiliti/list") || (currentPath.contains("/fasiliti/") && !currentPath.contains("/fasiliti/urus")) ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Fasiliti Kampung</span>
+                <span class="nav-label font-medium text-sm">Fasiliti Kampung</span>
             </a>
 
             <a href="<%= contextPath %>/aduan/penduduk" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/aduan/penduduk") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-comment-dots <%= currentPath.contains("/aduan/penduduk") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-comment-dots <%= currentPath.contains("/aduan/penduduk") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Aduan & Cadangan</span>
+                <span class="nav-label font-medium text-sm">Aduan & Cadangan</span>
             </a>
 
             <a href="<%= contextPath %>/hebahan/penduduk" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/hebahan/penduduk") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
-                    <i class="fas fa-bullhorn <%= currentPath.contains("/hebahan/penduduk") ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i>
+                    <i class="fas fa-bullhorn <%= currentPath.contains("/hebahan/penduduk") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="font-medium text-sm">Info & Hebahan</span>
+                <span class="nav-label font-medium text-sm">Info & Hebahan</span>
             </a>
 
             <% } %>
         </nav>
     </div>
 
-    <div class="p-6 border-t border-gray-100 bg-white">
-        <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 px-2">Lain-lain</p>
+    <!-- Sidebar Footer -->
+    <div class="footer-padding p-6 border-t border-slate-100/50 bg-white/50 relative shrink-0">
+        <p class="other-section-header text-[10px] font-black text-slate-400 uppercase tracking-[0.15em] mb-3 px-3 opacity-80">Lain-lain</p>
         
         <a href="<%= constructionPage %>?menu=tetapan" 
            class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 mb-2
            <%= (isConstruction && query.contains("menu=tetapan")) ? activeClass : inactiveClass %>">
-            <div class="w-6 text-center"><i class="fas fa-cog <%= (isConstruction && query.contains("menu=tetapan")) ? "text-white" : "text-gray-400 group-hover:text-brand-purple" %> transition"></i></div>
-            <span class="font-medium text-sm">Tetapan</span>
+            <div class="w-6 text-center"><i class="fas fa-cog <%= (isConstruction && query.contains("menu=tetapan")) ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i></div>
+            <span class="nav-label font-medium text-sm">Tetapan</span>
         </a>
         
-        <button onclick="confirmLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-red-400 hover:bg-red-50 hover:text-red-600 rounded-2xl transition group text-left">
-            <div class="w-6 text-center"><i class="fas fa-sign-out-alt transition"></i></div>
-            <span class="font-medium text-sm">Log Keluar</span>
+        <button onclick="confirmLogout()" class="w-full flex items-center gap-3 px-4 py-3 text-rose-500 hover:bg-rose-50 hover:text-rose-700 rounded-2xl transition group text-left font-bold focus:outline-none cursor-pointer">
+            <div class="w-6 text-center"><i class="fas fa-sign-out-alt transition group-hover:translate-x-0.5"></i></div>
+            <span class="nav-label font-bold text-sm">Log Keluar</span>
         </button>
     </div>
 
@@ -343,6 +443,7 @@
         <button onclick="toggleSidebar()" class="p-2 bg-white rounded-lg shadow text-gray-600 focus:outline-none"><i class="fas fa-bars"></i></button>
     </div>
 
+<!-- Logout Modal -->
 <div id="modalLogout" class="fixed inset-0 z-[999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeLogout()"></div>
     <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
@@ -376,13 +477,37 @@
         const overlay = document.getElementById('sidebarOverlay');
         
         if (sidebar.classList.contains('-translate-x-full')) {
-            // Open
             sidebar.classList.remove('-translate-x-full');
             overlay.classList.remove('hidden');
         } else {
-            // Close
             sidebar.classList.add('-translate-x-full');
             overlay.classList.add('hidden');
         }
     }
+
+    // Sidebar Desktop Collapsible Toggle
+    function toggleSidebarCollapse() {
+        const sidebar = document.getElementById('mainSidebar');
+        const icon = document.getElementById('collapseIcon');
+        const isCollapsed = sidebar.classList.toggle('collapsed');
+        
+        // Save choice in localStorage
+        localStorage.setItem('sidebarCollapsed', isCollapsed);
+        
+        // Rotate Chevron Icon
+        if (isCollapsed) {
+            icon.style.transform = 'rotate(180deg)';
+        } else {
+            icon.style.transform = 'rotate(0deg)';
+        }
+    }
+
+    // Sync icon rotation on load
+    document.addEventListener("DOMContentLoaded", function() {
+        const sidebar = document.getElementById('mainSidebar');
+        const icon = document.getElementById('collapseIcon');
+        if (sidebar && sidebar.classList.contains('collapsed') && icon) {
+            icon.style.transform = 'rotate(180deg)';
+        }
+    });
 </script>

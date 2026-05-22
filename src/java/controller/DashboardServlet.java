@@ -62,6 +62,48 @@ public class DashboardServlet extends HttpServlet {
         if ("Pentadbir Sistem".equals(peranan)) {
             request.getRequestDispatcher("/admin/dashboard.jsp").forward(request, response);
         } else if ("Ketua Kampung".equals(peranan)) {
+            AduanDAO aduanDao = new AduanDAO();
+            HebahanDAO hebahanDao = new HebahanDAO();
+            PermohonanBantuanDAO bantuanDao = new PermohonanBantuanDAO();
+            TempahanFasilitiDAO fasilitiDao = new TempahanFasilitiDAO();
+
+            // 1. Pending bantuan awaiting Ketua
+            List<PermohonanBantuan> pendingBantuanList = bantuanDao.getByStatus("MENUNGGU_KETUA");
+            request.setAttribute("pendingBantuanList", pendingBantuanList);
+            request.setAttribute("pendingBantuanCount", pendingBantuanList.size());
+
+            // 2. Pending tempahan awaiting approval
+            List<TempahanFasiliti> allTempahan = fasilitiDao.dapatkanSemuaTempahan();
+            List<TempahanFasiliti> pendingTempahanList = allTempahan.stream()
+                .filter(t -> "MENUNGGU".equalsIgnoreCase(t.getStatus()))
+                .collect(Collectors.toList());
+            request.setAttribute("pendingTempahanList", pendingTempahanList);
+            request.setAttribute("pendingTempahanCount", pendingTempahanList.size());
+
+            // 3. Active aduan count
+            List<Aduan> allAduan = aduanDao.getAll();
+            long pendingAduanCount = allAduan.stream()
+                .filter(a -> !"RESOLVED".equalsIgnoreCase(a.getStatus()) && !"REJECTED".equalsIgnoreCase(a.getStatus()))
+                .count();
+            request.setAttribute("pendingAduanCount", pendingAduanCount);
+
+            // 4. Latest published announcements
+            List<Hebahan> latestHebahan = hebahanDao.getPublished();
+            if (latestHebahan.size() > 3) latestHebahan = latestHebahan.subList(0, 3);
+            request.setAttribute("latestHebahan", latestHebahan);
+
+            // 5. Total residents and AJK list
+            try (Connection conn = DBUtil.getConnection()) {
+                PenggunaDAO pDao = new PenggunaDAO(conn);
+                List<Pengguna> activePenduduk = pDao.getAllActivePenduduk();
+                request.setAttribute("totalPenduduk", activePenduduk.size());
+                
+                List<Pengguna> ajkList = pDao.getAllAJK();
+                request.setAttribute("ajkList", ajkList);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
             request.getRequestDispatcher("/views/dashboard/ketuaDashboard.jsp").forward(request, response);
         } else if ("AJK Kampung".equals(peranan)) {
             /**
@@ -70,17 +112,141 @@ public class DashboardServlet extends HttpServlet {
              * masing-masing.
              */
             if ("Setiausaha".equals(biro)) {
+                AduanDAO aduanDao = new AduanDAO();
+                HebahanDAO hebahanDao = new HebahanDAO();
+
+                // 1. Pending residents awaiting registration approval
+                try (Connection conn = DBUtil.getConnection()) {
+                    PenggunaDAO pDao = new PenggunaDAO(conn);
+                    List<Pengguna> pendingPendudukList = pDao.getPendingPenduduk();
+                    request.setAttribute("pendingPendudukList", pendingPendudukList);
+                    request.setAttribute("pendingPendudukCount", pendingPendudukList.size());
+
+                    List<Pengguna> activePendudukList = pDao.getAllActivePenduduk();
+                    request.setAttribute("totalPenduduk", activePendudukList.size());
+
+                    List<Pengguna> ajkList = pDao.getAllAJK();
+                    request.setAttribute("ajkList", ajkList);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                // 2. Active aduan count
+                List<Aduan> allAduan = aduanDao.getAll();
+                long activeAduanCount = allAduan.stream()
+                    .filter(a -> !"RESOLVED".equalsIgnoreCase(a.getStatus()) && !"REJECTED".equalsIgnoreCase(a.getStatus()))
+                    .count();
+                request.setAttribute("activeAduanCount", activeAduanCount);
+
+                // 3. Latest published announcements
+                List<Hebahan> latestHebahan = hebahanDao.getPublished();
+                if (latestHebahan.size() > 3) latestHebahan = latestHebahan.subList(0, 3);
+                request.setAttribute("latestHebahan", latestHebahan);
+
                 request.getRequestDispatcher("/views/dashboard/setiausahaDashboard.jsp").forward(request, response);
             } else if ("Biro Kebajikan & Sosial".equals(biro)) {
+                PermohonanBantuanDAO bantuanDao = new PermohonanBantuanDAO();
+
+                // 1. Bantuan awaiting Biro review (status = 'BARU' or status = 'MENUNGGU_AJK')
+                List<PermohonanBantuan> pendingBantuanList = new ArrayList<>();
+                pendingBantuanList.addAll(bantuanDao.getByStatus("BARU"));
+                pendingBantuanList.addAll(bantuanDao.getByStatus("MENUNGGU_AJK"));
+                request.setAttribute("pendingBantuanList", pendingBantuanList);
+                request.setAttribute("pendingBantuanCount", pendingBantuanList.size());
+
+                // 2. Overall Bantuan Statistics for sidebar/metrics
+                List<PermohonanBantuan> allBantuan = bantuanDao.getAll();
+                long approvedCount = allBantuan.stream().filter(b -> "LULUS".equalsIgnoreCase(b.getStatus())).count();
+                request.setAttribute("totalBantuanCount", allBantuan.size());
+                request.setAttribute("approvedBantuanCount", approvedCount);
+
+                // 3. AJK List for sidebar
+                try (Connection conn = DBUtil.getConnection()) {
+                    PenggunaDAO pDao = new PenggunaDAO(conn);
+                    List<Pengguna> ajkList = pDao.getAllAJK();
+                    request.setAttribute("ajkList", ajkList);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 request.getRequestDispatcher("/views/dashboard/biroKebajikanDashboard.jsp").forward(request, response);
             } else if ("Biro Sukan & Riadah".equals(biro)) {
+                TempahanFasilitiDAO fasilitiDao = new TempahanFasilitiDAO();
+
+                // 1. Pending bookings awaiting approval
+                List<TempahanFasiliti> allTempahan = fasilitiDao.dapatkanSemuaTempahan();
+                List<TempahanFasiliti> pendingTempahanList = allTempahan.stream()
+                    .filter(t -> "MENUNGGU".equalsIgnoreCase(t.getStatus()))
+                    .collect(Collectors.toList());
+                request.setAttribute("pendingTempahanList", pendingTempahanList);
+                request.setAttribute("pendingTempahanCount", pendingTempahanList.size());
+
+                // 2. Booking stats
+                long approvedCount = allTempahan.stream().filter(t -> "LULUS".equalsIgnoreCase(t.getStatus())).count();
+                request.setAttribute("totalTempahanCount", allTempahan.size());
+                request.setAttribute("approvedTempahanCount", approvedCount);
+
+                // 3. AJK List
+                try (Connection conn = DBUtil.getConnection()) {
+                    PenggunaDAO pDao = new PenggunaDAO(conn);
+                    List<Pengguna> ajkList = pDao.getAllAJK();
+                    request.setAttribute("ajkList", ajkList);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 request.getRequestDispatcher("/views/dashboard/biroSukanDashboard.jsp").forward(request, response);
             } else if ("Biro Keselamatan".equals(biro)) {
+                AduanDAO aduanDao = new AduanDAO();
+
+                // 1. Pending complaints (status = 'SUBMITTED' or status = 'UNDER_REVIEW_AJK')
+                List<Aduan> allAduan = aduanDao.getAll();
+                List<Aduan> pendingAduanList = allAduan.stream()
+                    .filter(a -> "SUBMITTED".equalsIgnoreCase(a.getStatus()) || "UNDER_REVIEW_AJK".equalsIgnoreCase(a.getStatus()))
+                    .collect(Collectors.toList());
+                request.setAttribute("pendingAduanList", pendingAduanList);
+                request.setAttribute("pendingAduanCount", pendingAduanList.size());
+
+                // 2. Stats
+                long resolvedCount = allAduan.stream()
+                    .filter(a -> "RESOLVED".equalsIgnoreCase(a.getStatus()) || "CLOSED".equalsIgnoreCase(a.getStatus()))
+                    .count();
+                request.setAttribute("totalAduanCount", allAduan.size());
+                request.setAttribute("resolvedAduanCount", resolvedCount);
+
+                // 3. AJK List
+                try (Connection conn = DBUtil.getConnection()) {
+                    PenggunaDAO pDao = new PenggunaDAO(conn);
+                    List<Pengguna> ajkList = pDao.getAllAJK();
+                    request.setAttribute("ajkList", ajkList);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 request.getRequestDispatcher("/views/dashboard/biroKeselamatanDashboard.jsp").forward(request, response);
             } else if ("Biro Hebahan".equals(biro)) {
+                HebahanDAO hebahanDao = new HebahanDAO();
+
+                // 1. All announcements
+                List<Hebahan> allHebahan = hebahanDao.getAll();
+                request.setAttribute("hebahanList", allHebahan);
+                request.setAttribute("totalHebahanCount", allHebahan.size());
+
+                // 2. Published vs Draft stats
+                long publishedCount = allHebahan.stream().filter(h -> "Published".equalsIgnoreCase(h.getStatus_hebahan())).count();
+                request.setAttribute("publishedCount", publishedCount);
+
+                // 3. AJK List
+                try (Connection conn = DBUtil.getConnection()) {
+                    PenggunaDAO pDao = new PenggunaDAO(conn);
+                    List<Pengguna> ajkList = pDao.getAllAJK();
+                    request.setAttribute("ajkList", ajkList);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
                 request.getRequestDispatcher("/views/dashboard/biroHebahanDashboard.jsp").forward(request, response);
             } else {
-                // Default dashboard if biro-specific one doesn't exist
                 request.getRequestDispatcher("/views/dashboard/setiausahaDashboard.jsp").forward(request, response);
             }
         } else if ("Penduduk".equals(peranan)) {

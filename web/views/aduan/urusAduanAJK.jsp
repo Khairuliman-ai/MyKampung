@@ -32,12 +32,35 @@
     }
     
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm");
+    SimpleDateFormat sdfFull = new SimpleDateFormat("yyyy-MM-dd");
 %>
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F7F7F9]">
     <div class="mb-8">
         <h2 class="text-2xl font-bold text-gray-800">Urus Aduan (AJK)</h2>
         <p class="text-gray-500 text-sm">Bertindak mengikut status aduan yang diberikan.</p>
+    </div>
+
+    <!-- Carian & Penapis Card -->
+    <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Carian Pantas</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
+                    <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Cari no. aduan, tajuk, kategori, pengadu..." 
+                           class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-purple text-gray-800 text-sm transition-all">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Tarikh Aduan</label>
+                <div class="relative">
+                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="far fa-calendar-alt"></i></span>
+                    <input type="date" id="dateFilter" onchange="filterData()"
+                           class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-purple text-gray-800 text-sm transition-all">
+                </div>
+            </div>
+        </div>
     </div>
 
     <div class="mb-8 border-b border-gray-200">
@@ -57,210 +80,228 @@
     <!-- Tab Baharu -->
     <div id="content-baharu" class="space-y-6">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-purple-50 border-b border-purple-100">
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">No.</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Tarikh</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Pengadu / Tajuk</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Kategori</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Status</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider text-center">Tindakan</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    <% if (!listBaharu.isEmpty()) { 
-                        for (Aduan a : listBaharu) { %>
-                    <tr class="hover:bg-purple-50/30 transition cursor-pointer" 
-                        onclick="showAduanDetail(this)"
-                        data-id="<%= a.getId_aduan() %>"
-                        data-tajuk="<%= a.getTajuk().replace("\"", "&quot;") %>"
-                        data-keterangan="<%= a.getKeterangan().replace("\"", "&quot;") %>"
-                        data-pengadu="<%= a.getNama_penuh() %>"
-                        data-tarikh="<%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %>"
-                        data-kategori="<%= a.getNama_kategori() %>"
-                        data-status="<%= a.getStatus() %>"
-                        data-status-label="<%= a.getStatusLabel() %>"
-                        data-status-class="<%= a.getStatusBadgeClass() %>"
-                        data-priority="<%= a.getKeutamaan() %>"
-                        data-priority-class="<%= a.getKeutamaanBadge() %>"
-                        data-catatan-ajk="<%= a.getCatatan_ajk() != null ? a.getCatatan_ajk().replace("\"", "&quot;") : "" %>"
-                        data-catatan-ketua="<%= a.getCatatan_ketua() != null ? a.getCatatan_ketua().replace("\"", "&quot;") : "" %>"
-                        data-gambar="<%= a.getGambar_aduan() != null ? a.getGambar_aduan() : "" %>"
-                        >
-                        <td class="p-4 text-sm font-bold text-brand-purple">#<%= a.getId_aduan() %></td>
-                        <td class="p-4 text-sm text-gray-600"><%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %></td>
-                        <td class="p-4">
-                            <div class="flex flex-col">
-                                <span class="text-sm font-bold text-gray-800"><%= a.getNama_penuh() %></span>
-                                <span class="text-[10px] text-gray-400"><%= a.getTajuk() %></span>
-                            </div>
-                        </td>
-                        <td class="p-4">
-                            <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold border <%= a.getKeutamaanBadge() %>">
-                                <%= a.getNama_kategori() %>
-                            </span>
-                        </td>
-                        <td class="p-4">
-                            <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase <%= a.getStatusBadgeClass() %>">
-                                <%= a.getStatusLabel() %>
-                            </span>
-                        </td>
-                        <td class="p-4 text-center">
-                            <% if ("SUBMITTED".equals(a.getStatus()) || "UNDER_REVIEW_AJK".equals(a.getStatus()) || "IN_PROGRESS_AJK".equals(a.getStatus())) { %>
-                            <button onclick="event.stopPropagation(); openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" class="p-2 text-gray-400 hover:text-brand-purple transition">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <% } else { %>
-                            <span class="text-gray-300">-</span>
-                            <% } %>
-                        </td>
-                    </tr>
-                    <% } } else { %>
-                    <tr><td colspan="6" class="p-12 text-center text-gray-400 italic">Tiada aduan baharu.</td></tr>
-                    <% } %>
-                </tbody>
-            </table>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-16">No.</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">Tarikh</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Pengadu / Tajuk</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-40">Kategori</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">Status</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center w-32">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <% if (!listBaharu.isEmpty()) { 
+                            for (Aduan a : listBaharu) { 
+                                String filterDate = (a.getDibuat_pada() != null) ? sdfFull.format(a.getDibuat_pada()) : "";
+                        %>
+                        <tr class="data-row hover:bg-purple-50/50 transition-colors cursor-pointer" 
+                            onclick="showAduanDetail(this)"
+                            data-date="<%= filterDate %>"
+                            data-id="<%= a.getId_aduan() %>"
+                            data-tajuk="<%= a.getTajuk().replace("\"", "&quot;") %>"
+                            data-keterangan="<%= a.getKeterangan().replace("\"", "&quot;") %>"
+                            data-pengadu="<%= a.getNama_penuh() %>"
+                            data-tarikh="<%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %>"
+                            data-kategori="<%= a.getNama_kategori() %>"
+                            data-status="<%= a.getStatus() %>"
+                            data-status-label="<%= a.getStatusLabel() %>"
+                            data-status-class="<%= a.getStatusBadgeClass() %>"
+                            data-priority="<%= a.getKeutamaan() %>"
+                            data-priority-class="<%= a.getKeutamaanBadge() %>"
+                            data-catatan-ajk="<%= a.getCatatan_ajk() != null ? a.getCatatan_ajk().replace("\"", "&quot;") : "" %>"
+                            data-catatan-ketua="<%= a.getCatatan_ketua() != null ? a.getCatatan_ketua().replace("\"", "&quot;") : "" %>"
+                            data-gambar="<%= a.getGambar_aduan() != null ? a.getGambar_aduan() : "" %>"
+                            >
+                            <td class="p-4 text-sm font-bold text-[#6C5DD3] whitespace-nowrap search-col">#<%= a.getId_aduan() %></td>
+                            <td class="p-4 text-sm text-gray-600 whitespace-nowrap"><%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %></td>
+                            <td class="p-4 search-col">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-gray-800"><%= a.getNama_penuh() %></span>
+                                    <span class="text-xs text-gray-400 mt-0.5"><%= a.getTajuk() %></span>
+                                </div>
+                            </td>
+                            <td class="p-4 whitespace-nowrap search-col">
+                                <span class="px-2 py-0.5 rounded-lg text-xs font-bold border <%= a.getKeutamaanBadge() %>">
+                                    <%= a.getNama_kategori() %>
+                                </span>
+                            </td>
+                            <td class="p-4 whitespace-nowrap search-col">
+                                <span class="px-3 py-1.5 rounded-full text-xs font-bold uppercase <%= a.getStatusBadgeClass() %>">
+                                    <%= a.getStatusLabel() %>
+                                </span>
+                            </td>
+                            <td class="p-4 text-center whitespace-nowrap" onclick="event.stopPropagation()">
+                                <% if ("SUBMITTED".equals(a.getStatus()) || "UNDER_REVIEW_AJK".equals(a.getStatus()) || "IN_PROGRESS_AJK".equals(a.getStatus())) { %>
+                                <button onclick="openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" 
+                                        class="group inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-50 text-[#6C5DD3] hover:bg-purple-100 hover:text-purple-700 transition text-xs font-bold">
+                                    <i class="fas fa-edit group-hover:scale-110 transition-transform"></i> Kemaskini
+                                </button>
+                                <% } else { %>
+                                <span class="text-gray-300 text-xs flex items-center justify-center gap-1"><i class="fas fa-lock"></i> Kunci</span>
+                                <% } %>
+                            </td>
+                        </tr>
+                        <% } } else { %>
+                        <tr class="no-data"><td colspan="6" class="p-8 text-center text-gray-400"><i class="fas fa-inbox text-3xl mb-2 block opacity-50"></i>Tiada aduan baharu.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <!-- Tab Tindakan -->
     <div id="content-tindakan" class="hidden space-y-6">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-purple-50 border-b border-purple-100">
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">No.</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Tarikh</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Pengadu / Tajuk</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Kategori</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Status</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider text-center">Tindakan</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    <% if (!listTindakan.isEmpty()) { 
-                        for (Aduan a : listTindakan) { %>
-                    <tr class="hover:bg-purple-50/30 transition cursor-pointer" 
-                        onclick="showAduanDetail(this)"
-                        data-id="<%= a.getId_aduan() %>"
-                        data-tajuk="<%= a.getTajuk().replace("\"", "&quot;") %>"
-                        data-keterangan="<%= a.getKeterangan().replace("\"", "&quot;") %>"
-                        data-pengadu="<%= a.getNama_penuh() %>"
-                        data-tarikh="<%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %>"
-                        data-kategori="<%= a.getNama_kategori() %>"
-                        data-status="<%= a.getStatus() %>"
-                        data-status-label="<%= a.getStatusLabel() %>"
-                        data-status-class="<%= a.getStatusBadgeClass() %>"
-                        data-priority="<%= a.getKeutamaan() %>"
-                        data-priority-class="<%= a.getKeutamaanBadge() %>"
-                        data-catatan-ajk="<%= a.getCatatan_ajk() != null ? a.getCatatan_ajk().replace("\"", "&quot;") : "" %>"
-                        data-catatan-ketua="<%= a.getCatatan_ketua() != null ? a.getCatatan_ketua().replace("\"", "&quot;") : "" %>"
-                        data-gambar="<%= a.getGambar_aduan() != null ? a.getGambar_aduan() : "" %>"
-                        >
-                        <td class="p-4 text-sm font-bold text-brand-purple">#<%= a.getId_aduan() %></td>
-                        <td class="p-4 text-sm text-gray-600"><%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %></td>
-                        <td class="p-4">
-                            <div class="flex flex-col">
-                                <span class="text-sm font-bold text-gray-800"><%= a.getNama_penuh() %></span>
-                                <span class="text-[10px] text-gray-400"><%= a.getTajuk() %></span>
-                            </div>
-                        </td>
-                        <td class="p-4">
-                            <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold border <%= a.getKeutamaanBadge() %>">
-                                <%= a.getNama_kategori() %>
-                            </span>
-                        </td>
-                        <td class="p-4">
-                            <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase <%= a.getStatusBadgeClass() %>">
-                                <%= a.getStatusLabel() %>
-                            </span>
-                        </td>
-                        <td class="p-4 text-center">
-                            <% if ("SUBMITTED".equals(a.getStatus()) || "UNDER_REVIEW_AJK".equals(a.getStatus()) || "IN_PROGRESS_AJK".equals(a.getStatus())) { %>
-                            <button onclick="event.stopPropagation(); openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" class="p-2 text-gray-400 hover:text-brand-purple transition">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <% } else { %>
-                            <span class="text-gray-300">-</span>
-                            <% } %>
-                        </td>
-                    </tr>
-                    <% } } else { %>
-                    <tr><td colspan="6" class="p-12 text-center text-gray-400 italic">Tiada aduan dalam tindakan.</td></tr>
-                    <% } %>
-                </tbody>
-            </table>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-16">No.</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">Tarikh</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Pengadu / Tajuk</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-40">Kategori</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">Status</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center w-32">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <% if (!listTindakan.isEmpty()) { 
+                            for (Aduan a : listTindakan) { 
+                                String filterDate = (a.getDibuat_pada() != null) ? sdfFull.format(a.getDibuat_pada()) : "";
+                        %>
+                        <tr class="data-row hover:bg-purple-50/50 transition-colors cursor-pointer" 
+                            onclick="showAduanDetail(this)"
+                            data-date="<%= filterDate %>"
+                            data-id="<%= a.getId_aduan() %>"
+                            data-tajuk="<%= a.getTajuk().replace("\"", "&quot;") %>"
+                            data-keterangan="<%= a.getKeterangan().replace("\"", "&quot;") %>"
+                            data-pengadu="<%= a.getNama_penuh() %>"
+                            data-tarikh="<%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %>"
+                            data-kategori="<%= a.getNama_kategori() %>"
+                            data-status="<%= a.getStatus() %>"
+                            data-status-label="<%= a.getStatusLabel() %>"
+                            data-status-class="<%= a.getStatusBadgeClass() %>"
+                            data-priority="<%= a.getKeutamaan() %>"
+                            data-priority-class="<%= a.getKeutamaanBadge() %>"
+                            data-catatan-ajk="<%= a.getCatatan_ajk() != null ? a.getCatatan_ajk().replace("\"", "&quot;") : "" %>"
+                            data-catatan-ketua="<%= a.getCatatan_ketua() != null ? a.getCatatan_ketua().replace("\"", "&quot;") : "" %>"
+                            data-gambar="<%= a.getGambar_aduan() != null ? a.getGambar_aduan() : "" %>"
+                            >
+                            <td class="p-4 text-sm font-bold text-[#6C5DD3] whitespace-nowrap search-col">#<%= a.getId_aduan() %></td>
+                            <td class="p-4 text-sm text-gray-600 whitespace-nowrap"><%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %></td>
+                            <td class="p-4 search-col">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-gray-800"><%= a.getNama_penuh() %></span>
+                                    <span class="text-xs text-gray-400 mt-0.5"><%= a.getTajuk() %></span>
+                                </div>
+                            </td>
+                            <td class="p-4 whitespace-nowrap search-col">
+                                <span class="px-2 py-0.5 rounded-lg text-xs font-bold border <%= a.getKeutamaanBadge() %>">
+                                    <%= a.getNama_kategori() %>
+                                </span>
+                            </td>
+                            <td class="p-4 whitespace-nowrap search-col">
+                                <span class="px-3 py-1.5 rounded-full text-xs font-bold uppercase <%= a.getStatusBadgeClass() %>">
+                                    <%= a.getStatusLabel() %>
+                                </span>
+                            </td>
+                            <td class="p-4 text-center whitespace-nowrap" onclick="event.stopPropagation()">
+                                <% if ("SUBMITTED".equals(a.getStatus()) || "UNDER_REVIEW_AJK".equals(a.getStatus()) || "IN_PROGRESS_AJK".equals(a.getStatus())) { %>
+                                <button onclick="openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" 
+                                        class="group inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-50 text-[#6C5DD3] hover:bg-purple-100 hover:text-purple-700 transition text-xs font-bold">
+                                    <i class="fas fa-edit group-hover:scale-110 transition-transform"></i> Kemaskini
+                                </button>
+                                <% } else { %>
+                                <span class="text-gray-300 text-xs flex items-center justify-center gap-1"><i class="fas fa-lock"></i> Kunci</span>
+                                <% } %>
+                            </td>
+                        </tr>
+                        <% } } else { %>
+                        <tr class="no-data"><td colspan="6" class="p-8 text-center text-gray-400"><i class="fas fa-inbox text-3xl mb-2 block opacity-50"></i>Tiada aduan dalam tindakan.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <!-- Tab Sejarah -->
     <div id="content-sejarah" class="hidden space-y-6">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-            <table class="w-full text-left border-collapse">
-                <thead>
-                    <tr class="bg-purple-50 border-b border-purple-100">
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">No.</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Tarikh</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Pengadu / Tajuk</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Kategori</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Status</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider text-center">Tindakan</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-100">
-                    <% if (!listSejarah.isEmpty()) { 
-                        for (Aduan a : listSejarah) { %>
-                    <tr class="hover:bg-purple-50/30 transition cursor-pointer" 
-                        onclick="showAduanDetail(this)"
-                        data-id="<%= a.getId_aduan() %>"
-                        data-tajuk="<%= a.getTajuk().replace("\"", "&quot;") %>"
-                        data-keterangan="<%= a.getKeterangan().replace("\"", "&quot;") %>"
-                        data-pengadu="<%= a.getNama_penuh() %>"
-                        data-tarikh="<%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %>"
-                        data-kategori="<%= a.getNama_kategori() %>"
-                        data-status="<%= a.getStatus() %>"
-                        data-status-label="<%= a.getStatusLabel() %>"
-                        data-status-class="<%= a.getStatusBadgeClass() %>"
-                        data-priority="<%= a.getKeutamaan() %>"
-                        data-priority-class="<%= a.getKeutamaanBadge() %>"
-                        data-catatan-ajk="<%= a.getCatatan_ajk() != null ? a.getCatatan_ajk().replace("\"", "&quot;") : "" %>"
-                        data-catatan-ketua="<%= a.getCatatan_ketua() != null ? a.getCatatan_ketua().replace("\"", "&quot;") : "" %>"
-                        data-gambar="<%= a.getGambar_aduan() != null ? a.getGambar_aduan() : "" %>"
-                        >
-                        <td class="p-4 text-sm font-bold text-brand-purple">#<%= a.getId_aduan() %></td>
-                        <td class="p-4 text-sm text-gray-600"><%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %></td>
-                        <td class="p-4">
-                            <div class="flex flex-col">
-                                <span class="text-sm font-bold text-gray-800"><%= a.getNama_penuh() %></span>
-                                <span class="text-[10px] text-gray-400"><%= a.getTajuk() %></span>
-                            </div>
-                        </td>
-                        <td class="p-4">
-                            <span class="px-2 py-0.5 rounded-lg text-[10px] font-bold border <%= a.getKeutamaanBadge() %>">
-                                <%= a.getNama_kategori() %>
-                            </span>
-                        </td>
-                        <td class="p-4">
-                            <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase <%= a.getStatusBadgeClass() %>">
-                                <%= a.getStatusLabel() %>
-                            </span>
-                        </td>
-                        <td class="p-4 text-center">
-                            <% if ("SUBMITTED".equals(a.getStatus()) || "UNDER_REVIEW_AJK".equals(a.getStatus()) || "IN_PROGRESS_AJK".equals(a.getStatus())) { %>
-                            <button onclick="event.stopPropagation(); openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" class="p-2 text-gray-400 hover:text-brand-purple transition">
-                                <i class="fas fa-edit"></i>
-                            </button>
-                            <% } else { %>
-                            <span class="text-gray-300">-</span>
-                            <% } %>
-                        </td>
-                    </tr>
-                    <% } } else { %>
-                    <tr><td colspan="6" class="p-12 text-center text-gray-400 italic">Tiada sejarah aduan.</td></tr>
-                    <% } %>
-                </tbody>
-            </table>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="bg-gray-50 border-b border-gray-100">
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-16">No.</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">Tarikh</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Pengadu / Tajuk</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-40">Kategori</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-32">Status</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center w-32">Tindakan</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <% if (!listSejarah.isEmpty()) { 
+                            for (Aduan a : listSejarah) { 
+                                String filterDate = (a.getDibuat_pada() != null) ? sdfFull.format(a.getDibuat_pada()) : "";
+                        %>
+                        <tr class="data-row hover:bg-purple-50/50 transition-colors cursor-pointer" 
+                            onclick="showAduanDetail(this)"
+                            data-date="<%= filterDate %>"
+                            data-id="<%= a.getId_aduan() %>"
+                            data-tajuk="<%= a.getTajuk().replace("\"", "&quot;") %>"
+                            data-keterangan="<%= a.getKeterangan().replace("\"", "&quot;") %>"
+                            data-pengadu="<%= a.getNama_penuh() %>"
+                            data-tarikh="<%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %>"
+                            data-kategori="<%= a.getNama_kategori() %>"
+                            data-status="<%= a.getStatus() %>"
+                            data-status-label="<%= a.getStatusLabel() %>"
+                            data-status-class="<%= a.getStatusBadgeClass() %>"
+                            data-priority="<%= a.getKeutamaan() %>"
+                            data-priority-class="<%= a.getKeutamaanBadge() %>"
+                            data-catatan-ajk="<%= a.getCatatan_ajk() != null ? a.getCatatan_ajk().replace("\"", "&quot;") : "" %>"
+                            data-catatan-ketua="<%= a.getCatatan_ketua() != null ? a.getCatatan_ketua().replace("\"", "&quot;") : "" %>"
+                            data-gambar="<%= a.getGambar_aduan() != null ? a.getGambar_aduan() : "" %>"
+                            >
+                            <td class="p-4 text-sm font-bold text-[#6C5DD3] whitespace-nowrap search-col">#<%= a.getId_aduan() %></td>
+                            <td class="p-4 text-sm text-gray-600 whitespace-nowrap"><%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %></td>
+                            <td class="p-4 search-col">
+                                <div class="flex flex-col">
+                                    <span class="text-sm font-bold text-gray-800"><%= a.getNama_penuh() %></span>
+                                    <span class="text-xs text-gray-400 mt-0.5"><%= a.getTajuk() %></span>
+                                </div>
+                            </td>
+                            <td class="p-4 whitespace-nowrap search-col">
+                                <span class="px-2 py-0.5 rounded-lg text-xs font-bold border <%= a.getKeutamaanBadge() %>">
+                                    <%= a.getNama_kategori() %>
+                                </span>
+                            </td>
+                            <td class="p-4 whitespace-nowrap search-col">
+                                <span class="px-3 py-1.5 rounded-full text-xs font-bold uppercase <%= a.getStatusBadgeClass() %>">
+                                    <%= a.getStatusLabel() %>
+                                </span>
+                            </td>
+                            <td class="p-4 text-center whitespace-nowrap" onclick="event.stopPropagation()">
+                                <% if ("SUBMITTED".equals(a.getStatus()) || "UNDER_REVIEW_AJK".equals(a.getStatus()) || "IN_PROGRESS_AJK".equals(a.getStatus())) { %>
+                                <button onclick="openStatusModal('<%= a.getId_aduan() %>', '<%= a.getStatus() %>', '<%= a.getStatusLabel() %>')" 
+                                        class="group inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-purple-50 text-[#6C5DD3] hover:bg-purple-100 hover:text-purple-700 transition text-xs font-bold">
+                                    <i class="fas fa-edit group-hover:scale-110 transition-transform"></i> Kemaskini
+                                </button>
+                                <% } else { %>
+                                <span class="text-gray-300 text-xs flex items-center justify-center gap-1"><i class="fas fa-lock"></i> Kunci</span>
+                                <% } %>
+                            </td>
+                        </tr>
+                        <% } } else { %>
+                        <tr class="no-data"><td colspan="6" class="p-8 text-center text-gray-400"><i class="fas fa-inbox text-3xl mb-2 block opacity-50"></i>Tiada sejarah aduan.</td></tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -402,6 +443,24 @@
         });
         
         document.getElementById('modalStatus').classList.remove('hidden');
+    }
+
+    function filterData() {
+        const searchVal = document.getElementById("searchInput").value.toLowerCase();
+        const dateVal = document.getElementById("dateFilter").value;
+        const rows = document.querySelectorAll(".data-row");
+        
+        rows.forEach(row => {
+            const rowDate = row.getAttribute("data-date");
+            let textContent = "";
+            row.querySelectorAll(".search-col").forEach(col => textContent += col.innerText.toLowerCase() + " ");
+            
+            let showRow = true;
+            if (dateVal !== "" && rowDate !== dateVal) showRow = false;
+            if (searchVal !== "" && !textContent.includes(searchVal)) showRow = false;
+            
+            row.style.display = showRow ? "" : "none";
+        });
     }
 
     // closeModal centralized in footer.jsp
