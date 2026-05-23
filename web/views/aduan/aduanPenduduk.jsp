@@ -29,10 +29,10 @@
     String errorParam = request.getParameter("error");
 %>
 
-<div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F8FAFC]">
+<div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F8FAFC] min-w-0">
     
     <!-- Hero / Welcome Section -->
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white p-6 md:p-8 shadow-xl mb-8 border border-emerald-500/20">
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-emerald-600 to-teal-700 text-white p-6 md:p-8 shadow-xl mb-8 border border-emerald-500/20 xl:hidden">
         <div class="absolute right-0 bottom-0 opacity-10 pointer-events-none transform translate-y-8 translate-x-8">
             <i class="fas fa-bullhorn text-9xl"></i>
         </div>
@@ -52,7 +52,7 @@
     </div>
 
     <!-- Quick Stats Grid (Glassmorphism Cards) -->
-    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-8 xl:hidden">
         <!-- Card 1: Total -->
         <div class="bg-white/80 backdrop-blur-md p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-5 hover:shadow-md transition">
             <div class="w-12 h-12 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg"><i class="fas fa-folder-open"></i></div>
@@ -79,157 +79,247 @@
         </div>
     </div>
 
-    <!-- Carian & Penapis Section -->
-    <div class="bg-white/90 backdrop-blur-md p-6 rounded-3xl border border-slate-100 shadow-sm mb-8">
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Carian Pantas</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><i class="fas fa-search"></i></span>
-                    <input type="text" id="searchInput" onkeyup="filterCards()" placeholder="Cari nombor aduan, tajuk, kategori..." 
-                           class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-100 focus:ring-2 focus:ring-emerald-500 focus:bg-white text-slate-800 text-xs transition">
-                </div>
+    <!-- Carian & Penapis Section (Professional Redesign) -->
+    <div class="flex flex-col md:flex-row gap-4 mb-8">
+        <!-- Search Input -->
+        <div class="flex-1 relative group">
+            <div class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600 group-focus-within:scale-110 transition-all duration-300">
+                <i class="fas fa-search text-sm"></i>
             </div>
-            <div>
-                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2">Tapis Mengikut Tarikh</label>
-                <div class="relative">
-                    <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400"><i class="far fa-calendar-alt"></i></span>
-                    <input type="date" id="dateFilter" onchange="filterCards()"
-                           class="w-full pl-11 pr-4 py-3 rounded-xl bg-slate-50 border border-slate-100 focus:ring-2 focus:ring-emerald-500 focus:bg-white text-slate-800 text-xs transition">
-                </div>
+            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari nombor aduan, tajuk, atau kategori..." 
+                class="w-full pl-14 pr-6 py-4 rounded-[2rem] bg-white border border-gray-100 focus:ring-4 focus:ring-emerald-50 focus:border-emerald-500 text-xs font-semibold shadow-sm transition-all outline-none placeholder:text-gray-300">
+        </div>
+        <!-- Date Filter -->
+        <div class="w-full md:w-64 relative group">
+            <div class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-emerald-600 group-focus-within:scale-110 transition-all duration-300">
+                <i class="far fa-calendar-alt text-sm"></i>
             </div>
+            <input type="date" id="dateFilter" onchange="filterTable()" 
+                class="w-full pl-14 pr-6 py-4 rounded-[2rem] bg-white border border-gray-100 focus:ring-4 focus:ring-emerald-50 focus:border-emerald-500 text-xs font-semibold shadow-sm transition-all outline-none text-gray-700">
         </div>
     </div>
 
-    <!-- Complaint Cards Grid Layout -->
-    <div id="cardsContainer" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-        <% if (aduanList != null && !aduanList.isEmpty()) { 
-            for (Aduan a : aduanList) { 
-                String filterDate = (a.getDibuat_pada() != null) ? sdfFull.format(a.getDibuat_pada()) : "";
-                
-                // Safe JSON/Attribute escaping
-                String safeTajuk = a.getTajuk() != null ? a.getTajuk().replace("\"", "&quot;").replace("'", "&#39;") : "";
-                String safeKeterangan = a.getKeterangan() != null ? a.getKeterangan().replace("\"", "&quot;").replace("'", "&#39;").replace("\n", " ").replace("\r", "") : "";
-                String safeAjkCatatan = a.getCatatan_ajk() != null ? a.getCatatan_ajk().replace("\"", "&quot;").replace("'", "&#39;").replace("\n", " ") : "";
-                String safeKetuaCatatan = a.getCatatan_ketua() != null ? a.getCatatan_ketua().replace("\"", "&quot;").replace("'", "&#39;").replace("\n", " ") : "";
-        %>
-        <!-- Complaint Card -->
-        <div class="data-card bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden hover:shadow-md transition duration-300 flex flex-col cursor-pointer"
-             onclick="showAduanDetail(this)"
-             data-date="<%= filterDate %>"
-             data-id="<%= a.getId_aduan() %>"
-             data-tajuk="<%= safeTajuk %>"
-             data-keterangan="<%= safeKeterangan %>"
-             data-pengadu="<%= a.getNama_penuh() %>"
-             data-tarikh="<%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %>"
-             data-kategori="<%= a.getNama_kategori() %>"
-             data-status="<%= a.getStatus() %>"
-             data-status-label="<%= a.getStatusLabel() %>"
-             data-status-class="<%= a.getStatusBadgeClass() %>"
-             data-priority="<%= a.getKeutamaan() %>"
-             data-priority-class="<%= a.getKeutamaanBadge() %>"
-             data-catatan-ajk="<%= safeAjkCatatan %>"
-             data-catatan-ketua="<%= safeKetuaCatatan %>"
-             data-gambar="<%= a.getGambar_aduan() != null ? a.getGambar_aduan() : "" %>"
-             data-bukti-selesai="<%= a.getBukti_selesai() != null ? a.getBukti_selesai() : "" %>"
-             data-reopen-count="<%= a.getReopen_count() %>"
-             >
-             
-             <!-- Card Top Header -->
-             <div class="px-6 py-4 bg-slate-50/50 border-b border-slate-100 flex justify-between items-center">
-                 <span class="text-xs font-black text-emerald-700 tracking-wider">ADUAN #<%= a.getId_aduan() %></span>
-                 <div class="flex gap-2">
-                     <span class="px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wide <%= a.getKeutamaanBadge() %>">
-                         <%= a.getKeutamaan() %>
-                     </span>
-                     <span class="px-2.5 py-1 rounded-full text-[9px] font-extrabold uppercase tracking-wide <%= a.getStatusBadgeClass() %>">
-                         <%= a.getStatusLabel() %>
-                     </span>
-                 </div>
-             </div>
-
-             <!-- Stepper Progress Bar -->
-             <div class="px-6 pt-5 pb-3">
-                 <div class="flex items-center justify-between text-[8px] font-bold text-slate-400 uppercase tracking-tight mb-2">
-                     <span class="text-emerald-600">Dihantar</span>
-                     <span class="<%= (!"SUBMITTED".equals(a.getStatus())) ? "text-emerald-600" : "" %>">Disemak</span>
-                     <span class="<%= (!"SUBMITTED".equals(a.getStatus()) && !"UNDER_REVIEW_AJK".equals(a.getStatus()) && !"REOPENED".equals(a.getStatus())) ? "text-emerald-600" : "" %>">Tindakan</span>
-                     <span class="<%= ("RESOLVED".equals(a.getStatus()) || "CLOSED".equals(a.getStatus())) ? "text-emerald-600" : "" %>">Selesai</span>
-                 </div>
-                 
-                 <!-- Visual Stepper bar -->
-                 <div class="w-full bg-slate-100 h-1.5 rounded-full flex overflow-hidden">
-                     <%
-                         int progressWidth = 25;
-                         String stepperColor = "bg-emerald-500";
-                         String statusKey = a.getStatus() != null ? a.getStatus() : "SUBMITTED";
-                         
-                         if ("UNDER_REVIEW_AJK".equals(statusKey) || "UNDER_REVIEW_KETUA".equals(statusKey)) {
-                             progressWidth = 50;
-                         } else if ("IN_PROGRESS_AJK".equals(statusKey) || "IN_PROGRESS_HIGH_LEVEL".equals(statusKey) || "ESCALATED_TO_KETUA".equals(statusKey)) {
-                             progressWidth = 75;
-                         } else if ("RESOLVED".equals(statusKey) || "CLOSED".equals(statusKey)) {
-                             progressWidth = 100;
-                         } else if ("REJECTED".equals(statusKey)) {
-                             progressWidth = 100;
-                             stepperColor = "bg-rose-500";
-                         } else if ("REOPENED".equals(statusKey)) {
-                             progressWidth = 40;
-                             stepperColor = "bg-amber-500 animate-pulse";
-                         }
-                     %>
-                     <div class="<%= stepperColor %> h-full rounded-full transition-all duration-500" style="width: <%= progressWidth %>%"></div>
-                 </div>
-             </div>
-
-             <!-- Card Body Content -->
-             <div class="px-6 py-4 flex-1 space-y-3">
-                 <div>
-                     <h3 class="font-extrabold text-slate-800 text-base leading-snug line-clamp-1 search-col"><%= a.getTajuk() %></h3>
-                     <p class="text-xs text-slate-400 mt-1 uppercase font-bold tracking-wider search-col"><i class="fas fa-tag text-emerald-500"></i> <%= a.getNama_kategori() %></p>
-                 </div>
-                 <p class="text-xs text-slate-500 leading-relaxed line-clamp-3 search-col"><%= a.getKeterangan() %></p>
-                 
-                 <% if (a.getGambar_aduan() != null && !a.getGambar_aduan().trim().isEmpty()) { %>
-                 <div class="w-20 h-12 rounded-lg overflow-hidden border border-slate-100 bg-slate-50 flex items-center justify-center">
-                     <img src="<%= request.getContextPath() %>/file/aduan/<%= a.getGambar_aduan() %>" class="w-full h-full object-cover">
-                 </div>
-                 <% } %>
-             </div>
-
-             <!-- Card Bottom Footer -->
-             <div class="px-6 py-4 border-t border-slate-100 bg-slate-50/20 flex justify-between items-center mt-auto" onclick="event.stopPropagation()">
-                 <span class="text-[9px] text-slate-400 font-bold uppercase"><i class="far fa-clock"></i> <%= a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-" %></span>
-                 
-                 <div class="flex gap-2">
-                     <% if (("RESOLVED".equals(statusKey) || "CLOSED".equals(statusKey) || "REJECTED".equals(statusKey)) && a.getReopen_count() < 2) { %>
-                     <button onclick="openReopenModal(<%= a.getId_aduan() %>)"
-                             class="px-3.5 py-1.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-extrabold text-[10px] shadow-sm transition hover:scale-105 active:scale-95 flex items-center gap-1">
-                         <i class="fas fa-undo"></i> Reopen (<%= a.getReopen_count() %>/2)
-                     </button>
-                     <% } %>
-                     <button onclick="showAduanDetail(this.closest('.data-card'))" 
-                             class="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-slate-700 font-bold text-[10px] border border-slate-200 shadow-sm transition flex items-center gap-1 hover:scale-105">
-                         <i class="fas fa-eye text-emerald-600"></i> Perincian
-                     </button>
-                 </div>
-             </div>
-        </div>
-        <% } } else { %>
-        <!-- Empty State -->
-        <div class="col-span-1 md:col-span-2 bg-white rounded-3xl border border-slate-100 p-12 text-center shadow-sm">
-            <div class="w-16 h-16 rounded-full bg-slate-50 text-slate-400 flex items-center justify-center mx-auto mb-4 text-2xl border border-slate-100">
-                <i class="far fa-comments"></i>
-            </div>
-            <h4 class="font-extrabold text-slate-800 text-base">Tiada Rekod Aduan Dijumpai</h4>
-            <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto">Anda belum menghantar sebarang laporan atau tiada rekod yang sepadan dengan carian.</p>
-            <button onclick="openModal('modalAduanBaru')" class="mt-5 inline-flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white px-5 py-2.5 rounded-xl font-bold text-xs shadow-md transition hover:scale-105">
-                <i class="fas fa-plus-circle"></i> Hantar Aduan Pertama Anda
+    <!-- Main Content Tabs -->
+    <div class="mb-8 border-b border-slate-200">
+        <nav class="flex gap-8">
+            <button onclick="switchTab('proses')" id="tab-proses" 
+                    class="py-4 px-1 border-b-2 font-black text-xs uppercase tracking-wider border-slate-800 text-slate-800 flex items-center gap-2">
+                Sedang Diproses
             </button>
-        </div>
-        <% } %>
+            <button onclick="switchTab('sejarah')" id="tab-sejarah" 
+                    class="py-4 px-1 border-b-2 border-transparent font-bold text-xs uppercase tracking-wider text-slate-400 hover:text-slate-600 transition">
+                Sejarah Aduan
+            </button>
+        </nav>
     </div>
+
+    <!-- Reusable Table Template Method -->
+    <%!
+        private void renderPendudukTable(JspWriter out, List<Aduan> list, boolean isHistoryTable, String emptyMessage, SimpleDateFormat sdf, SimpleDateFormat sdfFull) throws java.io.IOException {
+            out.print("<div class=\"bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden\">");
+            out.print("<div class=\"overflow-x-auto\">");
+            out.print("<table class=\"w-full text-left border-collapse\">");
+            out.print("<thead>");
+            out.print("<tr class=\"bg-slate-50 border-b border-slate-100\">");
+            out.print("<th class=\"p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest w-12 text-center\">No.</th>");
+            out.print("<th class=\"p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest w-36\">Tarikh Laporan</th>");
+            out.print("<th class=\"p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest\">Kategori / Tajuk</th>");
+            out.print("<th class=\"p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest w-32\">Keutamaan</th>");
+            out.print("<th class=\"p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest w-44\">Kemajuan & Status</th>");
+            out.print("<th class=\"p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center w-36\">Tindakan</th>");
+            out.print("</tr>");
+            out.print("</thead>");
+            out.print("<tbody class=\"divide-y divide-slate-100\">");
+            
+            boolean hasRows = false;
+            if (list != null && !list.isEmpty()) {
+                int count = 1;
+                for (Aduan a : list) {
+                    String statusKey = a.getStatus() != null ? a.getStatus() : "SUBMITTED";
+                    boolean isHistory = "RESOLVED".equals(statusKey) || "CLOSED".equals(statusKey) || "REJECTED".equals(statusKey);
+                    
+                    if (isHistoryTable != isHistory) {
+                        continue;
+                    }
+                    hasRows = true;
+                    
+                    String filterDate = (a.getDibuat_pada() != null) ? sdfFull.format(a.getDibuat_pada()) : "";
+                    String safeTajuk = a.getTajuk() != null ? a.getTajuk().replace("\"", "&quot;").replace("'", "&#39;") : "";
+                    String safeKeterangan = a.getKeterangan() != null ? a.getKeterangan().replace("\"", "&quot;").replace("'", "&#39;").replace("\n", " ").replace("\r", "") : "";
+                    String safeAjkCatatan = a.getCatatan_ajk() != null ? a.getCatatan_ajk().replace("\"", "&quot;").replace("'", "&#39;").replace("\n", " ") : "";
+                    String safeKetuaCatatan = a.getCatatan_ketua() != null ? a.getCatatan_ketua().replace("\"", "&quot;").replace("'", "&#39;").replace("\n", " ") : "";
+                    String safeGambar = a.getGambar_aduan() != null ? a.getGambar_aduan() : "";
+                    String safeBukti = a.getBukti_selesai() != null ? a.getBukti_selesai() : "";
+                    
+                    int progressWidth = 25;
+                    String stepperColor = "bg-emerald-500";
+                    if (isHistory) {
+                        progressWidth = 100;
+                        if ("REJECTED".equals(statusKey)) {
+                            stepperColor = "bg-rose-500";
+                        }
+                    } else {
+                        if ("UNDER_REVIEW_AJK".equals(statusKey) || "UNDER_REVIEW_KETUA".equals(statusKey)) {
+                            progressWidth = 50;
+                        } else if ("IN_PROGRESS_AJK".equals(statusKey) || "IN_PROGRESS_HIGH_LEVEL".equals(statusKey) || "ESCALATED_TO_KETUA".equals(statusKey)) {
+                            progressWidth = 75;
+                        } else if ("REOPENED".equals(statusKey)) {
+                            progressWidth = 40;
+                            stepperColor = "bg-amber-500 animate-pulse";
+                        }
+                    }
+                    
+                    out.print("<tr class=\"aduan-row hover:bg-slate-50/50 transition cursor-pointer\" onclick=\"showAduanDetail(this)\" ");
+                    out.print("data-date=\"" + filterDate + "\" ");
+                    out.print("data-id=\"" + a.getId_aduan() + "\" ");
+                    out.print("data-tajuk=\"" + safeTajuk + "\" ");
+                    out.print("data-keterangan=\"" + safeKeterangan + "\" ");
+                    out.print("data-pengadu=\"" + a.getNama_penuh() + "\" ");
+                    out.print("data-tarikh=\"" + (a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-") + "\" ");
+                    out.print("data-kategori=\"" + a.getNama_kategori() + "\" ");
+                    out.print("data-status=\"" + a.getStatus() + "\" ");
+                    out.print("data-status-label=\"" + a.getStatusLabel() + "\" ");
+                    out.print("data-status-class=\"" + a.getStatusBadgeClass() + "\" ");
+                    out.print("data-priority=\"" + a.getKeutamaan() + "\" ");
+                    out.print("data-priority-class=\"" + a.getKeutamaanBadge() + "\" ");
+                    out.print("data-catatan-ajk=\"" + safeAjkCatatan + "\" ");
+                    out.print("data-catatan-ketua=\"" + safeKetuaCatatan + "\" ");
+                    out.print("data-gambar=\"" + safeGambar + "\" ");
+                    out.print("data-bukti-selesai=\"" + safeBukti + "\" ");
+                    out.print("data-reopen-count=\"" + a.getReopen_count() + "\">");
+                    
+                    out.print("<td class=\"p-4 text-xs font-bold text-slate-500 text-center\">" + (count++) + "</td>");
+                    out.print("<td class=\"p-4 text-xs text-slate-500 whitespace-nowrap\">" + (a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-") + "</td>");
+                    
+                    out.print("<td class=\"p-4 search-col\">");
+                    out.print("<div class=\"flex flex-col\">");
+                    out.print("<span class=\"text-xs font-black text-slate-800\">" + a.getNama_kategori() + "</span>");
+                    out.print("<span class=\"text-[11px] text-slate-400 mt-0.5 line-clamp-1\">" + a.getTajuk() + "</span>");
+                    out.print("</div></td>");
+                    
+                    out.print("<td class=\"p-4 whitespace-nowrap\">");
+                    out.print("<span class=\"px-2 py-1 rounded-lg text-[9px] font-extrabold border " + a.getKeutamaanBadge() + "\">" + a.getKeutamaan() + "</span>");
+                    out.print("</td>");
+                    
+                    out.print("<td class=\"p-4\">");
+                    out.print("<div class=\"space-y-1 max-w-[150px]\">");
+                    out.print("<div class=\"flex justify-between items-center text-[9px] font-bold text-slate-400 uppercase tracking-tight\">");
+                    out.print("<span class=\"" + a.getStatusBadgeClass() + " bg-transparent !p-0 !text-current search-col\">" + a.getStatusLabel() + "</span>");
+                    out.print("<span>" + progressWidth + "%</span>");
+                    out.print("</div>");
+                    out.print("<div class=\"w-full bg-slate-100 h-1 rounded-full flex overflow-hidden\">");
+                    out.print("<div class=\"" + stepperColor + " h-full rounded-full transition-all duration-500\" style=\"width: " + progressWidth + "%\"></div>");
+                    out.print("</div>");
+                    out.print("</div></td>");
+                    
+                    out.print("<td class=\"p-4 text-center whitespace-nowrap\" onclick=\"event.stopPropagation()\">");
+                    out.print("<div class=\"flex items-center justify-center gap-2\">");
+                    out.print("<button onclick=\"showAduanDetail(this.closest('.aduan-row'))\" ");
+                    out.print("class=\"inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 hover:scale-105 active:scale-95 transition text-[10px] font-black uppercase tracking-wider shadow-sm border border-slate-200\">");
+                    out.print("<i class=\"fas fa-eye text-emerald-600\"></i> Butiran</button>");
+                    if (isHistory && a.getReopen_count() < 2) {
+                        out.print("<button onclick=\"openReopenModal(" + a.getId_aduan() + ")\" ");
+                        out.print("class=\"inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-100 hover:scale-105 active:scale-95 transition text-[10px] font-black uppercase tracking-wider shadow-sm border border-amber-200\" ");
+                        out.print("title=\"Buka Semula Aduan (" + a.getReopen_count() + "/2)\">");
+                        out.print("<i class=\"fas fa-undo\"></i> Reopen</button>");
+                    }
+                    out.print("</div></td>");
+                    out.print("</tr>");
+                }
+            }
+            
+            if (!hasRows) {
+                out.print("<tr><td colspan=\"6\" class=\"p-12 text-center text-slate-400\">");
+                out.print("<div class=\"w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mx-auto mb-3 text-lg opacity-60\"><i class=\"fas fa-inbox\"></i></div>");
+                out.print("<span class=\"font-extrabold text-xs block\">" + emptyMessage + "</span></td></tr>");
+            }
+            
+            // Search empty indicator
+            String searchEmptyId = isHistoryTable ? "sejarah-empty" : "proses-empty";
+            out.print("<tr id=\"" + searchEmptyId + "\" class=\"hidden\"><td colspan=\"6\" class=\"p-8 text-center text-slate-400\">");
+            out.print("<div class=\"w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mx-auto mb-3 text-lg opacity-60\"><i class=\"fas fa-search\"></i></div>");
+            out.print("<span class=\"font-extrabold text-xs block\">Tiada aduan sepadan dengan carian.</span></td></tr>");
+            
+            out.print("</tbody>");
+            out.print("</table>");
+            out.print("</div>");
+            out.print("</div>");
+        }
+    %>
+
+    <!-- Tab 1: Sedang Diproses -->
+    <div id="content-proses" class="block animate-fade-in-up">
+        <% renderPendudukTable(out, aduanList, false, "Tiada aduan sedang diproses.", sdf, sdfFull); %>
+    </div>
+
+    <!-- Tab 2: Sejarah Aduan -->
+    <div id="content-sejarah" class="hidden animate-fade-in-up">
+        <% renderPendudukTable(out, aduanList, true, "Tiada sejarah aduan ditemui.", sdf, sdfFull); %>
+    </div>
+
 </div>
+
+<!-- Right Aside Bar (Aduan) -->
+<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full custom-scrollbar flex-shrink-0 animate-fade-in">
+    <!-- Welcome Card -->
+    <div class="p-7 rounded-[2.5rem] bg-gradient-to-br from-emerald-600 to-teal-700 text-white relative overflow-hidden group shadow-xl shadow-emerald-100/50 mb-8 flex flex-col justify-between min-h-[220px]">
+        <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-colors"></div>
+        <div class="absolute right-3 top-3 opacity-10 pointer-events-none">
+            <i class="fas fa-bullhorn text-6xl"></i>
+        </div>
+        <div class="relative z-10">
+            <h4 class="font-black text-lg mb-2 tracking-tight">Hai, <%= user.getNama_penuh() %>! 👋</h4>
+            <p class="text-[11px] text-emerald-100/90 leading-relaxed font-medium mb-6">Pusat Laporan & Aduan Kampung Danan. Kongsi sebarang maklum balas, kerosakan infrastruktur, atau masalah keselamatan untuk tindakan Biro Keselamatan.</p>
+        </div>
+        <button onclick="openModal('modalAduanBaru')" class="w-full bg-white hover:bg-emerald-50 text-emerald-800 py-3.5 rounded-2xl text-[11px] font-black uppercase tracking-wider transition hover:scale-[1.02] active:scale-95 shadow-md flex items-center justify-center gap-2 relative z-10">
+            <i class="fas fa-plus-circle text-xs text-emerald-600"></i> Hantar Laporan Baru
+        </button>
+    </div>
+
+    <!-- Stats Section -->
+    <div class="flex justify-between items-center mb-6">
+        <h3 class="font-black text-lg text-gray-800 tracking-tight">Statistik Aduan</h3>
+        <div class="w-8 h-8 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-600">
+            <i class="fas fa-chart-simple text-xs"></i>
+        </div>
+    </div>
+
+    <div class="space-y-4">
+        <!-- Card 1: Total -->
+        <div class="bg-slate-50/50 p-5 rounded-[2rem] border border-slate-100 flex items-center gap-4 hover:bg-slate-50 transition duration-300">
+            <div class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-base flex-shrink-0"><i class="fas fa-folder-open"></i></div>
+            <div>
+                <p class="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider">Jumlah Laporan Anda</p>
+                <h4 class="text-xl font-black text-slate-800 mt-0.5"><%= totalAduan %></h4>
+            </div>
+        </div>
+
+        <!-- Card 2: Pending -->
+        <div class="bg-slate-50/50 p-5 rounded-[2rem] border border-slate-100 flex items-center gap-4 hover:bg-slate-50 transition duration-300">
+            <div class="w-11 h-11 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-base flex-shrink-0"><i class="fas fa-spinner animate-spin-slow"></i></div>
+            <div>
+                <p class="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider">Sedang Diproses</p>
+                <h4 class="text-xl font-black text-slate-800 mt-0.5"><%= pendingCount %></h4>
+            </div>
+        </div>
+
+        <!-- Card 3: Resolved -->
+        <div class="bg-slate-50/50 p-5 rounded-[2rem] border border-slate-100 flex items-center gap-4 hover:bg-slate-50 transition duration-300">
+            <div class="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-base flex-shrink-0"><i class="fas fa-check-circle"></i></div>
+            <div>
+                <p class="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider">Selesai & Ditutup</p>
+                <h4 class="text-xl font-black text-slate-800 mt-0.5"><%= resolvedCount %></h4>
+            </div>
+        </div>
+    </div>
+</aside>
+
+<style>
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #E5E7EB; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #059669; }
+</style>
 
 <!-- Modal Aduan Baru (Redesigned with Previews and counters) -->
 <div id="modalAduanBaru" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
@@ -324,23 +414,92 @@
 <%@ include file="/views/aduan/modalDetailAduan.jsp" %>
 
 <script>
-    // Live Search Filter for Cards
-    function filterCards() {
+    // Live Search Filter for Tables & Tabs
+    function filterTable() {
         const searchVal = document.getElementById("searchInput").value.toLowerCase();
         const dateVal = document.getElementById("dateFilter").value;
-        const cards = document.querySelectorAll(".data-card");
         
-        cards.forEach(card => {
-            const cardDate = card.getAttribute("data-date");
+        // Filter rows in "Sedang Diproses" table
+        const prosesRows = document.querySelectorAll("#content-proses .aduan-row");
+        let activeFound = false;
+        
+        prosesRows.forEach(row => {
+            const cardDate = row.getAttribute("data-date");
             let textContent = "";
-            card.querySelectorAll(".search-col").forEach(col => textContent += col.innerText.toLowerCase() + " ");
+            row.querySelectorAll(".search-col").forEach(col => textContent += col.innerText.toLowerCase() + " ");
             
-            let showCard = true;
-            if (dateVal !== "" && cardDate !== dateVal) showCard = false;
-            if (searchVal !== "" && !textContent.includes(searchVal)) showCard = false;
+            let showRow = true;
+            if (dateVal !== "" && cardDate !== dateVal) showRow = false;
+            if (searchVal !== "" && !textContent.includes(searchVal)) showRow = false;
             
-            card.style.display = showCard ? "" : "none";
+            row.style.display = showRow ? "" : "none";
+            if (showRow) {
+                activeFound = true;
+            }
         });
+        
+        const prosesEmpty = document.getElementById("proses-empty");
+        if (prosesEmpty) {
+            if (!activeFound && (searchVal !== "" || dateVal !== "")) {
+                prosesEmpty.classList.remove("hidden");
+            } else {
+                prosesEmpty.classList.add("hidden");
+            }
+        }
+
+        // Filter rows in "Sejarah Aduan" table
+        const sejarahRows = document.querySelectorAll("#content-sejarah .aduan-row");
+        let sejarahFound = false;
+        
+        sejarahRows.forEach(row => {
+            const cardDate = row.getAttribute("data-date");
+            let textContent = "";
+            row.querySelectorAll(".search-col").forEach(col => textContent += col.innerText.toLowerCase() + " ");
+            
+            let showRow = true;
+            if (dateVal !== "" && cardDate !== dateVal) showRow = false;
+            if (searchVal !== "" && !textContent.includes(searchVal)) showRow = false;
+            
+            row.style.display = showRow ? "" : "none";
+            if (showRow) {
+                sejarahFound = true;
+            }
+        });
+        
+        const sejarahEmpty = document.getElementById("sejarah-empty");
+        if (sejarahEmpty) {
+            if (!sejarahFound && (searchVal !== "" || dateVal !== "")) {
+                sejarahEmpty.classList.remove("hidden");
+            } else {
+                sejarahEmpty.classList.add("hidden");
+            }
+        }
+    }
+
+    // Interactive Tab Switching
+    function switchTab(tabId) {
+        const tabProses = document.getElementById('tab-proses');
+        const tabSejarah = document.getElementById('tab-sejarah');
+        const contentProses = document.getElementById('content-proses');
+        const contentSejarah = document.getElementById('content-sejarah');
+        
+        if (tabId === 'proses') {
+            tabProses.className = "py-4 px-1 border-b-2 font-black text-xs uppercase tracking-wider border-slate-800 text-slate-800 flex items-center gap-2";
+            tabSejarah.className = "py-4 px-1 border-b-2 border-transparent font-bold text-xs uppercase tracking-wider text-slate-400 hover:text-slate-600 transition";
+            contentProses.classList.remove('hidden');
+            contentProses.classList.add('block');
+            contentSejarah.classList.add('hidden');
+            contentSejarah.classList.remove('block');
+        } else {
+            tabSejarah.className = "py-4 px-1 border-b-2 font-black text-xs uppercase tracking-wider border-slate-800 text-slate-800 flex items-center gap-2";
+            tabProses.className = "py-4 px-1 border-b-2 border-transparent font-bold text-xs uppercase tracking-wider text-slate-400 hover:text-slate-600 transition";
+            contentSejarah.classList.remove('hidden');
+            contentSejarah.classList.add('block');
+            contentProses.classList.add('hidden');
+            contentProses.classList.remove('block');
+        }
+        // Run search filter to apply specifically to the current tab
+        filterTable();
     }
 
     // Live character counter

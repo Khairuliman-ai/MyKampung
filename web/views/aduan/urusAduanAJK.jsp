@@ -126,7 +126,7 @@
             out.print("<table class=\"w-full text-left border-collapse\">");
             out.print("<thead>");
             out.print("<tr class=\"bg-slate-50 border-b border-slate-100\">");
-            out.print("<th class=\"p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest w-20\">No. Aduan</th>");
+            out.print("<th class=\"p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest w-12 text-center\">No.</th>");
             out.print("<th class=\"p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest w-36\">Tarikh Laporan</th>");
             out.print("<th class=\"p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest\">Pengadu / Isu</th>");
             out.print("<th class=\"p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest w-32\">Keutamaan</th>");
@@ -137,6 +137,7 @@
             out.print("<tbody class=\"divide-y divide-slate-100\">");
             
             if (list != null && !list.isEmpty()) {
+                int count = 1;
                 for (Aduan a : list) {
                     String filterDate = (a.getDibuat_pada() != null) ? sdfFull.format(a.getDibuat_pada()) : "";
                     String safeTajuk = a.getTajuk() != null ? a.getTajuk().replace("\"", "&quot;").replace("'", "&#39;") : "";
@@ -167,7 +168,7 @@
                     out.print("data-bukti-selesai=\"" + safeBukti + "\" ");
                     out.print("data-reopen-count=\"" + a.getReopen_count() + "\">");
                     
-                    out.print("<td class=\"p-4 text-xs font-black text-indigo-600 search-col\">#" + a.getId_aduan() + "</td>");
+                    out.print("<td class=\"p-4 text-xs font-bold text-slate-500 text-center\">" + (count++) + "</td>");
                     out.print("<td class=\"p-4 text-xs text-slate-500 whitespace-nowrap\">" + (a.getDibuat_pada() != null ? sdf.format(a.getDibuat_pada()) : "-") + "</td>");
                     out.print("<td class=\"p-4 search-col\">");
                     out.print("<div class=\"flex flex-col\">");
