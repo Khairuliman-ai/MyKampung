@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 22, 2026 at 07:37 PM
+-- Generation Time: May 23, 2026 at 06:17 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -33,7 +33,7 @@ CREATE TABLE `aduan` (
   `id_kategori_aduan` int(11) NOT NULL,
   `tajuk` varchar(100) NOT NULL,
   `keterangan` text NOT NULL,
-  `status` varchar(30) DEFAULT 'SUBMITTED',
+  `status` varchar(30) NOT NULL DEFAULT 'SUBMITTED',
   `gambar_aduan` varchar(255) DEFAULT NULL,
   `catatan_pentadbir` text DEFAULT NULL,
   `dibuat_pada` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -43,34 +43,37 @@ CREATE TABLE `aduan` (
   `keutamaan` varchar(10) DEFAULT 'SEDERHANA' COMMENT 'RENDAH/SEDERHANA/TINGGI/KRITIKAL',
   `bukti_selesai` varchar(255) DEFAULT NULL COMMENT 'Gambar bukti penyelesaian',
   `catatan_ajk` text DEFAULT NULL,
-  `catatan_ketua` text DEFAULT NULL
+  `catatan_ketua` text DEFAULT NULL,
+  `reopen_count` int(11) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Dumping data for table `aduan`
 --
 
-INSERT INTO `aduan` (`id_aduan`, `id_pengguna`, `id_kategori_aduan`, `tajuk`, `keterangan`, `status`, `gambar_aduan`, `catatan_pentadbir`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`, `id_pengendali`, `keutamaan`, `bukti_selesai`, `catatan_ajk`, `catatan_ketua`) VALUES
-(1, 4, 1, 'Jalan Berlubang di Jalan Teratai', 'Terdapat lubang besar yang bahaya untuk penunggang motosikal.', 'UNDER_REVIEW_AJK', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL),
-(2, 2, 3, 'Longkang Tersumbat', 'Longkang belakang rumah tersumbat dan berbau busuk.', 'UNDER_REVIEW_AJK', NULL, NULL, '2026-03-13 19:52:27', '2026-04-28 00:26:52', NULL, NULL, 'SEDERHANA', NULL, 'wdw', NULL),
-(3, 6, 9, 'Lampu Gelanggang Futsal Terbakar', 'Dua biji lampu rosak, gelap nak main malam.', 'RESOLVED', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL),
-(4, 8, 6, 'Kumpulan Kera Musnahkan Kebun', 'Banyak kera masuk kebun pisang dan rosakkan tanaman.', 'SUBMITTED', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL),
-(5, 5, 4, 'Lampu Jalan Terpadam', 'Tiang lampu no 12 di Jalan Orkid terpadam sejak 3 hari lepas.', 'RESOLVED', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL),
-(6, 10, 2, 'Motor Kerap Hilang', 'Tolong tingkatkan rondaan SRS, banyak kes kecurian motor.', 'UNDER_REVIEW_AJK', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL),
-(7, 7, 5, 'Pokok Tumbang Hempap Pagar', 'Hujan lebat semalam akibatkan dahan reput jatuh atas pagar dewan.', 'RESOLVED', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL),
-(8, 9, 8, 'Kes Denggi Meningkat', 'Ada kes denggi dekat Lorong Kenanga 2, mohon fogging.', 'UNDER_REVIEW_AJK', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL),
-(9, 3, 7, 'Budak Motor Bising Malam', 'Sekumpulan remaja selalu merempit pukul 2 pagi.', 'SUBMITTED', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL),
-(10, 1, 10, 'Anjing Liar Berkeliaran', 'Bahaya untuk kanak-kanak yang pergi ke sekolah.', 'SUBMITTED', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL),
-(11, 2, 2, 'Test1', 'Test1.1', 'UNDER_REVIEW_AJK', NULL, NULL, '2026-04-25 09:10:27', '2026-04-25 09:20:05', NULL, NULL, 'SEDERHANA', NULL, 'test1', NULL),
-(12, 4, 5, 'Test2', 'Banjir', NULL, 'aduan_4_1777271660732_Gantt Chart.gif', NULL, '2026-04-27 06:34:20', '2026-04-27 06:36:46', NULL, 10, 'TINGGI', NULL, 'DIhantar ke ketua kampung', 'fef'),
-(13, 4, 1, 'Test3', 'test3', 'RESOLVED', 'aduan_4_1777287222288_3667006.png', NULL, '2026-04-27 10:53:42', '2026-04-27 11:10:52', NULL, 10, 'SEDERHANA', NULL, 'Selesai', NULL),
-(14, 4, 1, 'Test4', 'Test4', NULL, 'aduan_4_1777335127450_male-face-avatar-icon-set-flat-design-social-media-profiles_1281173-3806.avif', NULL, '2026-04-28 00:12:07', '2026-04-28 00:15:46', NULL, 10, 'TINGGI', NULL, 'Test4', 'Tidak lengkap'),
-(15, 4, 1, 'Test5', 'Test5', NULL, NULL, NULL, '2026-04-28 00:17:17', '2026-04-28 00:18:10', NULL, 10, 'SEDERHANA', NULL, NULL, 'f'),
-(16, 4, 1, 'Test6', 'fefoew', NULL, NULL, NULL, '2026-04-28 00:23:02', '2026-04-28 00:24:52', NULL, 10, 'SEDERHANA', NULL, 'ewfwf', NULL),
-(17, 4, 1, 'Test6', 'fewf', 'RESOLVED', NULL, NULL, '2026-04-28 00:27:33', '2026-04-28 00:29:33', NULL, 10, 'SEDERHANA', NULL, 'fewf', NULL),
-(18, 4, 1, 'Test2', 'few', 'CLOSED', NULL, NULL, '2026-04-28 00:34:30', '2026-04-28 00:36:53', NULL, 10, 'SEDERHANA', NULL, 'fwq', 'fwq'),
-(19, 4, 1, 'test 7', 'vds', 'CLOSED', NULL, NULL, '2026-04-28 00:37:14', '2026-04-28 00:38:40', NULL, 10, 'SEDERHANA', NULL, 'vds', 'vds'),
-(20, 2, 1, 'test 4', 'test 4', 'UNDER_REVIEW_AJK', NULL, NULL, '2026-05-10 12:52:16', '2026-05-10 12:59:18', NULL, 10, 'SEDERHANA', NULL, 'test4', NULL);
+INSERT INTO `aduan` (`id_aduan`, `id_pengguna`, `id_kategori_aduan`, `tajuk`, `keterangan`, `status`, `gambar_aduan`, `catatan_pentadbir`, `dibuat_pada`, `dikemaskini_pada`, `dipadam_pada`, `id_pengendali`, `keutamaan`, `bukti_selesai`, `catatan_ajk`, `catatan_ketua`, `reopen_count`) VALUES
+(1, 4, 1, 'Jalan Berlubang di Jalan Teratai', 'Terdapat lubang besar yang bahaya untuk penunggang motosikal.', 'UNDER_REVIEW_AJK', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL, 0),
+(2, 2, 3, 'Longkang Tersumbat', 'Longkang belakang rumah tersumbat dan berbau busuk.', 'UNDER_REVIEW_AJK', NULL, NULL, '2026-03-13 19:52:27', '2026-04-28 00:26:52', NULL, NULL, 'SEDERHANA', NULL, 'wdw', NULL, 0),
+(3, 6, 9, 'Lampu Gelanggang Futsal Terbakar', 'Dua biji lampu rosak, gelap nak main malam.', 'RESOLVED', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL, 0),
+(4, 8, 6, 'Kumpulan Kera Musnahkan Kebun', 'Banyak kera masuk kebun pisang dan rosakkan tanaman.', 'SUBMITTED', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL, 0),
+(5, 5, 4, 'Lampu Jalan Terpadam', 'Tiang lampu no 12 di Jalan Orkid terpadam sejak 3 hari lepas.', 'RESOLVED', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL, 0),
+(6, 10, 2, 'Motor Kerap Hilang', 'Tolong tingkatkan rondaan SRS, banyak kes kecurian motor.', 'UNDER_REVIEW_AJK', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL, 0),
+(7, 7, 5, 'Pokok Tumbang Hempap Pagar', 'Hujan lebat semalam akibatkan dahan reput jatuh atas pagar dewan.', 'RESOLVED', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL, 0),
+(8, 9, 8, 'Kes Denggi Meningkat', 'Ada kes denggi dekat Lorong Kenanga 2, mohon fogging.', 'UNDER_REVIEW_AJK', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL, 0),
+(9, 3, 7, 'Budak Motor Bising Malam', 'Sekumpulan remaja selalu merempit pukul 2 pagi.', 'SUBMITTED', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL, 0),
+(10, 1, 10, 'Anjing Liar Berkeliaran', 'Bahaya untuk kanak-kanak yang pergi ke sekolah.', 'SUBMITTED', NULL, NULL, '2026-03-13 19:52:27', '2026-04-25 07:08:10', NULL, NULL, 'SEDERHANA', NULL, NULL, NULL, 0),
+(11, 2, 2, 'Test1', 'Test1.1', 'UNDER_REVIEW_AJK', NULL, NULL, '2026-04-25 09:10:27', '2026-04-25 09:20:05', NULL, NULL, 'SEDERHANA', NULL, 'test1', NULL, 0),
+(12, 4, 5, 'Test2', 'Banjir', 'SUBMITTED', 'aduan_4_1777271660732_Gantt Chart.gif', NULL, '2026-04-27 06:34:20', '2026-05-23 03:55:40', NULL, 10, 'TINGGI', NULL, 'DIhantar ke ketua kampung', 'fef', 0),
+(13, 4, 1, 'Test3', 'test3', 'RESOLVED', 'aduan_4_1777287222288_3667006.png', NULL, '2026-04-27 10:53:42', '2026-04-27 11:10:52', NULL, 10, 'SEDERHANA', NULL, 'Selesai', NULL, 0),
+(14, 4, 1, 'Test4', 'Test4', 'SUBMITTED', 'aduan_4_1777335127450_male-face-avatar-icon-set-flat-design-social-media-profiles_1281173-3806.avif', NULL, '2026-04-28 00:12:07', '2026-05-23 03:55:40', NULL, 10, 'TINGGI', NULL, 'Test4', 'Tidak lengkap', 0),
+(15, 4, 1, 'Test5', 'Test5', 'SUBMITTED', NULL, NULL, '2026-04-28 00:17:17', '2026-05-23 03:55:40', NULL, 10, 'SEDERHANA', NULL, NULL, 'f', 0),
+(16, 4, 1, 'Test6', 'fefoew', 'SUBMITTED', NULL, NULL, '2026-04-28 00:23:02', '2026-05-23 03:55:40', NULL, 10, 'SEDERHANA', NULL, 'ewfwf', NULL, 0),
+(17, 4, 1, 'Test6', 'fewf', 'RESOLVED', NULL, NULL, '2026-04-28 00:27:33', '2026-04-28 00:29:33', NULL, 10, 'SEDERHANA', NULL, 'fewf', NULL, 0),
+(18, 4, 1, 'Test2', 'few', 'CLOSED', NULL, NULL, '2026-04-28 00:34:30', '2026-04-28 00:36:53', NULL, 10, 'SEDERHANA', NULL, 'fwq', 'fwq', 0),
+(19, 4, 1, 'test 7', 'vds', 'CLOSED', NULL, NULL, '2026-04-28 00:37:14', '2026-04-28 00:38:40', NULL, 10, 'SEDERHANA', NULL, 'vds', 'vds', 0),
+(20, 2, 1, 'test 4', 'test 4', 'UNDER_REVIEW_AJK', NULL, NULL, '2026-05-10 12:52:16', '2026-05-10 12:59:18', NULL, 10, 'SEDERHANA', NULL, 'test4', NULL, 0),
+(21, 2, 1, '23/5', '25/5', 'RESOLVED', 'aduan_2_1779474934287_professional-profile-pictures-1080-x-1080-460wjhrkbwdcp1ig.jpg', NULL, '2026-05-22 18:35:34', '2026-05-22 18:38:17', NULL, 10, 'SEDERHANA', NULL, '23/5', '23/5', 0),
+(22, 2, 1, 'Test 100', 'test 100', 'UNDER_REVIEW_KETUA', 'aduan_2_1779509637370_professional-profile-pictures-1080-x-1080-460wjhrkbwdcp1ig.jpg', NULL, '2026-05-23 04:13:57', '2026-05-23 04:16:38', NULL, 10, 'TINGGI', NULL, 'test100', 'test100', 0);
 
 -- --------------------------------------------------------
 
@@ -456,7 +459,8 @@ INSERT INTO `laporan_snapshot` (`id_snapshot`, `tahun`, `bulan`, `total_penduduk
 (1, 2026, 1, 140, 5, 3, 4, 3, 10, 2450.00, '2026-05-22 17:36:09'),
 (2, 2026, 2, 145, 8, 5, 6, 4, 15, 2480.00, '2026-05-22 17:36:09'),
 (3, 2026, 3, 150, 10, 7, 7, 5, 18, 2400.00, '2026-05-22 17:36:09'),
-(4, 2026, 4, 156, 12, 9, 8, 6, 22, 2380.00, '2026-05-22 17:36:09');
+(4, 2026, 4, 156, 12, 9, 8, 6, 22, 2380.00, '2026-05-22 17:36:09'),
+(5, 2026, 5, 21, 36, 7, 16, 7, 26, 2100.01, '2026-05-22 18:30:34');
 
 -- --------------------------------------------------------
 
@@ -503,7 +507,15 @@ INSERT INTO `log_aduan` (`id_log_aduan`, `id_aduan`, `id_pelaku`, `status_lama`,
 (22, 19, 1, 'UNDER_REVIEW_KETUA', 'IN_PROGRESS_HIGH_LEVEL', 'vd', '2026-04-28 00:38:22'),
 (23, 19, 1, 'IN_PROGRESS_HIGH_LEVEL', 'RESOLVED', 'vd', '2026-04-28 00:38:31'),
 (24, 19, 1, 'RESOLVED', 'CLOSED', 'vds', '2026-04-28 00:38:40'),
-(25, 20, 10, 'SUBMITTED', 'UNDER_REVIEW_AJK', 'test4', '2026-05-10 12:59:18');
+(25, 20, 10, 'SUBMITTED', 'UNDER_REVIEW_AJK', 'test4', '2026-05-10 12:59:18'),
+(26, 21, 10, 'SUBMITTED', 'UNDER_REVIEW_AJK', '23/5', '2026-05-22 18:36:49'),
+(27, 21, 10, 'UNDER_REVIEW_AJK', 'ESCALATED_TO_KETUA', '23/5', '2026-05-22 18:37:12'),
+(28, 21, 1, 'ESCALATED_TO_KETUA', 'UNDER_REVIEW_KETUA', '23/5', '2026-05-22 18:37:42'),
+(29, 21, 1, 'UNDER_REVIEW_KETUA', 'IN_PROGRESS_HIGH_LEVEL', '23/5', '2026-05-22 18:38:00'),
+(30, 21, 1, 'IN_PROGRESS_HIGH_LEVEL', 'RESOLVED', '23/5', '2026-05-22 18:38:17'),
+(31, 22, 10, 'SUBMITTED', 'UNDER_REVIEW_AJK', 'test100', '2026-05-23 04:15:05'),
+(32, 22, 10, 'UNDER_REVIEW_AJK', 'ESCALATED_TO_KETUA', 'test100', '2026-05-23 04:15:29'),
+(33, 22, 1, 'ESCALATED_TO_KETUA', 'UNDER_REVIEW_KETUA', 'test100', '2026-05-23 04:16:38');
 
 -- --------------------------------------------------------
 
@@ -695,21 +707,21 @@ INSERT INTO `permohonan_bantuan` (`id_permohonan`, `id_pengguna`, `id_bantuan`, 
 (2, 8, 6, 'DIKEMBALIKAN', NULL, NULL, NULL, 'Mohon baja untuk kebun.', 'kabur', NULL, '2026-03-13 19:52:27', '2026-05-22 16:53:03', NULL, 20, 'RENDAH', '[\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
 (3, 7, 5, 'MENUNGGU', NULL, NULL, NULL, 'Anak 3 orang akan masuk sekolah.', NULL, NULL, '2026-03-13 19:52:27', '2026-05-22 16:53:03', NULL, 50, 'SEDERHANA', '[\"TIADA_PENDAPATAN\",\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
 (4, 4, 9, 'DILULUSKAN', NULL, NULL, NULL, 'Mohon bantuan modal niaga.', NULL, NULL, '2026-03-13 19:52:27', '2026-05-22 16:53:03', NULL, 5, 'RENDAH', '[]'),
-(5, 2, 5, 'LULUS', NULL, NULL, NULL, 'Mohon bantuan pakaian sekolah anak.', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, '2026-03-13 19:52:27', '2026-05-22 16:53:03', NULL, 30, 'RENDAH', '[\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
+(5, 2, 5, 'LULUS', NULL, NULL, NULL, 'Mohon bantuan pakaian sekolah anak.', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, '2026-03-13 19:52:27', '2026-05-22 17:38:34', NULL, 75, 'SEDERHANA', '[\"PENDAPATAN_SANGAT_RENDAH\",\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
 (6, 10, 3, 'MENUNGGU', NULL, NULL, NULL, 'Rumah dimasuki air sedalam 1 meter.', NULL, NULL, '2026-03-13 19:52:27', '2026-05-22 16:53:03', NULL, 5, 'RENDAH', '[]'),
 (7, 5, 7, 'DITOLAK', NULL, NULL, NULL, 'Atap zink bocor teruk.', NULL, NULL, '2026-03-13 19:52:27', '2026-05-22 16:53:03', NULL, 40, 'SEDERHANA', '[\"PENDAPATAN_RENDAH\",\"IBU_BAPA_TUNGGAL\",\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
 (8, 6, 10, 'DILULUSKAN', NULL, NULL, NULL, 'Adik dapat 5A SPM.', NULL, NULL, '2026-03-13 19:52:27', '2026-05-22 16:53:03', NULL, 5, 'RENDAH', '[]'),
 (9, 9, 1, 'LULUS', NULL, NULL, NULL, 'Kos sara hidup meningkat.', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, '2026-03-13 19:52:27', '2026-05-22 16:53:03', NULL, 20, 'RENDAH', '[]'),
 (10, 3, 9, 'DITOLAK', NULL, NULL, NULL, 'Mohon tambah gerai.', NULL, NULL, '2026-03-13 19:52:27', '2026-05-22 16:53:03', NULL, 5, 'RENDAH', '[]'),
-(11, 2, 1, 'DITOLAK', NULL, NULL, NULL, NULL, 'DITOLAK oleh Ketua Kampung: DITOLAK: Skor kelayakan permohonan (30%) adalah di bawah paras minima kelayakan. Sila hubungi AJK jika maklumat sosio-ekonomi (pendapatan/pekerjaan/ahli keluarga) perlu dikemaskini.', NULL, '2026-04-22 10:17:39', '2026-05-22 16:53:55', NULL, 30, 'RENDAH', '[\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
-(12, 2, 2, 'MENUNGGU_KETUA', NULL, NULL, NULL, NULL, 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 10:29:15', '2026-05-22 16:53:03', NULL, 30, 'RENDAH', '[\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
-(13, 2, 1, 'LULUS', NULL, NULL, NULL, 'Test2', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, '2026-04-22 10:45:21', '2026-05-22 16:53:03', NULL, 30, 'RENDAH', '[\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
-(14, 2, 9, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'test2', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 10:47:08', '2026-05-22 16:53:03', NULL, 30, 'RENDAH', '[\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
-(15, 2, 6, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'test3', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 10:49:46', '2026-05-22 16:53:03', NULL, 30, 'RENDAH', '[\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
-(16, 2, 2, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'Test4', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 10:58:18', '2026-05-22 16:53:03', NULL, 30, 'RENDAH', '[\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
-(17, 2, 10, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'Test6', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 10:59:10', '2026-05-22 16:53:03', NULL, 30, 'RENDAH', '[\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
-(18, 2, 9, 'LULUS', NULL, NULL, NULL, 'Test7', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, '2026-04-22 11:04:03', '2026-05-22 16:53:03', NULL, 30, 'RENDAH', '[\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
-(20, 2, 11, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'Test11', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 11:11:51', '2026-05-22 16:53:03', NULL, 30, 'RENDAH', '[\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
+(11, 2, 1, 'DITOLAK', NULL, NULL, NULL, NULL, 'DITOLAK oleh Ketua Kampung: DITOLAK: Skor kelayakan permohonan (30%) adalah di bawah paras minima kelayakan. Sila hubungi AJK jika maklumat sosio-ekonomi (pendapatan/pekerjaan/ahli keluarga) perlu dikemaskini.', NULL, '2026-04-22 10:17:39', '2026-05-22 17:38:34', NULL, 75, 'SEDERHANA', '[\"PENDAPATAN_SANGAT_RENDAH\",\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
+(12, 2, 2, 'MENUNGGU_KETUA', NULL, NULL, NULL, NULL, 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 10:29:15', '2026-05-22 17:38:34', NULL, 75, 'SEDERHANA', '[\"PENDAPATAN_SANGAT_RENDAH\",\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
+(13, 2, 1, 'LULUS', NULL, NULL, NULL, 'Test2', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, '2026-04-22 10:45:21', '2026-05-22 17:38:34', NULL, 75, 'SEDERHANA', '[\"PENDAPATAN_SANGAT_RENDAH\",\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
+(14, 2, 9, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'test2', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 10:47:08', '2026-05-22 17:38:34', NULL, 75, 'SEDERHANA', '[\"PENDAPATAN_SANGAT_RENDAH\",\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
+(15, 2, 6, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'test3', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 10:49:46', '2026-05-22 17:38:34', NULL, 75, 'SEDERHANA', '[\"PENDAPATAN_SANGAT_RENDAH\",\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
+(16, 2, 2, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'Test4', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 10:58:18', '2026-05-22 17:38:34', NULL, 75, 'SEDERHANA', '[\"PENDAPATAN_SANGAT_RENDAH\",\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
+(17, 2, 10, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'Test6', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 10:59:10', '2026-05-22 17:38:34', NULL, 75, 'SEDERHANA', '[\"PENDAPATAN_SANGAT_RENDAH\",\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
+(18, 2, 9, 'LULUS', NULL, NULL, NULL, 'Test7', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, '2026-04-22 11:04:03', '2026-05-22 17:38:34', NULL, 75, 'SEDERHANA', '[\"PENDAPATAN_SANGAT_RENDAH\",\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
+(20, 2, 11, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'Test11', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-22 11:11:51', '2026-05-22 17:38:34', NULL, 75, 'SEDERHANA', '[\"PENDAPATAN_SANGAT_RENDAH\",\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
 (21, 4, 6, 'LULUS', NULL, NULL, NULL, 'Test terakhir 1.1.1', 'DILULUSKAN: Permohonan disokong oleh Ketua Kampung.', NULL, '2026-04-22 13:17:55', '2026-05-22 16:47:05', NULL, 5, 'RENDAH', '[]'),
 (22, 2, 7, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'test10', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-23 04:56:00', '2026-05-22 16:57:51', NULL, 75, 'SEDERHANA', '[\"PENDAPATAN_SANGAT_RENDAH\",\"KERJA_SEKTOR_TIDAK_FORMAL\"]'),
 (23, 4, 1, 'MENUNGGU_KETUA', NULL, NULL, NULL, 'maklumat telah dikemaskini', 'Disemak oleh JKKK: Dokumen Lengkap.', NULL, '2026-04-28 01:25:17', '2026-05-22 16:47:05', NULL, 5, 'RENDAH', '[]'),
@@ -933,7 +945,7 @@ ALTER TABLE `tempahan_fasiliti`
 -- AUTO_INCREMENT for table `aduan`
 --
 ALTER TABLE `aduan`
-  MODIFY `id_aduan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=21;
+  MODIFY `id_aduan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=23;
 
 --
 -- AUTO_INCREMENT for table `ahli_keluarga`
@@ -993,13 +1005,13 @@ ALTER TABLE `kategori_aduan`
 -- AUTO_INCREMENT for table `laporan_snapshot`
 --
 ALTER TABLE `laporan_snapshot`
-  MODIFY `id_snapshot` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id_snapshot` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT for table `log_aduan`
 --
 ALTER TABLE `log_aduan`
-  MODIFY `id_log_aduan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
+  MODIFY `id_log_aduan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
 
 --
 -- AUTO_INCREMENT for table `log_aktiviti`

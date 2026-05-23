@@ -83,7 +83,9 @@ public class DashboardServlet extends HttpServlet {
             // 3. Active aduan count
             List<Aduan> allAduan = aduanDao.getAll();
             long pendingAduanCount = allAduan.stream()
-                .filter(a -> !"RESOLVED".equalsIgnoreCase(a.getStatus()) && !"REJECTED".equalsIgnoreCase(a.getStatus()))
+                .filter(a -> !"RESOLVED".equalsIgnoreCase(a.getStatus()) 
+                          && !"REJECTED".equalsIgnoreCase(a.getStatus())
+                          && !"CLOSED".equalsIgnoreCase(a.getStatus()))
                 .count();
             request.setAttribute("pendingAduanCount", pendingAduanCount);
 
@@ -134,7 +136,9 @@ public class DashboardServlet extends HttpServlet {
                 // 2. Active aduan count
                 List<Aduan> allAduan = aduanDao.getAll();
                 long activeAduanCount = allAduan.stream()
-                    .filter(a -> !"RESOLVED".equalsIgnoreCase(a.getStatus()) && !"REJECTED".equalsIgnoreCase(a.getStatus()))
+                    .filter(a -> !"RESOLVED".equalsIgnoreCase(a.getStatus()) 
+                              && !"REJECTED".equalsIgnoreCase(a.getStatus())
+                              && !"CLOSED".equalsIgnoreCase(a.getStatus()))
                     .count();
                 request.setAttribute("activeAduanCount", activeAduanCount);
 
@@ -199,10 +203,13 @@ public class DashboardServlet extends HttpServlet {
             } else if ("Biro Keselamatan".equals(biro)) {
                 AduanDAO aduanDao = new AduanDAO();
 
-                // 1. Pending complaints (status = 'SUBMITTED' or status = 'UNDER_REVIEW_AJK')
+                // 1. Pending complaints (active for Biro Keselamatan)
                 List<Aduan> allAduan = aduanDao.getAll();
                 List<Aduan> pendingAduanList = allAduan.stream()
-                    .filter(a -> "SUBMITTED".equalsIgnoreCase(a.getStatus()) || "UNDER_REVIEW_AJK".equalsIgnoreCase(a.getStatus()))
+                    .filter(a -> "SUBMITTED".equalsIgnoreCase(a.getStatus()) 
+                              || "UNDER_REVIEW_AJK".equalsIgnoreCase(a.getStatus()) 
+                              || "IN_PROGRESS_AJK".equalsIgnoreCase(a.getStatus())
+                              || "REOPENED".equalsIgnoreCase(a.getStatus()))
                     .collect(Collectors.toList());
                 request.setAttribute("pendingAduanList", pendingAduanList);
                 request.setAttribute("pendingAduanCount", pendingAduanList.size());
@@ -265,7 +272,11 @@ public class DashboardServlet extends HttpServlet {
 
             // 2. Complaints stats for user
             List<Aduan> userAduan = aduanDao.getByPenduduk(userId);
-            long pendingAduan = userAduan.stream().filter(a -> !"RESOLVED".equals(a.getStatus()) && !"REJECTED".equals(a.getStatus())).count();
+            long pendingAduan = userAduan.stream()
+                .filter(a -> !"RESOLVED".equals(a.getStatus()) 
+                          && !"REJECTED".equals(a.getStatus())
+                          && !"CLOSED".equals(a.getStatus()))
+                .count();
             request.setAttribute("totalAduan", userAduan.size());
             request.setAttribute("pendingAduan", pendingAduan);
             request.setAttribute("userAduan", userAduan);

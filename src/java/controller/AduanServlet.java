@@ -20,11 +20,10 @@ import model.Aduan;
 import model.KategoriAduan;
 import model.LogAduan;
 import model.Pengguna;
+import model.StatusAduan;
 import util.AppConfig;
 import util.FileUploadUtil;
 import util.DBUtil;
-
-
 
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 5 * 1024 * 1024, maxRequestSize = 10 * 1024 * 1024)
 public class AduanServlet extends HttpServlet {
@@ -73,12 +72,15 @@ public class AduanServlet extends HttpServlet {
                     request.setAttribute("kategoriList", kategoriList);
                     request.getRequestDispatcher("/views/aduan/aduanPenduduk.jsp").forward(request, response);
                 } else if ("AJK Kampung".equalsIgnoreCase(role)) {
-                    // Filter by Biro Keselamatan if needed, but normally AJK sees assigned ones
                     list = aduanDAO.getByPengendali(user.getId_pengguna());
                     request.setAttribute("aduanList", list);
                     request.getRequestDispatcher("/views/aduan/urusAduanAJK.jsp").forward(request, response);
                 } else if ("Ketua Kampung".equalsIgnoreCase(role)) {
                     list = aduanDAO.getAll();
+                    // Alihkan data AJK Keselamatan (Biro Keselamatan) ke JSP sebagai parameter
+                    String[] ajkKeselamatan = aduanDAO.getAJKDetailsByJawatan(6);
+                    request.setAttribute("namaAJKKeselamatan", ajkKeselamatan[0]);
+                    request.setAttribute("telAJKKeselamatan", ajkKeselamatan[1]);
                     request.setAttribute("aduanList", list);
                     request.getRequestDispatcher("/views/aduan/urusAduanKetua.jsp").forward(request, response);
                 } else {
@@ -116,7 +118,7 @@ public class AduanServlet extends HttpServlet {
                 response.setCharacterEncoding("UTF-8");
                 
                 StringBuilder json = new StringBuilder("[");
-                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM, hh:mm a");
+                SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy, hh:mm a");
                 for (int i = 0; i < logList.size(); i++) {
                     LogAduan l = logList.get(i);
                     String tarikhStr = (l.getDibuat_pada() != null) ? sdf.format(l.getDibuat_pada()) : "-";
@@ -172,7 +174,6 @@ public class AduanServlet extends HttpServlet {
         LogAduanDAO logDAO = new LogAduanDAO();
 
         try {
-
             /*
              * =========================
              * 3. ACTION: SUBMIT COMPLAINT
@@ -187,16 +188,16 @@ public class AduanServlet extends HttpServlet {
                 String fileName = FileUploadUtil.saveFile(
                     request.getPart("gambar_aduan"), SAVE_DIR, "aduan_" + user.getId_pengguna() + "_");
 
-
                 Aduan aduan = new Aduan();
                 aduan.setId_pengguna(user.getId_pengguna());
                 aduan.setId_kategori_aduan(idKategori);
-                aduan.setTajuk(tajuk);
-                aduan.setKeterangan(keterangan);
+                // Sanitasi input tajuk & keterangan ringkas bagi mencegah XSS
+                aduan.setTajuk(sanitize(tajuk));
+                aduan.setKeterangan(sanitize(keterangan));
                 aduan.setKeutamaan(keutamaan);
                 aduan.setGambar_aduan(fileName);
 
-                // Rule 1: Auto-assign to Biro Keselamatan (id_jawatan = 6)
+                // Auto-assign to Biro Keselamatan (id_jawatan = 6)
                 Integer ajkId = aduanDAO.getAJKIdByJawatan(6);
                 aduan.setId_pengendali(ajkId);
 
@@ -213,33 +214,142 @@ public class AduanServlet extends HttpServlet {
              */
             else if ("/updateStatus".equals(pathInfo)) {
                 int idAduan = Integer.parseInt(request.getParameter("id_aduan"));
-                String currentStatus = request.getParameter("current_status");
                 String nextStatus = request.getParameter("next_status");
                 String catatan = request.getParameter("catatan");
                 String role = user.getNama_peranan();
 
-                // Determine which catatan field to update based on status/role
+                // Dapatkan rekod aduan semasa
+                Aduan aduan = aduanDAO.getById(idAduan);
+                if (aduan == null) {
+                    response.sendRedirect(request.getContextPath() + "/aduan/list?error=not_found");
+                    return;
+                }
+
+                // Sekuriti & Keizinan: Hanya AJK Kampung & Ketua Kampung sahaja
+                if (!"AJK Kampung".equalsIgnoreCase(role) && !"Ketua Kampung".equalsIgnoreCase(role)) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Akses Ditolak");
+                    return;
+                }
+
+                // Validasi Server-Side State Transition menggunakan StatusAduan enum
+                try {
+                    StatusAduan currentEnum = StatusAduan.valueOf(aduan.getStatus() != null ? aduan.getStatus() : "SUBMITTED");
+                    StatusAduan nextEnum = StatusAduan.valueOf(nextStatus);
+
+                    if (!currentEnum.canTransitionTo(nextEnum, role, aduan.getReopen_count())) {
+                        response.sendRedirect(request.getContextPath() + "/aduan/list?error=invalid_transition");
+                        return;
+                    }
+                } catch (IllegalArgumentException e) {
+                    response.sendRedirect(request.getContextPath() + "/aduan/list?error=invalid_status");
+                    return;
+                }
+
+                // Menguruskan Bukti Selesai bagi status RESOLVED
+                String buktiSelesaiFileName = aduan.getBukti_selesai();
+                if ("RESOLVED".equals(nextStatus)) {
+                    String contentType = request.getContentType();
+                    if (contentType != null && contentType.startsWith("multipart/")) {
+                        try {
+                            Part part = request.getPart("bukti_selesai_file");
+                            if (part != null && part.getSize() > 0) {
+                                String uploadedFile = FileUploadUtil.saveFile(part, SAVE_DIR, "bukti_" + idAduan + "_");
+                                if (uploadedFile != null) {
+                                    buktiSelesaiFileName = uploadedFile;
+                                    aduanDAO.updateBuktiSelesai(idAduan, uploadedFile);
+                                }
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
+                    // Hanya AJK Kampung (Biro Keselamatan) sahaja yang diwajibkan untuk muat naik bukti
+                    if ("AJK Kampung".equalsIgnoreCase(role)) {
+                        if (buktiSelesaiFileName == null || buktiSelesaiFileName.trim().isEmpty()) {
+                            response.sendRedirect(request.getContextPath() + "/aduan/list?error=missing_bukti");
+                            return;
+                        }
+                    }
+                }
+
+                // Tentukan kolum catatan berdasarkan peranan
                 String catatanField = "catatan_ajk";
-                if ("Ketua Kampung".equals(role))
+                if ("Ketua Kampung".equalsIgnoreCase(role)) {
                     catatanField = "catatan_ketua";
+                }
 
-                if (aduanDAO.updateStatus(idAduan, nextStatus, catatanField, catatan)) {
-                    LogAduan log = new LogAduan();
-                    log.setId_aduan(idAduan);
-                    log.setId_pelaku(user.getId_pengguna());
-                    log.setStatus_lama(currentStatus);
-                    log.setStatus_baru(nextStatus);
-                    log.setCatatan(catatan);
-                    logDAO.insertLog(log);
+                // Sanitasi catatan
+                String sanitisedCatatan = sanitize(catatan);
+                String logCatatan = (sanitisedCatatan != null && !sanitisedCatatan.trim().isEmpty()) ? sanitisedCatatan : "Status dikemaskini oleh " + role;
 
+                // Kemaskini status dan log secara atomik (transaksi pangkalan data)
+                if (aduanDAO.updateStatusWithLog(idAduan, nextStatus, catatanField, sanitisedCatatan, user.getId_pengguna(), logCatatan)) {
                     response.sendRedirect(request.getContextPath() + "/aduan/list?msg=updated");
                 } else {
                     response.sendRedirect(request.getContextPath() + "/aduan/list?error=db");
                 }
             }
+            /*
+             * =========================
+             * 5. ACTION: REOPEN COMPLAINT
+             * =========================
+             */
+            else if ("/reopen".equals(pathInfo)) {
+                int idAduan = Integer.parseInt(request.getParameter("id_aduan"));
+                String catatan = request.getParameter("catatan");
+                String role = user.getNama_peranan();
+
+                Aduan aduan = aduanDAO.getById(idAduan);
+                if (aduan == null) {
+                    response.sendRedirect(request.getContextPath() + "/aduan/list?error=not_found");
+                    return;
+                }
+
+                // Keizinan: Hanya penduduk (pemilik asal aduan) sahaja dibenarkan
+                if (!"Penduduk".equalsIgnoreCase(role) || aduan.getId_pengguna() != user.getId_pengguna()) {
+                    response.sendError(HttpServletResponse.SC_FORBIDDEN, "Akses Ditolak");
+                    return;
+                }
+
+                // Validasi status aduan (mesti RESOLVED, REJECTED, atau CLOSED)
+                String currentStatus = aduan.getStatus();
+                if (!"RESOLVED".equalsIgnoreCase(currentStatus) && !"REJECTED".equalsIgnoreCase(currentStatus) && !"CLOSED".equalsIgnoreCase(currentStatus)) {
+                    response.sendRedirect(request.getContextPath() + "/aduan/list?error=cannot_reopen");
+                    return;
+                }
+
+                // Validasi had kekerapan reopen (max 2 kali)
+                if (aduan.getReopen_count() >= 2) {
+                    response.sendRedirect(request.getContextPath() + "/aduan/list?error=reopen_limit");
+                    return;
+                }
+
+                String sanitisedCatatan = sanitize(catatan);
+                String logCatatan = "Aduan dibuka semula oleh Pengadu. Sebab: " + (sanitisedCatatan != null && !sanitisedCatatan.trim().isEmpty() ? sanitisedCatatan : "Tiada catatan.");
+
+                // Jalankan proses reopen secara atomik
+                if (aduanDAO.reopenAduan(idAduan, user.getId_pengguna(), logCatatan)) {
+                    response.sendRedirect(request.getContextPath() + "/aduan/list?msg=reopened");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/aduan/list?error=db");
+                }
+            } else {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Tindakan tidak sah");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    private String sanitize(String input) {
+        if (input == null) return "";
+        return input.replace("&", "&amp;")
+                    .replace("<", "&lt;")
+                    .replace(">", "&gt;")
+                    .replace("\"", "&quot;")
+                    .replace("'", "&#x27;")
+                    .replace("/", "&#x2F;");
     }
 }

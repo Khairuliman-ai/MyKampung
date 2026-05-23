@@ -110,6 +110,25 @@ public class AduanDAO {
         return null;
     }
 
+    public String[] getAJKDetailsByJawatan(int idJawatan) {
+        String sql = "SELECT p.nama_penuh, p.nombor_telefon " +
+                     "FROM pengguna p " +
+                     "JOIN ajk_jawatan aj ON p.id_pengguna = aj.id_pengguna " +
+                     "WHERE aj.id_jawatan = ? LIMIT 1";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, idJawatan);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return new String[]{rs.getString("nama_penuh"), rs.getString("nombor_telefon")};
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return new String[]{"Tiada AJK", ""};
+    }
+
     public List<Aduan> getAll() {
         List<Aduan> list = new ArrayList<>();
         String sql = "SELECT a.*, p.nama_penuh, k.nama_kategori, p2.nama_penuh as nama_pengendali " +
@@ -132,15 +151,173 @@ public class AduanDAO {
     }
 
     public boolean updateStatus(int id, String status, String catatanField, String catatanValue) {
-        if (!"catatan_ajk".equals(catatanField) && !"catatan_ketua".equals(catatanField) && !"catatan_pentadbir".equals(catatanField)) {
-            throw new IllegalArgumentException("Nama medan catatan tidak sah: " + catatanField);
+        String sql;
+        if (catatanField != null && ("catatan_ajk".equals(catatanField) || "catatan_ketua".equals(catatanField) || "catatan_pentadbir".equals(catatanField))) {
+            sql = "UPDATE aduan SET status = ?, " + catatanField + " = ?, dikemaskini_pada = NOW() WHERE id_aduan = ?";
+        } else {
+            sql = "UPDATE aduan SET status = ?, dikemaskini_pada = NOW() WHERE id_aduan = ?";
         }
-        String sql = "UPDATE aduan SET status = ?, " + catatanField + " = ?, dikemaskini_pada = NOW() WHERE id_aduan = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, status);
-            ps.setString(2, catatanValue);
-            ps.setInt(3, id);
+            if (catatanField != null && ("catatan_ajk".equals(catatanField) || "catatan_ketua".equals(catatanField) || "catatan_pentadbir".equals(catatanField))) {
+                ps.setString(2, catatanValue);
+                ps.setInt(3, id);
+            } else {
+                ps.setInt(2, id);
+            }
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    /**
+     * Mengemaskini status aduan beserta rekod log aduan dalam satu transaksi atomik.
+     */
+    public boolean updateStatusWithLog(int id, String status, String catatanField, String catatanValue, int idPelaku, String logCatatan) {
+        String sqlUpdate;
+        if (catatanField != null && ("catatan_ajk".equals(catatanField) || "catatan_ketua".equals(catatanField) || "catatan_pentadbir".equals(catatanField))) {
+            sqlUpdate = "UPDATE aduan SET status = ?, " + catatanField + " = ?, dikemaskini_pada = NOW() WHERE id_aduan = ?";
+        } else {
+            sqlUpdate = "UPDATE aduan SET status = ?, dikemaskini_pada = NOW() WHERE id_aduan = ?";
+        }
+        String sqlGetOldStatus = "SELECT status FROM aduan WHERE id_aduan = ?";
+        String sqlInsertLog = "INSERT INTO log_aduan (id_aduan, id_pelaku, status_lama, status_baru, catatan, dibuat_pada) VALUES (?, ?, ?, ?, ?, NOW())";
+
+        Connection conn = null;
+        PreparedStatement psGet = null;
+        PreparedStatement psUpdate = null;
+        PreparedStatement psLog = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBUtil.getConnection();
+            conn.setAutoCommit(false);
+
+            // 1. Dapatkan status lama
+            String oldStatus = "SUBMITTED";
+            psGet = conn.prepareStatement(sqlGetOldStatus);
+            psGet.setInt(1, id);
+            rs = psGet.executeQuery();
+            if (rs.next()) {
+                oldStatus = rs.getString("status");
+            }
+
+            // 2. Kemaskini status aduan
+            psUpdate = conn.prepareStatement(sqlUpdate);
+            psUpdate.setString(1, status);
+            if (catatanField != null && ("catatan_ajk".equals(catatanField) || "catatan_ketua".equals(catatanField) || "catatan_pentadbir".equals(catatanField))) {
+                psUpdate.setString(2, catatanValue);
+                psUpdate.setInt(3, id);
+            } else {
+                psUpdate.setInt(2, id);
+            }
+            int affected = psUpdate.executeUpdate();
+
+            if (affected > 0) {
+                // 3. Masukkan ke log aduan
+                psLog = conn.prepareStatement(sqlInsertLog);
+                psLog.setInt(1, id);
+                psLog.setInt(2, idPelaku);
+                psLog.setString(3, oldStatus != null ? oldStatus : "SUBMITTED");
+                psLog.setString(4, status);
+                psLog.setString(5, logCatatan);
+                psLog.executeUpdate();
+
+                conn.commit();
+                return true;
+            } else {
+                conn.rollback();
+                return false;
+            }
+        } catch (SQLException e) {
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            }
+            e.printStackTrace();
+        } finally {
+            try { if (rs != null) rs.close(); } catch (SQLException e) {}
+            try { if (psGet != null) psGet.close(); } catch (SQLException e) {}
+            try { if (psUpdate != null) psUpdate.close(); } catch (SQLException e) {}
+            try { if (psLog != null) psLog.close(); } catch (SQLException e) {}
+            try { if (conn != null) conn.close(); } catch (SQLException e) {}
+        }
+        return false;
+    }
+
+    /**
+     * Membuka semula (Reopen) aduan yang selesai/ditolak. Menambah kaunter reopen_count secara atomik.
+     */
+    public boolean reopenAduan(int id, int idPelaku, String logCatatan) {
+        String sqlUpdate = "UPDATE aduan SET status = 'REOPENED', reopen_count = reopen_count + 1, dikemaskini_pada = NOW() WHERE id_aduan = ? AND reopen_count < 2";
+        String sqlGetOldStatus = "SELECT status FROM aduan WHERE id_aduan = ?";
+        String sqlInsertLog = "INSERT INTO log_aduan (id_aduan, id_pelaku, status_lama, status_baru, catatan, dibuat_pada) VALUES (?, ?, ?, 'REOPENED', ?, NOW())";
+
+        Connection conn = null;
+        PreparedStatement psGet = null;
+        PreparedStatement psUpdate = null;
+        PreparedStatement psLog = null;
+        ResultSet rs = null;
+
+        try {
+            conn = DBUtil.getConnection();
+            conn.setAutoCommit(false);
+
+            // 1. Dapatkan status lama
+            String oldStatus = "RESOLVED";
+            psGet = conn.prepareStatement(sqlGetOldStatus);
+            psGet.setInt(1, id);
+            rs = psGet.executeQuery();
+            if (rs.next()) {
+                oldStatus = rs.getString("status");
+            }
+
+            // 2. Kemaskini status dan tambah kaunter reopen
+            psUpdate = conn.prepareStatement(sqlUpdate);
+            psUpdate.setInt(1, id);
+            int affected = psUpdate.executeUpdate();
+
+            if (affected > 0) {
+                // 3. Masukkan ke log aduan
+                psLog = conn.prepareStatement(sqlInsertLog);
+                psLog.setInt(1, id);
+                psLog.setInt(2, idPelaku);
+                psLog.setString(3, oldStatus != null ? oldStatus : "RESOLVED");
+                psLog.setString(4, logCatatan);
+                psLog.executeUpdate();
+
+                conn.commit();
+                return true;
+            } else {
+                conn.rollback();
+                return false;
+            }
+        } catch (SQLException e) {
+            if (conn != null) {
+                try { conn.rollback(); } catch (SQLException ex) { ex.printStackTrace(); }
+            }
+            e.printStackTrace();
+        } finally {
+            try { if (rs != null) rs.close(); } catch (SQLException e) {}
+            try { if (psGet != null) psGet.close(); } catch (SQLException e) {}
+            try { if (psUpdate != null) psUpdate.close(); } catch (SQLException e) {}
+            try { if (psLog != null) psLog.close(); } catch (SQLException e) {}
+            try { if (conn != null) conn.close(); } catch (SQLException e) {}
+        }
+        return false;
+    }
+
+    /**
+     * Mengemaskini fail bukti penyelesaian aduan
+     */
+    public boolean updateBuktiSelesai(int idAduan, String fileName) {
+        String sql = "UPDATE aduan SET bukti_selesai = ? WHERE id_aduan = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, fileName);
+            ps.setInt(2, idAduan);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -177,6 +354,7 @@ public class AduanDAO {
         a.setCatatan_pentadbir(rs.getString("catatan_pentadbir"));
         a.setCatatan_ajk(rs.getString("catatan_ajk"));
         a.setCatatan_ketua(rs.getString("catatan_ketua"));
+        a.setReopen_count(rs.getInt("reopen_count"));
         a.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
         a.setDikemaskini_pada(rs.getTimestamp("dikemaskini_pada"));
         a.setDipadam_pada(rs.getTimestamp("dipadam_pada"));
@@ -195,6 +373,7 @@ public class AduanDAO {
         stats.put("RESOLVED", 0);
         stats.put("REJECTED", 0);
         stats.put("CLOSED", 0);
+        stats.put("REOPENED", 0);
         
         String sql = "SELECT status, COUNT(*) as count FROM aduan WHERE dipadam_pada IS NULL GROUP BY status";
         try (Connection conn = DBUtil.getConnection();
@@ -254,3 +433,4 @@ public class AduanDAO {
         return stats;
     }
 }
+

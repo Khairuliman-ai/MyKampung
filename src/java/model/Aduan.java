@@ -16,6 +16,7 @@ public class Aduan {
     private String catatan_pentadbir;
     private String catatan_ajk;
     private String catatan_ketua;
+    private int reopen_count;
     private Date dibuat_pada;
     private Date dikemaskini_pada;
     private Date dipadam_pada;
@@ -31,15 +32,16 @@ public class Aduan {
     public String getStatusBadgeClass() {
         if (status == null) return "bg-gray-100 text-gray-600";
         switch (status) {
-            case "SUBMITTED": return "bg-blue-100 text-blue-700";
-            case "UNDER_REVIEW_AJK": return "bg-yellow-100 text-yellow-700";
-            case "IN_PROGRESS_AJK": return "bg-orange-100 text-orange-700";
-            case "ESCALATED_TO_KETUA": return "bg-purple-100 text-purple-700";
-            case "UNDER_REVIEW_KETUA": return "bg-indigo-100 text-indigo-700";
-            case "IN_PROGRESS_HIGH_LEVEL": return "bg-cyan-100 text-cyan-700";
-            case "RESOLVED": return "bg-green-100 text-green-700";
-            case "REJECTED": return "bg-red-100 text-red-700";
-            case "CLOSED": return "bg-gray-100 text-gray-600";
+            case "SUBMITTED": return "bg-blue-100 text-blue-700 border border-blue-200";
+            case "UNDER_REVIEW_AJK": return "bg-yellow-100 text-yellow-700 border border-yellow-200";
+            case "IN_PROGRESS_AJK": return "bg-orange-100 text-orange-700 border border-orange-200";
+            case "ESCALATED_TO_KETUA": return "bg-purple-100 text-purple-700 border border-purple-200";
+            case "UNDER_REVIEW_KETUA": return "bg-indigo-100 text-indigo-700 border border-indigo-200";
+            case "IN_PROGRESS_HIGH_LEVEL": return "bg-cyan-100 text-cyan-700 border border-cyan-200";
+            case "RESOLVED": return "bg-green-100 text-green-700 border border-green-200";
+            case "REJECTED": return "bg-red-100 text-red-700 border border-red-200";
+            case "CLOSED": return "bg-gray-100 text-gray-500 border border-gray-200";
+            case "REOPENED": return "bg-amber-100 text-amber-800 border border-amber-200 animate-pulse";
             default: return "bg-gray-100 text-gray-600";
         }
     }
@@ -48,14 +50,15 @@ public class Aduan {
         if (status == null) return "N/A";
         switch (status) {
             case "SUBMITTED": return "Dihantar";
-            case "UNDER_REVIEW_AJK": return "Dalam Semakan AJK";
-            case "IN_PROGRESS_AJK": return "Sedang Ditangani (AJK)";
-            case "ESCALATED_TO_KETUA": return "Dimajukan ke Ketua";
+            case "UNDER_REVIEW_AJK": return "Dalam Semakan Biro";
+            case "IN_PROGRESS_AJK": return "Tindakan Biro";
+            case "ESCALATED_TO_KETUA": return "Diserah ke Ketua";
             case "UNDER_REVIEW_KETUA": return "Dalam Semakan Ketua";
-            case "IN_PROGRESS_HIGH_LEVEL": return "Tindakan Lanjut";
+            case "IN_PROGRESS_HIGH_LEVEL": return "Tindakan Khas Ketua";
             case "RESOLVED": return "Selesai";
             case "REJECTED": return "Ditolak";
             case "CLOSED": return "Ditutup";
+            case "REOPENED": return "Dibuka Semula";
             default: return status;
         }
     }
@@ -64,9 +67,9 @@ public class Aduan {
         if (keutamaan == null) return "bg-gray-100 text-gray-600";
         switch (keutamaan) {
             case "TINGGI":
-            case "KRITIKAL": return "bg-red-100 text-red-700";
-            case "SEDERHANA": return "bg-blue-100 text-blue-700";
-            case "RENDAH": return "bg-green-100 text-green-700";
+            case "KRITIKAL": return "bg-red-100 text-red-700 border border-red-200";
+            case "SEDERHANA": return "bg-blue-100 text-blue-700 border border-blue-200";
+            case "RENDAH": return "bg-green-100 text-green-700 border border-green-200";
             default: return "bg-gray-100 text-gray-600";
         }
     }
@@ -111,6 +114,9 @@ public class Aduan {
     public String getCatatan_ketua() { return catatan_ketua; }
     public void setCatatan_ketua(String catatan_ketua) { this.catatan_ketua = catatan_ketua; }
 
+    public int getReopen_count() { return reopen_count; }
+    public void setReopen_count(int reopen_count) { this.reopen_count = reopen_count; }
+
     public Date getDibuat_pada() { return dibuat_pada; }
     public void setDibuat_pada(Date dibuat_pada) { this.dibuat_pada = dibuat_pada; }
 
@@ -129,3 +135,4 @@ public class Aduan {
     public String getNama_pengendali() { return nama_pengendali; }
     public void setNama_pengendali(String nama_pengendali) { this.nama_pengendali = nama_pengendali; }
 }
+
