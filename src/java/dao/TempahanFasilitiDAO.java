@@ -238,13 +238,15 @@ public class TempahanFasilitiDAO {
         String sql = "SELECT f.nama_fasiliti, COUNT(*) as count " +
                      "FROM tempahan_fasiliti t " +
                      "JOIN fasiliti f ON t.id_fasiliti = f.id_fasiliti " +
-                     "WHERE t.status = '" + StatusConstant.TEMPAHAN_LULUS + "' " +
+                     "WHERE t.status = ? " +
                      "GROUP BY f.nama_fasiliti";
         try (Connection conn = DBUtil.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                stats.put(rs.getString("nama_fasiliti"), rs.getInt("count"));
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, StatusConstant.TEMPAHAN_LULUS);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    stats.put(rs.getString("nama_fasiliti"), rs.getInt("count"));
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
