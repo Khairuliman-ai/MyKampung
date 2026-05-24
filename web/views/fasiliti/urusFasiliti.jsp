@@ -12,6 +12,14 @@
 <%
     List<Fasiliti> senaraiFasiliti = (List<Fasiliti>) request.getAttribute("senaraiFasiliti");
     List<TempahanFasiliti> senaraiTempahan = (List<TempahanFasiliti>) request.getAttribute("senaraiTempahan");
+    int pendingCount = 0;
+    if (senaraiTempahan != null) {
+        for (TempahanFasiliti t : senaraiTempahan) {
+            if (StatusConstant.TEMPAHAN_MENUNGGU.equals(t.getStatus())) {
+                pendingCount++;
+            }
+        }
+    }
 %>
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F7F7F9] min-w-0">
@@ -29,34 +37,6 @@
         </div>
     </header>
 
-    <!-- Stat Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-5">
-            <div class="w-14 h-14 bg-indigo-50 text-brand-purple rounded-2xl flex items-center justify-center text-xl">
-                <i class="fas fa-warehouse"></i>
-            </div>
-            <div>
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Jumlah Fasiliti</p>
-                <h3 class="text-2xl font-bold text-gray-800"><%= (senaraiFasiliti != null) ? senaraiFasiliti.size() : 0 %></h3>
-            </div>
-        </div>
-        <div class="bg-white p-6 rounded-[2rem] shadow-sm border border-gray-100 flex items-center gap-5">
-            <div class="w-14 h-14 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center text-xl">
-                <i class="fas fa-clock-rotate-left"></i>
-            </div>
-            <div>
-                <p class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-1">Permohonan Menunggu</p>
-                <% 
-                    int pendingCount = 0;
-                    if (senaraiTempahan != null) {
-                        for (TempahanFasiliti t : senaraiTempahan) if (StatusConstant.TEMPAHAN_MENUNGGU.equals(t.getStatus())) pendingCount++;
-                    }
-                %>
-                <h3 class="text-2xl font-bold text-gray-800"><%= pendingCount %></h3>
-            </div>
-        </div>
-    </div>
-
     <!-- Tabs -->
     <div class="mb-8 border-b border-gray-200">
         <nav class="flex gap-8">
@@ -67,33 +47,33 @@
                     <span class="bg-red-500 text-white text-[10px] px-2 py-0.5 rounded-full"><%= pendingCount %></span>
                 <% } %>
             </button>
-            <button onclick="switchTab('active')" id="tab-active" class="pb-4 px-2 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition-all flex items-center gap-2">
-                Tempahan Lulus
-            </button>
             <button onclick="switchTab('history')" id="tab-history" class="pb-4 px-2 text-sm font-bold border-b-2 border-transparent text-gray-400 hover:text-gray-600 transition-all flex items-center gap-2">
-                Sejarah / Ditolak
+                Sejarah Tempahan
             </button>
         </nav>
     </div>
 
     <!-- Tab 1: Inventory -->
     <div id="content-inventory" class="block">
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left">
+                <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-100">
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fasiliti</th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Lokasi</th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Tindakan</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-16 text-center">No.</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Fasiliti</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Lokasi</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Status</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Tindakan</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
+                    <tbody class="divide-y divide-gray-100">
                         <% if (senaraiFasiliti != null && !senaraiFasiliti.isEmpty()) { 
+                            int noInv = 1;
                             for (Fasiliti f : senaraiFasiliti) { %>
-                            <tr class="hover:bg-gray-50/50 transition-colors">
-                                <td class="px-8 py-6">
+                            <tr class="hover:bg-purple-50/50 transition cursor-pointer group">
+                                <td class="p-4 text-sm text-gray-400 font-medium text-center"><%= noInv++ %></td>
+                                <td class="p-4">
                                     <div class="flex items-center gap-4">
                                         <div class="w-12 h-12 rounded-xl overflow-hidden bg-gray-100 flex-shrink-0">
                                             <% if (f.getGambar_fasiliti() != null) { %>
@@ -104,43 +84,43 @@
                                                 </div>
                                             <% } %>
                                         </div>
-                                        <p class="text-sm font-bold text-gray-800"><%= f.getNama_fasiliti() %></p>
+                                        <p class="text-sm font-bold text-gray-800 group-hover:text-brand-purple"><%= f.getNama_fasiliti() %></p>
                                     </div>
                                 </td>
-                                <td class="px-8 py-6 text-sm text-gray-500"><%= f.getLokasi() %></td>
-                                <td class="px-8 py-6">
+                                <td class="p-4 text-sm text-gray-500"><%= f.getLokasi() %></td>
+                                <td class="p-4 text-center">
                                     <% if (StatusConstant.FASILITI_AKTIF.equalsIgnoreCase(f.getStatus())) { %>
                                         <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-bold uppercase tracking-wider">Aktif</span>
                                     <% } else { %>
                                         <span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-bold uppercase tracking-wider">Tidak Aktif</span>
                                     <% } %>
                                 </td>
-                                <td class="px-8 py-6">
-                                    <div class="flex justify-center gap-3">
+                                <td class="p-4">
+                                    <div class="flex justify-center gap-2" onclick="event.stopPropagation()">
                                         <% if (StatusConstant.ROLE_KETUA_KAMPUNG.equalsIgnoreCase(role) || "Setiausaha".equals(biro)) {
                                             if (f.getLatitude() != null && f.getLongitude() != null) { %>
                                             <a href="https://www.google.com/maps/dir/?api=1&destination=<%= f.getLatitude() %>,<%= f.getLongitude() %>"
                                                target="_blank"
-                                               class="w-9 h-9 flex items-center justify-center bg-gray-50 text-green-500 hover:text-green-600 hover:bg-green-50 rounded-xl transition-all"
+                                               class="w-8 h-8 flex items-center justify-center text-green-600 hover:bg-green-100 rounded-lg transition"
                                                title="Navigasi GPS">
                                                 <i class="fas fa-route text-xs"></i>
                                             </a>
                                         <% } } %>
                                         
                                         <button onclick="openEditModal('<%= f.getId_fasiliti() %>', '<%= f.getNama_fasiliti() %>', '<%= f.getLokasi() %>', '<%= f.getStatus() %>', '<%= f.getLatitude() != null ? f.getLatitude() : "" %>', '<%= f.getLongitude() != null ? f.getLongitude() : "" %>', <%= f.isRequiresApproval() %>, '<%= f.getGambar_fasiliti() != null ? f.getGambar_fasiliti() : "" %>')" 
-                                                class="w-9 h-9 flex items-center justify-center bg-gray-50 text-gray-400 hover:text-brand-purple hover:bg-indigo-50 rounded-xl transition-all">
+                                                class="w-8 h-8 flex items-center justify-center text-blue-600 hover:bg-blue-100 rounded-lg transition" title="Kemaskini">
                                             <i class="fas fa-pen text-xs"></i>
                                         </button>
                                         <a href="<%= contextPath %>/fasiliti/padam?id=<%= f.getId_fasiliti() %>" 
                                            onclick="return confirm('Adakah anda pasti mahu memadam fasiliti ini?')"
-                                           class="w-9 h-9 flex items-center justify-center bg-gray-50 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all">
+                                           class="w-8 h-8 flex items-center justify-center text-red-600 hover:bg-red-100 rounded-lg transition" title="Padam">
                                             <i class="fas fa-trash text-xs"></i>
                                         </a>
                                     </div>
                                 </td>
                             </tr>
                         <% } } else { %>
-                            <tr><td colspan="4" class="px-8 py-10 text-center text-gray-400 text-sm italic">Tiada data fasiliti.</td></tr>
+                            <tr><td colspan="5" class="p-12 text-center text-gray-400 italic">Tiada data fasiliti.</td></tr>
                         <% } %>
                     </tbody>
                 </table>
@@ -151,51 +131,54 @@
 
     <!-- Tab 2: Pending Requests -->
     <div id="content-requests" class="hidden">
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left">
+                <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-100">
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pemohon</th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fasiliti</th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tarikh & Masa</th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sebab Tempahan</th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Tindakan</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-16 text-center">No.</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Pemohon</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Fasiliti</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Tarikh & Masa</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Sebab Tempahan</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Tindakan</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
+                    <tbody class="divide-y divide-gray-100">
                         <% if (senaraiTempahan != null) { 
                             boolean hasPending = false;
+                            int noReq = 1;
                             for (TempahanFasiliti t : senaraiTempahan) { 
                                 if (StatusConstant.TEMPAHAN_MENUNGGU.equals(t.getStatus())) {
                                     hasPending = true; %>
-                            <tr class="hover:bg-gray-50/50 transition-colors">
-                                <td class="px-8 py-6">
-                                    <p class="text-sm font-bold text-gray-800"><%= t.getNama_pengguna() %></p>
+                            <tr class="hover:bg-purple-50/50 transition cursor-pointer group">
+                                <td class="p-4 text-sm text-gray-400 font-medium text-center"><%= noReq++ %></td>
+                                <td class="p-4">
+                                    <p class="text-sm font-bold text-gray-800 group-hover:text-brand-purple"><%= t.getNama_pengguna() %></p>
                                     <p class="text-[10px] text-gray-400">ID: #<%= t.getId_tempahan() %></p>
                                 </td>
-                                <td class="px-8 py-6 text-sm text-gray-500 font-medium"><%= t.getNama_fasiliti() %></td>
-                                <td class="px-8 py-6">
+                                <td class="p-4 text-sm text-gray-600 font-medium"><%= t.getNama_fasiliti() %></td>
+                                <td class="p-4">
                                     <p class="text-xs font-bold text-gray-700"><%= t.getTarikh_tempah() %></p>
                                     <p class="text-[10px] text-gray-400"><%= t.getMasa_mula() %> - <%= t.getMasa_tamat() %></p>
                                 </td>
-                                <td class="px-8 py-6">
+                                <td class="p-4">
                                     <p class="text-[10px] text-gray-500 italic max-w-[200px]">
                                         <%= (t.getCatatan_pemohon() != null && !t.getCatatan_pemohon().isEmpty()) ? t.getCatatan_pemohon() : "-" %>
                                     </p>
                                 </td>
-                                <td class="px-8 py-6 text-center">
-                                    <div class="flex justify-center gap-2">
+                                <td class="p-4 text-center">
+                                    <div class="flex justify-center gap-2" onclick="event.stopPropagation()">
                                         <form action="<%= contextPath %>/fasiliti/approve" method="post" class="inline">
                                             <input type="hidden" name="idTempahan" value="<%= t.getId_tempahan() %>">
-                                            <button type="submit" class="bg-green-100 text-green-600 px-4 py-2 rounded-xl text-[10px] font-bold hover:bg-green-200 transition uppercase tracking-wider">Lulus</button>
+                                            <button type="submit" class="bg-green-100 text-green-600 px-4 py-2 rounded-xl text-[10px] font-bold hover:bg-green-200 transition uppercase tracking-wider shadow-sm border border-green-200">Lulus</button>
                                         </form>
-                                        <button onclick="openRejectModal('<%= t.getId_tempahan() %>')" class="bg-red-100 text-red-600 px-4 py-2 rounded-xl text-[10px] font-bold hover:bg-red-200 transition uppercase tracking-wider">Tolak</button>
+                                        <button onclick="openRejectModal('<%= t.getId_tempahan() %>')" class="bg-red-100 text-red-600 px-4 py-2 rounded-xl text-[10px] font-bold hover:bg-red-200 transition uppercase tracking-wider shadow-sm border border-red-200">Tolak</button>
                                     </div>
                                 </td>
                             </tr>
                         <% } } if(!hasPending) { %>
-                            <tr><td colspan="5" class="px-8 py-10 text-center text-gray-400 text-sm italic">Tiada permohonan menunggu kelulusan.</td></tr>
+                            <tr><td colspan="6" class="p-12 text-center text-gray-400 italic">Tiada permohonan menunggu kelulusan.</td></tr>
                         <% } } %>
                     </tbody>
                 </table>
@@ -203,82 +186,56 @@
         </div>
     </div>
 
-    <!-- Tab 3: Active/Approved -->
-    <div id="content-active" class="hidden">
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
+    <!-- Tab 3: Unified Sejarah Tempahan -->
+    <div id="content-history" class="hidden">
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left">
+                <table class="w-full text-left border-collapse">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-100">
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pemohon</th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fasiliti</th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tarikh & Masa</th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Status</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-16 text-center">No.</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Pemohon</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Fasiliti</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Tarikh & Masa</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Catatan/Alasan</th>
+                            <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-center">Status</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
+                    <tbody class="divide-y divide-gray-100">
                         <% if (senaraiTempahan != null) { 
-                            boolean hasActive = false;
+                            boolean hasHistory = false;
+                            int noHist = 1;
                             for (TempahanFasiliti t : senaraiTempahan) { 
-                                if (StatusConstant.TEMPAHAN_LULUS.equals(t.getStatus())) {
-                                    hasActive = true; %>
-                            <tr class="hover:bg-gray-50/50 transition-colors">
-                                <td class="px-8 py-6">
-                                    <p class="text-sm font-bold text-gray-800"><%= t.getNama_pengguna() %></p>
+                                if (StatusConstant.TEMPAHAN_LULUS.equals(t.getStatus()) || 
+                                    StatusConstant.TEMPAHAN_TOLAK.equals(t.getStatus()) || 
+                                    StatusConstant.TEMPAHAN_DIBATAL.equals(t.getStatus())) {
+                                    hasHistory = true; %>
+                            <tr class="hover:bg-purple-50/50 transition cursor-pointer group">
+                                <td class="p-4 text-sm text-gray-400 font-medium text-center"><%= noHist++ %></td>
+                                <td class="p-4">
+                                    <p class="text-sm font-bold text-gray-800 group-hover:text-brand-purple"><%= t.getNama_pengguna() %></p>
                                     <p class="text-[10px] text-gray-400">ID: #<%= t.getId_tempahan() %></p>
                                 </td>
-                                <td class="px-8 py-6 text-sm text-gray-500 font-medium"><%= t.getNama_fasiliti() %></td>
-                                <td class="px-8 py-6">
+                                <td class="p-4 text-sm text-gray-600 font-medium"><%= t.getNama_fasiliti() %></td>
+                                <td class="p-4">
                                     <p class="text-xs font-bold text-gray-700"><%= t.getTarikh_tempah() %></p>
                                     <p class="text-[10px] text-gray-400"><%= t.getMasa_mula() %> - <%= t.getMasa_tamat() %></p>
                                 </td>
-                                <td class="px-8 py-6 text-center">
-                                    <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-bold uppercase tracking-wider">Lulus</span>
-                                </td>
-                            </tr>
-                        <% } } if(!hasActive) { %>
-                            <tr><td colspan="4" class="px-8 py-10 text-center text-gray-400 text-sm italic">Tiada tempahan aktif.</td></tr>
-                        <% } } %>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- Tab 4: History/Rejected -->
-    <div id="content-history" class="hidden">
-        <div class="bg-white rounded-[2.5rem] shadow-sm border border-gray-100 overflow-hidden">
-            <div class="overflow-x-auto">
-                <table class="w-full text-left">
-                    <thead>
-                        <tr class="bg-gray-50 border-b border-gray-100">
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Pemohon</th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Fasiliti</th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Tarikh</th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest">Sebab/Alasan</th>
-                            <th class="px-8 py-5 text-[10px] font-bold text-gray-400 uppercase tracking-widest text-center">Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-50">
-                        <% if (senaraiTempahan != null) { 
-                            boolean hasHistory = false;
-                            for (TempahanFasiliti t : senaraiTempahan) { 
-                                if (StatusConstant.TEMPAHAN_TOLAK.equals(t.getStatus()) || StatusConstant.TEMPAHAN_DIBATAL.equals(t.getStatus())) {
-                                    hasHistory = true; %>
-                            <tr class="hover:bg-gray-50/50 transition-colors">
-                                <td class="px-8 py-6">
-                                    <p class="text-sm font-bold text-gray-800"><%= t.getNama_pengguna() %></p>
-                                    <p class="text-[10px] text-gray-400">ID: #<%= t.getId_tempahan() %></p>
-                                </td>
-                                <td class="px-8 py-6 text-sm text-gray-500 font-medium"><%= t.getNama_fasiliti() %></td>
-                                <td class="px-8 py-6 text-xs text-gray-700 font-bold"><%= t.getTarikh_tempah() %></td>
-                                <td class="px-8 py-6">
+                                <td class="p-4">
                                     <p class="text-[10px] text-gray-500 italic max-w-[200px]">
-                                        <%= t.getStatus().equals(StatusConstant.TEMPAHAN_TOLAK) ? "Alasan: " + (t.getAlasanPenolakan() != null ? t.getAlasanPenolakan() : "-") : "Dibatalkan oleh penduduk" %>
+                                        <% if (StatusConstant.TEMPAHAN_LULUS.equals(t.getStatus())) { %>
+                                            Catatan: <%= (t.getCatatan_pemohon() != null && !t.getCatatan_pemohon().isEmpty()) ? t.getCatatan_pemohon() : "-" %>
+                                        <% } else if (StatusConstant.TEMPAHAN_TOLAK.equals(t.getStatus())) { %>
+                                            Alasan: <%= (t.getAlasanPenolakan() != null && !t.getAlasanPenolakan().isEmpty()) ? t.getAlasanPenolakan() : "-" %>
+                                        <% } else { %>
+                                            Dibatalkan oleh penduduk
+                                        <% } %>
                                     </p>
                                 </td>
-                                <td class="px-8 py-6 text-center">
-                                    <% if (StatusConstant.TEMPAHAN_TOLAK.equals(t.getStatus())) { %>
+                                <td class="p-4 text-center">
+                                    <% if (StatusConstant.TEMPAHAN_LULUS.equals(t.getStatus())) { %>
+                                        <span class="px-3 py-1 bg-green-50 text-green-600 rounded-full text-[10px] font-bold uppercase tracking-wider">Lulus</span>
+                                    <% } else if (StatusConstant.TEMPAHAN_TOLAK.equals(t.getStatus())) { %>
                                         <span class="px-3 py-1 bg-red-50 text-red-600 rounded-full text-[10px] font-bold uppercase tracking-wider">Ditolak</span>
                                     <% } else { %>
                                         <span class="px-3 py-1 bg-gray-50 text-gray-400 rounded-full text-[10px] font-bold uppercase tracking-wider">Dibatalkan</span>
@@ -286,7 +243,7 @@
                                 </td>
                             </tr>
                         <% } } if(!hasHistory) { %>
-                            <tr><td colspan="5" class="px-8 py-10 text-center text-gray-400 text-sm italic">Tiada sejarah tempahan.</td></tr>
+                            <tr><td colspan="6" class="p-12 text-center text-gray-400 italic">Tiada sejarah tempahan.</td></tr>
                         <% } } %>
                     </tbody>
                 </table>
@@ -297,7 +254,39 @@
     
     <!-- Right Aside Bar (Admin) -->
     <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full custom-scrollbar flex-shrink-0">
-        <div class="flex justify-between items-start mb-8">
+        <!-- Stats Section -->
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="font-black text-lg text-gray-800 tracking-tight">Statistik Fasiliti</h3>
+            <div class="w-8 h-8 bg-indigo-50 rounded-xl flex items-center justify-center text-brand-purple">
+                <i class="fas fa-chart-simple text-xs"></i>
+            </div>
+        </div>
+
+        <div class="space-y-4 mb-8">
+            <!-- Jumlah Fasiliti Card -->
+            <div class="bg-slate-50/50 p-5 rounded-[2rem] border border-slate-100 flex items-center gap-4 hover:bg-slate-50 transition duration-300">
+                <div class="w-11 h-11 rounded-2xl bg-indigo-50 text-brand-purple flex items-center justify-center text-base flex-shrink-0">
+                    <i class="fas fa-warehouse"></i>
+                </div>
+                <div>
+                    <p class="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider">Jumlah Fasiliti</p>
+                    <h4 class="text-xl font-black text-slate-800 mt-0.5"><%= (senaraiFasiliti != null) ? senaraiFasiliti.size() : 0 %></h4>
+                </div>
+            </div>
+
+            <!-- Permohonan Menunggu Card -->
+            <div class="bg-slate-50/50 p-5 rounded-[2rem] border border-slate-100 flex items-center gap-4 hover:bg-slate-50 transition duration-300">
+                <div class="w-11 h-11 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-base flex-shrink-0">
+                    <i class="fas fa-clock-rotate-left"></i>
+                </div>
+                <div>
+                    <p class="text-[9px] text-slate-400 font-extrabold uppercase tracking-wider">Permohonan Menunggu</p>
+                    <h4 class="text-xl font-black text-slate-800 mt-0.5"><%= pendingCount %></h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-start mb-6">
             <h3 class="font-bold text-lg text-gray-800">Garis Panduan</h3>
         </div>
 
@@ -520,7 +509,6 @@
 
         document.getElementById('content-inventory').classList.add('hidden');
         document.getElementById('content-requests').classList.add('hidden');
-        document.getElementById('content-active').classList.add('hidden');
         document.getElementById('content-history').classList.add('hidden');
         document.getElementById('content-' + tabId).classList.remove('hidden');
     }

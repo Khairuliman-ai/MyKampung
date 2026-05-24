@@ -41,39 +41,54 @@
             <p class="text-gray-500 text-sm">Uruskan permohonan baharu, semak sejarah, dan urus jenis bantuan.</p>
         </div>
         
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex items-center gap-3">
             <a href="<%= request.getContextPath() %>/bantuan/config" 
-               class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white border border-gray-200 text-gray-700 hover:text-brand-purple hover:border-purple-200 shadow-sm transition-all text-xs font-bold">
+               class="inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white border border-gray-100 text-gray-700 hover:text-brand-purple hover:border-purple-200 shadow-sm transition-all text-xs font-black uppercase tracking-wider">
                 <i class="fas fa-sliders-h text-brand-purple"></i>
                 Konfigurasi Kelayakan
             </a>
-            
-            <!-- Professional Filter Bar -->
-            <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex flex-wrap items-center gap-3">
-            <div class="relative">
-                <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                <input type="text" id="searchPemohon" onkeyup="filterData()" placeholder="Cari pemohon/ID..." 
-                       class="pl-9 pr-4 py-2 bg-gray-50 border-none rounded-xl text-xs focus:ring-2 focus:ring-brand-purple w-48">
+        </div>
+    </div>
+
+    <!-- Carian & Penapis Section -->
+    <div class="flex flex-col md:flex-row gap-4 mb-8">
+        <!-- Search Input -->
+        <div class="flex-1 relative group">
+            <div class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-purple group-focus-within:scale-110 transition-all duration-300 pointer-events-none">
+                <i class="fas fa-search text-sm"></i>
             </div>
-            
-            <select id="filterKategori" onchange="filterData()" class="bg-gray-50 border-none rounded-xl text-xs focus:ring-2 focus:ring-brand-purple py-2 px-3 pr-8">
+            <input type="text" id="searchPemohon" onkeyup="filterData()" placeholder="Cari pemohon atau ID permohonan..." 
+                   class="w-full pl-14 pr-6 py-4 rounded-[2rem] bg-white border border-gray-100 focus:ring-4 focus:ring-purple-50 focus:border-brand-purple text-xs font-semibold shadow-sm transition-all outline-none placeholder:text-gray-300">
+        </div>
+        
+        <!-- Category Filter -->
+        <div class="w-full md:w-64 relative group">
+            <div class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-purple group-focus-within:scale-110 transition-all duration-300 pointer-events-none">
+                <i class="fas fa-tags text-sm"></i>
+            </div>
+            <select id="filterKategori" onchange="filterData()" class="w-full pl-14 pr-10 py-4 rounded-[2rem] bg-white border border-gray-100 focus:ring-4 focus:ring-purple-50 focus:border-brand-purple text-xs font-semibold shadow-sm transition-all outline-none text-gray-700 appearance-none">
                 <option value="ALL">Semua Kategori</option>
                 <option value="RASMI">Bantuan Rasmi</option>
                 <option value="KOMUNITI">Bantuan Komuniti</option>
             </select>
-
-            <div class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-xl border border-transparent focus-within:border-brand-purple/30 transition">
-                <i class="fas fa-calendar-alt text-gray-400 text-[10px]"></i>
-                <input type="date" id="filterDateStart" onchange="filterData()" class="bg-transparent border-none p-0 text-[10px] focus:ring-0">
-                <span class="text-gray-300">-</span>
-                <input type="date" id="filterDateEnd" onchange="filterData()" class="bg-transparent border-none p-0 text-[10px] focus:ring-0">
+            <div class="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                <i class="fas fa-chevron-down text-xs"></i>
             </div>
+        </div>
 
-            <button onclick="resetFilters()" class="p-2 text-gray-400 hover:text-red-500 transition tooltip" title="Reset Tapisan">
-                <i class="fas fa-sync-alt text-xs"></i>
-            </button>
+        <!-- Date Filter -->
+        <div class="w-full md:w-64 relative group">
+            <div class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-purple group-focus-within:scale-110 transition-all duration-300 pointer-events-none">
+                <i class="far fa-calendar-alt text-sm"></i>
+            </div>
+            <input type="date" id="filterDate" onchange="filterData()" class="w-full pl-14 pr-6 py-4 rounded-[2rem] bg-white border border-gray-100 focus:ring-4 focus:ring-purple-50 focus:border-brand-purple text-xs font-semibold shadow-sm transition-all outline-none text-gray-700">
         </div>
-        </div>
+
+        <!-- Reset Button -->
+        <button onclick="resetFilters()" class="px-6 py-4 rounded-[2rem] bg-white border border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-100 focus:ring-4 focus:ring-red-50 text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-2" title="Reset Tapisan">
+            <i class="fas fa-sync-alt text-xs"></i>
+            <span>Reset</span>
+        </button>
     </div>
 
     <% if (request.getParameter("msg") != null) { %>
@@ -181,11 +196,19 @@
                                 <% } %>
                             </td>
                         </tr>
-                        <% } } else { %>
-                        <tr><td colspan="5" class="p-12 text-center text-gray-400"><i class="fas fa-inbox text-4xl mb-4 block opacity-20"></i>Tiada permohonan baharu.</td></tr>
-                        <% } %>
+                        <% } } %>
+                        <tr id="tableBaru-empty" class="<%= !listBaru.isEmpty() ? "hidden" : "" %> empty-state-row">
+                            <td colspan="5" class="p-12 text-center text-gray-400">
+                                <i class="fas fa-inbox text-4xl mb-4 block opacity-20"></i>Tiada permohonan baharu.
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
+            </div>
+            
+            <!-- Pagination Footer for Permohonan Baharu -->
+            <div id="footerBaru" class="p-6 bg-white border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
+                <!-- Will be populated dynamically by JS -->
             </div>
         </div>
     </div>
@@ -194,7 +217,7 @@
     <div id="content-sejarah" class="hidden">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+                <table class="w-full text-left border-collapse" id="tableSejarah">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-100">
                             <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider w-16">No.</th>
@@ -207,7 +230,7 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <% if (!listSejarah.isEmpty()) { 
-                            int noSejarah = 1;
+                            int noSejarah = (currentPage - 1) * 10 + 1;
                             for (PermohonanBantuan pb : listSejarah) { %>
                         <tr class="hover:bg-gray-50/50 transition data-row-filter cursor-pointer group"
                             data-search="<%= pb.getNama_penuh() %> #<%= pb.getId_permohonan() %>" 
@@ -274,9 +297,12 @@
                                 <% } %>
                             </td>
                         </tr>
-                        <% } } else { %>
-                        <tr><td colspan="6" class="p-12 text-center text-gray-400"><i class="fas fa-history text-4xl mb-4 block opacity-20"></i>Tiada sejarah rekod.</td></tr>
-                        <% } %>
+                        <% } } %>
+                        <tr id="tableSejarah-empty" class="<%= !listSejarah.isEmpty() ? "hidden" : "" %> empty-state-row">
+                            <td colspan="6" class="p-12 text-center text-gray-400">
+                                <i class="fas fa-history text-4xl mb-4 block opacity-20"></i>Tiada sejarah rekod.
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -324,6 +350,14 @@
                             Seterusnya <i class="fas fa-chevron-right"></i>
                         </button>
                     <% } %>
+
+                    <!-- Lompat Ke Page Selector -->
+                    <div class="flex items-center gap-1.5 text-xs text-gray-500 font-medium border-l border-gray-200 pl-4 ml-2">
+                        <span>Lompat ke:</span>
+                        <input type="number" min="1" max="<%= totalPages %>" value="<%= currentPage %>" 
+                               onkeypress="if(event.key === 'Enter') { const p = parseInt(this.value); if(p >= 1 && p <= <%= totalPages %>) { window.location.href = '?page=' + p; } }"
+                               class="w-12 h-9 px-2 text-center bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 outline-none focus:ring-2 focus:ring-brand-purple focus:border-brand-purple [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                    </div>
                 </div>
             </div>
         </div>
@@ -331,14 +365,14 @@
 
     <!-- TAB 3: JENIS BANTUAN -->
     <div id="content-jenis" class="hidden">
-        <div class="flex justify-between items-center mb-4">
+        <div class="flex justify-between items-center mb-6">
             <h3 class="font-bold text-lg text-gray-800">Senarai Konfigurasi Bantuan</h3>
-            <button onclick="openModal('modalTambahBantuan')" class="bg-brand-purple text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md">
+            <button onclick="openModal('modalTambahBantuan')" class="inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-brand-purple text-white hover:bg-opacity-90 shadow-md transition-all text-xs font-black uppercase tracking-wider">
                 <i class="fas fa-plus"></i> Tambah Bantuan
             </button>
         </div>
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left border-collapse" id="tableJenis">
                 <thead>
                     <tr class="bg-gray-50 border-b border-gray-100">
                         <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider w-16">No.</th>
@@ -353,10 +387,10 @@
                     <% if (senaraiBantuan != null && !senaraiBantuan.isEmpty()) { 
                         int noJenis = 1;
                         for (Bantuan b : senaraiBantuan) { %>
-                    <tr class="hover:bg-gray-50/50 transition group">
+                    <tr class="hover:bg-gray-50/50 transition group data-jenis-row" data-category="<%= b.getJenis_bantuan() %>">
                         <td class="p-4 text-sm text-gray-400 font-medium"><%= noJenis++ %></td>
                         <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-brand-purple transition-colors"><%= b.getNama_bantuan() %></td>
-                        <td class="p-4">
+                        <td class="p-4 text-center">
                             <% if ("RASMI".equalsIgnoreCase(b.getJenis_bantuan())) { %>
                                 <span class="px-2 py-1 rounded-lg text-[9px] font-bold bg-blue-50 text-blue-600 border border-blue-100">RASMI</span>
                             <% } else { %>
@@ -364,29 +398,37 @@
                             <% } %>
                         </td>
                         <td class="p-4 text-sm text-gray-600 font-medium"><%= b.getJumlahBantuanFormatted() %></td>
-                        <td class="p-4 text-xs text-gray-500 max-w-xs truncate" title="<%= (b.getSyarat_dokumen() != null) ? b.getSyarat_dokumen() : "" %>">
+                        <td class="p-4 text-sm text-gray-600 max-w-xs truncate" title="<%= (b.getSyarat_dokumen() != null) ? b.getSyarat_dokumen() : "" %>">
                             <%= (b.getSyarat_dokumen() != null) ? b.getSyarat_dokumen() : "Tiada syarat khusus" %>
                         </td>
                         <td class="p-4 text-center">
                             <div class="flex justify-center gap-2">
                                 <button onclick="openEditBantuanModal('<%= b.getId_bantuan() %>', '<%= b.getNama_bantuan().replace("'", "\\'") %>', '<%= b.getJenis_bantuan() %>', '<%= b.getJumlah_bantuan() %>', '<%= (b.getSyarat_dokumen() != null ? b.getSyarat_dokumen().replace("'", "\\'") : "") %>')" 
-                                        class="w-8 h-8 flex items-center justify-center rounded-lg text-blue-600 hover:bg-blue-50 transition" title="Edit">
+                                        class="w-9 h-9 flex items-center justify-center rounded-xl text-blue-600 hover:bg-blue-50/80 border border-transparent hover:border-blue-100 shadow-sm transition-all" title="Edit">
                                     <i class="fas fa-edit text-xs"></i>
                                 </button>
                                 <form action="<%= request.getContextPath() %>/bantuan/padamJenisBantuan" method="post" class="inline" onsubmit="return confirm('Padam jenis bantuan ini?')">
                                     <input type="hidden" name="id" value="<%= b.getId_bantuan() %>">
-                                    <button type="submit" class="w-8 h-8 flex items-center justify-center rounded-lg text-red-600 hover:bg-red-50 transition" title="Padam">
+                                    <button type="submit" class="w-9 h-9 flex items-center justify-center rounded-xl text-red-600 hover:bg-red-50/80 border border-transparent hover:border-red-100 shadow-sm transition-all" title="Padam">
                                         <i class="fas fa-trash text-xs"></i>
                                     </button>
                                 </form>
                             </div>
                         </td>
                     </tr>
-                    <% } } else { %>
-                    <tr><td colspan="6" class="p-12 text-center text-gray-400">Tiada jenis bantuan dikonfigurasi.</td></tr>
-                    <% } %>
+                    <% } } %>
+                    <tr id="tableJenis-empty" class="<%= (senaraiBantuan != null && !senaraiBantuan.isEmpty()) ? "hidden" : "" %> empty-state-row">
+                        <td colspan="6" class="p-12 text-center text-gray-400">
+                            <i class="fas fa-cog text-4xl mb-4 block opacity-20"></i>Tiada jenis bantuan dikonfigurasi.
+                        </td>
+                    </tr>
                 </tbody>
             </table>
+            
+            <!-- Pagination Footer for Jenis Bantuan -->
+            <div id="footerJenis" class="p-6 bg-white border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
+                <!-- Will be populated dynamically by JS -->
+            </div>
         </div>
     </div>
 </div>
@@ -806,36 +848,205 @@
 </div>
 
 <script>
+    const clientPaginators = {};
+
+    function initClientPagination(tableId, footerId, itemsPerPage = 10) {
+        clientPaginators[tableId] = {
+            footerId: footerId,
+            itemsPerPage: itemsPerPage,
+            currentPage: 1
+        };
+        updateClientPagination(tableId);
+    }
+
+    function updateClientPagination(tableId) {
+        const paginator = clientPaginators[tableId];
+        if (!paginator) return;
+
+        const table = document.getElementById(tableId);
+        const footer = document.getElementById(paginator.footerId);
+        if (!table || !footer) return;
+
+        const tbody = table.querySelector('tbody');
+        const allRows = Array.from(tbody.querySelectorAll('tr:not(.empty-state-row)'));
+        const visibleRows = allRows.filter(row => row.getAttribute('data-search-hidden') !== 'true');
+
+        const totalItems = visibleRows.length;
+        const totalPages = Math.ceil(totalItems / paginator.itemsPerPage) || 1;
+
+        if (paginator.currentPage > totalPages) {
+            paginator.currentPage = totalPages;
+        }
+        if (paginator.currentPage < 1) {
+            paginator.currentPage = 1;
+        }
+
+        allRows.forEach(row => {
+            row.style.display = 'none';
+        });
+
+        const startIndex = (paginator.currentPage - 1) * paginator.itemsPerPage;
+        const endIndex = startIndex + paginator.itemsPerPage;
+
+        visibleRows.forEach((row, index) => {
+            if (index >= startIndex && index < endIndex) {
+                row.style.display = '';
+            }
+        });
+
+        // Show/hide empty state
+        const emptyRow = document.getElementById(tableId + '-empty');
+        if (emptyRow) {
+            if (totalItems === 0) {
+                emptyRow.classList.remove('hidden');
+            } else {
+                emptyRow.classList.add('hidden');
+            }
+        }
+
+        renderClientFooter(tableId, footer, paginator.currentPage, totalPages, totalItems);
+    }
+
+    function renderClientFooter(tableId, footer, currentPage, totalPages, totalItems) {
+        let pagesHtml = '';
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, startPage + 4);
+        
+        for (let i = startPage; i <= endPage; i++) {
+            if (i === currentPage) {
+                pagesHtml += `
+                    <button type="button" class="w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold bg-brand-purple text-white shadow-lg shadow-purple-100">
+                        \${i}
+                    </button>
+                `;
+            } else {
+                pagesHtml += `
+                    <button type="button" onclick="setClientPage('\${tableId}', \${i})" class="w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold bg-white text-gray-500 hover:bg-gray-50 border border-gray-100 transition">
+                        \${i}
+                    </button>
+                `;
+            }
+        }
+
+        footer.innerHTML = `
+            <div class="text-xs text-gray-500 font-medium">
+                Menunjukkan halaman <span class="text-gray-900 font-bold">\${currentPage}</span> daripada <span class="text-gray-900 font-bold">\${totalPages}</span> 
+                (\${totalItems} rekod keseluruhan)
+            </div>
+            
+            <div class="flex items-center gap-2">
+                \${currentPage > 1 ? `
+                    <button type="button" onclick="setClientPage('\${tableId}', \${currentPage - 1})" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 transition flex items-center gap-2">
+                        <i class="fas fa-chevron-left"></i> Sebelumnya
+                    </button>
+                ` : `
+                    <button disabled class="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-300 cursor-not-allowed flex items-center gap-2">
+                        <i class="fas fa-chevron-left"></i> Sebelumnya
+                    </button>
+                `}
+
+                <div class="flex items-center gap-1">
+                    \${pagesHtml}
+                </div>
+
+                \${currentPage < totalPages ? `
+                    <button type="button" onclick="setClientPage('\${tableId}', \${currentPage + 1})" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 transition flex items-center gap-2">
+                        Seterusnya <i class="fas fa-chevron-right"></i>
+                    </button>
+                ` : `
+                    <button disabled class="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-300 cursor-not-allowed flex items-center gap-2">
+                        Seterusnya <i class="fas fa-chevron-right"></i>
+                    </button>
+                `}
+
+                <!-- Lompat Ke Page Selector -->
+                <div class="flex items-center gap-1.5 text-xs text-gray-500 font-medium border-l border-gray-200 pl-4 ml-2">
+                    <span>Lompat ke:</span>
+                    <input type="number" min="1" max="\${totalPages}" value="\${currentPage}" 
+                           onkeypress="if(event.key === 'Enter') { const p = parseInt(this.value); if(p >= 1 && p <= \${totalPages}) { setClientPage('\${tableId}', p); } }"
+                           class="w-12 h-9 px-2 text-center bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 outline-none focus:ring-2 focus:ring-brand-purple focus:border-brand-purple [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
+                </div>
+            </div>
+        `;
+    }
+
+    function setClientPage(tableId, page) {
+        if (clientPaginators[tableId]) {
+            clientPaginators[tableId].currentPage = page;
+            updateClientPagination(tableId);
+        }
+    }
+
     function resetFilters() {
         document.getElementById('searchPemohon').value = '';
         document.getElementById('filterKategori').value = 'ALL';
-        document.getElementById('filterDateStart').value = '';
-        document.getElementById('filterDateEnd').value = '';
+        document.getElementById('filterDate').value = '';
         filterData();
     }
 
     function filterData() {
         const search = document.getElementById('searchPemohon').value.toLowerCase();
         const category = document.getElementById('filterKategori').value;
-        const dateStart = document.getElementById('filterDateStart').value;
-        const dateEnd = document.getElementById('filterDateEnd').value;
+        const dateVal = document.getElementById('filterDate').value;
 
-        const rows = document.querySelectorAll('.data-row-filter');
-        rows.forEach(row => {
+        // Filter tableBaru rows
+        const baruRows = document.querySelectorAll('#tableBaru tbody tr:not(.empty-state-row)');
+        baruRows.forEach(row => {
             const rowSearch = row.getAttribute('data-search').toLowerCase();
             const rowCategory = row.getAttribute('data-category');
-            const rowDate = row.getAttribute('data-date'); // YYYY-MM-DD
+            const rowDate = row.getAttribute('data-date');
 
             let show = true;
 
             if (search && !rowSearch.includes(search)) show = false;
             if (category !== 'ALL' && rowCategory !== category) show = false;
-            
-            if (dateStart && rowDate < dateStart) show = false;
-            if (dateEnd && rowDate > dateEnd) show = false;
+            if (dateVal && rowDate !== dateVal) show = false;
 
-            row.style.display = show ? '' : 'none';
+            row.setAttribute('data-search-hidden', show ? 'false' : 'true');
         });
+        updateClientPagination('tableBaru');
+
+        // Filter tableSejarah rows
+        const sejarahRows = document.querySelectorAll('#tableSejarah tbody tr:not(.empty-state-row)');
+        let sejarahVisibleCount = 0;
+        sejarahRows.forEach(row => {
+            const rowSearch = row.getAttribute('data-search').toLowerCase();
+            const rowCategory = row.getAttribute('data-category');
+            const rowDate = row.getAttribute('data-date');
+
+            let show = true;
+
+            if (search && !rowSearch.includes(search)) show = false;
+            if (category !== 'ALL' && rowCategory !== category) show = false;
+            if (dateVal && rowDate !== dateVal) show = false;
+
+            if (show) {
+                row.style.display = '';
+                sejarahVisibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        const sejarahEmpty = document.getElementById('tableSejarah-empty');
+        if (sejarahEmpty) {
+            if (sejarahVisibleCount === 0) {
+                sejarahEmpty.classList.remove('hidden');
+            } else {
+                sejarahEmpty.classList.add('hidden');
+            }
+        }
+
+        // Filter tableJenis rows
+        const jenisRows = document.querySelectorAll('.data-jenis-row');
+        jenisRows.forEach(row => {
+            const rowCategory = row.getAttribute('data-category');
+            let show = true;
+            if (category !== 'ALL' && rowCategory !== category) show = false;
+            
+            row.setAttribute('data-search-hidden', show ? 'false' : 'true');
+        });
+        updateClientPagination('tableJenis');
     }
 
     function switchTab(tabName) {
@@ -850,12 +1061,15 @@
         document.getElementById('content-' + tabName).classList.remove('hidden');
     }
 
-    // Auto-switch to sejarah tab if page param exists
+    // Auto-switch to sejarah tab if page param exists, and init client pagination
     window.addEventListener('DOMContentLoaded', function() {
+        initClientPagination('tableBaru', 'footerBaru', 10);
+        initClientPagination('tableJenis', 'footerJenis', 10);
+
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('page')) {
             switchTab('sejarah');
-}
+        }
     });
 
     // Functions centralized in footer.jsp
