@@ -117,10 +117,11 @@
 
         <form action="<%= request.getContextPath()%>/profil/update" method="post" enctype="multipart/form-data" class="w-full space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000" onsubmit="return confirmAction(event, 'Simpan Perubahan?', 'Adakah anda pasti mahu menyimpan maklumat profil yang baharu?', 'Ya, Simpan!', '<%= primaryColor %>')">
 
-            <%-- Profile Header Card --%>
-            <div class="relative group">
-                <div class="absolute -inset-1 bg-gradient-to-r from-brand-purple to-brand-secondary rounded-[2rem] blur opacity-25 group-hover:opacity-40 transition duration-1000 group-hover:duration-200"></div>
-                <div class="relative bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 flex flex-col md:flex-row items-center gap-8 overflow-hidden">
+            <%-- Bekas Kad Tunggal (Single Form Card Container) --%>
+            <div class="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-slate-100 space-y-10 animate-in fade-in duration-500">
+                
+                <%-- Profile Header Section --%>
+                <div class="relative flex flex-col md:flex-row items-center gap-8 overflow-hidden pb-8 border-b border-slate-100">
                     <%-- Decorative Background Pattern --%>
                     <div class="absolute top-0 right-0 w-64 h-full opacity-[0.03] pointer-events-none">
                         <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -133,13 +134,13 @@
                         </svg>
                     </div>
 
-                    <div class="relative">
+                    <div class="relative flex-shrink-0">
                         <div class="w-36 h-36 rounded-full p-1.5 bg-gradient-to-tr from-brand-purple to-brand-secondary shadow-2xl relative">
                             <div class="w-full h-full rounded-full bg-white overflow-hidden flex items-center justify-center text-5xl font-bold text-brand-purple">
                                 <% if (pDetail.getFoto_profil() != null && !pDetail.getFoto_profil().isEmpty() && !pDetail.getFoto_profil().equals("default_avatar.png")) {%>
-                                <img id="previewFoto" src="<%= request.getContextPath()%>/file/profil/<%= pDetail.getFoto_profil()%>" class="w-full h-full object-cover">
+                                <img id="previewFoto" src="<%= request.getContextPath() %>/file/profil/<%= pDetail.getFoto_profil() %>" class="w-full h-full object-cover">
                                 <% } else {%>
-                                <img id="previewFoto" src="https://ui-avatars.com/api/?name=<%= pDetail.getNama_penuh()%>&background=6C5DD3&color=fff&size=128" class="w-full h-full object-cover">
+                                <img id="previewFoto" src="https://ui-avatars.com/api/?name=<%= pDetail.getNama_penuh() %>&background=6C5DD3&color=fff&size=128" class="w-full h-full object-cover">
                                 <% }%>
                             </div>
                             <label for="fotoInput" class="absolute bottom-2 right-2 w-11 h-11 bg-white text-brand-purple rounded-full flex items-center justify-center cursor-pointer shadow-xl border border-gray-100 hover:scale-110 active:scale-95 transition-all z-10">
@@ -150,59 +151,55 @@
                     </div>
 
                     <div class="text-center md:text-left flex-1">
-                        <div class="flex flex-col md:flex-row md:items-center gap-3 mb-2">
-                            <h3 class="text-3xl font-extrabold text-gray-900 tracking-tight"><%= pDetail.getNama_penuh()%></h3>
+                        <div class="flex flex-col md:flex-row md:items-center gap-3 mb-2 justify-center md:justify-start">
+                            <h3 class="text-3xl font-extrabold text-gray-900 tracking-tight"><%= pDetail.getNama_penuh() %></h3>
                             <span class="inline-flex items-center px-3 py-1 rounded-full text-[10px] font-bold bg-purple-100 text-brand-purple uppercase tracking-widest border border-purple-200 w-fit mx-auto md:mx-0">
-                                <%= pDetail.getNama_peranan()%>
+                                <%= pDetail.getNama_peranan() %>
                             </span>
                         </div>
                         <p class="text-gray-500 font-medium flex items-center justify-center md:justify-start gap-2 mb-4">
                             <i class="far fa-id-card text-brand-purple"></i>
-                            <%= pDetail.getNombor_kp()%>
+                            <%= pDetail.getNombor_kp() %>
                         </p>
                         
                         <div class="flex flex-wrap items-center justify-center md:justify-start gap-4">
-                            <div class="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
+                            <div class="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
                                 <i class="fas fa-envelope text-xs text-gray-400"></i>
-                                <span class="text-xs font-semibold text-gray-600"><%= (pDetail.getEmail() != null) ? pDetail.getEmail() : "Tiada Email"%></span>
+                                <span class="text-xs font-semibold text-gray-600"><%= (pDetail.getEmail() != null) ? pDetail.getEmail() : "Tiada Email" %></span>
                             </div>
-                            <div class="flex items-center gap-2 px-4 py-2 bg-gray-50 rounded-xl border border-gray-100">
+                            <div class="flex items-center gap-2 px-4 py-2 bg-slate-50 rounded-xl border border-slate-100">
                                 <i class="fas fa-phone text-xs text-gray-400"></i>
-                                <span class="text-xs font-semibold text-gray-600"><%= pDetail.getNombor_telefon()%></span>
+                                <span class="text-xs font-semibold text-gray-600"><%= pDetail.getNombor_telefon() %></span>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <%-- Form Content --%>
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                
                 <%-- Section 1: Peribadi --%>
-                <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-500 flex flex-col">
-                    <div class="flex items-center gap-4 mb-8">
-                        <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-brand-purple shadow-inner">
-                            <i class="fas fa-user-edit text-xl"></i>
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4 border-b border-slate-100 pb-4">
+                        <div class="w-10 h-10 rounded-xl bg-purple-50 text-brand-purple flex items-center justify-center text-lg shadow-inner flex-shrink-0">
+                            <i class="fas fa-user-edit"></i>
                         </div>
                         <div>
-                            <h4 class="text-lg font-bold text-gray-900">Maklumat Peribadi</h4>
-                            <p class="text-xs text-gray-500 font-medium tracking-wide uppercase">Lengkapkan data asas anda</p>
+                            <h4 class="text-base font-bold text-slate-800">Maklumat Peribadi</h4>
+                            <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wide">Lengkapkan data peribadi dan perhubungan utama anda</p>
                         </div>
                     </div>
 
                     <div class="space-y-6">
                         <div class="group">
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Nama Penuh</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Nama Penuh</label>
                             <div class="relative">
                                 <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-brand-purple transition-colors"></i>
                                 <input type="text" name="nama_penuh" value="<%= pDetail.getNama_penuh()%>" required 
-                                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple text-gray-800 text-sm font-semibold transition-all">
+                                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple text-slate-800 text-sm font-semibold transition-all">
                             </div>
                         </div>
 
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div class="group opacity-70">
-                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">No. Kad Pengenalan</label>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">No. Kad Pengenalan</label>
                                 <%
                                     String icRaw = pDetail.getNombor_kp();
                                     String icFormatted = (icRaw != null && icRaw.length() == 12)
@@ -211,48 +208,51 @@
                                 <div class="relative">
                                     <i class="fas fa-id-badge absolute left-4 top-1/2 -translate-y-1/2 text-gray-300"></i>
                                     <input type="text" value="<%= icFormatted%>" readonly 
-                                        class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-100 border-none text-gray-400 text-sm cursor-not-allowed font-semibold">
+                                        class="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-100 border-none text-slate-400 text-sm cursor-not-allowed font-semibold">
                                 </div>
                             </div>
                             <div class="group">
-                                <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">No. Telefon</label>
+                                <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">No. Telefon</label>
                                 <div class="relative">
                                     <i class="fas fa-phone absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-brand-purple transition-colors"></i>
                                     <input type="text" name="nombor_telefon" value="<%= pDetail.getNombor_telefon()%>" required oninput="formatPhoneNumber(this)" maxlength="13" 
-                                        class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple text-gray-800 text-sm font-semibold transition-all">
+                                        class="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple text-slate-800 text-sm font-semibold transition-all">
                                 </div>
                             </div>
                         </div>
 
                         <div class="group">
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Alamat Emel</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Alamat Emel</label>
                             <div class="relative">
                                 <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-brand-purple transition-colors"></i>
                                 <input type="email" name="email" value="<%= (pDetail.getEmail() != null) ? pDetail.getEmail() : ""%>" required 
-                                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple text-gray-800 text-sm font-semibold transition-all">
+                                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple text-slate-800 text-sm font-semibold transition-all">
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <%-- Divider --%>
+                <div class="h-px bg-slate-100"></div>
+
                 <%-- Section 2: Sosio-Ekonomi --%>
-                <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-500 flex flex-col">
-                    <div class="flex items-center gap-4 mb-8">
-                        <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 shadow-inner">
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4 border-b border-slate-100 pb-4">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-lg shadow-inner flex-shrink-0">
                             <i class="fas fa-wallet text-xl"></i>
                         </div>
                         <div>
-                            <h4 class="text-lg font-bold text-gray-900">Sosio-Ekonomi</h4>
-                            <p class="text-xs text-gray-500 font-medium tracking-wide uppercase">Status kewangan & keluarga</p>
+                            <h4 class="text-base font-bold text-slate-800">Sosio-Ekonomi</h4>
+                            <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wide">Status kewangan & keluarga anda</p>
                         </div>
                     </div>
 
                     <div class="space-y-6">
                         <div class="group">
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Status Keluarga</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Status Keluarga</label>
                             <div class="relative">
                                 <i class="fas fa-users absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors z-10"></i>
-                                <select name="status_keluarga" class="w-full pl-12 pr-10 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-gray-800 text-sm font-semibold transition-all appearance-none">
+                                <select name="status_keluarga" class="w-full pl-12 pr-10 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-800 text-sm font-semibold transition-all appearance-none">
                                     <option value="Bujang" <%= "Bujang".equals(pDetail.getStatus_keluarga()) ? "selected" : ""%>>Bujang</option>
                                     <option value="Berkahwin" <%= "Berkahwin".equals(pDetail.getStatus_keluarga()) ? "selected" : ""%>>Berkahwin</option>
                                     <option value="Ibu Tunggal" <%= "Ibu Tunggal".equals(pDetail.getStatus_keluarga()) ? "selected" : ""%>>Ibu Tunggal</option>
@@ -263,31 +263,31 @@
                         </div>
 
                         <div class="group">
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Pekerjaan</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Pekerjaan</label>
                             <div class="relative">
                                 <i class="fas fa-briefcase absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors"></i>
                                 <input type="text" name="pekerjaan" value="<%= (pDetail.getPekerjaan() != null) ? pDetail.getPekerjaan() : ""%>" 
-                                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-gray-800 text-sm font-semibold transition-all">
+                                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-800 text-sm font-semibold transition-all">
                             </div>
                         </div>
 
                         <div class="group">
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Pendapatan Bulanan (RM)</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Pendapatan Bulanan (RM)</label>
                             <div class="relative">
-                                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 font-bold text-sm group-focus-within:text-blue-600 transition-colors">RM</div>
+                                <div class="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 font-bold text-sm group-focus-within:text-blue-600 transition-colors">RM</div>
                                 <input type="number" step="0.01" name="pendapatan" value="<%= pDetail.getPendapatan()%>" 
-                                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-gray-800 text-sm font-semibold transition-all">
+                                    class="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-800 text-sm font-semibold transition-all">
                             </div>
-                            <p class="text-[10px] text-gray-400 mt-2 italic px-1">* Digunakan untuk penentuan kelayakan bantuan.</p>
+                            <p class="text-[9px] text-slate-400 mt-2 italic px-1">* Digunakan untuk penentuan kelayakan bantuan.</p>
                         </div>
 
                         <div class="group">
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Pengesahan Pendapatan (Slip Gaji / Dokumen Sokongan)</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Pengesahan Pendapatan (Slip Gaji / Dokumen Sokongan)</label>
                             <div class="relative flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
                                 <div class="relative flex-1">
                                     <i class="fas fa-file-invoice-dollar absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors"></i>
                                     <input type="file" name="pengesahan_pendapatan" accept=".pdf,.png,.jpg,.jpeg" 
-                                        class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-gray-800 text-xs font-semibold transition-all file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-blue-100 file:text-blue-600 hover:file:bg-blue-200 file:cursor-pointer">
+                                        class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-800 text-xs font-semibold transition-all file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-blue-100 file:text-blue-600 hover:file:bg-blue-200 file:cursor-pointer">
                                 </div>
                                 <% if (pDetail.getPengesahan_pendapatan() != null && !pDetail.getPengesahan_pendapatan().isEmpty()) { %>
                                 <a href="<%= request.getContextPath() %>/file/pendapatan/<%= pDetail.getPengesahan_pendapatan() %>" target="_blank" 
@@ -297,21 +297,24 @@
                                 </a>
                                 <% } %>
                             </div>
-                            <p class="text-[10px] text-gray-400 mt-2 italic px-1">* Format dibenarkan: PDF, PNG, JPG, JPEG (Max 10MB).</p>
+                            <p class="text-[9px] text-slate-400 mt-2 italic px-1">* Format dibenarkan: PDF, PNG, JPG, JPEG (Max 10MB).</p>
                         </div>
                     </div>
                 </div>
 
+                <%-- Divider --%>
+                <div class="h-px bg-slate-100"></div>
+
                 <%-- Section 2.5: Ahli Keluarga --%>
-                <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-500 flex flex-col lg:col-span-2">
-                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+                <div class="space-y-6">
+                    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl bg-green-50 flex items-center justify-center text-green-600 shadow-inner">
+                            <div class="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-lg shadow-inner flex-shrink-0">
                                 <i class="fas fa-users-medical text-xl"></i>
                             </div>
                             <div>
-                                <h4 class="text-lg font-bold text-gray-900">Maklumat Ahli Keluarga</h4>
-                                <p class="text-xs text-gray-500 font-medium tracking-wide uppercase">Senarai tanggungan & isi rumah</p>
+                                <h4 class="text-base font-bold text-slate-800">Maklumat Ahli Keluarga</h4>
+                                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wide">Senarai tanggungan & isi rumah</p>
                             </div>
                         </div>
                         <button type="button" onclick="showAddFamilyModal()" class="flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-600 text-white text-xs font-bold rounded-xl transition-all shadow-lg shadow-green-500/20 active:scale-95">
@@ -436,60 +439,66 @@
                     </div>
                 </div>
 
+                <%-- Divider --%>
+                <div class="h-px bg-slate-100"></div>
+
                 <%-- Section 3: Alamat --%>
-                <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-500 lg:col-span-2">
-                    <div class="flex items-center gap-4 mb-8">
-                        <div class="w-12 h-12 rounded-2xl bg-orange-50 flex items-center justify-center text-orange-600 shadow-inner">
+                <div class="space-y-6">
+                    <div class="flex items-center gap-4 border-b border-slate-100 pb-4">
+                        <div class="w-10 h-10 rounded-xl bg-orange-50 text-orange-600 flex items-center justify-center text-lg shadow-inner flex-shrink-0">
                             <i class="fas fa-map-marked-alt text-xl"></i>
                         </div>
                         <div>
-                            <h4 class="text-lg font-bold text-gray-900">Alamat Kediaman</h4>
-                            <p class="text-xs text-gray-500 font-medium tracking-wide uppercase">Lokasi tempat tinggal tetap</p>
+                            <h4 class="text-base font-bold text-slate-800">Alamat Kediaman</h4>
+                            <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wide">Lokasi tempat tinggal tetap anda</p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                         <div class="md:col-span-2 lg:col-span-2">
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Nama Jalan / No. Rumah</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Nama Jalan / No. Rumah</label>
                             <input type="text" name="nama_jalan" value="<%= pDetail.getNama_jalan()%>" 
-                                class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 text-gray-800 text-sm font-semibold transition-all">
+                                class="w-full px-5 py-4 rounded-2xl bg-slate-50 border border-slate-200 focus:bg-white focus:ring-2 focus:ring-orange-600/20 focus:border-orange-600 text-slate-800 text-sm font-semibold transition-all">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Daerah</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Daerah</label>
                             <input type="text" name="daerah" value="<%= (pDetail.getDaerah() != null) ? pDetail.getDaerah() : "Selising"%>" readonly 
-                                class="w-full px-5 py-4 rounded-2xl bg-gray-100 border-none text-gray-500 text-sm font-semibold cursor-not-allowed">
+                                class="w-full px-5 py-4 rounded-2xl bg-slate-100 border-none text-slate-500 text-sm font-semibold cursor-not-allowed">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Poskod</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Poskod</label>
                             <input type="text" name="nombor_poskod" value="<%= (pDetail.getNombor_poskod() != null) ? pDetail.getNombor_poskod() : "16810"%>" readonly 
-                                class="w-full px-5 py-4 rounded-2xl bg-gray-100 border-none text-gray-500 text-sm font-semibold cursor-not-allowed">
+                                class="w-full px-5 py-4 rounded-2xl bg-slate-100 border-none text-slate-500 text-sm font-semibold cursor-not-allowed">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Bandar</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Bandar</label>
                             <input type="text" name="bandar" value="<%= (pDetail.getBandar() != null) ? pDetail.getBandar() : "Pasir Puteh"%>" readonly 
-                                class="w-full px-5 py-4 rounded-2xl bg-gray-100 border-none text-gray-500 text-sm font-semibold cursor-not-allowed">
+                                class="w-full px-5 py-4 rounded-2xl bg-slate-100 border-none text-slate-500 text-sm font-semibold cursor-not-allowed">
                         </div>
                         <div>
-                            <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Negeri</label>
+                            <label class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 px-1">Negeri</label>
                             <input type="text" name="negeri" value="<%= (pDetail.getNegeri() != null) ? pDetail.getNegeri() : "Kelantan"%>" readonly 
-                                class="w-full px-5 py-4 rounded-2xl bg-gray-100 border-none text-gray-500 text-sm font-semibold cursor-not-allowed">
+                                class="w-full px-5 py-4 rounded-2xl bg-slate-100 border-none text-slate-500 text-sm font-semibold cursor-not-allowed">
                         </div>
                     </div>
                 </div>
 
+                <%-- Divider --%>
+                <div class="h-px bg-slate-100"></div>
+
                 <%-- Section 4: Lokasi Peta --%>
-                <div class="bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-500 lg:col-span-2">
-                    <div class="flex items-center justify-between mb-8">
+                <div class="space-y-6">
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-4">
                         <div class="flex items-center gap-4">
-                            <div class="w-12 h-12 rounded-2xl bg-red-50 flex items-center justify-center text-red-600 shadow-inner">
+                            <div class="w-10 h-10 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-lg shadow-inner flex-shrink-0">
                                 <i class="fas fa-location-dot text-xl"></i>
                             </div>
                             <div>
-                                <h4 class="text-lg font-bold text-gray-900">Pin Lokasi Rumah</h4>
-                                <p class="text-xs text-gray-500 font-medium tracking-wide uppercase">Koordinat GPS untuk rujukan kecemasan</p>
+                                <h4 class="text-base font-bold text-slate-800">Pin Lokasi Rumah</h4>
+                                <p class="text-[11px] text-slate-400 font-semibold uppercase tracking-wide">Koordinat GPS untuk rujukan kecemasan</p>
                             </div>
                         </div>
-                        <div class="hidden md:block text-[10px] bg-red-50 text-red-600 font-bold px-3 py-1.5 rounded-lg border border-red-100">
+                        <div class="hidden md:block text-[9px] bg-red-50 text-red-600 font-bold px-3 py-1.5 rounded-lg border border-red-100">
                             DRAG MARKER PADA PETA
                         </div>
                     </div>
@@ -500,10 +509,10 @@
                                 <i class="fas fa-search"></i>
                             </span>
                             <input type="text" id="mapSearchInput" placeholder="Cari nama jalan, taman atau mercu tanda di sini..." 
-                                class="w-full pl-12 pr-28 py-4 rounded-2xl bg-gray-50 border border-gray-100 focus:ring-4 focus:ring-purple-100 focus:border-brand-purple text-sm font-bold shadow-sm transition-all outline-none"
+                                class="w-full pl-12 pr-28 py-4 rounded-2xl bg-slate-50 border border-slate-100 focus:ring-4 focus:ring-purple-100 focus:border-brand-purple text-sm font-bold shadow-sm transition-all outline-none"
                                 onkeydown="handleMapSearch(event)">
                             <div class="absolute inset-y-0 right-0 flex items-center pr-2">
-                                <button type="button" onclick="performMapSearch()" class="px-5 py-2.5 bg-brand-purple text-white text-xs font-black rounded-xl hover:bg-brand-purpleHover transition-all shadow-lg shadow-md active:scale-95 flex items-center gap-2">
+                                <button type="button" onclick="performMapSearch()" class="px-5 py-2.5 bg-brand-purple text-white text-xs font-black rounded-xl hover:bg-brand-purpleHover transition-all shadow-md active:scale-95 flex items-center gap-2">
                                     <i class="fas fa-search-location"></i>
                                     <span>Cari</span>
                                 </button>
@@ -511,10 +520,10 @@
                         </div>
                     </div>
 
-                    <div class="relative rounded-3xl overflow-hidden border-4 border-gray-50 shadow-inner group">
+                    <div class="relative rounded-3xl overflow-hidden border-4 border-slate-50 shadow-inner group">
                         <div id="mapProfil" style="height: 400px; z-index: 0;" class="w-full transition-transform duration-700"></div>
                         <div class="absolute bottom-4 left-4 right-4 flex gap-4 pointer-events-none">
-                            <div class="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg border border-gray-100 pointer-events-auto flex items-center gap-3">
+                            <div class="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl shadow-lg border border-slate-100 pointer-events-auto flex items-center gap-3">
                                 <i class="fas fa-crosshairs text-brand-purple animate-pulse"></i>
                                 <span class="text-[10px] font-bold text-gray-600 tracking-tight" id="coord-display">Sila pilih lokasi</span>
                             </div>
@@ -524,20 +533,22 @@
                     <input type="hidden" name="latitude" id="latInput" value="<%= (pDetail.getLatitude() != null) ? pDetail.getLatitude() : ""%>">
                     <input type="hidden" name="longitude" id="lonInput" value="<%= (pDetail.getLongitude() != null) ? pDetail.getLongitude() : ""%>">
                 </div>
-            </div>
 
-            <%-- Action Bar (Moved to bottom of flow) --%>
-            <div class="mt-12 mb-8">
-                <div class="flex flex-col md:flex-row gap-6 items-center justify-between bg-white/50 backdrop-blur-sm p-8 rounded-[2.5rem] border border-gray-100 shadow-sm">
-                    <div class="flex items-center gap-4 px-6 py-3 bg-white rounded-2xl border border-gray-50 shadow-sm">
+                <%-- Divider --%>
+                <div class="h-px bg-slate-100"></div>
+
+                <%-- Action Bar Section --%>
+                <div class="flex flex-col md:flex-row gap-6 items-center justify-between pt-4">
+                    <div class="flex items-center gap-4 px-6 py-3 bg-slate-50 rounded-2xl border border-slate-100 shadow-inner">
                         <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
-                        <span class="text-xs font-bold text-gray-500">Sedia untuk disimpan</span>
+                        <span class="text-xs font-bold text-slate-500">Sedia untuk disimpan</span>
                     </div>
                     <button type="submit" class="w-full md:w-auto px-12 py-5 bg-gradient-to-r from-brand-purple to-brand-secondary hover:shadow-2xl hover:shadow-purple-500/40 text-white font-black rounded-2xl transition-all duration-300 flex items-center justify-center gap-4 transform hover:-translate-y-1 active:scale-[0.98]">
                         <i class="fas fa-save text-xl"></i>
                         <span class="tracking-wide">SIMPAN SEMUA PERUBAHAN</span>
                     </button>
                 </div>
+
             </div>
         </form>
     </div>

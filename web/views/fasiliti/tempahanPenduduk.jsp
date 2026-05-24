@@ -50,62 +50,35 @@
         </div>
     <% } %>
 
-    <!-- Stat Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-        <div class="bg-white p-7 rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center gap-6 group hover:shadow-xl hover:shadow-indigo-50/50 transition-all duration-500 relative overflow-hidden">
-            <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-indigo-50/50 rounded-full blur-2xl group-hover:bg-indigo-100/50 transition-colors"></div>
-            <div class="w-16 h-16 bg-gradient-to-br from-indigo-50 to-indigo-100 text-brand-purple rounded-3xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-inner">
-                <i class="fas fa-building-circle-check"></i>
-            </div>
-            <div>
-                <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[0.2em] mb-1.5">Fasiliti Aktif</p>
-                <h3 class="text-3xl font-black text-gray-800 tracking-tight"><%= (senaraiFasiliti != null) ? senaraiFasiliti.size() : 0 %></h3>
-            </div>
-        </div>
-        
-        <div class="bg-white p-7 rounded-[2.5rem] shadow-sm border border-gray-100 flex items-center gap-6 group hover:shadow-xl hover:shadow-orange-50/50 transition-all duration-500 relative overflow-hidden">
-            <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-orange-50/50 rounded-full blur-2xl group-hover:bg-orange-100/50 transition-colors"></div>
-            <div class="w-16 h-16 bg-gradient-to-br from-orange-50 to-orange-100 text-orange-500 rounded-3xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 shadow-inner">
-                <i class="fas fa-calendar-check"></i>
-            </div>
-            <div>
-                <p class="text-[10px] font-extrabold text-gray-400 uppercase tracking-[0.2em] mb-1.5">Tempahan Saya</p>
-                <h3 class="text-3xl font-black text-gray-800 tracking-tight"><%= (senaraiTempahan != null) ? senaraiTempahan.size() : 0 %></h3>
-            </div>
-        </div>
-
-        <div class="bg-gradient-to-br from-brand-purple to-brand-secondary p-7 rounded-[2.5rem] shadow-lg shadow-purple-100 flex items-center gap-6 group hover:shadow-md transition-all duration-500 relative overflow-hidden">
-            <div class="absolute -right-4 -bottom-4 w-24 h-24 bg-white/10 rounded-full blur-2xl group-hover:bg-white/20 transition-colors"></div>
-            <div class="w-16 h-16 bg-white/20 backdrop-blur-md text-white rounded-3xl flex items-center justify-center text-2xl group-hover:scale-110 group-hover:-rotate-6 transition-all duration-500">
-                <i class="fas fa-clock-rotate-left"></i>
-            </div>
-            <div class="relative z-10">
-                <p class="text-[10px] font-extrabold text-white/70 uppercase tracking-[0.2em] mb-1.5">Status Terkini</p>
-                <h3 class="text-lg font-bold text-white leading-tight">Semak Rekod<br>Masa Nyata</h3>
-            </div>
-        </div>
-    </div>
-
-    <!-- Search Bar -->
-    <div class="flex gap-4 mb-10">
-        <div class="flex gap-3 flex-1 relative group">
+    <!-- Carian & Penapis Section -->
+    <div class="flex flex-col md:flex-row gap-4 mb-8">
+        <!-- Search Input -->
+        <div class="flex-1 relative group">
             <div class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-purple group-focus-within:scale-110 transition-all duration-300">
-                <i class="fas fa-search"></i>
+                <i class="fas fa-search text-sm"></i>
             </div>
             <input type="text" id="searchInput" oninput="filterData()" placeholder="Cari fasiliti, lokasi, atau sejarah tempahan..." 
-                class="flex-1 pl-14 pr-8 py-5 rounded-[2rem] bg-white border border-gray-100 focus:ring-4 focus:ring-purple-50 focus:border-brand-purple text-sm font-semibold shadow-sm transition-all outline-none placeholder:text-gray-300">
+                class="w-full pl-14 pr-6 py-4 rounded-[2rem] bg-white border border-gray-100 focus:ring-4 focus:ring-purple-50 focus:border-brand-purple text-xs font-semibold shadow-sm transition-all outline-none placeholder:text-gray-300">
+        </div>
+        <!-- Date Filter -->
+        <div class="w-full md:w-64 relative group">
+            <div class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-purple group-focus-within:scale-110 transition-all duration-300">
+                <i class="far fa-calendar-alt text-sm"></i>
+            </div>
+            <input type="date" id="dateFilter" onchange="filterData()" 
+                class="w-full pl-14 pr-6 py-4 rounded-[2rem] bg-white border border-gray-100 focus:ring-4 focus:ring-purple-50 focus:border-brand-purple text-xs font-semibold shadow-sm transition-all outline-none text-gray-700">
         </div>
     </div>
 
     <!-- Main Content Tabs -->
-    <div class="mb-10 flex justify-center md:justify-start">
-        <nav class="flex gap-2 p-1.5 bg-gray-100/50 backdrop-blur-sm rounded-[2rem] border border-gray-100">
+    <div class="mb-8 border-b border-slate-200">
+        <nav class="flex gap-8">
             <button onclick="switchTab('senarai')" id="tab-senarai" 
-                    class="py-3 px-8 text-[11px] font-black uppercase tracking-widest rounded-[1.5rem] transition-all duration-500 bg-white text-brand-purple shadow-sm">
+                    class="py-4 px-1 border-b-2 font-black text-xs uppercase tracking-wider border-slate-800 text-slate-800 flex items-center gap-2">
                 Senarai Fasiliti
             </button>
             <button onclick="switchTab('sejarah')" id="tab-sejarah" 
-                    class="py-3 px-8 text-[11px] font-black uppercase tracking-widest rounded-[1.5rem] transition-all duration-500 text-gray-400 hover:text-gray-600">
+                    class="py-4 px-1 border-b-2 border-transparent font-bold text-xs uppercase tracking-wider text-slate-400 hover:text-slate-600 transition">
                 Sejarah Tempahan
             </button>
         </nav>
@@ -196,69 +169,72 @@
             <div class="overflow-x-auto">
                 <table class="w-full text-left border-collapse">
                     <thead>
-                        <tr class="bg-gray-50/50 border-b border-gray-100">
-                            <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Maklumat Fasiliti</th>
-                            <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Slot Masa</th>
-                            <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Status Tempahan</th>
-                            <th class="px-10 py-6 text-[10px] font-black text-gray-400 uppercase tracking-[0.2em]">Tindakan</th>
+                        <tr class="bg-slate-50 border-b border-slate-100">
+                            <th class="p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest w-12 text-center">No.</th>
+                            <th class="p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest">Maklumat Fasiliti</th>
+                            <th class="p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest">Slot Masa</th>
+                            <th class="p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest">Status Tempahan</th>
+                            <th class="p-4 text-[9px] font-black text-slate-400 uppercase tracking-widest text-center w-36">Tindakan</th>
                         </tr>
                     </thead>
-                    <tbody class="divide-y divide-gray-50">
+                    <tbody class="divide-y divide-slate-100">
                         <% 
                             LocalDate today = LocalDate.now(ZoneId.of("Asia/Kuala_Lumpur"));
                             LocalTime nowTime = LocalTime.now(ZoneId.of("Asia/Kuala_Lumpur"));
                             
                             if (senaraiTempahan != null && !senaraiTempahan.isEmpty()) { 
+                            int count = 1;
                             for (TempahanFasiliti t : senaraiTempahan) { 
                                 LocalDate bookingDate = t.getTarikh_tempah().toLocalDate();
                                 LocalTime endTime = t.getMasa_tamat().toLocalTime();
                                 boolean isFuture = bookingDate.isAfter(today) || (bookingDate.isEqual(today) && endTime.isAfter(nowTime));
                         %>
-                            <tr class="booking-row group hover:bg-gray-50/50 transition-all duration-300">
-                                <td class="px-10 py-7">
-                                    <div class="flex items-center gap-5">
-                                        <div class="w-12 h-12 brand-gradient rounded-2xl flex items-center justify-center text-white shadow-lg shadow-purple-100 group-hover:scale-110 transition-transform">
-                                            <i class="fas fa-building text-sm"></i>
+                            <tr class="booking-row group hover:bg-slate-50/50 transition-all border-b border-slate-100" data-date="<%= t.getTarikh_tempah() %>">
+                                <td class="p-4 text-xs font-bold text-slate-500 text-center row-number"><%= count++ %></td>
+                                <td class="p-4">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-10 h-10 brand-gradient rounded-xl flex items-center justify-center text-white shadow-md shadow-purple-100/50 group-hover:scale-105 transition-transform flex-shrink-0">
+                                            <i class="fas fa-building text-xs"></i>
                                         </div>
                                         <div>
-                                            <p class="booking-facility-name text-[15px] font-black text-gray-800 tracking-tight"><%= t.getNama_fasiliti() %></p>
-                                            <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mt-0.5">ID: #TMP-<%= t.getId_tempahan() %></p>
+                                            <p class="booking-facility-name text-xs font-black text-slate-800 tracking-tight"><%= t.getNama_fasiliti() %></p>
+                                            <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">ID: #TMP-<%= t.getId_tempahan() %></p>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-10 py-7">
-                                    <div class="space-y-1.5">
-                                        <div class="flex items-center gap-2">
+                                <td class="p-4">
+                                    <div class="space-y-1">
+                                        <div class="flex items-center gap-2 text-xs font-bold text-slate-700">
                                             <i class="far fa-calendar text-brand-purple text-xs"></i>
-                                            <p class="booking-date text-sm font-bold text-gray-700 tracking-tight"><%= t.getTarikh_tempah() %></p>
+                                            <span class="booking-date"><%= t.getTarikh_tempah() %></span>
                                         </div>
-                                        <div class="flex items-center gap-2">
-                                            <i class="far fa-clock text-gray-300 text-xs"></i>
-                                            <p class="text-[11px] text-gray-400 font-black uppercase tracking-wider"><%= t.getMasa_mula() %> — <%= t.getMasa_tamat() %></p>
+                                        <div class="flex items-center gap-2 text-[10px] text-slate-400">
+                                            <i class="far fa-clock text-xs"></i>
+                                            <span class="font-extrabold uppercase tracking-wider"><%= t.getMasa_mula() %> — <%= t.getMasa_tamat() %></span>
                                         </div>
                                     </div>
                                 </td>
-                                <td class="px-10 py-7">
+                                <td class="p-4">
                                     <% if (StatusConstant.TEMPAHAN_LULUS.equals(t.getStatus())) { %>
-                                        <span class="booking-status inline-flex items-center gap-2 px-4 py-1.5 bg-emerald-50 text-emerald-600 rounded-2xl text-[10px] font-black uppercase tracking-wider border border-emerald-100">
+                                        <span class="booking-status inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-black uppercase tracking-wider border border-emerald-100">
                                             <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></span> LULUS
                                         </span>
                                     <% } else if (StatusConstant.TEMPAHAN_TOLAK.equals(t.getStatus())) { %>
-                                        <span class="booking-status inline-flex items-center gap-2 px-4 py-1.5 bg-rose-50 text-rose-600 rounded-2xl text-[10px] font-black uppercase tracking-wider border border-rose-100">
+                                        <span class="booking-status inline-flex items-center gap-1.5 px-2.5 py-1 bg-rose-50 text-rose-600 rounded-full text-[10px] font-black uppercase tracking-wider border border-rose-100">
                                             <span class="w-1.5 h-1.5 bg-rose-500 rounded-full"></span> TOLAK
                                         </span>
                                     <% } else if (StatusConstant.TEMPAHAN_DIBATAL.equals(t.getStatus())) { %>
-                                        <span class="booking-status inline-flex items-center gap-2 px-4 py-1.5 bg-gray-100 text-gray-500 rounded-2xl text-[10px] font-black uppercase tracking-wider border border-gray-200">
-                                            <span class="w-1.5 h-1.5 bg-gray-400 rounded-full"></span> BATAL
+                                        <span class="booking-status inline-flex items-center gap-1.5 px-2.5 py-1 bg-slate-100 text-slate-500 rounded-full text-[10px] font-black uppercase tracking-wider border border-slate-200">
+                                            <span class="w-1.5 h-1.5 bg-slate-400 rounded-full"></span> BATAL
                                         </span>
                                     <% } else { %>
-                                        <span class="booking-status inline-flex items-center gap-2 px-4 py-1.5 bg-blue-50 text-blue-600 rounded-2xl text-[10px] font-black uppercase tracking-wider border border-blue-100">
+                                        <span class="booking-status inline-flex items-center gap-1.5 px-2.5 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-wider border border-blue-100">
                                             <span class="w-1.5 h-1.5 bg-blue-500 rounded-full animate-bounce"></span> MENUNGGU
                                         </span>
                                     <% } %>
                                 </td>
-                                <td class="px-10 py-7">
-                                    <div class="flex items-center gap-3">
+                                <td class="p-4 text-center" onclick="event.stopPropagation()">
+                                    <div class="flex items-center justify-center gap-2">
                                         <button onclick='openBookingDetailModal({
                                             namaFasiliti: "<%= t.getNama_fasiliti().replace("\"", "\\\"") %>",
                                             tarikh: "<%= t.getTarikh_tempah() %>",
@@ -269,25 +245,37 @@
                                             lat: <%= t.getLatitude() %>,
                                             lon: <%= t.getLongitude() %>,
                                             gambar: "<%= t.getGambar_fasiliti() != null ? t.getGambar_fasiliti() : "" %>"
-                                        })' class="w-9 h-9 rounded-xl bg-gray-50 text-gray-400 hover:bg-brand-purple hover:text-white transition-all flex items-center justify-center shadow-sm">
-                                            <i class="fas fa-eye text-xs"></i>
+                                        })' class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 hover:scale-105 active:scale-95 transition text-[10px] font-black uppercase tracking-wider shadow-sm border border-slate-200">
+                                            <i class="fas fa-eye text-brand-purple"></i> Butiran
                                         </button>
                                         
                                         <% if (isFuture && (StatusConstant.TEMPAHAN_MENUNGGU.equals(t.getStatus()) || StatusConstant.TEMPAHAN_LULUS.equals(t.getStatus()))) { %>
                                             <a href="<%= contextPath %>/fasiliti/batal?id=<%= t.getId_tempahan() %>" 
                                                onclick="return confirm('Adakah anda pasti mahu membatalkan tempahan ini?')"
-                                               class="w-9 h-9 rounded-xl bg-rose-50 text-rose-400 hover:bg-rose-500 hover:text-white transition-all flex items-center justify-center shadow-sm">
-                                                <i class="fas fa-trash-can text-xs"></i>
+                                               class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 hover:scale-105 active:scale-95 transition text-[10px] font-black uppercase tracking-wider shadow-sm border border-rose-200">
+                                                <i class="fas fa-trash-can text-rose-500"></i> Batal
                                             </a>
                                         <% } %>
                                     </div>
                                 </td>
                             </tr>
                         <% } } else { %>
-                            <tr><td colspan="4" class="px-10 py-20 text-center text-gray-400 text-sm italic font-medium">Tiada sejarah tempahan ditemui.</td></tr>
+                            <tr>
+                                <td colspan="5" class="p-12 text-center text-slate-400">
+                                    <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mx-auto mb-3 text-lg opacity-60">
+                                        <i class="fas fa-inbox"></i>
+                                    </div>
+                                    <span class="font-extrabold text-xs block">Tiada sejarah tempahan ditemui.</span>
+                                </td>
+                            </tr>
                         <% } %>
                         <tr id="sejarah-empty" class="hidden">
-                            <td colspan="4" class="px-10 py-20 text-center text-gray-400 text-sm italic font-medium">Tiada tempahan sepadan dengan carian anda.</td>
+                            <td colspan="5" class="p-12 text-center text-slate-400">
+                                <div class="w-12 h-12 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center mx-auto mb-3 text-lg opacity-60">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <span class="font-extrabold text-xs block">Tiada tempahan sepadan dengan carian anda.</span>
+                            </td>
                         </tr>
                     </tbody>
                 </table>
@@ -558,6 +546,7 @@
 <script>
     function filterData() {
         const keyword = document.getElementById('searchInput').value.toLowerCase();
+        const dateVal = document.getElementById('dateFilter').value;
         
         // Filter Facility Cards
         const cards = document.querySelectorAll('.facility-card');
@@ -585,13 +574,27 @@
         // Filter Booking Table
         const rows = document.querySelectorAll('.booking-row');
         let rowFound = false;
+        let visibleCount = 0;
         rows.forEach(row => {
             const name = row.querySelector('.booking-facility-name').innerText.toLowerCase();
             const date = row.querySelector('.booking-date').innerText.toLowerCase();
             const status = row.querySelector('.booking-status').innerText.toLowerCase();
-            if (name.includes(keyword) || date.includes(keyword) || status.includes(keyword)) {
+            const rowDate = row.getAttribute('data-date');
+            
+            let showRow = true;
+            if (keyword !== "" && !(name.includes(keyword) || date.includes(keyword) || status.includes(keyword))) {
+                showRow = false;
+            }
+            if (dateVal !== "" && rowDate !== dateVal) {
+                showRow = false;
+            }
+            
+            if (showRow) {
                 row.style.display = '';
                 rowFound = true;
+                visibleCount++;
+                const noCell = row.querySelector('.row-number');
+                if (noCell) noCell.innerText = visibleCount;
             } else {
                 row.style.display = 'none';
             }
@@ -599,10 +602,10 @@
 
         const rowEmpty = document.getElementById('sejarah-empty');
         if (rowEmpty) {
-            if (!rowFound && keyword !== "") {
-                rowEmpty.style.display = '';
+            if (!rowFound && (keyword !== "" || dateVal !== "")) {
+                rowEmpty.classList.remove('hidden');
             } else {
-                rowEmpty.style.display = 'none';
+                rowEmpty.classList.add('hidden');
             }
         }
     }
@@ -812,15 +815,11 @@
         const tabSejarah = document.getElementById('tab-sejarah');
         
         if (tabId === 'senarai') {
-            tabSenarai.classList.add('bg-white', 'text-brand-purple', 'shadow-sm');
-            tabSenarai.classList.remove('text-gray-400');
-            tabSejarah.classList.remove('bg-white', 'text-brand-purple', 'shadow-sm');
-            tabSejarah.classList.add('text-gray-400');
+            tabSenarai.className = "py-4 px-1 border-b-2 font-black text-xs uppercase tracking-wider border-slate-800 text-slate-800 flex items-center gap-2";
+            tabSejarah.className = "py-4 px-1 border-b-2 border-transparent font-bold text-xs uppercase tracking-wider text-slate-400 hover:text-slate-600 transition";
         } else {
-            tabSejarah.classList.add('bg-white', 'text-brand-purple', 'shadow-sm');
-            tabSejarah.classList.remove('text-gray-400');
-            tabSenarai.classList.remove('bg-white', 'text-brand-purple', 'shadow-sm');
-            tabSenarai.classList.add('text-gray-400');
+            tabSejarah.className = "py-4 px-1 border-b-2 font-black text-xs uppercase tracking-wider border-slate-800 text-slate-800 flex items-center gap-2";
+            tabSenarai.className = "py-4 px-1 border-b-2 border-transparent font-bold text-xs uppercase tracking-wider text-slate-400 hover:text-slate-600 transition";
         }
 
         // Update Content
