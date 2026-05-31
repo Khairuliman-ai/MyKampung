@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="model.Pengguna" %>
+<%@ page import="model.AhliKeluarga" %>
 
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
@@ -31,6 +32,8 @@
         List<Pengguna> listAJK = (List<Pengguna>) request.getAttribute("listAJK");
         List<Pengguna> listPenduduk = (List<Pengguna>) request.getAttribute("listPenduduk"); // Now contains ALL active users
         List<Pengguna> semuaPenduduk = (listPenduduk != null) ? listPenduduk : new java.util.ArrayList<>();
+        List<AhliKeluarga> familyOnlyList = (List<AhliKeluarga>) request.getAttribute("familyOnlyList");
+        int totalMerged = (semuaPenduduk.size()) + ((familyOnlyList != null) ? familyOnlyList.size() : 0);
     %>
 
     <% if (request.getParameter("status") != null) { %>
@@ -216,8 +219,8 @@
                     </thead>
                     <tbody class="divide-y divide-gray-100">
                         <% 
+                        int countPenduduk = 1;
                         if (semuaPenduduk != null && !semuaPenduduk.isEmpty()) {
-                            int countPenduduk = 1;
                             for (Pengguna p : semuaPenduduk) { 
                                 // Serialize family info
                                 StringBuilder sbFam = new StringBuilder();
@@ -287,15 +290,58 @@
                                 </div>
                             </td>
                         </tr>
-                        <% } } else { %>
-                        <tr>
-                            <td colspan="5" class="p-20 text-center">
-                                <div class="flex flex-col items-center justify-center opacity-40">
-                                    <div class="w-16 h-16 mb-4 rounded-full bg-gray-100 flex items-center justify-center">
-                                        <i class="fas fa-users text-3xl"></i>
+                        <% } 
+                        }
+                        // --- PAPARAN AHLI KELUARGA YANG BELUM BERDAFTAR ---
+                        if (familyOnlyList != null && !familyOnlyList.isEmpty()) {
+                            for (AhliKeluarga fam : familyOnlyList) {
+                        %>
+                        <tr class="hover:bg-green-50/30 transition-all group" title="Ahli keluarga didaftarkan oleh <%= fam.getNamaWakil() %>">
+                            <td class="p-5 text-sm text-gray-400 font-medium"><%= countPenduduk++ %></td>
+                            <td class="p-5">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-11 h-11 rounded-2xl bg-green-50 text-green-500 flex items-center justify-center text-sm font-bold border border-green-100">
+                                        <i class="fas fa-user-friends text-xs"></i>
                                     </div>
-                                    <p class="font-bold text-gray-500 italic">Tiada data penduduk ditemui.</p>
+                                    <div>
+                                        <div class="text-sm font-bold text-gray-800 search-col flex items-center gap-2">
+                                            <%= fam.getNama_penuh() %>
+                                            <span class="px-2 py-0.5 rounded-md bg-green-50 text-green-600 text-[9px] font-black uppercase tracking-tighter border border-green-200 whitespace-nowrap flex items-center gap-1">
+                                                <i class="fas fa-link text-[7px]"></i> <%= fam.getHubungan() != null ? fam.getHubungan() : "Ahli Keluarga" %>
+                                            </span>
+                                        </div>
+                                        <div class="text-[11px] text-gray-400 font-medium mt-0.5 search-col flex items-center gap-2">
+                                            <% if (fam.getNombor_kp() != null && !fam.getNombor_kp().isEmpty()) { %>
+                                                <i class="fas fa-id-card text-[10px]"></i> <%= fam.getNombor_kp() %>
+                                            <% } else { %>
+                                                <span class="text-gray-300 italic">Tiada KP</span>
+                                            <% } %>
+                                            <span class="px-2 py-0.5 rounded-md bg-emerald-50 text-emerald-600 text-[9px] font-bold border border-emerald-100 whitespace-nowrap">
+                                                <i class="fas fa-house-user text-[7px]"></i> Wakil: <%= fam.getNamaWakil() %>
+                                            </span>
+                                        </div>
+                                    </div>
                                 </div>
+                            </td>
+                            <td class="p-5">
+                                <div class="flex flex-col">
+                                    <span class="text-xs text-gray-400 italic">Ikut wakil keluarga</span>
+                                </div>
+                            </td>
+                            <td class="p-5 text-sm">
+                                <span class="px-3 py-1 rounded-full bg-green-50 text-green-600 text-[10px] font-black uppercase tracking-widest border border-green-100">
+                                    Ahli Keluarga
+                                </span>
+                            </td>
+                        </tr>
+                        <% }
+                        } 
+                        // Hanya papar empty state jika kedua-dua senarai kosong
+                        if ((semuaPenduduk == null || semuaPenduduk.isEmpty()) && (familyOnlyList == null || familyOnlyList.isEmpty())) { %>
+                        <tr>
+                            <td colspan="4" class="p-20 text-center text-gray-400">
+                                <i class="fas fa-users-slash text-3xl mb-4 block opacity-30"></i>
+                                <p class="font-bold italic">Tiada data penduduk aktif dijumpai.</p>
                             </td>
                         </tr>
                         <% } %>
@@ -330,7 +376,13 @@
                     <i class="fas fa-users text-xs"></i>
                 </div>
                 <p class="text-[10px] text-gray-500 font-bold uppercase tracking-wide">Penduduk</p>
-                <h4 class="font-black text-2xl text-gray-900 leading-tight"><%= (listPenduduk != null) ? listPenduduk.size() : 0 %></h4>
+                <h4 class="font-black text-2xl text-gray-900 leading-tight"><%= totalMerged %></h4>
+                <p class="text-[9px] text-gray-400 mt-0.5 leading-normal">
+                    <span class="text-indigo-500 font-bold"><%= (listPenduduk != null) ? listPenduduk.size() : 0 %></span> Berdaftar
+                    <% if (familyOnlyList != null && !familyOnlyList.isEmpty()) { %>
+                        <br>&middot; <span class="text-green-600 font-bold"><%= familyOnlyList.size() %></span> Keluarga
+                    <% } %>
+                </p>
             </div>
         </div>
 

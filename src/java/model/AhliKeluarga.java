@@ -15,6 +15,7 @@ public class AhliKeluarga {
     private BigDecimal pendapatan;
     private String pengesahan_pendapatan;
     private Date dibuat_pada;
+    private String namaWakil; // Transient: nama penduduk berdaftar yang mendaftarkan ahli ini
 
     // Constructors
     public AhliKeluarga() {}
@@ -106,5 +107,13 @@ public class AhliKeluarga {
 
     public void setDibuat_pada(Date dibuat_pada) {
         this.dibuat_pada = dibuat_pada;
+    }
+
+    public String getNamaWakil() {
+        return namaWakil;
+    }
+
+    public void setNamaWakil(String namaWakil) {
+        this.namaWakil = namaWakil;
     }
 }

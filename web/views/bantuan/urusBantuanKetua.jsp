@@ -96,18 +96,14 @@
                                                     </div>
                                                     <% } %>
 
-                                                        <% // Logic Pengasingan Data List<PermohonanBantuan> list =
-                                                            (List<PermohonanBantuan>)
-                                                                request.getAttribute("permohonanList");
-                                                                SimpleDateFormat sdf = new
-                                                                SimpleDateFormat("dd/MM/yyyy");
-                                                                SimpleDateFormat sdfFull = new
-                                                                SimpleDateFormat("yyyy-MM-dd");
-                                                                List<PermohonanBantuan> listPending = new ArrayList<>();
-                                                                        // Status 3 (Dari AJK)
-                                                                        List<PermohonanBantuan> listSejarah = new
-                                                                            ArrayList<>(); // Status 1 (Lulus) atau 4
-                                                                                (Tolak)
+                                                        <%
+                                                            // Logic Pengasingan Data
+                                                            List<PermohonanBantuan> list = (List<PermohonanBantuan>) request.getAttribute("permohonanList");
+                                                            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+                                                            SimpleDateFormat sdfFull = new SimpleDateFormat("yyyy-MM-dd");
+                                                            List<PermohonanBantuan> listPending = new ArrayList<>();
+                                                            // Status 3 (Dari AJK)
+                                                            List<PermohonanBantuan> listSejarah = new ArrayList<>(); // Status 1 (Lulus) atau 4 (Tolak)
 
                                                                                 if(list != null) {
                                                                                 for(PermohonanBantuan pb : list) {
@@ -233,11 +229,7 @@
                                                                                                             data-category="<%= (pb.getJenis_bantuan() != null) ? pb.getJenis_bantuan() : "" %>"
                                                                                                             data-date="<%= (pb.getDibuat_pada() != null) ? sdfFull.format(pb.getDibuat_pada()) : "" %>"
                                                                                                             data-id="<%= pb.getId_permohonan() %>"
-                                                                                                            data-bantuan="<%= (pb.getNama_bantuan() != null ? pb.getNama_bantuan().replace("
-                                                                                                            \"", "&quot;"
-                                                                                                            )
-                                                                                                            : "Lain-lain"
-                                                                                                            ) %>"
+                                                                                                            data-bantuan="<%= (pb.getNama_bantuan() != null ? pb.getNama_bantuan().replace("\"", "&quot;") : "Lain-lain") %>"
                                                                                                             data-pemohon="
                                                                                                             <%= pb.getNama_penuh().replace("\"", "&quot;"
                                                                                                                 ) %>"
@@ -520,11 +512,7 @@
                                                                                                             data-category="<%= (pb.getJenis_bantuan() != null) ? pb.getJenis_bantuan() : "" %>"
                                                                                                             data-date="<%= (pb.getDibuat_pada() != null) ? sdfFull.format(pb.getDibuat_pada()) : "" %>"
                                                                                                             data-id="<%= pb.getId_permohonan() %>"
-                                                                                                            data-bantuan="<%= (pb.getNama_bantuan() != null ? pb.getNama_bantuan().replace("
-                                                                                                            \"", "&quot;"
-                                                                                                            )
-                                                                                                            : "Lain-lain"
-                                                                                                            ) %>"
+                                                                                                            data-bantuan="<%= (pb.getNama_bantuan() != null ? pb.getNama_bantuan().replace("\"", "&quot;") : "Lain-lain") %>"
                                                                                                             data-pemohon="
                                                                                                             <%= pb.getNama_penuh().replace("\"", "&quot;"
                                                                                                                 ) %>"

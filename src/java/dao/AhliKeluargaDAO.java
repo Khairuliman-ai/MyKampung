@@ -64,4 +64,58 @@ public class AhliKeluargaDAO {
             return ps.executeUpdate() >= 0;
         }
     }
+
+    /**
+     * Mengira bilangan ahli keluarga yang TIDAK berdaftar sebagai pengguna aktif.
+     * Deduplikasi berdasarkan nombor_kp — ahli yang nombor_kp-nya sudah wujud
+     * dalam table pengguna (status aktif) tidak akan dikira semula.
+     */
+    public int countNonRegistered() {
+        String sql = "SELECT COUNT(*) FROM ahli_keluarga ak "
+                   + "WHERE (ak.nombor_kp IS NULL OR ak.nombor_kp = '' "
+                   + "OR ak.nombor_kp NOT IN (SELECT p.nombor_kp FROM pengguna p WHERE p.status = 1))";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
+
+    /**
+     * Mengambil semua ahli keluarga yang TIDAK berdaftar sebagai pengguna aktif,
+     * berserta nama wakil keluarga (pengguna yang mendaftarkan mereka).
+     * Digunakan untuk paparan dalam senarai penduduk AJK/Ketua.
+     */
+    public List<AhliKeluarga> getAllNonRegistered() {
+        List<AhliKeluarga> senarai = new ArrayList<>();
+        String sql = "SELECT ak.*, p.nama_penuh AS nama_wakil FROM ahli_keluarga ak "
+                   + "JOIN pengguna p ON ak.id_pengguna = p.id_pengguna "
+                   + "WHERE p.status = 1 AND (ak.nombor_kp IS NULL OR ak.nombor_kp = '' "
+                   + "OR ak.nombor_kp NOT IN (SELECT pg.nombor_kp FROM pengguna pg WHERE pg.status = 1)) "
+                   + "ORDER BY p.nama_penuh ASC, ak.nama_penuh ASC";
+        try (PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                AhliKeluarga a = new AhliKeluarga();
+                a.setId_ahli(rs.getInt("id_ahli"));
+                a.setId_pengguna(rs.getInt("id_pengguna"));
+                a.setNama_penuh(rs.getString("nama_penuh"));
+                a.setNombor_kp(rs.getString("nombor_kp"));
+                a.setNombor_telefon(rs.getString("nombor_telefon"));
+                a.setUmur(rs.getInt("umur"));
+                a.setHubungan(rs.getString("hubungan"));
+                a.setPekerjaan(rs.getString("pekerjaan"));
+                a.setPendapatan(rs.getBigDecimal("pendapatan"));
+                a.setPengesahan_pendapatan(rs.getString("pengesahan_pendapatan"));
+                a.setDibuat_pada(rs.getTimestamp("dibuat_pada"));
+                a.setNamaWakil(rs.getString("nama_wakil"));
+                senarai.add(a);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return senarai;
+    }
 }

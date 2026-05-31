@@ -759,7 +759,11 @@
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">No. Kad Pengenalan</label>
                     <div class="relative">
                         <i class="fas fa-id-badge absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-green-600 transition-colors"></i>
-                        <input type="text" id="m_kp" oninput="formatIC(this)" maxlength="14" placeholder="000000-00-0000" class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-sm font-semibold transition-all">
+                        <input type="text" id="m_kp" oninput="formatIC(this)" onblur="checkKPDuplicate(this.value)" maxlength="14" placeholder="000000-00-0000" class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-sm font-semibold transition-all">
+                    </div>
+                    <div id="kpDuplicateWarning" class="hidden mt-2 px-3 py-2 bg-amber-50 border border-amber-200 rounded-xl flex items-center gap-2 text-[11px] text-amber-700 font-semibold animate-in fade-in duration-300">
+                        <i class="fas fa-exclamation-triangle text-amber-500"></i>
+                        <span>No. KP ini sudah wujud sebagai penduduk berdaftar dalam sistem. Ahli ini tidak akan dikira dua kali dalam senarai penduduk.</span>
                     </div>
                 </div>
                 <div class="group">
@@ -827,6 +831,42 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Senarai No. KP penduduk berdaftar (current user's KP) untuk semakan pertindihan client-side
+    const currentUserKP = '<%= pDetail.getNombor_kp() %>';
+    
+    function checkKPDuplicate(kpValue) {
+        const warning = document.getElementById('kpDuplicateWarning');
+        if (!kpValue || kpValue.trim() === '') {
+            warning.classList.add('hidden');
+            return;
+        }
+        // Normalise: remove dashes and spaces for comparison
+        const normalised = kpValue.replace(/[\-\s]/g, '');
+        const normalised_current = currentUserKP.replace(/[\-\s]/g, '');
+        
+        // Check against current user's own KP
+        if (normalised === normalised_current) {
+            warning.classList.remove('hidden');
+            return;
+        }
+        
+        // Check against existing family members already on the page
+        const existingKPs = document.querySelectorAll('.f-kp');
+        for (const el of existingKPs) {
+            const existingNorm = el.value.replace(/[\-\s]/g, '');
+            if (existingNorm === normalised && existingNorm !== '') {
+                warning.classList.remove('hidden');
+                warning.querySelector('span').textContent = 
+                    'No. KP ini sudah didaftarkan sebagai ahli keluarga anda. Sila semak semula.';
+                return;
+            }
+        }
+        
+        warning.classList.add('hidden');
+    }
+</script>
 
 <script>
     function confirmAction(e, title, text, confirmButtonText, confirmButtonColor) {

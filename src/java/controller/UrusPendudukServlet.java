@@ -47,8 +47,12 @@ public class UrusPendudukServlet extends HttpServlet {
                         p.setSenaraiAhliKeluarga(ahliKeluargaDAO.getByPenggunaId(p.getId_pengguna()));
                     }
                 }
+                // Ambil ahli keluarga yang belum berdaftar sebagai pengguna (untuk paparan senarai penduduk)
+                List<AhliKeluarga> familyOnlyList = ahliKeluargaDAO.getAllNonRegistered();
+
                 request.setAttribute("pendingList", pendingList);
                 request.setAttribute("activeList", activeList);
+                request.setAttribute("familyOnlyList", familyOnlyList);
                 request.getRequestDispatcher("/views/maklumatPenduduk/urusPendudukAJK.jsp").forward(request, response);
             } 
             else if ("/ketua/urus".equals(action)) {
@@ -65,10 +69,12 @@ public class UrusPendudukServlet extends HttpServlet {
                     }
                 }
                 List<Pengguna> listJawatan = jawatanDAO.getJawatanHolders();
+                List<AhliKeluarga> familyOnlyList = ahliKeluargaDAO.getAllNonRegistered();
 
                 request.setAttribute("listAJK", listAJK);
                 request.setAttribute("listPenduduk", listPenduduk);
                 request.setAttribute("listJawatan", listJawatan);
+                request.setAttribute("familyOnlyList", familyOnlyList);
                 request.getRequestDispatcher("/views/maklumatPenduduk/urusPendudukKetua.jsp").forward(request, response);
             }
         } catch (Exception e) {

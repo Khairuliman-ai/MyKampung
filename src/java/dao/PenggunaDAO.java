@@ -331,9 +331,15 @@ public boolean updateStatus(int idPengguna, int statusBaru) {
 }
 
 public int countAll() {
-    String sql = "SELECT COUNT(*) FROM pengguna";
+    // Kira semua pengguna aktif + ahli keluarga yang TIDAK berdaftar sebagai pengguna
+    String sql = "SELECT "
+               + "(SELECT COUNT(*) FROM pengguna WHERE status = 1) + "
+               + "(SELECT COUNT(*) FROM ahli_keluarga ak "
+               + " WHERE (ak.nombor_kp IS NULL OR ak.nombor_kp = '' "
+               + "  OR ak.nombor_kp NOT IN (SELECT p.nombor_kp FROM pengguna p WHERE p.status = 1))) "
+               + "AS total";
     try (PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
-        if (rs.next()) return rs.getInt(1);
+        if (rs.next()) return rs.getInt("total");
     } catch (SQLException e) {
         e.printStackTrace();
     }
