@@ -4,6 +4,7 @@ import model.Pengguna;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
+import util.DBUtil;
 
 public class PenggunaDAO {
 
@@ -436,5 +437,62 @@ public int countAll() {
             e.printStackTrace();
         }
         return 0.0;
+    }
+
+    // === NOTIFICATION HELPERS ===
+    
+    public List<Integer> getIdsByPeranan(String namaPeranan) {
+        List<Integer> list = new ArrayList<>();
+        String sql = "SELECT p.id_pengguna FROM pengguna p "
+                   + "JOIN pengguna_peranan pp ON p.id_pengguna = pp.id_pengguna "
+                   + "JOIN peranan r ON pp.id_peranan = r.id_peranan "
+                   + "WHERE r.nama_peranan = ? AND p.status = 1 AND p.dipadam_pada IS NULL";
+        try (Connection connection = DBUtil.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, namaPeranan);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(rs.getInt("id_pengguna"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Integer> getIdsByJawatan(String namaJawatan) {
+        List<Integer> list = new ArrayList<>();
+        String sql = "SELECT aj.id_pengguna FROM ajk_jawatan aj "
+                   + "JOIN jawatan_ajk j ON aj.id_jawatan = j.id_jawatan "
+                   + "JOIN pengguna p ON aj.id_pengguna = p.id_pengguna "
+                   + "WHERE j.nama_jawatan = ? AND p.status = 1 AND p.dipadam_pada IS NULL";
+        try (Connection connection = DBUtil.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql)) {
+            ps.setString(1, namaJawatan);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    list.add(rs.getInt("id_pengguna"));
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+
+    public List<Integer> getAllActiveIds() {
+        List<Integer> list = new ArrayList<>();
+        String sql = "SELECT id_pengguna FROM pengguna WHERE status = 1 AND dipadam_pada IS NULL";
+        try (Connection connection = DBUtil.getConnection();
+             PreparedStatement ps = connection.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                list.add(rs.getInt("id_pengguna"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return list;
     }
 }

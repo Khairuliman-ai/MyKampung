@@ -202,6 +202,23 @@ public class AduanServlet extends HttpServlet {
                 aduan.setId_pengendali(ajkId);
 
                 if (aduanDAO.insertAduan(aduan)) {
+                    // Trigger Notifikasi ke AJK Biro Keselamatan
+                    try {
+                        dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
+                        PenggunaDAO pDao = new PenggunaDAO(null);
+                        List<Integer> ajkIds = pDao.getIdsByJawatan("Biro Keselamatan");
+                        model.Notifications notif = new model.Notifications();
+                        notif.setJenis("ADUAN");
+                        notif.setTajuk("Aduan Baru Diterima");
+                        notif.setMesej("Aduan '" + aduan.getTajuk() + "' telah dihantar oleh " + user.getNama_penuh());
+                        notif.setPautan("/aduan/list");
+                        for (int id : ajkIds) {
+                            notif.setId_pengguna(id);
+                            notifDao.insertNotifications(notif);
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                     response.sendRedirect(request.getContextPath() + "/aduan/list?status=success");
                 } else {
                     response.sendRedirect(request.getContextPath() + "/aduan/list?status=error");
@@ -264,8 +281,8 @@ public class AduanServlet extends HttpServlet {
                         }
                     }
 
-                    // Hanya AJK Kampung (Biro Keselamatan) sahaja yang diwajibkan untuk muat naik bukti
-                    if ("AJK Kampung".equalsIgnoreCase(role)) {
+                    // AJK Kampung (Biro Keselamatan) & Ketua Kampung diwajibkan untuk muat naik bukti
+                    if ("AJK Kampung".equalsIgnoreCase(role) || "Ketua Kampung".equalsIgnoreCase(role)) {
                         if (buktiSelesaiFileName == null || buktiSelesaiFileName.trim().isEmpty()) {
                             response.sendRedirect(request.getContextPath() + "/aduan/list?error=missing_bukti");
                             return;
@@ -285,6 +302,36 @@ public class AduanServlet extends HttpServlet {
 
                 // Kemaskini status dan log secara atomik (transaksi pangkalan data)
                 if (aduanDAO.updateStatusWithLog(idAduan, nextStatus, catatanField, sanitisedCatatan, user.getId_pengguna(), logCatatan)) {
+                    // Trigger Notifikasi
+                    try {
+                        dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
+                        
+                        // 1. Notifikasi kepada Pengadu (Penduduk)
+                        model.Notifications notifPengadu = new model.Notifications();
+                        notifPengadu.setId_pengguna(aduan.getId_pengguna());
+                        notifPengadu.setJenis("ADUAN");
+                        notifPengadu.setTajuk("Status Aduan Dikemaskini");
+                        notifPengadu.setMesej("Aduan '" + aduan.getTajuk() + "' -> " + nextStatus);
+                        notifPengadu.setPautan("/aduan/list");
+                        notifDao.insertNotifications(notifPengadu);
+
+                        // 2. Jika di-escalate ke Ketua Kampung, hantar notifikasi ke Ketua Kampung
+                        if ("ESCALATED_TO_KETUA".equals(nextStatus) || "UNDER_REVIEW_KETUA".equals(nextStatus)) {
+                            PenggunaDAO pDao = new PenggunaDAO(null);
+                            List<Integer> ketuaIds = pDao.getIdsByPeranan("Ketua Kampung");
+                            model.Notifications notifKetua = new model.Notifications();
+                            notifKetua.setJenis("ADUAN");
+                            notifKetua.setTajuk("Aduan Telah Diserahkan");
+                            notifKetua.setMesej("Aduan '" + aduan.getTajuk() + "' memerlukan tindakan Ketua Kampung");
+                            notifKetua.setPautan("/aduan/list");
+                            for (int ketuaId : ketuaIds) {
+                                notifKetua.setId_pengguna(ketuaId);
+                                notifDao.insertNotifications(notifKetua);
+                            }
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                     response.sendRedirect(request.getContextPath() + "/aduan/list?msg=updated");
                 } else {
                     response.sendRedirect(request.getContextPath() + "/aduan/list?error=db");
@@ -330,6 +377,23 @@ public class AduanServlet extends HttpServlet {
 
                 // Jalankan proses reopen secara atomik
                 if (aduanDAO.reopenAduan(idAduan, user.getId_pengguna(), logCatatan)) {
+                    // Trigger Notifikasi ke AJK Biro Keselamatan
+                    try {
+                        dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
+                        PenggunaDAO pDao = new PenggunaDAO(null);
+                        List<Integer> ajkIds = pDao.getIdsByJawatan("Biro Keselamatan");
+                        model.Notifications notif = new model.Notifications();
+                        notif.setJenis("ADUAN");
+                        notif.setTajuk("Aduan Dibuka Semula");
+                        notif.setMesej("Aduan '" + aduan.getTajuk() + "' telah dibuka semula oleh " + user.getNama_penuh());
+                        notif.setPautan("/aduan/list");
+                        for (int id : ajkIds) {
+                            notif.setId_pengguna(id);
+                            notifDao.insertNotifications(notif);
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
                     response.sendRedirect(request.getContextPath() + "/aduan/list?msg=reopened");
                 } else {
                     response.sendRedirect(request.getContextPath() + "/aduan/list?error=db");

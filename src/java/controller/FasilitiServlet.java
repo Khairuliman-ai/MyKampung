@@ -230,6 +230,26 @@ public class FasilitiServlet extends HttpServlet {
         }
         
         if (tempahanDAO.simpanTempahanBaru(t)) {
+            // Trigger Notifikasi ke AJK Biro Sukan & Riadah
+            try {
+                dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
+                dao.PenggunaDAO pDao = new dao.PenggunaDAO(null);
+                List<Integer> ajkIds = pDao.getIdsByJawatan("Biro Sukan & Riadah");
+                model.Notifications notif = new model.Notifications();
+                notif.setJenis("TEMPAHAN");
+                notif.setTajuk("Tempahan Fasiliti Baru");
+                Fasiliti f = fasilitiDAO.dapatkanFasilitiById(idFasiliti);
+                String namaF = f != null ? f.getNama_fasiliti() : "Fasiliti";
+                notif.setMesej("Tempahan baru untuk " + namaF + " pada " + tarikh + " oleh " + user.getNama_penuh());
+                notif.setPautan("/fasiliti/urus");
+                for (int ajkId : ajkIds) {
+                    notif.setId_pengguna(ajkId);
+                    notifDao.insertNotifications(notif);
+                }
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+
             String msg = t.getStatus().equals(StatusConstant.TEMPAHAN_LULUS) ? "booked" : "pending_approval";
             response.sendRedirect(request.getContextPath() + "/fasiliti/list?success=" + msg);
         } else {
@@ -332,7 +352,32 @@ public class FasilitiServlet extends HttpServlet {
         int id = Integer.parseInt(request.getParameter("idTempahan"));
         String catatan = request.getParameter("catatan"); // This will be the reason for rejection
         
+        // Dapatkan rekod tempahan untuk hantar notifikasi
+        TempahanFasiliti tempahan = tempahanDAO.dapatkanTempahanById(id);
+
         if (tempahanDAO.updateStatusTempahan(id, status, catatan)) {
+            // Trigger Notifikasi ke Penduduk (pemohon)
+            if (tempahan != null) {
+                try {
+                    dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
+                    model.Notifications notif = new model.Notifications();
+                    notif.setId_pengguna(tempahan.getId_pengguna());
+                    notif.setJenis("TEMPAHAN");
+                    
+                    if (StatusConstant.TEMPAHAN_LULUS.equals(status)) {
+                        notif.setTajuk("Tempahan Diluluskan");
+                        notif.setMesej("Tempahan anda untuk " + tempahan.getNama_fasiliti() + " pada " + tempahan.getTarikh_tempah() + " telah diluluskan.");
+                    } else {
+                        notif.setTajuk("Tempahan Ditolak");
+                        String ulasan = (catatan != null && !catatan.trim().isEmpty()) ? catatan : "Tidak menepati syarat.";
+                        notif.setMesej("Tempahan anda untuk " + tempahan.getNama_fasiliti() + " pada " + tempahan.getTarikh_tempah() + " ditolak: " + ulasan);
+                    }
+                    notif.setPautan("/fasiliti/list");
+                    notifDao.insertNotifications(notif);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
             response.sendRedirect(request.getContextPath() + "/fasiliti/urus?success=status_updated");
         } else {
             response.sendRedirect(request.getContextPath() + "/fasiliti/urus?error=status_failed");

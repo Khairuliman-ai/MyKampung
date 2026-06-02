@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: May 23, 2026 at 06:17 AM
+-- Generation Time: Jun 01, 2026 at 04:28 AM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -73,7 +73,7 @@ INSERT INTO `aduan` (`id_aduan`, `id_pengguna`, `id_kategori_aduan`, `tajuk`, `k
 (19, 4, 1, 'test 7', 'vds', 'CLOSED', NULL, NULL, '2026-04-28 00:37:14', '2026-04-28 00:38:40', NULL, 10, 'SEDERHANA', NULL, 'vds', 'vds', 0),
 (20, 2, 1, 'test 4', 'test 4', 'UNDER_REVIEW_AJK', NULL, NULL, '2026-05-10 12:52:16', '2026-05-10 12:59:18', NULL, 10, 'SEDERHANA', NULL, 'test4', NULL, 0),
 (21, 2, 1, '23/5', '25/5', 'RESOLVED', 'aduan_2_1779474934287_professional-profile-pictures-1080-x-1080-460wjhrkbwdcp1ig.jpg', NULL, '2026-05-22 18:35:34', '2026-05-22 18:38:17', NULL, 10, 'SEDERHANA', NULL, '23/5', '23/5', 0),
-(22, 2, 1, 'Test 100', 'test 100', 'UNDER_REVIEW_KETUA', 'aduan_2_1779509637370_professional-profile-pictures-1080-x-1080-460wjhrkbwdcp1ig.jpg', NULL, '2026-05-23 04:13:57', '2026-05-23 04:16:38', NULL, 10, 'TINGGI', NULL, 'test100', 'test100', 0);
+(22, 2, 1, 'Test 100', 'test 100', 'CLOSED', 'aduan_2_1779509637370_professional-profile-pictures-1080-x-1080-460wjhrkbwdcp1ig.jpg', NULL, '2026-05-23 04:13:57', '2026-05-23 08:14:43', NULL, 10, 'TINGGI', NULL, 'test100', 'test', 0);
 
 -- --------------------------------------------------------
 
@@ -366,7 +366,7 @@ INSERT INTO `hebahan` (`id_hebahan`, `id_pengguna`, `tajuk`, `kandungan`, `kateg
 (9, 5, 'Sumbangan Asnaf', 'Majlis penyerahan bantuan asnaf di masjid.', 'Umum', NULL, 'Published', NULL, NULL, NULL, NULL, '2023-12-10', '2026-03-13 19:52:27', '2026-04-30 07:21:20', '2026-04-30 07:21:20'),
 (10, 1, 'Sambutan Hari Keluarga', 'Semua penduduk dijemput hadir ke padang awam.', 'Umum', 'hebahan_21_1777533658918_Gemini_Generated_Image_5x766n5x766n5x76 (1).png', 'Published', '2026-05-25 14:00:00', '2026-05-25 18:00:00', 'Dewan Serbaguna', NULL, '2023-12-15', '2026-03-13 19:52:27', '2026-04-30 07:20:58', NULL),
 (11, 21, 'Test2', 'fwqfw', 'Umum', 'hebahan_21_1777347009060_3667006.png', 'Published', '2026-04-28 11:29:00', '2026-04-30 11:29:00', 'feww', '2026-05-07 11:29:00', '2026-04-28', '2026-04-28 03:30:09', '2026-04-30 07:01:34', '2026-04-30 07:01:34'),
-(12, 21, 'Gotong Royong Perdana', 'Hebahan Program Khidmat Masyarakat: Semangat Gotong-Royong\r\n\r\nTuan/Puan,\r\n\r\nMerujuk kepada poster, pihak kami dengan sukacitanya ingin menjemput seluruh warga [Nama Organisasi/Kawasan] untuk menyertai aktiviti gotong-royong perdana.\r\n\r\nObjektif program ini adalah untuk memupuk kesedaran tentang kebersihan alam sekitar dan mengukuhkan semangat kerjasama antara kita. Kerana seperti slogan kami, ', 'Umum', 'hebahan_21_1777533819112_Gemini_Generated_Image_vypzswvypzswvypz.png', 'Published', '2026-05-30 09:00:00', '2026-05-30 12:00:00', 'Seluruh Kampung', '2026-04-30 22:19:00', '2026-04-28', '2026-04-28 14:19:18', '2026-04-30 07:23:39', NULL);
+(12, 21, 'Gotong Royong Perdana', 'Hebahan Program Khidmat Masyarakat: Semangat Gotong-Royong\r\n\r\nTuan/Puan,\r\n\r\nMerujuk kepada poster, pihak kami dengan sukacitanya ingin menjemput seluruh warga [Nama Organisasi/Kawasan] untuk menyertai aktiviti gotong-royong perdana.\r\n\r\nObjektif program ini adalah untuk memupuk kesedaran tentang kebersihan alam sekitar dan mengukuhkan semangat kerjasama antara kita. Kerana seperti slogan kami, ', 'Umum', 'hebahan_21_1777533819112_Gemini_Generated_Image_vypzswvypzswvypz.png', 'Published', '2026-05-30 09:00:00', '2026-05-30 12:00:00', 'Seluruh Kampung', '2026-04-30 22:19:00', '2026-04-28', '2026-04-28 14:19:18', '2026-05-24 02:43:01', NULL);
 
 -- --------------------------------------------------------
 
@@ -515,7 +515,9 @@ INSERT INTO `log_aduan` (`id_log_aduan`, `id_aduan`, `id_pelaku`, `status_lama`,
 (30, 21, 1, 'IN_PROGRESS_HIGH_LEVEL', 'RESOLVED', '23/5', '2026-05-22 18:38:17'),
 (31, 22, 10, 'SUBMITTED', 'UNDER_REVIEW_AJK', 'test100', '2026-05-23 04:15:05'),
 (32, 22, 10, 'UNDER_REVIEW_AJK', 'ESCALATED_TO_KETUA', 'test100', '2026-05-23 04:15:29'),
-(33, 22, 1, 'ESCALATED_TO_KETUA', 'UNDER_REVIEW_KETUA', 'test100', '2026-05-23 04:16:38');
+(33, 22, 1, 'ESCALATED_TO_KETUA', 'UNDER_REVIEW_KETUA', 'test100', '2026-05-23 04:16:38'),
+(34, 22, 1, 'UNDER_REVIEW_KETUA', 'RESOLVED', 'ee', '2026-05-23 04:22:49'),
+(35, 22, 1, 'RESOLVED', 'CLOSED', 'test', '2026-05-23 08:14:43');
 
 -- --------------------------------------------------------
 
@@ -545,6 +547,23 @@ INSERT INTO `log_aktiviti` (`id_log`, `id_pengguna`, `id_admin`, `jenis_tindakan
 (6, 3, 1, 'KEMASKINI_PROFIL', 'Admin mengemaskini: Status Keluarga (Berkahwin -> Duda). ', '2026-04-20 12:22:13'),
 (7, 2, 3, 'KEMASKINI_PROFIL', 'Admin mengemaskini: Alamat (Bandar: - -> Pasir Puteh; Poskod: - -> 16810; Negeri: - -> Kelantan; ). ', '2026-04-22 09:21:47'),
 (8, 2, 3, 'KEMASKINI_PROFIL', 'Admin mengemaskini: Status Keluarga (Bujang -> Berkahwin). ', '2026-05-09 12:03:05');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notifikasi`
+--
+
+CREATE TABLE `notifikasi` (
+  `id_notifikasi` int(11) NOT NULL,
+  `id_pengguna` int(11) NOT NULL COMMENT 'Penerima notifikasi',
+  `jenis` varchar(30) NOT NULL COMMENT 'ADUAN | BANTUAN | TEMPAHAN | HEBAHAN | SISTEM',
+  `tajuk` varchar(150) NOT NULL,
+  `mesej` text NOT NULL,
+  `pautan` varchar(255) DEFAULT NULL COMMENT 'URL untuk navigate ke detail',
+  `sudah_baca` tinyint(1) NOT NULL DEFAULT 0 COMMENT '0=Belum baca, 1=Sudah baca',
+  `dibuat_pada` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
 
@@ -902,6 +921,14 @@ ALTER TABLE `log_aktiviti`
   ADD KEY `log_ibfk_admin` (`id_admin`);
 
 --
+-- Indexes for table `notifikasi`
+--
+ALTER TABLE `notifikasi`
+  ADD PRIMARY KEY (`id_notifikasi`),
+  ADD KEY `idx_pengguna_baca` (`id_pengguna`,`sudah_baca`),
+  ADD KEY `idx_dibuat` (`dibuat_pada`);
+
+--
 -- Indexes for table `pengguna`
 --
 ALTER TABLE `pengguna`
@@ -1011,13 +1038,19 @@ ALTER TABLE `laporan_snapshot`
 -- AUTO_INCREMENT for table `log_aduan`
 --
 ALTER TABLE `log_aduan`
-  MODIFY `id_log_aduan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=34;
+  MODIFY `id_log_aduan` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=36;
 
 --
 -- AUTO_INCREMENT for table `log_aktiviti`
 --
 ALTER TABLE `log_aktiviti`
   MODIFY `id_log` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+
+--
+-- AUTO_INCREMENT for table `notifikasi`
+--
+ALTER TABLE `notifikasi`
+  MODIFY `id_notifikasi` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- AUTO_INCREMENT for table `pengguna`
@@ -1105,6 +1138,12 @@ ALTER TABLE `log_aduan`
 ALTER TABLE `log_aktiviti`
   ADD CONSTRAINT `log_ibfk_admin` FOREIGN KEY (`id_admin`) REFERENCES `pengguna` (`id_pengguna`),
   ADD CONSTRAINT `log_ibfk_pengguna` FOREIGN KEY (`id_pengguna`) REFERENCES `pengguna` (`id_pengguna`) ON DELETE CASCADE;
+
+--
+-- Constraints for table `notifikasi`
+--
+ALTER TABLE `notifikasi`
+  ADD CONSTRAINT `fk_notifikasi_pengguna` FOREIGN KEY (`id_pengguna`) REFERENCES `pengguna` (`id_pengguna`) ON DELETE CASCADE;
 
 --
 -- Constraints for table `pengguna_peranan`

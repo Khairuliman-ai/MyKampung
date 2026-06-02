@@ -97,12 +97,12 @@
                     </div>
 
                     <!-- Column 2: Chronological Timeline Log (1/3 width) -->
-                    <div class="bg-slate-50/50 rounded-3xl p-6 border border-slate-100">
-                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-2">
+                    <div class="bg-slate-50/50 rounded-3xl p-6 border border-slate-100 flex flex-col max-h-[450px] lg:max-h-[60vh] flex-shrink-0">
+                        <h4 class="text-xs font-black text-slate-800 uppercase tracking-widest mb-6 flex items-center gap-2 flex-shrink-0">
                             <i class="fas fa-history text-indigo-600"></i> Sejarah & Log Tindakan
                         </h4>
                         
-                        <div id="det-logs" class="relative space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+                        <div id="det-logs" class="relative space-y-6 before:absolute before:left-[11px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200 overflow-y-auto pr-2 flex-1 custom-scrollbar">
                             <!-- Logs populated dynamically by AJAX -->
                         </div>
                     </div>

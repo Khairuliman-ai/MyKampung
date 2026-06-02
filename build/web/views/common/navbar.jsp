@@ -119,6 +119,33 @@
     #mainSidebar.collapsed button div.w-6 {
         width: auto !important;
     }
+    
+    /* Notification dropdown animation */
+    #notifDropdown {
+        animation: slideDown 0.2s ease;
+    }
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-8px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    /* Bell ring animation when new notification */
+    @keyframes bellRing {
+        0%, 100% { transform: rotate(0); }
+        15% { transform: rotate(14deg); }
+        30% { transform: rotate(-14deg); }
+        45% { transform: rotate(10deg); }
+        60% { transform: rotate(-8deg); }
+        75% { transform: rotate(4deg); }
+    }
+    .bell-ringing {
+        animation: bellRing 0.8s ease;
+    }
 </style>
 
 <aside id="mainSidebar" class="w-64 bg-white/95 backdrop-blur-md fixed inset-y-0 left-0 z-[60] flex flex-col border-r border-slate-100 flex-shrink-0 h-full justify-between transition-all duration-300 transform -translate-x-full md:translate-x-0 md:relative md:inset-auto md:z-0 shadow-sm">
@@ -443,6 +470,51 @@
         <button onclick="toggleSidebar()" class="p-2 bg-white rounded-lg shadow text-gray-600 focus:outline-none"><i class="fas fa-bars"></i></button>
     </div>
 
+    <!-- Notification Bell (All Roles) -->
+    <div class="absolute top-4 right-4 z-50">
+        <button id="notifBellBtn" onclick="toggleNotifDropdown()" 
+                class="relative p-2.5 bg-white rounded-xl shadow-md hover:shadow-lg 
+                       text-gray-500 hover:text-[var(--brand-color)] 
+                       transition-all duration-300 focus:outline-none cursor-pointer">
+            <i class="fas fa-bell text-lg" id="bellIcon"></i>
+            <span id="notifBadge" 
+                  class="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] 
+                         font-bold rounded-full min-w-[18px] h-[18px] flex items-center 
+                         justify-center px-1 hidden">
+                0
+            </span>
+        </button>
+
+        <!-- Dropdown Panel -->
+        <div id="notifDropdown" 
+             class="hidden absolute right-0 top-14 w-[380px] max-h-[480px] 
+                    bg-white rounded-2xl shadow-2xl border border-slate-100 
+                    overflow-hidden z-[999]">
+            
+            <!-- Header -->
+            <div class="flex items-center justify-between px-5 py-4 
+                        border-b border-slate-100 bg-gradient-to-r 
+                        from-[var(--brand-color)] to-[var(--brand-secondary)]">
+                <h3 class="font-bold text-white text-sm">
+                    <i class="fas fa-bell mr-2"></i>Pemberitahuan
+                </h3>
+                <button onclick="tandaSemuaBaca()" 
+                        class="text-xs text-white/80 hover:text-white 
+                               font-medium cursor-pointer">
+                    Tanda semua dibaca
+                </button>
+            </div>
+
+            <!-- Notification List -->
+            <div id="notifList" class="overflow-y-auto max-h-[380px] divide-y divide-slate-50">
+                <div class="p-8 text-center text-sm text-gray-400">
+                    <i class="fas fa-bell-slash text-2xl mb-2 block"></i>
+                    Tiada Pemberitahuan
+                </div>
+            </div>
+        </div>
+    </div>
+
 <!-- Logout Modal -->
 <div id="modalLogout" class="fixed inset-0 z-[999] hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeLogout()"></div>
@@ -510,4 +582,148 @@
             icon.style.transform = 'rotate(180deg)';
         }
     });
+
+    // === NOTIFICATION BELL FUNCTIONS ===
+    const ctxPath = '<%= contextPath %>';
+    let lastNotifCount = 0;
+    let notifPollingInterval = null;
+
+    function toggleNotifDropdown() {
+        const dd = document.getElementById('notifDropdown');
+        dd.classList.toggle('hidden');
+        if (!dd.classList.contains('hidden')) {
+            loadNotifikasi();
+        }
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function(e) {
+        const bell = document.getElementById('notifBellBtn');
+        const dd = document.getElementById('notifDropdown');
+        if (bell && dd && !bell.contains(e.target) && !dd.contains(e.target)) {
+            dd.classList.add('hidden');
+        }
+    });
+
+    // ====== AUTO-POLLING: Load count setiap 30 saat ======
+    function loadNotifCount() {
+        fetch(ctxPath + '/notifikasi/count')
+            .then(r => r.json())
+            .then(data => {
+                const badge = document.getElementById('notifBadge');
+                const bellIcon = document.getElementById('bellIcon');
+                if (data.count > 0) {
+                    badge.textContent = data.count > 99 ? '99+' : data.count;
+                    badge.classList.remove('hidden');
+                    // Animate bell if count increased
+                    if (data.count > lastNotifCount && lastNotifCount >= 0) {
+                        bellIcon.classList.add('bell-ringing');
+                        setTimeout(() => bellIcon.classList.remove('bell-ringing'), 1000);
+                    }
+                } else {
+                    badge.classList.add('hidden');
+                }
+                lastNotifCount = data.count;
+            }).catch(err => console.error('Notif count error:', err));
+    }
+
+    function startNotifPolling() {
+        loadNotifCount(); // Initial load
+        notifPollingInterval = setInterval(loadNotifCount, 30000); // Every 30s
+    }
+
+    // Stop polling when tab is inactive (save resources)
+    document.addEventListener('visibilitychange', function() {
+        if (document.hidden) {
+            if (notifPollingInterval) clearInterval(notifPollingInterval);
+        } else {
+            startNotifPolling();
+        }
+    });
+
+    // Load notification list (for dropdown)
+    function loadNotifikasi() {
+        fetch(ctxPath + '/notifikasi/list')
+            .then(r => r.json())
+            .then(list => {
+                const container = document.getElementById('notifList');
+                if (list.length === 0) {
+                    container.innerHTML = 
+                        '<div class="p-8 text-center text-sm text-gray-400">' +
+                        '<i class="fas fa-bell-slash text-2xl mb-2 block"></i>' +
+                        'Tiada notifikasi</div>';
+                    return;
+                }
+                container.innerHTML = list.map(function(n) {
+                    return '<a href="' + (n.pautan ? ctxPath + n.pautan : '#') + '" ' +
+                       'onclick="tandaBaca(' + n.id + ')" ' +
+                       'class="flex gap-3 px-5 py-3.5 hover:bg-slate-50 transition ' +
+                       'cursor-pointer ' + (!n.sudahBaca ? 'bg-blue-50/50' : '') + '">' +
+                       '<div class="w-9 h-9 rounded-xl ' + getJenisBg(n.jenis) + ' ' +
+                       'flex items-center justify-center flex-shrink-0 mt-0.5">' +
+                       '<i class="' + getJenisIcon(n.jenis) + ' text-sm"></i></div>' +
+                       '<div class="flex-1 min-w-0">' +
+                       '<p class="text-sm font-semibold text-slate-800 truncate">' +
+                       escapeHtml(n.tajuk) + '</p>' +
+                       '<p class="text-xs text-slate-500 mt-0.5 line-clamp-2">' +
+                       escapeHtml(n.mesej) + '</p>' +
+                       '<p class="text-[10px] text-slate-400 mt-1">' +
+                       formatTimeAgo(n.dibuat) + '</p></div>' +
+                       (!n.sudahBaca ? '<div class="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0"></div>' : '') +
+                       '</a>';
+                }).join('');
+            }).catch(err => console.error('Notif list error:', err));
+    }
+
+    function tandaBaca(id) {
+        fetch(ctxPath + '/notifikasi/baca', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/x-www-form-urlencoded'},
+            body: 'id=' + id
+        }).then(() => loadNotifCount());
+    }
+
+    function tandaSemuaBaca() {
+        fetch(ctxPath + '/notifikasi/bacaSemua', { method: 'POST' })
+            .then(() => { loadNotifCount(); loadNotifikasi(); });
+    }
+
+    // Helper functions
+    function getJenisIcon(jenis) {
+        var icons = {
+            'ADUAN': 'fas fa-comment-dots', 'BANTUAN': 'fas fa-hand-holding-heart',
+            'TEMPAHAN': 'fas fa-calendar-check', 'HEBAHAN': 'fas fa-bullhorn',
+            'SISTEM': 'fas fa-cog'
+        };
+        return icons[jenis] || 'fas fa-bell';
+    }
+
+    function getJenisBg(jenis) {
+        var bgs = {
+            'ADUAN': 'bg-orange-100 text-orange-600', 'BANTUAN': 'bg-emerald-100 text-emerald-600',
+            'TEMPAHAN': 'bg-blue-100 text-blue-600', 'HEBAHAN': 'bg-purple-100 text-purple-600',
+            'SISTEM': 'bg-slate-100 text-slate-600'
+        };
+        return bgs[jenis] || 'bg-gray-100 text-gray-600';
+    }
+
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/&/g,'&amp;').replace(/</g,'&lt;')
+                  .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+    }
+
+    function formatTimeAgo(dateStr) {
+        var now = new Date();
+        var date = new Date(dateStr);
+        var diff = Math.floor((now - date) / 1000);
+        if (diff < 60) return 'Baru sahaja';
+        if (diff < 3600) return Math.floor(diff/60) + ' minit lalu';
+        if (diff < 86400) return Math.floor(diff/3600) + ' jam lalu';
+        if (diff < 604800) return Math.floor(diff/86400) + ' hari lalu';
+        return date.toLocaleDateString('ms-MY');
+    }
+
+    // Auto-start polling on page load
+    document.addEventListener('DOMContentLoaded', startNotifPolling);
 </script>

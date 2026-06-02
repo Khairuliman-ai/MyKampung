@@ -8,6 +8,7 @@ import dao.PermohonanBantuanDAO;
 import model.Pengguna;
 import model.BantuanLampiran;
 import dao.BantuanLampiranDAO;
+import dao.PenggunaDAO;
 import util.AppConfig;
 
 
@@ -339,6 +340,24 @@ public class BantuanServlet extends HttpServlet {
                 
                 // Save additional attachments
                 if (newId != -1) {
+                    // Trigger Notifikasi ke AJK Biro Kebajikan & Sosial
+                    try {
+                        dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
+                        PenggunaDAO pDao = new PenggunaDAO(null);
+                        List<Integer> ajkIds = pDao.getIdsByJawatan("Biro Kebajikan & Sosial");
+                        model.Notifications notif = new model.Notifications();
+                        notif.setJenis("BANTUAN");
+                        notif.setTajuk("Permohonan Bantuan Baru");
+                        notif.setMesej("Permohonan bantuan baru oleh " + user.getNama_penuh());
+                        notif.setPautan("/bantuan/list");
+                        for (int ajkId : ajkIds) {
+                            notif.setId_pengguna(ajkId);
+                            notifDao.insertNotifications(notif);
+                        }
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+
                     for (String fName : savedFiles) {
                         BantuanLampiran bl = new BantuanLampiran(newId, fName, "PEMOHON");
                         lampiranDao.insert(bl);
@@ -500,6 +519,46 @@ public class BantuanServlet extends HttpServlet {
                 }
 
                 pbDao.updateStatus(idPermohonan, statusBaru, catatanSimpan, null);
+
+                // Trigger Notifikasi selepas review AJK
+                try {
+                    dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
+                    if ("lengkap".equals(keputusan)) {
+                        // 1. Notifikasi ke Ketua Kampung
+                        PenggunaDAO pDao = new PenggunaDAO(null);
+                        List<Integer> ketuaIds = pDao.getIdsByPeranan("Ketua Kampung");
+                        model.Notifications notifKetua = new model.Notifications();
+                        notifKetua.setJenis("BANTUAN");
+                        notifKetua.setTajuk("Permohonan Menunggu Kelulusan");
+                        notifKetua.setMesej("Permohonan bantuan #" + idPermohonan + " telah disemak oleh AJK dan menunggu kelulusan anda.");
+                        notifKetua.setPautan("/bantuan/list");
+                        for (int ketuaId : ketuaIds) {
+                            notifKetua.setId_pengguna(ketuaId);
+                            notifDao.insertNotifications(notifKetua);
+                        }
+
+                        // 2. Notifikasi ke Penduduk (pemohon)
+                        model.Notifications notifPenduduk = new model.Notifications();
+                        notifPenduduk.setId_pengguna(currentPb.getId_pengguna());
+                        notifPenduduk.setJenis("BANTUAN");
+                        notifPenduduk.setTajuk("Permohonan Sedang Diproses");
+                        notifPenduduk.setMesej("Permohonan bantuan anda sedang dihantar ke Ketua Kampung untuk kelulusan.");
+                        notifPenduduk.setPautan("/bantuan/list");
+                        notifDao.insertNotifications(notifPenduduk);
+                    } else {
+                        // Notifikasi ke Penduduk (pemohon) - Dokumen Tidak Lengkap
+                        model.Notifications notifPenduduk = new model.Notifications();
+                        notifPenduduk.setId_pengguna(currentPb.getId_pengguna());
+                        notifPenduduk.setJenis("BANTUAN");
+                        notifPenduduk.setTajuk("Dokumen Tidak Lengkap");
+                        notifPenduduk.setMesej("Permohonan bantuan anda memerlukan tindakan: " + catatanSimpan);
+                        notifPenduduk.setPautan("/bantuan/list");
+                        notifDao.insertNotifications(notifPenduduk);
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
                 response.sendRedirect(request.getContextPath() + "/bantuan/list?msg=reviewed");
             } else if ("/keputusanKetua".equals(action)) {
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
@@ -544,6 +603,26 @@ public class BantuanServlet extends HttpServlet {
                 }
 
                 pbDao.updateStatus(idPermohonan, statusBaru, ulasanAdmin, firstFileName);
+
+                // Trigger Notifikasi selepas keputusan Ketua Kampung
+                try {
+                    dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
+                    model.Notifications notifPenduduk = new model.Notifications();
+                    notifPenduduk.setId_pengguna(currentPb.getId_pengguna());
+                    notifPenduduk.setJenis("BANTUAN");
+                    if ("LULUS".equalsIgnoreCase(keputusan)) {
+                        notifPenduduk.setTajuk("Permohonan Diluluskan! 🎉");
+                        notifPenduduk.setMesej("Tahniah! Permohonan bantuan #" + idPermohonan + " telah diluluskan.");
+                    } else {
+                        notifPenduduk.setTajuk("Permohonan Ditolak");
+                        notifPenduduk.setMesej("Permohonan bantuan #" + idPermohonan + " ditolak: " + ulasanAdmin);
+                    }
+                    notifPenduduk.setPautan("/bantuan/list");
+                    notifDao.insertNotifications(notifPenduduk);
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+
                 response.sendRedirect(request.getContextPath() + "/bantuan/list?msg=decision_made");
             }
             

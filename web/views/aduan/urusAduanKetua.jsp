@@ -279,7 +279,7 @@
                 <h3 class="text-sm font-black uppercase tracking-wider flex items-center gap-2"><i class="fas fa-balance-scale"></i> Keputusan Ketua Kampung</h3>
             </div>
             
-            <form action="<%= request.getContextPath() %>/aduan/updateStatus" method="post" id="statusForm">
+            <form action="<%= request.getContextPath() %>/aduan/updateStatus" method="post" enctype="multipart/form-data" id="statusForm">
                 <input type="hidden" name="id_aduan" id="modal-id">
                 <input type="hidden" name="current_status" id="modal-current">
                 
@@ -294,6 +294,15 @@
                             <!-- Options populated dynamically by JS -->
                         </select>
                     </div>
+                    
+                    <!-- Upload Bukti Selesai (Dynamic Section, mandatory for RESOLVED) -->
+                    <div id="bukti-upload-container" class="hidden space-y-2">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider">Gambar Bukti Penyelesaian (Wajib)</label>
+                        <input type="file" name="bukti_selesai_file" id="bukti-file-input" accept="image/*" 
+                               class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 focus:ring-2 focus:ring-slate-500 focus:bg-white text-xs transition">
+                        <p class="text-[9px] text-slate-400">Sila muat naik foto bukti fizikal bahawa aduan ini telah diselesaikan dengan memuaskan.</p>
+                    </div>
+
                     <div>
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Ulasan Bertulis Ketua</label>
                         <textarea name="catatan" rows="3" required placeholder="Tulis ulasan, arahan atau alasan keputusan anda di sini..." class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 focus:ring-2 focus:ring-slate-500 focus:bg-white text-xs transition"></textarea>
@@ -328,6 +337,11 @@
         document.getElementById('modal-current').value = status;
         document.getElementById('modal-label').innerText = label;
         
+        // Reset file input & hide container by default
+        document.getElementById('bukti-file-input').value = '';
+        document.getElementById('bukti-file-input').required = false;
+        document.getElementById('bukti-upload-container').classList.add('hidden');
+
         const next = document.getElementById('modal-next');
         next.innerHTML = '';
         
@@ -361,8 +375,27 @@
             next.appendChild(el);
         });
         
+        // If the first option is RESOLVED, make sure upload shows up
+        if (possible.length > 0 && possible[0].v === 'RESOLVED') {
+            document.getElementById('bukti-upload-container').classList.remove('hidden');
+            document.getElementById('bukti-file-input').required = true;
+        }
+
         document.getElementById('modalStatus').classList.remove('hidden');
     }
+
+    // Dynamic show/hide upload box when next_status changes
+    document.getElementById('modal-next').addEventListener('change', function() {
+        const container = document.getElementById('bukti-upload-container');
+        const fileInput = document.getElementById('bukti-file-input');
+        if (this.value === 'RESOLVED') {
+            container.classList.remove('hidden');
+            fileInput.required = true;
+        } else {
+            container.classList.add('hidden');
+            fileInput.required = false;
+        }
+    });
 
     // Loading overlay on form submit
     document.getElementById("statusForm").addEventListener("submit", function() {
