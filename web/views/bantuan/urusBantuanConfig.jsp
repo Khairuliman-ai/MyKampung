@@ -74,6 +74,7 @@
 
         <!-- Configuration Card Form -->
         <form id="configForm" action="<%= request.getContextPath() %>/bantuan/config/save" method="post" class="space-y-6">
+            <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
             
             <!-- SECTION 1: Poverty Line Threshold -->
             <div class="bg-white rounded-3xl p-6 md:p-8 shadow-sm border border-gray-100 transition-all hover:shadow-md relative overflow-hidden">

@@ -1,27 +1,28 @@
 package util;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
+import javax.naming.Context;
+import javax.naming.InitialContext;
+import javax.sql.DataSource;
 
 public class DBUtil {
 
-    // DB untuk CURSOR_
-    // private static final String URL = "jdbc:mysql://localhost:3306/s71383_mykampung";
-    // private static final String USER = "s71383";
-    // private static final String PASS = "dPtVvs0JQZYi";
+    private static DataSource dataSource;
 
-    // DB untuk local
-    private static final String URL = "jdbc:mysql://localhost:3306/mykampung_v2_db?useSSL=false";
-    private static final String USER = "root";
-    private static final String PASS = "";
+    static {
+        try {
+            Context initCtx = new InitialContext();
+            Context envCtx = (Context) initCtx.lookup("java:comp/env");
+            dataSource = (DataSource) envCtx.lookup("jdbc/mykampung");
+        } catch (Exception e) {
+            System.err.println("DBUtil JNDI Initialization Error:");
+            e.printStackTrace();
+            throw new RuntimeException("Failed to initialize DataSource", e);
+        }
+    }
 
     public static Connection getConnection() throws SQLException {
-        try {
-            Class.forName("com.mysql.cj.jdbc.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-        return DriverManager.getConnection(URL, USER, PASS);
+        return dataSource.getConnection();
     }
 }

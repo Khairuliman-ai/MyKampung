@@ -253,6 +253,7 @@
                 <button class="text-white hover:text-gray-200" onclick="closeModal('modalHebahan')"><i class="fas fa-times"></i></button>
             </div>
             <form id="formHebahan" action="<%= request.getContextPath() %>/hebahan/create" method="post" enctype="multipart/form-data" onsubmit="return validateHebahanForm()">
+                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="id_hebahan" id="id_hebahan">
                 <div class="bg-white px-8 py-6 space-y-4 max-h-[70vh] overflow-y-auto">
                     <div>
@@ -400,6 +401,7 @@
                 <p class="text-sm text-gray-500">Tindakan ini tidak boleh diundur.</p>
             </div>
             <form action="<%= request.getContextPath() %>/hebahan/delete" method="post" class="bg-gray-50 px-6 py-4 flex flex-row-reverse gap-2">
+                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="id_hebahan" id="delete_id">
                 <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-sm">Ya, Padam</button>
                 <button type="button" onclick="closeModal('modalDelete')" class="bg-white text-gray-500 px-4 py-2 rounded-xl font-bold text-sm border">Batal</button>

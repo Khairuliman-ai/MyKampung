@@ -22,6 +22,7 @@
 
         <%-- 2. Borang Utama --%>
       <form action="${pageContext.request.contextPath}/ForgotPassServlet" method="POST">
+          <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
             <h3>Set Semula Kata Laluan</h3>
             <p>Masukkan emel akaun anda untuk menerima pautan set semula.</p>
             

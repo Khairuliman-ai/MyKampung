@@ -380,6 +380,7 @@
             </header>
 
             <form action="<%= contextPath %>/fasiliti/tempah" method="post" class="space-y-6" id="formTempah">
+                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="id_fasiliti" id="modalIdFasiliti">
                 
                 <div class="space-y-2">

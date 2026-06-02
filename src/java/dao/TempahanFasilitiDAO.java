@@ -276,4 +276,21 @@ public class TempahanFasilitiDAO {
         }
         return stats;
     }
+
+    public int countByStatus(String status) {
+        String sql = "SELECT COUNT(*) FROM tempahan_fasiliti WHERE status = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, status);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }
+

@@ -103,17 +103,15 @@ public class RegisterServlet extends HttpServlet {
              * 5. SAVE TO DATABASE
              * =========================
              */
-            try (Connection conn = DBUtil.getConnection()) {
-                PenggunaDAO pDao = new PenggunaDAO(conn);
-                boolean isSuccess = pDao.daftarPengguna(p);
+            PenggunaDAO pDao = new PenggunaDAO();
+            boolean isSuccess = pDao.daftarPengguna(p);
 
-                if (isSuccess) {
-                    String msg = "Pendaftaran berjaya dihantar. Sila tunggu pengesahan daripada Ketua Kampung.";
-                    response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp?success=" + java.net.URLEncoder.encode(msg, "UTF-8"));
-                } else {
-                    request.setAttribute("errorMessage", "Pendaftaran gagal. Nombor KP mungkin sudah berdaftar.");
-                    request.getRequestDispatcher("/views/auth/auth.jsp").forward(request, response);
-                }
+            if (isSuccess) {
+                String msg = "Pendaftaran berjaya dihantar. Sila tunggu pengesahan daripada Ketua Kampung.";
+                response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp?success=" + java.net.URLEncoder.encode(msg, "UTF-8"));
+            } else {
+                request.setAttribute("errorMessage", "Pendaftaran gagal. Nombor KP mungkin sudah berdaftar.");
+                request.getRequestDispatcher("/views/auth/auth.jsp").forward(request, response);
             }
 
         } catch (Exception e) {

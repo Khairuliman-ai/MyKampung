@@ -24,8 +24,8 @@
     Integer pendingTempahanCount = (Integer) request.getAttribute("pendingTempahanCount");
     if (pendingTempahanCount == null) pendingTempahanCount = 0;
     
-    Long pendingAduanCount = (Long) request.getAttribute("pendingAduanCount");
-    if (pendingAduanCount == null) pendingAduanCount = 0L;
+    Integer pendingAduanCount = (Integer) request.getAttribute("pendingAduanCount");
+    if (pendingAduanCount == null) pendingAduanCount = 0;
     
     Integer totalPenduduk = (Integer) request.getAttribute("totalPenduduk");
     if (totalPenduduk == null) totalPenduduk = 0;

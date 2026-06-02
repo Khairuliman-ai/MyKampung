@@ -81,12 +81,7 @@ public class DashboardServlet extends HttpServlet {
             request.setAttribute("pendingTempahanCount", pendingTempahanList.size());
 
             // 3. Active aduan count
-            List<Aduan> allAduan = aduanDao.getAll();
-            long pendingAduanCount = allAduan.stream()
-                .filter(a -> !"RESOLVED".equalsIgnoreCase(a.getStatus()) 
-                          && !"REJECTED".equalsIgnoreCase(a.getStatus())
-                          && !"CLOSED".equalsIgnoreCase(a.getStatus()))
-                .count();
+            int pendingAduanCount = aduanDao.countActiveAduan();
             request.setAttribute("pendingAduanCount", pendingAduanCount);
 
             // 4. Latest published announcements
@@ -95,8 +90,8 @@ public class DashboardServlet extends HttpServlet {
             request.setAttribute("latestHebahan", latestHebahan);
 
             // 5. Total residents and AJK list
-            try (Connection conn = DBUtil.getConnection()) {
-                PenggunaDAO pDao = new PenggunaDAO(conn);
+            try {
+                PenggunaDAO pDao = new PenggunaDAO();
                 List<Pengguna> activePenduduk = pDao.getAllActivePenduduk();
                 request.setAttribute("totalPenduduk", activePenduduk.size());
                 
@@ -118,8 +113,8 @@ public class DashboardServlet extends HttpServlet {
                 HebahanDAO hebahanDao = new HebahanDAO();
 
                 // 1. Pending residents awaiting registration approval
-                try (Connection conn = DBUtil.getConnection()) {
-                    PenggunaDAO pDao = new PenggunaDAO(conn);
+                try {
+                    PenggunaDAO pDao = new PenggunaDAO();
                     List<Pengguna> pendingPendudukList = pDao.getPendingPenduduk();
                     request.setAttribute("pendingPendudukList", pendingPendudukList);
                     request.setAttribute("pendingPendudukCount", pendingPendudukList.size());
@@ -134,12 +129,7 @@ public class DashboardServlet extends HttpServlet {
                 }
 
                 // 2. Active aduan count
-                List<Aduan> allAduan = aduanDao.getAll();
-                long activeAduanCount = allAduan.stream()
-                    .filter(a -> !"RESOLVED".equalsIgnoreCase(a.getStatus()) 
-                              && !"REJECTED".equalsIgnoreCase(a.getStatus())
-                              && !"CLOSED".equalsIgnoreCase(a.getStatus()))
-                    .count();
+                int activeAduanCount = aduanDao.countActiveAduan();
                 request.setAttribute("activeAduanCount", activeAduanCount);
 
                 // 3. Latest published announcements
@@ -165,8 +155,8 @@ public class DashboardServlet extends HttpServlet {
                 request.setAttribute("approvedBantuanCount", approvedCount);
 
                 // 3. AJK List for sidebar
-                try (Connection conn = DBUtil.getConnection()) {
-                    PenggunaDAO pDao = new PenggunaDAO(conn);
+                try {
+                    PenggunaDAO pDao = new PenggunaDAO();
                     List<Pengguna> ajkList = pDao.getAllAJK();
                     request.setAttribute("ajkList", ajkList);
                 } catch (Exception e) {
@@ -191,8 +181,8 @@ public class DashboardServlet extends HttpServlet {
                 request.setAttribute("approvedTempahanCount", approvedCount);
 
                 // 3. AJK List
-                try (Connection conn = DBUtil.getConnection()) {
-                    PenggunaDAO pDao = new PenggunaDAO(conn);
+                try {
+                    PenggunaDAO pDao = new PenggunaDAO();
                     List<Pengguna> ajkList = pDao.getAllAJK();
                     request.setAttribute("ajkList", ajkList);
                 } catch (Exception e) {
@@ -222,8 +212,8 @@ public class DashboardServlet extends HttpServlet {
                 request.setAttribute("resolvedAduanCount", resolvedCount);
 
                 // 3. AJK List
-                try (Connection conn = DBUtil.getConnection()) {
-                    PenggunaDAO pDao = new PenggunaDAO(conn);
+                try {
+                    PenggunaDAO pDao = new PenggunaDAO();
                     List<Pengguna> ajkList = pDao.getAllAJK();
                     request.setAttribute("ajkList", ajkList);
                 } catch (Exception e) {
@@ -244,8 +234,8 @@ public class DashboardServlet extends HttpServlet {
                 request.setAttribute("publishedCount", publishedCount);
 
                 // 3. AJK List
-                try (Connection conn = DBUtil.getConnection()) {
-                    PenggunaDAO pDao = new PenggunaDAO(conn);
+                try {
+                    PenggunaDAO pDao = new PenggunaDAO();
                     List<Pengguna> ajkList = pDao.getAllAJK();
                     request.setAttribute("ajkList", ajkList);
                 } catch (Exception e) {
@@ -294,8 +284,8 @@ public class DashboardServlet extends HttpServlet {
             request.setAttribute("userTempahan", userTempahan);
 
             // 5. AJK List for sidebar
-            try (Connection conn = DBUtil.getConnection()) {
-                PenggunaDAO pDao = new PenggunaDAO(conn);
+            try {
+                PenggunaDAO pDao = new PenggunaDAO();
                 List<Pengguna> ajkList = pDao.getAllAJK();
                 request.setAttribute("ajkList", ajkList);
             } catch (Exception e) {

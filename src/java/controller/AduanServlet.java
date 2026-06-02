@@ -24,6 +24,7 @@ import model.StatusAduan;
 import util.AppConfig;
 import util.FileUploadUtil;
 import util.DBUtil;
+import util.InputSanitizer;
 
 @MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 5 * 1024 * 1024, maxRequestSize = 10 * 1024 * 1024)
 public class AduanServlet extends HttpServlet {
@@ -192,8 +193,8 @@ public class AduanServlet extends HttpServlet {
                 aduan.setId_pengguna(user.getId_pengguna());
                 aduan.setId_kategori_aduan(idKategori);
                 // Sanitasi input tajuk & keterangan ringkas bagi mencegah XSS
-                aduan.setTajuk(sanitize(tajuk));
-                aduan.setKeterangan(sanitize(keterangan));
+                aduan.setTajuk(InputSanitizer.sanitize(tajuk));
+                aduan.setKeterangan(InputSanitizer.sanitize(keterangan));
                 aduan.setKeutamaan(keutamaan);
                 aduan.setGambar_aduan(fileName);
 
@@ -203,22 +204,8 @@ public class AduanServlet extends HttpServlet {
 
                 if (aduanDAO.insertAduan(aduan)) {
                     // Trigger Notifikasi ke AJK Biro Keselamatan
-                    try {
-                        dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
-                        PenggunaDAO pDao = new PenggunaDAO(null);
-                        List<Integer> ajkIds = pDao.getIdsByJawatan("Biro Keselamatan");
-                        model.Notifications notif = new model.Notifications();
-                        notif.setJenis("ADUAN");
-                        notif.setTajuk("Aduan Baru Diterima");
-                        notif.setMesej("Aduan '" + aduan.getTajuk() + "' telah dihantar oleh " + user.getNama_penuh());
-                        notif.setPautan("/aduan/list");
-                        for (int id : ajkIds) {
-                            notif.setId_pengguna(id);
-                            notifDao.insertNotifications(notif);
-                        }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
+                    service.NotificationService.notifyByJawatan("Biro Keselamatan", "ADUAN", "Aduan Baru Diterima",
+                        "Aduan '" + aduan.getTajuk() + "' telah dihantar oleh " + user.getNama_penuh(), "/aduan/list");
                     response.sendRedirect(request.getContextPath() + "/aduan/list?status=success");
                 } else {
                     response.sendRedirect(request.getContextPath() + "/aduan/list?status=error");
@@ -297,40 +284,19 @@ public class AduanServlet extends HttpServlet {
                 }
 
                 // Sanitasi catatan
-                String sanitisedCatatan = sanitize(catatan);
+                String sanitisedCatatan = InputSanitizer.sanitize(catatan);
                 String logCatatan = (sanitisedCatatan != null && !sanitisedCatatan.trim().isEmpty()) ? sanitisedCatatan : "Status dikemaskini oleh " + role;
 
                 // Kemaskini status dan log secara atomik (transaksi pangkalan data)
                 if (aduanDAO.updateStatusWithLog(idAduan, nextStatus, catatanField, sanitisedCatatan, user.getId_pengguna(), logCatatan)) {
                     // Trigger Notifikasi
-                    try {
-                        dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
-                        
-                        // 1. Notifikasi kepada Pengadu (Penduduk)
-                        model.Notifications notifPengadu = new model.Notifications();
-                        notifPengadu.setId_pengguna(aduan.getId_pengguna());
-                        notifPengadu.setJenis("ADUAN");
-                        notifPengadu.setTajuk("Status Aduan Dikemaskini");
-                        notifPengadu.setMesej("Aduan '" + aduan.getTajuk() + "' -> " + nextStatus);
-                        notifPengadu.setPautan("/aduan/list");
-                        notifDao.insertNotifications(notifPengadu);
+                    service.NotificationService.notifyUser(aduan.getId_pengguna(), "ADUAN", "Status Aduan Dikemaskini",
+                        "Aduan '" + aduan.getTajuk() + "' -> " + nextStatus, "/aduan/list");
 
-                        // 2. Jika di-escalate ke Ketua Kampung, hantar notifikasi ke Ketua Kampung
-                        if ("ESCALATED_TO_KETUA".equals(nextStatus) || "UNDER_REVIEW_KETUA".equals(nextStatus)) {
-                            PenggunaDAO pDao = new PenggunaDAO(null);
-                            List<Integer> ketuaIds = pDao.getIdsByPeranan("Ketua Kampung");
-                            model.Notifications notifKetua = new model.Notifications();
-                            notifKetua.setJenis("ADUAN");
-                            notifKetua.setTajuk("Aduan Telah Diserahkan");
-                            notifKetua.setMesej("Aduan '" + aduan.getTajuk() + "' memerlukan tindakan Ketua Kampung");
-                            notifKetua.setPautan("/aduan/list");
-                            for (int ketuaId : ketuaIds) {
-                                notifKetua.setId_pengguna(ketuaId);
-                                notifDao.insertNotifications(notifKetua);
-                            }
-                        }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
+                    // Jika di-escalate ke Ketua Kampung, hantar notifikasi ke Ketua Kampung
+                    if ("ESCALATED_TO_KETUA".equals(nextStatus) || "UNDER_REVIEW_KETUA".equals(nextStatus)) {
+                        service.NotificationService.notifyByPeranan("Ketua Kampung", "ADUAN", "Aduan Telah Diserahkan",
+                            "Aduan '" + aduan.getTajuk() + "' memerlukan tindakan Ketua Kampung", "/aduan/list");
                     }
                     response.sendRedirect(request.getContextPath() + "/aduan/list?msg=updated");
                 } else {
@@ -372,28 +338,14 @@ public class AduanServlet extends HttpServlet {
                     return;
                 }
 
-                String sanitisedCatatan = sanitize(catatan);
+                String sanitisedCatatan = InputSanitizer.sanitize(catatan);
                 String logCatatan = "Aduan dibuka semula oleh Pengadu. Sebab: " + (sanitisedCatatan != null && !sanitisedCatatan.trim().isEmpty() ? sanitisedCatatan : "Tiada catatan.");
 
                 // Jalankan proses reopen secara atomik
                 if (aduanDAO.reopenAduan(idAduan, user.getId_pengguna(), logCatatan)) {
                     // Trigger Notifikasi ke AJK Biro Keselamatan
-                    try {
-                        dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
-                        PenggunaDAO pDao = new PenggunaDAO(null);
-                        List<Integer> ajkIds = pDao.getIdsByJawatan("Biro Keselamatan");
-                        model.Notifications notif = new model.Notifications();
-                        notif.setJenis("ADUAN");
-                        notif.setTajuk("Aduan Dibuka Semula");
-                        notif.setMesej("Aduan '" + aduan.getTajuk() + "' telah dibuka semula oleh " + user.getNama_penuh());
-                        notif.setPautan("/aduan/list");
-                        for (int id : ajkIds) {
-                            notif.setId_pengguna(id);
-                            notifDao.insertNotifications(notif);
-                        }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
+                    service.NotificationService.notifyByJawatan("Biro Keselamatan", "ADUAN", "Aduan Dibuka Semula",
+                        "Aduan '" + aduan.getTajuk() + "' telah dibuka semula oleh " + user.getNama_penuh(), "/aduan/list");
                     response.sendRedirect(request.getContextPath() + "/aduan/list?msg=reopened");
                 } else {
                     response.sendRedirect(request.getContextPath() + "/aduan/list?error=db");
@@ -407,13 +359,4 @@ public class AduanServlet extends HttpServlet {
         }
     }
 
-    private String sanitize(String input) {
-        if (input == null) return "";
-        return input.replace("&", "&amp;")
-                    .replace("<", "&lt;")
-                    .replace(">", "&gt;")
-                    .replace("\"", "&quot;")
-                    .replace("'", "&#x27;")
-                    .replace("/", "&#x2F;");
-    }
 }

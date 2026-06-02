@@ -34,7 +34,7 @@ public class LoginServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        try (Connection conn = DBUtil.getConnection()) {
+        try {
 
             /*
              * =========================
@@ -54,7 +54,7 @@ public class LoginServlet extends HttpServlet {
              * =========================
              */
 
-            PenggunaDAO dao = new PenggunaDAO(conn);
+            PenggunaDAO dao = new PenggunaDAO();
             Pengguna user = dao.findByKP(noKpClean);
 
             // Validate user existence and password hash
@@ -90,7 +90,7 @@ public class LoginServlet extends HttpServlet {
             // Redirect authenticated user to dashboard
             response.sendRedirect("DashboardServlet");
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
 
             /*
              * =========================

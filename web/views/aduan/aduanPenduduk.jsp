@@ -331,6 +331,7 @@
                 <button class="text-white/60 hover:text-white" onclick="closeModal('modalAduanBaru')"><i class="fas fa-times"></i></button>
             </div>
             <form action="<%= request.getContextPath() %>/aduan/submit" method="post" enctype="multipart/form-data" id="aduanForm">
+                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <div class="bg-white px-6 py-6 space-y-5 max-h-[70vh] overflow-y-auto custom-scrollbar">
                     
                     <!-- Tajuk -->

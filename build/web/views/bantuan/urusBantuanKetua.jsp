@@ -1039,6 +1039,7 @@
                                                 class="relative w-full max-w-md bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-white/20">
                                                 <form action="<%= request.getContextPath() %>/bantuan/keputusanKetua"
                                                     method="post" enctype="multipart/form-data">
+                                                    <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                                                     <input type="hidden" name="idPermohonan" id="actId">
                                                     <input type="hidden" name="keputusan" id="actDecision">
 

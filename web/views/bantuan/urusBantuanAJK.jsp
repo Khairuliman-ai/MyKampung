@@ -408,6 +408,7 @@
                                     <i class="fas fa-edit text-xs"></i>
                                 </button>
                                 <form action="<%= request.getContextPath() %>/bantuan/padamJenisBantuan" method="post" class="inline" onsubmit="return confirm('Padam jenis bantuan ini?')">
+                                    <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                                     <input type="hidden" name="id" value="<%= b.getId_bantuan() %>">
                                     <button type="submit" class="w-9 h-9 flex items-center justify-center rounded-xl text-red-600 hover:bg-red-50/80 border border-transparent hover:border-red-100 shadow-sm transition-all" title="Padam">
                                         <i class="fas fa-trash text-xs"></i>
@@ -748,6 +749,7 @@
                 <button onclick="closeModal('modalTambahBantuan')"><i class="fas fa-times"></i></button>
             </div>
             <form action="<%= request.getContextPath() %>/bantuan/tambahJenisBantuan" method="post" class="p-6 space-y-4">
+                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nama Bantuan</label>
                     <input type="text" name="namaBantuan" required class="w-full px-4 py-2 bg-gray-50 border rounded-xl focus:ring-2 focus:ring-brand-purple outline-none transition">
@@ -787,6 +789,7 @@
                 <button onclick="closeModal('modalEditBantuan')"><i class="fas fa-times"></i></button>
             </div>
             <form action="<%= request.getContextPath() %>/bantuan/kemaskiniJenisBantuan" method="post" class="p-6 space-y-4">
+                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="idBantuan" id="editId">
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nama Bantuan</label>
@@ -826,6 +829,7 @@
                 <button onclick="closeModal('modalTindakan')"><i class="fas fa-times"></i></button>
             </div>
             <form action="<%= request.getContextPath() %>/bantuan/reviewAJK" method="post" class="p-6">
+                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="idPermohonan" id="actId">
                 <input type="hidden" name="keputusan" id="actDecision">
                 <div id="boxLengkap" class="hidden text-center py-4">

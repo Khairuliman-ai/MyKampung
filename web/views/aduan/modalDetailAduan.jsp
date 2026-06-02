@@ -133,6 +133,7 @@
                 <button class="text-white/60 hover:text-white" onclick="closeModal('modalAduanReopen')"><i class="fas fa-times"></i></button>
             </div>
             <form action="<%= request.getContextPath() %>/aduan/reopen" method="post">
+                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="id_aduan" id="reopen-id-aduan">
                 <div class="bg-white px-6 py-6 space-y-4">
                     <p class="text-xs text-slate-500 leading-relaxed">Sila jelaskan sebab anda ingin membuka semula aduan ini. Pihak Biro Keselamatan akan meneliti semula laporan anda.</p>

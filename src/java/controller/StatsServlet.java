@@ -27,8 +27,8 @@ public class StatsServlet extends HttpServlet {
         response.setContentType("application/json");
         PrintWriter out = response.getWriter();
         
-        try (Connection conn = DBUtil.getConnection()) {
-            PenggunaDAO pDao = new PenggunaDAO(conn);
+        try {
+            PenggunaDAO pDao = new PenggunaDAO();
             TempahanFasilitiDAO tDao = new TempahanFasilitiDAO();
             PermohonanBantuanDAO bDao = new PermohonanBantuanDAO();
             
@@ -43,7 +43,7 @@ public class StatsServlet extends HttpServlet {
             out.print("\"totalBantuan\":" + totalBantuan);
             out.print("}");
             
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             response.setStatus(500);
             out.print("{\"error\":\"Database error\"}");

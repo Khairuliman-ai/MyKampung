@@ -22,6 +22,7 @@
 
         <%-- Borang Semakan OTP --%>
         <form action="${pageContext.request.contextPath}/UpdatePasswordServlet" method="POST">
+            <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
             <h3>Sahkan Kod OTP</h3>
             <p>Sila masukkan kod OTP yang dihantar ke emel anda beserta kata laluan baru.</p>
             

@@ -266,6 +266,7 @@
     <!-- ===== LOGIN ===== -->
 <div class="form-container sign-in-container">
     <form action="${pageContext.request.contextPath}/LoginServlet" method="post">
+        <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
 
         <div class="brand-logo mb-3 text-center">
             <i class="bi bi-houses-fill" style="font-size: 2rem; color: #0D9488;"></i>
@@ -332,6 +333,7 @@
             <!-- ===== Register ===== -->
 <div class="form-container sign-up-container">
     <form action="${pageContext.request.contextPath}/RegisterServlet" method="post" enctype="multipart/form-data" class="py-3 px-4">
+        <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
 
         <h4 class="fw-bold text-center mb-1">Daftar Penduduk</h4>
         <p class="text-muted text-center small mb-4">Sila isi butiran dengan lengkap untuk pengesahan AJK</p>

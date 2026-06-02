@@ -114,12 +114,14 @@
                             <td class="p-5">
                                 <div class="flex items-center justify-center gap-2">
                                     <form action="<%= request.getContextPath() %>/penduduk/approve" method="post" class="m-0" onsubmit="return confirmAction(event, 'Sahkan Kelulusan?', 'Adakah anda pasti mahu meluluskan pendaftaran penduduk ini?', 'Ya, Luluskan!', '#10B981')">
+                                        <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                                         <input type="hidden" name="idPengguna" value="<%= p.getId_pengguna() %>">
                                         <button type="submit" class="px-4 py-2 bg-green-50 text-green-600 hover:bg-green-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-tight transition-all">
                                             Lulus
                                         </button>
                                     </form>
                                     <form action="<%= request.getContextPath() %>/penduduk/reject" method="post" class="m-0" onsubmit="return confirmAction(event, 'Tolak Pendaftaran?', 'Tindakan ini tidak boleh diubah. Adakah anda pasti?', 'Ya, Tolak', '#EF4444')">
+                                        <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                                         <input type="hidden" name="idPengguna" value="<%= p.getId_pengguna() %>">
                                         <button type="submit" class="px-4 py-2 bg-red-50 text-red-600 hover:bg-red-600 hover:text-white rounded-xl text-[10px] font-black uppercase tracking-tight transition-all">
                                             Tolak
@@ -517,6 +519,7 @@
     <div class="flex min-h-full items-center justify-center p-4">
         <div class="relative transform overflow-hidden rounded-[2.5rem] bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-3xl border border-white/20 flex flex-col max-h-[90vh]">
             <form action="<%= request.getContextPath() %>/penduduk/update" method="post" class="flex flex-col h-full" onsubmit="return confirmAction(event, 'Simpan Perubahan?', 'Adakah anda mahu menyimpan maklumat profil yang dikemaskini?', 'Ya, Simpan', '<%= primaryColor %>')">
+                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="idPengguna" id="editId">
                 
                 <!-- Header Modal -->

@@ -83,6 +83,16 @@ public class BantuanConfigServlet extends HttpServlet {
             boolean success = eligibilityService.updateRuleWeights(weights);
 
             if (success) {
+                // Recalculate all pending applications with new rules
+                dao.PermohonanBantuanDAO pbDao = new dao.PermohonanBantuanDAO();
+                java.util.List<model.PermohonanBantuan> pendingList = pbDao.getByStatus("BARU");
+                if (pendingList != null) {
+                    for (model.PermohonanBantuan pb : pendingList) {
+                        eligibilityService.calculateEligibilityScore(pb);
+                        pbDao.updateEligibilityData(pb.getId_permohonan(), pb.getEligibilityScore(),
+                            pb.getEligibilityTier(), pb.getEligibilityFlags());
+                    }
+                }
                 response.sendRedirect(request.getContextPath() + "/bantuan/config?status=success");
             } else {
                 response.sendRedirect(request.getContextPath() + "/bantuan/config?error=db");

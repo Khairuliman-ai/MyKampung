@@ -30,7 +30,7 @@ public class UrusPendudukServlet extends HttpServlet {
         String action = request.getServletPath();
 
         try (Connection conn = DBUtil.getConnection()) {
-            penggunaDAO = new PenggunaDAO(conn);
+            penggunaDAO = new PenggunaDAO();
             dao.JawatanDAO jawatanDAO = new dao.JawatanDAO();
             dao.AhliKeluargaDAO ahliKeluargaDAO = new dao.AhliKeluargaDAO(conn);
 
@@ -91,7 +91,7 @@ public class UrusPendudukServlet extends HttpServlet {
         request.setCharacterEncoding("UTF-8");
 
         try (Connection conn = DBUtil.getConnection()) {
-            penggunaDAO = new PenggunaDAO(conn);
+            penggunaDAO = new PenggunaDAO();
             dao.JawatanDAO jawatanDAO = new dao.JawatanDAO();
 
             // 1. LOGIC LANTIK AJK

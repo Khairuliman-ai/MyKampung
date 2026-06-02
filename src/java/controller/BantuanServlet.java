@@ -10,6 +10,7 @@ import model.BantuanLampiran;
 import dao.BantuanLampiranDAO;
 import dao.PenggunaDAO;
 import util.AppConfig;
+import util.InputSanitizer;
 
 
 import java.util.Collection;
@@ -83,20 +84,7 @@ public class BantuanServlet extends HttpServlet {
                     List<PermohonanBantuan> listBaru = pbDao.getByStatus("BARU");
                     List<PermohonanBantuan> listSejarah = pbDao.getSejarahPaginated(offset, pageSize);
 
-                    // Recalculate and persist scores dynamically to reflect latest rules & profile updates
-                    service.EligibilityService eligibilityService = new service.EligibilityService();
-                    if (listBaru != null) {
-                        for (PermohonanBantuan pb : listBaru) {
-                            eligibilityService.calculateEligibilityScore(pb);
-                            pbDao.updateEligibilityData(pb.getId_permohonan(), pb.getEligibilityScore(), pb.getEligibilityTier(), pb.getEligibilityFlags());
-                        }
-                    }
-                    if (listSejarah != null) {
-                        for (PermohonanBantuan pb : listSejarah) {
-                            eligibilityService.calculateEligibilityScore(pb);
-                            pbDao.updateEligibilityData(pb.getId_permohonan(), pb.getEligibilityScore(), pb.getEligibilityTier(), pb.getEligibilityFlags());
-                        }
-                    }
+                    // Caching implemented: eligibility recalculated only on rules or profile change
 
                     int totalSejarahCount = pbDao.getSejarahCount();
                     int totalPagesSejarah = (int) Math.ceil((double) totalSejarahCount / pageSize);
@@ -115,14 +103,7 @@ public class BantuanServlet extends HttpServlet {
 
                 } else if ("Ketua Kampung".equalsIgnoreCase(user.getNama_peranan())) {
                     list = pbDao.getAll();
-                    // Recalculate and persist scores dynamically for Ketua Kampung as well
-                    service.EligibilityService eligibilityService = new service.EligibilityService();
-                    if (list != null) {
-                        for (PermohonanBantuan pb : list) {
-                            eligibilityService.calculateEligibilityScore(pb);
-                            pbDao.updateEligibilityData(pb.getId_permohonan(), pb.getEligibilityScore(), pb.getEligibilityTier(), pb.getEligibilityFlags());
-                        }
-                    }
+                    // Caching implemented: eligibility recalculated only on rules or profile change
                     request.setAttribute("permohonanList", list);
                     request.getRequestDispatcher("/views/bantuan/urusBantuanKetua.jsp").forward(request, response);
                 } else {
@@ -287,8 +268,8 @@ public class BantuanServlet extends HttpServlet {
                 }
 
                 String jenisBantuan = request.getParameter("jenisBantuan");
-                String jenisBantuanLain = request.getParameter("jenisBantuanLain"); 
-                String keterangan = request.getParameter("keterangan"); 
+                String jenisBantuanLain = InputSanitizer.sanitize(request.getParameter("jenisBantuanLain")); 
+                String keterangan = InputSanitizer.sanitize(request.getParameter("keterangan")); 
                 
                 String namaBank = request.getParameter("namaBank");
                 String nomorAkaun = request.getParameter("nomorAkaun");
@@ -320,8 +301,8 @@ public class BantuanServlet extends HttpServlet {
                 }
 
                 // Fetch fresh socioeconomic data of current user for eligibility scoring
-                try (java.sql.Connection conn = util.DBUtil.getConnection()) {
-                    dao.PenggunaDAO uDao = new dao.PenggunaDAO(conn);
+                try {
+                    dao.PenggunaDAO uDao = new dao.PenggunaDAO();
                     Pengguna freshUser = uDao.getPenggunaById(user.getId_pengguna());
                     if (freshUser != null) {
                         pb.setPendapatan(freshUser.getPendapatan() != null ? freshUser.getPendapatan().doubleValue() : null);
@@ -341,22 +322,8 @@ public class BantuanServlet extends HttpServlet {
                 // Save additional attachments
                 if (newId != -1) {
                     // Trigger Notifikasi ke AJK Biro Kebajikan & Sosial
-                    try {
-                        dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
-                        PenggunaDAO pDao = new PenggunaDAO(null);
-                        List<Integer> ajkIds = pDao.getIdsByJawatan("Biro Kebajikan & Sosial");
-                        model.Notifications notif = new model.Notifications();
-                        notif.setJenis("BANTUAN");
-                        notif.setTajuk("Permohonan Bantuan Baru");
-                        notif.setMesej("Permohonan bantuan baru oleh " + user.getNama_penuh());
-                        notif.setPautan("/bantuan/list");
-                        for (int ajkId : ajkIds) {
-                            notif.setId_pengguna(ajkId);
-                            notifDao.insertNotifications(notif);
-                        }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
+                    service.NotificationService.notifyByJawatan("Biro Kebajikan & Sosial", "BANTUAN", "Permohonan Bantuan Baru",
+                        "Permohonan bantuan baru oleh " + user.getNama_penuh(), "/bantuan/list");
 
                     for (String fName : savedFiles) {
                         BantuanLampiran bl = new BantuanLampiran(newId, fName, "PEMOHON");
@@ -394,7 +361,7 @@ public class BantuanServlet extends HttpServlet {
             } // ===================== 3. UPDATE INFO (KETUA) =====================
             else if ("/update".equals(action)) {
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
-                String catatan = request.getParameter("catatan");
+                String catatan = InputSanitizer.sanitize(request.getParameter("catatan"));
 
                 Part filePart = request.getPart("dokumenBalik");
                 String fileName = null;
@@ -438,8 +405,8 @@ public class BantuanServlet extends HttpServlet {
                 }
 
                 String jenisBantuan = request.getParameter("jenisBantuan");
-                String jenisBantuanLain = request.getParameter("jenisBantuanLain");
-                String keterangan = request.getParameter("keterangan");
+                String jenisBantuanLain = InputSanitizer.sanitize(request.getParameter("jenisBantuanLain"));
+                String keterangan = InputSanitizer.sanitize(request.getParameter("keterangan"));
                 String namaBank = request.getParameter("namaBank");
                 String nomorAkaun = request.getParameter("nomorAkaun");
 
@@ -463,8 +430,8 @@ public class BantuanServlet extends HttpServlet {
                 }
 
                 // Fetch fresh socioeconomic data for recalculation on edit
-                try (java.sql.Connection conn = util.DBUtil.getConnection()) {
-                    dao.PenggunaDAO uDao = new dao.PenggunaDAO(conn);
+                try {
+                    dao.PenggunaDAO uDao = new dao.PenggunaDAO();
                     Pengguna freshUser = uDao.getPenggunaById(user.getId_pengguna());
                     if (freshUser != null) {
                         pb.setPendapatan(freshUser.getPendapatan() != null ? freshUser.getPendapatan().doubleValue() : null);
@@ -496,7 +463,7 @@ public class BantuanServlet extends HttpServlet {
             else if ("/reviewAJK".equals(action)) {
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 String keputusan = request.getParameter("keputusan"); 
-                String ulasanAJK = request.getParameter("ulasan");   
+                String ulasanAJK = InputSanitizer.sanitize(request.getParameter("ulasan"));   
 
                 // State Validation: Enforce that status must be "BARU"
                 PermohonanBantuan currentPb = pbDao.getById(idPermohonan);
@@ -521,49 +488,25 @@ public class BantuanServlet extends HttpServlet {
                 pbDao.updateStatus(idPermohonan, statusBaru, catatanSimpan, null);
 
                 // Trigger Notifikasi selepas review AJK
-                try {
-                    dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
-                    if ("lengkap".equals(keputusan)) {
-                        // 1. Notifikasi ke Ketua Kampung
-                        PenggunaDAO pDao = new PenggunaDAO(null);
-                        List<Integer> ketuaIds = pDao.getIdsByPeranan("Ketua Kampung");
-                        model.Notifications notifKetua = new model.Notifications();
-                        notifKetua.setJenis("BANTUAN");
-                        notifKetua.setTajuk("Permohonan Menunggu Kelulusan");
-                        notifKetua.setMesej("Permohonan bantuan #" + idPermohonan + " telah disemak oleh AJK dan menunggu kelulusan anda.");
-                        notifKetua.setPautan("/bantuan/list");
-                        for (int ketuaId : ketuaIds) {
-                            notifKetua.setId_pengguna(ketuaId);
-                            notifDao.insertNotifications(notifKetua);
-                        }
+                if ("lengkap".equals(keputusan)) {
+                    // 1. Notifikasi ke Ketua Kampung
+                    service.NotificationService.notifyByPeranan("Ketua Kampung", "BANTUAN", "Permohonan Menunggu Kelulusan",
+                        "Permohonan bantuan #" + idPermohonan + " telah disemak oleh AJK and menunggu kelulusan anda.", "/bantuan/list");
 
-                        // 2. Notifikasi ke Penduduk (pemohon)
-                        model.Notifications notifPenduduk = new model.Notifications();
-                        notifPenduduk.setId_pengguna(currentPb.getId_pengguna());
-                        notifPenduduk.setJenis("BANTUAN");
-                        notifPenduduk.setTajuk("Permohonan Sedang Diproses");
-                        notifPenduduk.setMesej("Permohonan bantuan anda sedang dihantar ke Ketua Kampung untuk kelulusan.");
-                        notifPenduduk.setPautan("/bantuan/list");
-                        notifDao.insertNotifications(notifPenduduk);
-                    } else {
-                        // Notifikasi ke Penduduk (pemohon) - Dokumen Tidak Lengkap
-                        model.Notifications notifPenduduk = new model.Notifications();
-                        notifPenduduk.setId_pengguna(currentPb.getId_pengguna());
-                        notifPenduduk.setJenis("BANTUAN");
-                        notifPenduduk.setTajuk("Dokumen Tidak Lengkap");
-                        notifPenduduk.setMesej("Permohonan bantuan anda memerlukan tindakan: " + catatanSimpan);
-                        notifPenduduk.setPautan("/bantuan/list");
-                        notifDao.insertNotifications(notifPenduduk);
-                    }
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                    // 2. Notifikasi ke Penduduk (pemohon)
+                    service.NotificationService.notifyUser(currentPb.getId_pengguna(), "BANTUAN", "Permohonan Sedang Diproses",
+                        "Permohonan bantuan anda sedang dihantar ke Ketua Kampung untuk kelulusan.", "/bantuan/list");
+                } else {
+                    // Notifikasi ke Penduduk (pemohon) - Dokumen Tidak Lengkap
+                    service.NotificationService.notifyUser(currentPb.getId_pengguna(), "BANTUAN", "Dokumen Tidak Lengkap",
+                        "Permohonan bantuan anda memerlukan tindakan: " + catatanSimpan, "/bantuan/list");
                 }
 
                 response.sendRedirect(request.getContextPath() + "/bantuan/list?msg=reviewed");
             } else if ("/keputusanKetua".equals(action)) {
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 String keputusan = request.getParameter("keputusan");
-                String ulasanKetua = request.getParameter("ulasan");
+                String ulasanKetua = InputSanitizer.sanitize(request.getParameter("ulasan"));
 
                 // State Validation: Enforce that status must be "MENUNGGU_KETUA"
                 PermohonanBantuan currentPb = pbDao.getById(idPermohonan);
@@ -605,22 +548,12 @@ public class BantuanServlet extends HttpServlet {
                 pbDao.updateStatus(idPermohonan, statusBaru, ulasanAdmin, firstFileName);
 
                 // Trigger Notifikasi selepas keputusan Ketua Kampung
-                try {
-                    dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
-                    model.Notifications notifPenduduk = new model.Notifications();
-                    notifPenduduk.setId_pengguna(currentPb.getId_pengguna());
-                    notifPenduduk.setJenis("BANTUAN");
-                    if ("LULUS".equalsIgnoreCase(keputusan)) {
-                        notifPenduduk.setTajuk("Permohonan Diluluskan! 🎉");
-                        notifPenduduk.setMesej("Tahniah! Permohonan bantuan #" + idPermohonan + " telah diluluskan.");
-                    } else {
-                        notifPenduduk.setTajuk("Permohonan Ditolak");
-                        notifPenduduk.setMesej("Permohonan bantuan #" + idPermohonan + " ditolak: " + ulasanAdmin);
-                    }
-                    notifPenduduk.setPautan("/bantuan/list");
-                    notifDao.insertNotifications(notifPenduduk);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                if ("LULUS".equalsIgnoreCase(keputusan)) {
+                    service.NotificationService.notifyUser(currentPb.getId_pengguna(), "BANTUAN", "Permohonan Diluluskan! 🎉",
+                        "Tahniah! Permohonan bantuan #" + idPermohonan + " telah diluluskan.", "/bantuan/list");
+                } else {
+                    service.NotificationService.notifyUser(currentPb.getId_pengguna(), "BANTUAN", "Permohonan Ditolak",
+                        "Permohonan bantuan #" + idPermohonan + " ditolak: " + ulasanAdmin, "/bantuan/list");
                 }
 
                 response.sendRedirect(request.getContextPath() + "/bantuan/list?msg=decision_made");
@@ -672,6 +605,15 @@ public class BantuanServlet extends HttpServlet {
                     boolean success = es.updateRuleWeights(weights);
 
                     if (success) {
+                        // Recalculate all pending applications with new rules
+                        java.util.List<model.PermohonanBantuan> pendingList = pbDao.getByStatus("BARU");
+                        if (pendingList != null) {
+                            for (model.PermohonanBantuan pb : pendingList) {
+                                es.calculateEligibilityScore(pb);
+                                pbDao.updateEligibilityData(pb.getId_permohonan(), pb.getEligibilityScore(),
+                                    pb.getEligibilityTier(), pb.getEligibilityFlags());
+                            }
+                        }
                         response.sendRedirect(request.getContextPath() + "/bantuan/config?status=success");
                     } else {
                         response.sendRedirect(request.getContextPath() + "/bantuan/config?error=db");

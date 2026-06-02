@@ -280,6 +280,7 @@
             </div>
             
             <form action="<%= request.getContextPath() %>/aduan/updateStatus" method="post" enctype="multipart/form-data" id="statusForm">
+                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="id_aduan" id="modal-id">
                 <input type="hidden" name="current_status" id="modal-current">
                 

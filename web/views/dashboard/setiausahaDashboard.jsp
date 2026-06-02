@@ -21,8 +21,8 @@
     Integer totalPenduduk = (Integer) request.getAttribute("totalPenduduk");
     if (totalPenduduk == null) totalPenduduk = 0;
 
-    Long activeAduanCount = (Long) request.getAttribute("activeAduanCount");
-    if (activeAduanCount == null) activeAduanCount = 0L;
+    Integer activeAduanCount = (Integer) request.getAttribute("activeAduanCount");
+    if (activeAduanCount == null) activeAduanCount = 0;
 %>
 
 <%@ include file="/views/common/header.jsp" %>
@@ -183,12 +183,14 @@
                                 <td class="py-4">
                                     <div class="flex items-center justify-center gap-2">
                                         <form action="<%= request.getContextPath() %>/penduduk/approve" method="post" class="m-0">
+                                            <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                                             <input type="hidden" name="idPengguna" value="<%= p.getId_pengguna() %>">
                                             <button type="submit" class="px-3.5 py-1.5 bg-emerald-50 text-emerald-600 hover:bg-emerald-600 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-wider transition-all">
                                                 Lulus
                                             </button>
                                         </form>
                                         <form action="<%= request.getContextPath() %>/penduduk/reject" method="post" class="m-0">
+                                            <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                                             <input type="hidden" name="idPengguna" value="<%= p.getId_pengguna() %>">
                                             <button type="submit" class="px-3.5 py-1.5 bg-rose-50 text-rose-600 hover:bg-rose-600 hover:text-white rounded-xl text-[9px] font-black uppercase tracking-wider transition-all">
                                                 Tolak

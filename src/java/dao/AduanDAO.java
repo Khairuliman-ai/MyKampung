@@ -8,6 +8,13 @@ import util.DBUtil;
 
 public class AduanDAO {
 
+    private static final String BASE_SQL =
+        "SELECT a.*, p.nama_penuh, k.nama_kategori, p2.nama_penuh as nama_pengendali " +
+        "FROM aduan a " +
+        "JOIN pengguna p ON a.id_pengguna = p.id_pengguna " +
+        "JOIN kategori_aduan k ON a.id_kategori_aduan = k.id_kategori_aduan " +
+        "LEFT JOIN pengguna p2 ON a.id_pengendali = p2.id_pengguna ";
+
     public boolean insertAduan(Aduan aduan) {
         String sql = "INSERT INTO aduan (id_pengguna, id_kategori_aduan, tajuk, keterangan, status, keutamaan, gambar_aduan, id_pengendali) VALUES (?, ?, ?, ?, 'SUBMITTED', ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
@@ -29,12 +36,7 @@ public class AduanDAO {
     }
 
     public Aduan getById(int id) {
-        String sql = "SELECT a.*, p.nama_penuh, k.nama_kategori, p2.nama_penuh as nama_pengendali " +
-                     "FROM aduan a " +
-                     "JOIN pengguna p ON a.id_pengguna = p.id_pengguna " +
-                     "JOIN kategori_aduan k ON a.id_kategori_aduan = k.id_kategori_aduan " +
-                     "LEFT JOIN pengguna p2 ON a.id_pengendali = p2.id_pengguna " +
-                     "WHERE a.id_aduan = ?";
+        String sql = BASE_SQL + "WHERE a.id_aduan = ?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
@@ -51,13 +53,7 @@ public class AduanDAO {
 
     public List<Aduan> getByPenduduk(int idPengguna) {
         List<Aduan> list = new ArrayList<>();
-        String sql = "SELECT a.*, p.nama_penuh, k.nama_kategori, p2.nama_penuh as nama_pengendali " +
-                     "FROM aduan a " +
-                     "JOIN pengguna p ON a.id_pengguna = p.id_pengguna " +
-                     "JOIN kategori_aduan k ON a.id_kategori_aduan = k.id_kategori_aduan " +
-                     "LEFT JOIN pengguna p2 ON a.id_pengendali = p2.id_pengguna " +
-                     "WHERE a.id_pengguna = ? AND a.dipadam_pada IS NULL " +
-                     "ORDER BY a.dibuat_pada DESC";
+        String sql = BASE_SQL + "WHERE a.id_pengguna = ? AND a.dipadam_pada IS NULL ORDER BY a.dibuat_pada DESC";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idPengguna);
@@ -74,14 +70,8 @@ public class AduanDAO {
 
     public List<Aduan> getByPengendali(int idAJK) {
         List<Aduan> list = new ArrayList<>();
-        String sql = "SELECT a.*, p.nama_penuh, k.nama_kategori, p2.nama_penuh as nama_pengendali " +
-                     "FROM aduan a " +
-                     "JOIN pengguna p ON a.id_pengguna = p.id_pengguna " +
-                     "JOIN kategori_aduan k ON a.id_kategori_aduan = k.id_kategori_aduan " +
-                     "LEFT JOIN pengguna p2 ON a.id_pengendali = p2.id_pengguna " +
-                     "WHERE (a.id_pengendali = ? OR (a.id_pengendali IS NULL AND a.status = 'SUBMITTED')) " +
-                     "AND a.dipadam_pada IS NULL " +
-                     "ORDER BY a.dibuat_pada DESC";
+        String sql = BASE_SQL + "WHERE (a.id_pengendali = ? OR (a.id_pengendali IS NULL AND a.status = 'SUBMITTED')) " +
+                     "AND a.dipadam_pada IS NULL ORDER BY a.dibuat_pada DESC";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, idAJK);
@@ -131,13 +121,7 @@ public class AduanDAO {
 
     public List<Aduan> getAll() {
         List<Aduan> list = new ArrayList<>();
-        String sql = "SELECT a.*, p.nama_penuh, k.nama_kategori, p2.nama_penuh as nama_pengendali " +
-                     "FROM aduan a " +
-                     "JOIN pengguna p ON a.id_pengguna = p.id_pengguna " +
-                     "JOIN kategori_aduan k ON a.id_kategori_aduan = k.id_kategori_aduan " +
-                     "LEFT JOIN pengguna p2 ON a.id_pengendali = p2.id_pengguna " +
-                     "WHERE a.dipadam_pada IS NULL " +
-                     "ORDER BY a.dibuat_pada DESC";
+        String sql = BASE_SQL + "WHERE a.dipadam_pada IS NULL ORDER BY a.dibuat_pada DESC";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
@@ -432,5 +416,21 @@ public class AduanDAO {
         }
         return stats;
     }
+
+    public int countActiveAduan() {
+        String sql = "SELECT COUNT(*) FROM aduan WHERE dipadam_pada IS NULL "
+                   + "AND status NOT IN ('RESOLVED','REJECTED','CLOSED')";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return 0;
+    }
 }
+
 

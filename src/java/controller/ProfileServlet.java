@@ -75,7 +75,7 @@ public class ProfileServlet extends HttpServlet {
                     String oldPass = request.getParameter("oldPassword");
                     String newPass = request.getParameter("newPassword");
                     
-                    PenggunaDAO pDao = new PenggunaDAO(conn);
+                    PenggunaDAO pDao = new PenggunaDAO();
                     boolean isOldPassCorrect = false;
                     try {
                         isOldPassCorrect = org.mindrot.jbcrypt.BCrypt.checkpw(oldPass, currentUser.getKata_laluan());
@@ -211,7 +211,7 @@ public class ProfileServlet extends HttpServlet {
                 // C. Simpan ke Database (Gunakan Transaction)
                 conn.setAutoCommit(false);
                 try {
-                    PenggunaDAO pDao = new PenggunaDAO(conn);
+                    PenggunaDAO pDao = new PenggunaDAO();
                     boolean pSuccess = pDao.updateProfil(currentUser);
                     
                     if (pSuccess) {

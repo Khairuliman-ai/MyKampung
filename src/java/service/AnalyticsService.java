@@ -12,8 +12,8 @@ public class AnalyticsService {
     public Map<String, Object> getAnalyticsDataForRole(String role, String biro) {
         Map<String, Object> data = new HashMap<>();
         
-        try (Connection conn = DBUtil.getConnection()) {
-            PenggunaDAO penggunaDao = new PenggunaDAO(conn);
+        try {
+            PenggunaDAO penggunaDao = new PenggunaDAO();
             PermohonanBantuanDAO bantuanDao = new PermohonanBantuanDAO();
             AduanDAO aduanDao = new AduanDAO();
             TempahanFasilitiDAO fasilitiDao = new TempahanFasilitiDAO();
@@ -61,7 +61,7 @@ public class AnalyticsService {
                 data.put("monthlySnapshots", snapshotDao.getAllSnapshots());
             }
 
-        } catch (SQLException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 

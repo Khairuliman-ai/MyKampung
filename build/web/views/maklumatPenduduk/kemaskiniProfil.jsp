@@ -116,6 +116,7 @@
         <% } %>
 
         <form action="<%= request.getContextPath()%>/profil/update" method="post" enctype="multipart/form-data" class="w-full space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000" onsubmit="return confirmAction(event, 'Simpan Perubahan?', 'Adakah anda pasti mahu menyimpan maklumat profil yang baharu?', 'Ya, Simpan!', '<%= primaryColor %>')">
+            <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
 
             <%-- Bekas Kad Tunggal (Single Form Card Container) --%>
             <div class="bg-white rounded-[2.5rem] p-8 md:p-12 shadow-sm border border-slate-100 space-y-10 animate-in fade-in duration-500">
@@ -702,6 +703,7 @@
         </div>
 
         <form action="<%= request.getContextPath()%>/profil/update?action=changePassword" method="post" class="space-y-6" onsubmit="return confirmAction(event, 'Tukar Kata Laluan?', 'Tindakan ini akan menukar akses akaun anda. Adakah anda pasti?', 'Ya, Tukar!', '#3B82F6')">
+            <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
             <div class="space-y-4">
                 <div class="group">
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Kata Laluan Lama</label>

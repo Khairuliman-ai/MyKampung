@@ -24,6 +24,7 @@
         // Paparkan borang tukar password
 %>
         <form action="UpdatePasswordServlet" method="POST">
+            <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
             <input type="hidden" name="token" value="<%= token %>">
             <label>Kata Laluan Baru:</label>
             <input type="password" name="newPassword" required>

@@ -231,24 +231,10 @@ public class FasilitiServlet extends HttpServlet {
         
         if (tempahanDAO.simpanTempahanBaru(t)) {
             // Trigger Notifikasi ke AJK Biro Sukan & Riadah
-            try {
-                dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
-                dao.PenggunaDAO pDao = new dao.PenggunaDAO(null);
-                List<Integer> ajkIds = pDao.getIdsByJawatan("Biro Sukan & Riadah");
-                model.Notifications notif = new model.Notifications();
-                notif.setJenis("TEMPAHAN");
-                notif.setTajuk("Tempahan Fasiliti Baru");
-                Fasiliti f = fasilitiDAO.dapatkanFasilitiById(idFasiliti);
-                String namaF = f != null ? f.getNama_fasiliti() : "Fasiliti";
-                notif.setMesej("Tempahan baru untuk " + namaF + " pada " + tarikh + " oleh " + user.getNama_penuh());
-                notif.setPautan("/fasiliti/urus");
-                for (int ajkId : ajkIds) {
-                    notif.setId_pengguna(ajkId);
-                    notifDao.insertNotifications(notif);
-                }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            }
+            Fasiliti f = fasilitiDAO.dapatkanFasilitiById(idFasiliti);
+            String namaF = f != null ? f.getNama_fasiliti() : "Fasiliti";
+            service.NotificationService.notifyByJawatan("Biro Sukan & Riadah", "TEMPAHAN", "Tempahan Fasiliti Baru",
+                "Tempahan baru untuk " + namaF + " pada " + tarikh + " oleh " + user.getNama_penuh(), "/fasiliti/urus");
 
             String msg = t.getStatus().equals(StatusConstant.TEMPAHAN_LULUS) ? "booked" : "pending_approval";
             response.sendRedirect(request.getContextPath() + "/fasiliti/list?success=" + msg);
@@ -358,24 +344,13 @@ public class FasilitiServlet extends HttpServlet {
         if (tempahanDAO.updateStatusTempahan(id, status, catatan)) {
             // Trigger Notifikasi ke Penduduk (pemohon)
             if (tempahan != null) {
-                try {
-                    dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
-                    model.Notifications notif = new model.Notifications();
-                    notif.setId_pengguna(tempahan.getId_pengguna());
-                    notif.setJenis("TEMPAHAN");
-                    
-                    if (StatusConstant.TEMPAHAN_LULUS.equals(status)) {
-                        notif.setTajuk("Tempahan Diluluskan");
-                        notif.setMesej("Tempahan anda untuk " + tempahan.getNama_fasiliti() + " pada " + tempahan.getTarikh_tempah() + " telah diluluskan.");
-                    } else {
-                        notif.setTajuk("Tempahan Ditolak");
-                        String ulasan = (catatan != null && !catatan.trim().isEmpty()) ? catatan : "Tidak menepati syarat.";
-                        notif.setMesej("Tempahan anda untuk " + tempahan.getNama_fasiliti() + " pada " + tempahan.getTarikh_tempah() + " ditolak: " + ulasan);
-                    }
-                    notif.setPautan("/fasiliti/list");
-                    notifDao.insertNotifications(notif);
-                } catch (Exception ex) {
-                    ex.printStackTrace();
+                if (StatusConstant.TEMPAHAN_LULUS.equals(status)) {
+                    service.NotificationService.notifyUser(tempahan.getId_pengguna(), "TEMPAHAN", "Tempahan Diluluskan",
+                        "Tempahan anda untuk " + tempahan.getNama_fasiliti() + " pada " + tempahan.getTarikh_tempah() + " telah diluluskan.", "/fasiliti/list");
+                } else {
+                    String ulasan = (catatan != null && !catatan.trim().isEmpty()) ? catatan : "Tidak menepati syarat.";
+                    service.NotificationService.notifyUser(tempahan.getId_pengguna(), "TEMPAHAN", "Tempahan Ditolak",
+                        "Tempahan anda untuk " + tempahan.getNama_fasiliti() + " pada " + tempahan.getTarikh_tempah() + " ditolak: " + ulasan, "/fasiliti/list");
                 }
             }
             response.sendRedirect(request.getContextPath() + "/fasiliti/urus?success=status_updated");
@@ -394,11 +369,8 @@ public class FasilitiServlet extends HttpServlet {
         String durasiStr = request.getParameter("durasi");
         String tarikhStr = request.getParameter("tarikh");
         
-        System.out.println("DEBUG: getSlots called with id=" + idFasilitiStr + ", durasi=" + durasiStr + ", tarikh=" + tarikhStr);
-
         if (idFasilitiStr == null || durasiStr == null || tarikhStr == null || tarikhStr.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            System.out.println("DEBUG: Missing parameters");
             return;
         }
 
@@ -417,7 +389,7 @@ public class FasilitiServlet extends HttpServlet {
                     throw new Exception("Format tarikh tidak sah: " + tarikhStr);
                 }
             }
-            System.out.println("DEBUG: Parsed date: " + tarikh);
+
 
             List<FasilitiSlot> slots = new ArrayList<>();
             
@@ -459,7 +431,7 @@ public class FasilitiServlet extends HttpServlet {
                 }
             }
             
-            System.out.println("DEBUG: Found " + slots.size() + " available slots");
+
 
             long nowMillis = System.currentTimeMillis();
             java.time.LocalDate todayLD = java.time.LocalDate.now(java.time.ZoneId.of("Asia/Kuala_Lumpur"));
@@ -487,7 +459,6 @@ public class FasilitiServlet extends HttpServlet {
             out.print("]");
             out.flush();
         } catch (Exception e) {
-            System.out.println("DEBUG ERROR in handleGetSlots: " + e.toString());
             e.printStackTrace();
             if (!response.isCommitted()) {
                 response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

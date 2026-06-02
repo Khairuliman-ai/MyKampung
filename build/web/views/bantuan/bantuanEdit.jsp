@@ -69,6 +69,7 @@
             %>
             
             <form action="<%= request.getContextPath() %>/bantuan/updateMyRequest" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 
                 <input type="hidden" name="idPermohonan" value="<%= pb.getId_permohonan() %>">
 

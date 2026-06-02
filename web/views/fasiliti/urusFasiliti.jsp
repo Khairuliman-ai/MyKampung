@@ -170,6 +170,7 @@
                                 <td class="p-4 text-center">
                                     <div class="flex justify-center gap-2" onclick="event.stopPropagation()">
                                         <form action="<%= contextPath %>/fasiliti/approve" method="post" class="inline">
+                                            <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                                             <input type="hidden" name="idTempahan" value="<%= t.getId_tempahan() %>">
                                             <button type="submit" class="bg-green-100 text-green-600 px-4 py-2 rounded-xl text-[10px] font-bold hover:bg-green-200 transition uppercase tracking-wider shadow-sm border border-green-200">Lulus</button>
                                         </form>
@@ -347,6 +348,7 @@
             </header>
 
             <form action="<%= contextPath %>/fasiliti/tambah" method="post" id="formFasiliti" class="space-y-6" enctype="multipart/form-data">
+                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="id" id="fasilitiId">
                 
                 <div class="space-y-2">
@@ -436,6 +438,7 @@
             </header>
 
             <form action="<%= contextPath %>/fasiliti/reject" method="post" class="space-y-6">
+                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="idTempahan" id="rejectIdTempahan">
                 
                 <div class="space-y-2">

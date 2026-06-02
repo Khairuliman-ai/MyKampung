@@ -18,13 +18,13 @@ public class PermohonanBantuanDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     PermohonanBantuan pb = mapRow(rs);
-                    pb.setSenaraiLampiran(lampiranDao.getByPermohonan(pb.getId_permohonan()));
                     list.add(pb);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        populateAttachments(list);
         return list;
     }
 
@@ -41,13 +41,13 @@ public class PermohonanBantuanDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     PermohonanBantuan pb = mapRow(rs);
-                    pb.setSenaraiLampiran(lampiranDao.getByPermohonan(pb.getId_permohonan()));
                     list.add(pb);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        populateAttachments(list);
         return list;
     }
 
@@ -77,14 +77,16 @@ public class PermohonanBantuanDAO {
                         pb.setStatus_keluarga(rs.getString("status_keluarga"));
                         pb.setPekerjaan(rs.getString("pekerjaan"));
                         pb.setPendapatan(rs.getDouble("pendapatan"));
-                    } catch (SQLException e) {}
-                    pb.setSenaraiLampiran(lampiranDao.getByPermohonan(pb.getId_permohonan()));
+                    } catch (SQLException e) {
+                        // Expected: column not present when called from getByPenduduk() which doesn't JOIN pengguna
+                    }
                     list.add(pb);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        populateAttachments(list);
         return list;
     }
 
@@ -108,13 +110,13 @@ public class PermohonanBantuanDAO {
                     pb.setStatus_keluarga(rs.getString("status_keluarga"));
                     pb.setPekerjaan(rs.getString("pekerjaan"));
                     pb.setPendapatan(rs.getDouble("pendapatan"));
-                    pb.setSenaraiLampiran(lampiranDao.getByPermohonan(pb.getId_permohonan()));
                     list.add(pb);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        populateAttachments(list);
         return list;
     }
 
@@ -140,13 +142,13 @@ public class PermohonanBantuanDAO {
                     pb.setStatus_keluarga(rs.getString("status_keluarga"));
                     pb.setPekerjaan(rs.getString("pekerjaan"));
                     pb.setPendapatan(rs.getDouble("pendapatan"));
-                    pb.setSenaraiLampiran(lampiranDao.getByPermohonan(pb.getId_permohonan()));
                     list.add(pb);
                 }
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        populateAttachments(list);
         return list;
     }
 
@@ -337,20 +339,20 @@ public class PermohonanBantuanDAO {
         pb.setCatatan_pentadbir(rs.getString("catatan_pentadbir"));
         pb.setDokumen_pentadbir(rs.getString("dokumen_pentadbir"));
         
-        try { pb.setNama_bank(rs.getString("nama_bank")); } catch (SQLException e) {}
-        try { pb.setNombor_akaun(rs.getString("nombor_akaun")); } catch (SQLException e) {}
-        try { pb.setPenyata_bank(rs.getString("penyata_bank")); } catch (SQLException e) {}
+        try { pb.setNama_bank(rs.getString("nama_bank")); } catch (SQLException e) { /* Expected: Column not in all query contexts */ }
+        try { pb.setNombor_akaun(rs.getString("nombor_akaun")); } catch (SQLException e) { /* Expected: Column not in all query contexts */ }
+        try { pb.setPenyata_bank(rs.getString("penyata_bank")); } catch (SQLException e) { /* Expected: Column not in all query contexts */ }
 
         try {
             pb.setNama_bantuan(rs.getString("nama_bantuan"));
-        } catch (SQLException e) {}
+        } catch (SQLException e) { /* Expected: Column not in all query contexts */ }
         try {
             pb.setJenis_bantuan(rs.getString("jenis_bantuan"));
-        } catch (SQLException e) {}
+        } catch (SQLException e) { /* Expected: Column not in all query contexts */ }
 
         // Map eligibility fields from DB
-        try { pb.setEligibilityScore(rs.getDouble("eligibility_score")); } catch (SQLException e) {}
-        try { pb.setEligibilityTier(rs.getString("eligibility_tier")); } catch (SQLException e) {}
+        try { pb.setEligibilityScore(rs.getDouble("eligibility_score")); } catch (SQLException e) { /* Expected: Column not in all query contexts */ }
+        try { pb.setEligibilityTier(rs.getString("eligibility_tier")); } catch (SQLException e) { /* Expected: Column not in all query contexts */ }
         try {
             String flagsStr = rs.getString("eligibility_flags");
             List<String> flags = new ArrayList<>();
@@ -364,7 +366,7 @@ public class PermohonanBantuanDAO {
                 }
             }
             pb.setEligibilityFlags(flags);
-        } catch (SQLException e) {}
+        } catch (SQLException e) { /* Expected: Column not in all query contexts */ }
 
         return pb;
     }
@@ -458,5 +460,18 @@ public class PermohonanBantuanDAO {
             e.printStackTrace();
         }
         return dist;
+    }
+
+    private void populateAttachments(List<PermohonanBantuan> list) {
+        if (list == null || list.isEmpty()) return;
+        List<Integer> ids = new ArrayList<>();
+        for (PermohonanBantuan pb : list) {
+            ids.add(pb.getId_permohonan());
+        }
+        java.util.Map<Integer, List<model.BantuanLampiran>> map = lampiranDao.getByPermohonanIds(ids);
+        for (PermohonanBantuan pb : list) {
+            List<model.BantuanLampiran> sub = map.get(pb.getId_permohonan());
+            pb.setSenaraiLampiran(sub != null ? sub : new ArrayList<>());
+        }
     }
 }

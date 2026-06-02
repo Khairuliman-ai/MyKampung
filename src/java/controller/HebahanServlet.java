@@ -13,6 +13,7 @@ import model.Hebahan;
 import model.Pengguna;
 import util.AppConfig;
 import util.FileUploadUtil;
+import util.InputSanitizer;
 
 
 
@@ -113,11 +114,11 @@ public class HebahanServlet extends HttpServlet {
             if ("/create".equals(path)) {
                 Hebahan h = new Hebahan();
                 h.setId_pengguna(user.getId_pengguna());
-                h.setTajuk(req.getParameter("tajuk"));
-                h.setKandungan(req.getParameter("kandungan"));
+                h.setTajuk(InputSanitizer.sanitize(req.getParameter("tajuk")));
+                h.setKandungan(InputSanitizer.sanitize(req.getParameter("kandungan")));
                 h.setKategori(req.getParameter("kategori"));
                 h.setStatus_hebahan(req.getParameter("status_hebahan"));
-                h.setLokasi_acara(req.getParameter("lokasi_acara"));
+                h.setLokasi_acara(InputSanitizer.sanitize(req.getParameter("lokasi_acara")));
 
                 String mula = req.getParameter("tarikh_mula_acara");
                 String tamat = req.getParameter("tarikh_tamat_acara");
@@ -135,42 +136,26 @@ public class HebahanServlet extends HttpServlet {
 
                 // Trigger batch notification if status is Published
                 if ("Published".equalsIgnoreCase(h.getStatus_hebahan())) {
-                    try {
-                        dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
-                        PenggunaDAO pDao = new PenggunaDAO(null);
-                        List<Integer> semuaIds = pDao.getAllActiveIds();
-                        // Exclude creator
-                        semuaIds.removeIf(uid -> uid == user.getId_pengguna());
-                        
-                        // Get latest hebahan ID for link
-                        int latestId = 0;
-                        try (java.sql.Connection conn = util.DBUtil.getConnection();
-                             java.sql.PreparedStatement ps = conn.prepareStatement("SELECT MAX(id_hebahan) FROM hebahan WHERE id_pengguna = ?")) {
-                            ps.setInt(1, user.getId_pengguna());
-                            try (java.sql.ResultSet rs = ps.executeQuery()) {
-                                if (rs.next()) {
-                                    latestId = rs.getInt(1);
-                                }
+                    // Get latest hebahan ID for link
+                    int latestId = 0;
+                    try (java.sql.Connection conn = util.DBUtil.getConnection();
+                         java.sql.PreparedStatement ps = conn.prepareStatement("SELECT MAX(id_hebahan) FROM hebahan WHERE id_pengguna = ?")) {
+                        ps.setInt(1, user.getId_pengguna());
+                        try (java.sql.ResultSet rs = ps.executeQuery()) {
+                            if (rs.next()) {
+                                latestId = rs.getInt(1);
                             }
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
                         }
-                        
-                        String pautan = latestId > 0 ? "/hebahan/detail?id=" + latestId : "/hebahan/list";
-                        String ringkasan = h.getKandungan() != null && h.getKandungan().length() > 100 
-                            ? h.getKandungan().substring(0, 100) + "..." 
-                            : h.getKandungan();
-                        
-                        notifDao.insertBatch(
-                            semuaIds,
-                            "HEBAHAN",
-                            "Hebahan Baru: " + h.getTajuk(),
-                            ringkasan,
-                            pautan
-                        );
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
+                    
+                    String pautan = latestId > 0 ? "/hebahan/detail?id=" + latestId : "/hebahan/list";
+                    String ringkasan = h.getKandungan() != null && h.getKandungan().length() > 100 
+                        ? h.getKandungan().substring(0, 100) + "..." 
+                        : h.getKandungan();
+                    
+                    service.NotificationService.broadcast(user.getId_pengguna(), "HEBAHAN", "Hebahan Baru: " + h.getTajuk(), ringkasan, pautan);
                 }
 
                 resp.sendRedirect(req.getContextPath() + "/hebahan/list?msg=created");
@@ -184,11 +169,11 @@ public class HebahanServlet extends HttpServlet {
                 }
                 String oldStatus = h.getStatus_hebahan();
 
-                h.setTajuk(req.getParameter("tajuk"));
-                h.setKandungan(req.getParameter("kandungan"));
+                h.setTajuk(InputSanitizer.sanitize(req.getParameter("tajuk")));
+                h.setKandungan(InputSanitizer.sanitize(req.getParameter("kandungan")));
                 h.setKategori(req.getParameter("kategori"));
                 h.setStatus_hebahan(req.getParameter("status_hebahan"));
-                h.setLokasi_acara(req.getParameter("lokasi_acara"));
+                h.setLokasi_acara(InputSanitizer.sanitize(req.getParameter("lokasi_acara")));
 
                 String mula = req.getParameter("tarikh_mula_acara");
                 String tamat = req.getParameter("tarikh_tamat_acara");
@@ -203,27 +188,11 @@ public class HebahanServlet extends HttpServlet {
 
                 // Trigger batch notification if status transitions to Published
                 if ("Published".equalsIgnoreCase(h.getStatus_hebahan()) && !"Published".equalsIgnoreCase(oldStatus)) {
-                    try {
-                        dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
-                        PenggunaDAO pDao = new PenggunaDAO(null);
-                        List<Integer> semuaIds = pDao.getAllActiveIds();
-                        // Exclude creator
-                        semuaIds.removeIf(uid -> uid == user.getId_pengguna());
-                        
-                        String ringkasan = h.getKandungan() != null && h.getKandungan().length() > 100 
-                            ? h.getKandungan().substring(0, 100) + "..." 
-                            : h.getKandungan();
+                    String ringkasan = h.getKandungan() != null && h.getKandungan().length() > 100 
+                        ? h.getKandungan().substring(0, 100) + "..." 
+                        : h.getKandungan();
 
-                        notifDao.insertBatch(
-                            semuaIds,
-                            "HEBAHAN",
-                            "Hebahan Baru: " + h.getTajuk(),
-                            ringkasan,
-                            "/hebahan/detail?id=" + h.getId_hebahan()
-                        );
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
-                    }
+                    service.NotificationService.broadcast(user.getId_pengguna(), "HEBAHAN", "Hebahan Baru: " + h.getTajuk(), ringkasan, "/hebahan/detail?id=" + h.getId_hebahan());
                 }
 
                 resp.sendRedirect(req.getContextPath() + "/hebahan/list?msg=updated");
@@ -240,29 +209,13 @@ public class HebahanServlet extends HttpServlet {
 
                 // Trigger batch notification if status updated to Published
                 if ("Published".equalsIgnoreCase(status)) {
-                    try {
-                        Hebahan h = dao.getById(id);
-                        if (h != null) {
-                            dao.NotificationsDAO notifDao = new dao.NotificationsDAO();
-                            PenggunaDAO pDao = new PenggunaDAO(null);
-                            List<Integer> semuaIds = pDao.getAllActiveIds();
-                            // Exclude creator
-                            semuaIds.removeIf(uid -> uid == user.getId_pengguna());
-                            
-                            String ringkasan = h.getKandungan() != null && h.getKandungan().length() > 100 
-                                ? h.getKandungan().substring(0, 100) + "..." 
-                                : h.getKandungan();
+                    Hebahan h = dao.getById(id);
+                    if (h != null) {
+                        String ringkasan = h.getKandungan() != null && h.getKandungan().length() > 100 
+                            ? h.getKandungan().substring(0, 100) + "..." 
+                            : h.getKandungan();
 
-                            notifDao.insertBatch(
-                                semuaIds,
-                                "HEBAHAN",
-                                "Hebahan Baru: " + h.getTajuk(),
-                                ringkasan,
-                                "/hebahan/detail?id=" + h.getId_hebahan()
-                            );
-                        }
-                    } catch (Exception ex) {
-                        ex.printStackTrace();
+                        service.NotificationService.broadcast(user.getId_pengguna(), "HEBAHAN", "Hebahan Baru: " + h.getTajuk(), ringkasan, "/hebahan/detail?id=" + h.getId_hebahan());
                     }
                 }
 
