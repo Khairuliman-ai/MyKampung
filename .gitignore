@@ -1,19 +1,43 @@
-# Abaikan hasil compile NetBeans
+# Abaikan hasil compile NetBeans & Java
 build/
 nbbuild/
 dist/
 nbproject/private/
+*.class
+*.war
+*.ear
+*.jar
 
-# Abaikan fail sistem
+# Abaikan fail sistem & backup
 .DS_Store
 Thumbs.db
+*.tmp
+*.bak
+*.swp
+*.log
 
-# Abaikan fail konfigurasi sensitif
+# Abaikan fail konfigurasi sensitif & secrets
 src/java/config.properties
+.env
+.env.*
+*.env
+secrets/
+credentials/
+web/META-INF/context.xml.local
 
 # Abaikan fail pengujian mengandungi maklumat sensitif (Public Repo Security)
 docs/roles_list.md
 docs/roles_list.pdf
 
-#opencode plugin
+# Abaikan konfigurasi IDE & Editor luaran
+.idea/
+.vscode/
+.settings/
+.classpath
+.project
+*.iml
+*.iws
+*.ipr
+
+# opencode plugin
 opencode.json
