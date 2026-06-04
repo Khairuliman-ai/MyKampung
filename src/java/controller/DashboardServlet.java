@@ -119,8 +119,19 @@ public class DashboardServlet extends HttpServlet {
                     request.setAttribute("pendingPendudukList", pendingPendudukList);
                     request.setAttribute("pendingPendudukCount", pendingPendudukList.size());
 
-                    List<Pengguna> activePendudukList = pDao.getAllActivePenduduk();
-                    request.setAttribute("totalPenduduk", activePendudukList.size());
+                    List<Pengguna> activePendudukList = pDao.getAllActiveUsers();
+                    int totalActive = (activePendudukList != null) ? activePendudukList.size() : 0;
+                    int totalFamily = 0;
+                    try (Connection conn = DBUtil.getConnection()) {
+                        dao.AhliKeluargaDAO akDao = new dao.AhliKeluargaDAO(conn);
+                        List<model.AhliKeluarga> famList = akDao.getAllNonRegistered();
+                        if (famList != null) {
+                            totalFamily = famList.size();
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                    request.setAttribute("totalPenduduk", totalActive + totalFamily);
 
                     List<Pengguna> ajkList = pDao.getAllAJK();
                     request.setAttribute("ajkList", ajkList);

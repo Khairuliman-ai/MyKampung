@@ -75,15 +75,6 @@
                 <h1 class="text-3xl font-black text-slate-800 tracking-tight mt-2">Papan Pemuka Sukan & Riadah</h1>
                 <p class="text-slate-500 text-sm mt-0.5">Urus kelulusan slot tempahan kemudahan awam kampung seperti dewan komuniti dan gelanggang sukan.</p>
             </div>
-            
-            <div class="relative w-full md:w-80 group">
-                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 group-focus-within:text-blue-600 transition-colors">
-                    <i class="fas fa-search"></i>
-                </span>
-                <input type="text" 
-                       class="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border border-slate-200 focus:ring-4 focus:ring-blue-100 focus:border-blue-400 shadow-sm text-sm placeholder-gray-400 transition-all outline-none" 
-                       placeholder="Cari tempahan fasiliti...">
-            </div>
         </header>
 
         <!-- Premium Hero Section -->

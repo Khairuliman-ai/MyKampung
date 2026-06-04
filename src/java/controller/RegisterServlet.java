@@ -101,13 +101,22 @@ public class RegisterServlet extends HttpServlet {
                 String msg = "Pendaftaran berjaya dihantar. Sila tunggu pengesahan daripada Ketua Kampung.";
                 response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp?success=" + java.net.URLEncoder.encode(msg, "UTF-8"));
             } else {
+                request.setAttribute("authMode", "signup");
                 request.setAttribute("errorMessage", "Pendaftaran gagal. Nombor KP mungkin sudah berdaftar.");
                 request.getRequestDispatcher("/views/auth/auth.jsp").forward(request, response);
             }
 
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("errorMessage", "Ralat sistem: " + e.getMessage());
+            String rawMessage = e.getMessage() != null ? e.getMessage() : "";
+            String friendlyMessage;
+            if (rawMessage.contains("Duplicate entry") || rawMessage.contains("Duplicate") || rawMessage.contains("constraint")) {
+                friendlyMessage = "Pendaftaran gagal. Nombor KP atau Emel mungkin sudah berdaftar.";
+            } else {
+                friendlyMessage = "Ralat sistem: " + rawMessage.replace("'", "\\'");
+            }
+            request.setAttribute("authMode", "signup");
+            request.setAttribute("errorMessage", friendlyMessage);
             request.getRequestDispatcher("/views/auth/auth.jsp").forward(request, response);
         }
     }

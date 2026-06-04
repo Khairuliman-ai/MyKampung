@@ -5,7 +5,7 @@ import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
-@WebServlet("/logout")
+@WebServlet(urlPatterns = {"/logout", "/LogoutServlet"})
 /**
  * LogoutServlet handles session termination.
  * It invalidates the user's active session and sets cache-bust HTTP headers

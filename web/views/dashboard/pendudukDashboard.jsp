@@ -84,15 +84,6 @@
                 <h1 class="text-3xl font-black text-slate-800 tracking-tight mt-2">Selamat Pulang, <%= user.getNama_penuh() %></h1>
                 <p class="text-slate-500 text-sm mt-0.5">Semak pengumuman kampung, mohon bantuan kebajikan, buat aduan keselamatan, dan tempah fasiliti awam.</p>
             </div>
-            
-            <div class="relative w-full md:w-80 group">
-                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 group-focus-within:text-purple-600 transition-colors">
-                    <i class="fas fa-search"></i>
-                </span>
-                <input type="text" 
-                       class="w-full pl-11 pr-4 py-3 bg-white rounded-2xl border border-slate-200 focus:ring-4 focus:ring-purple-100 focus:border-purple-400 shadow-sm text-sm placeholder-gray-400 transition-all outline-none" 
-                       placeholder="Cari pengumuman atau aduan...">
-            </div>
         </header>
 
         <!-- Announcement Slider Hero Section -->

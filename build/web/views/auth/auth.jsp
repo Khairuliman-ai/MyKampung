@@ -236,31 +236,115 @@
 
     <script>
     function formatIC(input) {
-    // 1. Buang semua karakter bukan nombor
-    let val = input.value.replace(/\D/g, '');
-    
-    // 2. Potong jika lebih 12 digit (elak ralat)
-    if (val.length > 12) {
-        val = val.substring(0, 12);
+        // 1. Buang semua karakter bukan nombor
+        let val = input.value.replace(/\D/g, '');
+        
+        // 2. Potong jika lebih 12 digit (elak ralat)
+        if (val.length > 12) {
+            val = val.substring(0, 12);
+        }
+
+        // 3. Masukkan sempang mengikut posisi
+        let formatted = "";
+        if (val.length > 0) {
+            // Bahagian Tarikh Lahir (6 digit pertama)
+            formatted += val.substring(0, 6);
+        }
+        if (val.length > 6) {
+            // Bahagian Kod Negeri (2 digit tengah)
+            formatted += '-' + val.substring(6, 8);
+        }
+        if (val.length > 8) {
+            // Bahagian Nombor Siri (4 digit terakhir)
+            formatted += '-' + val.substring(8, 12);
+        }
+
+        input.value = formatted;
     }
 
-    // 3. Masukkan sempang mengikut posisi
-    let formatted = "";
-    if (val.length > 0) {
-        // Bahagian Tarikh Lahir (6 digit pertama)
-        formatted += val.substring(0, 6);
-    }
-    if (val.length > 6) {
-        // Bahagian Kod Negeri (2 digit tengah)
-        formatted += '-' + val.substring(6, 8);
-    }
-    if (val.length > 8) {
-        // Bahagian Nombor Siri (4 digit terakhir)
-        formatted += '-' + val.substring(8, 12);
+    function cleanNameInput(input) {
+        // Remove numbers and convert to uppercase
+        input.value = input.value.replace(/[0-9]/g, '').toUpperCase();
     }
 
-    input.value = formatted;
-}
+    function formatPhoneNumber(input) {
+        let num = input.value.replace(/\D/g, '');
+        if (num.length > 3 && num.length <= 7) {
+            input.value = num.substring(0, 3) + '-' + num.substring(3);
+        } else if (num.length > 7) {
+            input.value = num.substring(0, 3) + '-' + num.substring(3, 7) + ' ' + num.substring(7, 11);
+        } else {
+            input.value = num;
+        }
+    }
+
+    function validateRegisterForm(form) {
+        // 1. Check Full Name
+        const name = form.nama_penuh.value;
+        if (/[0-9]/.test(name)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Ralat Pendaftaran',
+                text: 'Nama Penuh tidak boleh mengandungi nombor.',
+                confirmButtonColor: '#0D9488'
+            });
+            return false;
+        }
+        
+        // 2. Check IC format
+        const ic = form.nombor_kp.value;
+        const icRegex = /^\d{6}-\d{2}-\d{4}$/;
+        if (!icRegex.test(ic)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Ralat Pendaftaran',
+                text: 'Nombor Kad Pengenalan mestilah dalam format 12 digit (Contoh: 010203-03-0441).',
+                confirmButtonColor: '#0D9488'
+            });
+            return false;
+        }
+        
+        // 3. Check Phone format
+        const tel = form.nombor_telefon.value;
+        const telClean = tel.replace(/\D/g, '');
+        if (telClean.length < 9 || telClean.length > 11) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Ralat Pendaftaran',
+                text: 'Sila masukkan nombor telefon yang sah.',
+                confirmButtonColor: '#0D9488'
+            });
+            return false;
+        }
+
+        // 4. Check Gmail
+        const email = form.email.value;
+        if (!email.toLowerCase().endsWith('@gmail.com')) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Ralat Pendaftaran',
+                text: 'Sila gunakan alamat e-mel Gmail yang sah (berakhir dengan @gmail.com).',
+                confirmButtonColor: '#0D9488'
+            });
+            return false;
+        }
+        
+        // 5. Check Password combination (Letters + Numbers)
+        const pass = form.kata_laluan.value;
+        const hasLetter = /[a-zA-Z]/.test(pass);
+        const hasNumber = /[0-9]/.test(pass);
+        if (!hasLetter || !hasNumber) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Ralat Pendaftaran',
+                text: 'Kata laluan mestilah gabungan huruf dan nombor untuk keselamatan.',
+                confirmButtonColor: '#0D9488'
+            });
+            return false;
+        }
+        
+        return true;
+    }
     </script>
     
     <!-- ===== LOGIN ===== -->
@@ -299,14 +383,14 @@
         <label class="form-label small fw-bold text-dark">Nombor Kad Pengenalan:</label>
         <input type="text" name="nombor_kp" class="form-control mb-3" 
                placeholder="Contoh: 900502-11-4032" 
-               oninput="formatIC(this)" maxlength="14" required>
+               onkeyup="formatIC(this)" onchange="formatIC(this)" maxlength="14" autocomplete="username" required>
 
         <div class="mb-3">
             <label class="form-label small fw-bold text-dark">Kata Laluan:</label>
             <div class="position-relative">
                 <input type="password" id="passwordField" name="kata_laluan" 
                        class="form-control pe-5" 
-                       placeholder="Kata Laluan" required>
+                       placeholder="Kata Laluan" autocomplete="current-password" required>
                 <span class="position-absolute end-0 top-50 translate-middle-y me-3 cursor-pointer text-muted" 
                       onclick="togglePassword()" 
                       style="z-index: 10; cursor: pointer;">
@@ -332,7 +416,7 @@
 
             <!-- ===== Register ===== -->
 <div class="form-container sign-up-container">
-    <form action="${pageContext.request.contextPath}/RegisterServlet" method="post" enctype="multipart/form-data" class="py-3 px-4">
+    <form action="${pageContext.request.contextPath}/RegisterServlet" method="post" enctype="multipart/form-data" class="py-3 px-4" onsubmit="return validateRegisterForm(this)">
         <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
 
         <h4 class="fw-bold text-center mb-1">Daftar Penduduk</h4>
@@ -340,23 +424,23 @@
 
         <div class="mb-3 text-start">
             <label class="form-label small fw-bold text-dark">Nama Penuh (Seperti dalam MyKad):</label>
-            <input type="text" name="nama_penuh" class="form-control" placeholder="Contoh: KHAIRUL BIN ABDULLAH" required>
+            <input type="text" name="nama_penuh" class="form-control" placeholder="Contoh: KHAIRUL BIN ABDULLAH" onkeyup="cleanNameInput(this)" onchange="cleanNameInput(this)" autocomplete="name" required>
         </div>
 
         <div class="mb-3 text-start">
             <label class="form-label small fw-bold text-dark">Nombor Kad Pengenalan:</label>
-            <input type="text" name="nombor_kp" class="form-control" placeholder="Contoh: 010203030441" required>
-            <div class="form-text" style="font-size: 10px;">Masukkan 12 digit tanpa tanda sempang (-)</div>
+            <input type="text" name="nombor_kp" class="form-control" placeholder="Contoh: 010203-03-0441" onkeyup="formatIC(this)" onchange="formatIC(this)" maxlength="14" autocomplete="off" required>
+            <div class="form-text" style="font-size: 10px;">Masukkan 12 digit nombor KP. Sempang (-) dimasukkan secara automatik.</div>
         </div>
 
         <div class="mb-3 text-start">
             <label class="form-label small fw-bold text-dark">Nombor Telefon:</label>
-            <input type="text" name="nombor_telefon" class="form-control" placeholder="Contoh: 0123456789" required>
+            <input type="text" name="nombor_telefon" class="form-control" placeholder="Contoh: 012-345 6789" onkeyup="formatPhoneNumber(this)" onchange="formatPhoneNumber(this)" maxlength="13" autocomplete="tel" required>
         </div>
 
         <div class="mb-3 text-start">
             <label class="form-label small fw-bold text-dark">Alamat Emel:</label>
-            <input type="email" name="email" class="form-control" placeholder="Contoh: ali@gmail.com" required>
+            <input type="email" name="email" class="form-control" placeholder="Contoh: ali@gmail.com" pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$" title="Sila gunakan alamat e-mel Gmail yang sah (berakhir dengan @gmail.com)." autocomplete="email" required>
         </div>
 
         <div class="row g-2 text-start">
@@ -394,7 +478,7 @@
         
         <div class="mb-3 text-start">
             <label class="form-label small fw-bold text-dark">Cipta Kata Laluan:</label>
-            <input type="password" name="kata_laluan" class="form-control" placeholder="Gunakan gabungan huruf dan nombor" required>
+            <input type="password" name="kata_laluan" class="form-control" placeholder="Gunakan gabungan huruf dan nombor" autocomplete="new-password" required>
         </div>
 
         <button type="submit" class="btn btn-success w-100 mt-2 shadow-sm py-2" style="background:#0D9488; border:none; font-weight: bold;">
@@ -436,11 +520,11 @@
                     <p class="text-muted small mb-4">Sila masukkan Nombor Kad Pengenalan dan Emel anda untuk pengesahan identiti.</p>
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-dark">Nombor Kad Pengenalan:</label>
-                        <input type="text" id="forgot-ic-input" class="form-control custom-input" placeholder="Contoh: 900502-11-4032" oninput="formatIC(this)" maxlength="14" required>
+                        <input type="text" id="forgot-ic-input" class="form-control custom-input" placeholder="Contoh: 900502-11-4032" onkeyup="formatIC(this)" onchange="formatIC(this)" maxlength="14" autocomplete="off" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-dark">Alamat Emel:</label>
-                        <input type="email" id="forgot-email-input" class="form-control custom-input" placeholder="nama@emel.com" required>
+                        <input type="email" id="forgot-email-input" class="form-control custom-input" placeholder="nama@emel.com" autocomplete="email" required>
                     </div>
                     <button type="button" onclick="handleForgotEmail()" class="btn btn-primary w-100 py-3 mt-2 brand-btn">
                         Hantar Kod OTP <i class="fas fa-paper-plane ms-2"></i>
@@ -474,11 +558,11 @@
                     <p class="text-muted small mb-4">OTP disahkan! Sila tetapkan kata laluan baru anda sekarang.</p>
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-dark">Kata Laluan Baru:</label>
-                        <input type="password" id="forgot-new-pass" class="form-control custom-input" placeholder="Masukkan kata laluan baru" required>
+                        <input type="password" id="forgot-new-pass" class="form-control custom-input" placeholder="Masukkan kata laluan baru" autocomplete="new-password" required>
                     </div>
                     <div class="mb-3">
                         <label class="form-label small fw-bold text-dark">Sahkan Kata Laluan:</label>
-                        <input type="password" id="forgot-confirm-pass" class="form-control custom-input" placeholder="Taip semula kata laluan" required>
+                        <input type="password" id="forgot-confirm-pass" class="form-control custom-input" placeholder="Taip semula kata laluan" autocomplete="new-password" required>
                     </div>
                     <button type="button" onclick="handleResetPassword()" class="btn btn-success w-100 py-3 mt-2 shadow-sm" style="border-radius: 15px; font-weight: 700; background: #10b981; border: none;">
                         Kemaskini Kata Laluan <i class="fas fa-shield-alt ms-2"></i>
@@ -700,12 +784,16 @@
 
     const container = document.getElementById("authContainer");
     
+    <% if ("signup".equals(request.getAttribute("authMode"))) { %>
+    container.classList.add("sign-up-mode");
+    <% } %>
+    
     // ===== SWEETALERT NOTIFICATIONS =====
     document.addEventListener("DOMContentLoaded", function() {
         const urlParams = new URLSearchParams(window.location.search);
         
         // 1. Check for Errors (from forward or redirect)
-        let errorMsg = '<%= request.getAttribute("error") != null ? request.getAttribute("error") : (request.getAttribute("errorMessage") != null ? request.getAttribute("errorMessage") : "") %>';
+        let errorMsg = '<%= request.getAttribute("error") != null ? request.getAttribute("error").toString().replace("'", "\\'") : (request.getAttribute("errorMessage") != null ? request.getAttribute("errorMessage").toString().replace("'", "\\'") : "") %>';
         if (!errorMsg && urlParams.has('error')) {
             errorMsg = urlParams.get('error');
         }
@@ -714,9 +802,13 @@
         }
         
         if (errorMsg && errorMsg !== "null") {
+            let errorTitle = 'Log Masuk Gagal';
+            <% if ("signup".equals(request.getAttribute("authMode"))) { %>
+            errorTitle = 'Pendaftaran Gagal';
+            <% } %>
             Swal.fire({
                 icon: 'error',
-                title: 'Log Masuk Gagal',
+                title: errorTitle,
                 text: errorMsg,
                 confirmButtonColor: '#0D9488',
                 timer: 4000
