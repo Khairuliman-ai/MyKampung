@@ -4,6 +4,10 @@ import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 
+/**
+ * Represents a facility booking reservation (TempahanFasiliti).
+ * Captures booking dates, timing windows, status tracking, and facility/applicant reference fields.
+ */
 public class TempahanFasiliti {
     private int id_tempahan;
     private int id_fasiliti;

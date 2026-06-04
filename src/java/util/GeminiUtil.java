@@ -17,6 +17,11 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+/**
+ * GeminiUtil provides integration with the Google Gemini AI generative text API.
+ * Manages API configuration loading from properties, custom SSL bypass for legacy platforms,
+ * manual JSON request construction, and manual JSON parsing to retrieve response text.
+ */
 public class GeminiUtil {
 
     private static final Logger LOGGER = Logger.getLogger(GeminiUtil.class.getName());
@@ -75,11 +80,16 @@ public class GeminiUtil {
     }
 
     /**
-     * Send chat request to Gemini.
-     * @param systemPrompt Instructions for behavior and knowledge
-     * @param history List of [role, text] history elements (role: "user" or "model")
-     * @param userMessage New user input
-     * @return AI text response
+     * Sends a chat/generation request to the Google Gemini API.
+     * Injects the system instructions as the initial conversational turn, appends chat history,
+     * and includes the latest user query. Employs direct SSL certificate verification bypass
+     * directly on the HttpsURLConnection to handle runtime compatibility issues with old Tomcat/JVM setups.
+     * Handles connection timeouts (15s), read timeouts (30s), and parses error streams gracefully.
+     * 
+     * @param systemPrompt behavioral instructions or knowledge corpus for the model
+     * @param history list of [role, text] arrays representing previous conversation turns
+     * @param userMessage the new user prompt
+     * @return the generated AI text response, or an error message if the call fails
      */
     public static String chat(String systemPrompt, List<String[]> history, String userMessage) {
         if (apiKey == null || apiKey.isEmpty()) {

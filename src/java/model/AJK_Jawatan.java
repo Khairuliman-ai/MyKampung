@@ -1,5 +1,9 @@
 package model;
 
+/**
+ * Represents the mapping relation between a user and a committee portfolio (AJK_Jawatan).
+ * Enforces the exclusivity mapping (e.g. one user per active portfolio).
+ */
 public class AJK_Jawatan {
     private int id_ajk_jawatan; // Primary Key
     private int id_pengguna;    // Foreign Key

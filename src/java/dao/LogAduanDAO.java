@@ -6,8 +6,18 @@ import java.util.List;
 import model.LogAduan;
 import util.DBUtil;
 
+/**
+ * LogAduanDAO handles database CRUD operations for the complaint lifecycle history (log_aduan).
+ * Tracks changes in complaint status, recording when transitions occurred and who authorized them.
+ */
 public class LogAduanDAO {
     
+    /**
+     * Inserts an audit trail log entry for a complaint status transition.
+     * 
+     * @param log the LogAduan model containing details of the status transition
+     * @return true if insertion succeeded, false otherwise
+     */
     public boolean insertLog(LogAduan log) {
         String sql = "INSERT INTO log_aduan (id_aduan, id_pelaku, status_lama, status_baru, catatan) VALUES (?, ?, ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
@@ -24,6 +34,13 @@ public class LogAduanDAO {
         return false;
     }
     
+    /**
+     * Retrieves all lifecycle history logs recorded for a specific complaint, sorted chronologically.
+     * Joins with the pengguna table to resolve the name of the user who made each change.
+     * 
+     * @param idAduan the complaint ID
+     * @return list of LogAduan history entries
+     */
     public List<LogAduan> getByAduan(int idAduan) {
         List<LogAduan> list = new ArrayList<>();
         String sql = "SELECT l.*, p.nama_penuh as nama_pelaku " +

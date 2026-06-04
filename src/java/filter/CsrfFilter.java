@@ -5,9 +5,24 @@ import java.util.UUID;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+/**
+ * CsrfFilter implements the Synchronizer Token Pattern to prevent Cross-Site Request Forgery (CSRF) attacks.
+ * It automatically generates a secure, random CSRF token on GET requests and associates it with the HTTP session.
+ * For POST requests, it verifies that the incoming request contains a matching token parameter (_csrf).
+ */
 public class CsrfFilter implements Filter {
     private static final String TOKEN_KEY = "csrf_token";
 
+    /**
+     * Intercepts incoming requests to generate or validate CSRF tokens.
+     * Whitelists specific AJAX, stats, API, and password reset endpoints to bypass validation checks.
+     * 
+     * @param req the servlet request
+     * @param res the servlet response
+     * @param chain the filter chain
+     * @throws IOException if an I/O error occurs
+     * @throws ServletException if a servlet error occurs
+     */
     @Override
     public void doFilter(ServletRequest req, ServletResponse res, FilterChain chain)
             throws IOException, ServletException {
@@ -54,6 +69,15 @@ public class CsrfFilter implements Filter {
         }
     }
 
+    /**
+     * Initializes the filter configuration.
+     * 
+     * @param fc the filter configuration
+     */
     @Override public void init(FilterConfig fc) {}
+
+    /**
+     * Cleans up filter resources on shutdown.
+     */
     @Override public void destroy() {}
 }

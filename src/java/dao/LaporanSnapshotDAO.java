@@ -6,8 +6,17 @@ import java.util.List;
 import model.LaporanSnapshot;
 import util.DBUtil;
 
+/**
+ * LaporanSnapshotDAO handles database operations for monthly statistical snapshots (laporan_snapshot).
+ * Aggregates and stores census, welfare, complaint, and facility utilization statistics for monthly reporting.
+ */
 public class LaporanSnapshotDAO {
 
+    /**
+     * Retrieves all monthly snapshots in chronological order.
+     * 
+     * @return a list of LaporanSnapshot records
+     */
     public List<LaporanSnapshot> getAllSnapshots() {
         List<LaporanSnapshot> list = new ArrayList<>();
         String sql = "SELECT * FROM laporan_snapshot ORDER BY tahun ASC, bulan ASC";
@@ -37,6 +46,13 @@ public class LaporanSnapshotDAO {
         return list;
     }
 
+    /**
+     * Inserts or updates a monthly snapshot.
+     * Uses ON DUPLICATE KEY UPDATE to overwrite existing records for the same month/year key.
+     * 
+     * @param s the LaporanSnapshot model containing metrics
+     * @return true if insertion/upsert succeeded, false otherwise
+     */
     public boolean insertSnapshot(LaporanSnapshot s) {
         String sql = "INSERT INTO laporan_snapshot " +
                      "(tahun, bulan, total_penduduk, total_bantuan_dipohon, total_bantuan_diluluskan, " +

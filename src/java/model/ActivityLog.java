@@ -2,6 +2,10 @@ package model;
 
 import java.sql.Timestamp;
 
+/**
+ * Represents an entry in the activity audit trail (ActivityLog).
+ * Records administrative actions taken on residents, storing target/actor IDs and action descriptions.
+ */
 public class ActivityLog {
     private int id_log;
     private int id_pengguna;

@@ -1,5 +1,13 @@
 package util;
 
+/**
+ * AppConfig contains static configuration constants for directory paths and routing redirects.
+ * 
+ * > [!WARNING]
+ * > **Hardcoded Paths**: The directory paths (DATA_DIR) are currently hardcoded to a local path
+ * > for development. These should be externalized to web.xml context parameters or retrieved via
+ * > JNDI environment lookups for production packaging and cross-platform compatibility.
+ */
 public final class AppConfig {
     private AppConfig() {}
 

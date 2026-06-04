@@ -6,13 +6,26 @@ import java.util.ArrayList;
 import java.util.List;
 import util.DBUtil;
 
+/**
+ * PenggunaDAO handles database CRUD operations for the user (Pengguna) domain.
+ * This includes user registration, authentication, profile updates, role/jawatan assignments,
+ * and retrieving socio-economic statistical distributions for analytics.
+ */
 public class PenggunaDAO {
 
+    /**
+     * Default constructor.
+     */
     public PenggunaDAO() {}
 
     /**
-     * Mendaftar pengguna baru (Penduduk) dengan status Pending (2). Menggunakan
-     * Transaction untuk insert ke table pengguna & pengguna_peranan.
+     * Registers a new resident (Penduduk) in a pending status (2).
+     * Enforces database transaction integrity: inserts the user record, retrieves
+     * the auto-generated user ID, and assigns the default 'Penduduk' role (ID 4).
+     * 
+     * @param u the Pengguna model to register
+     * @return true if both user and role mappings were inserted successfully
+     * @throws SQLException if a database error occurs during insertion or rollback
      */
     public boolean daftarPengguna(Pengguna u) throws SQLException {
         boolean success = false;
@@ -64,8 +77,12 @@ public class PenggunaDAO {
     }
 
     /**
-     * Mencari pengguna berdasarkan No KP (Digunakan untuk Login dengan BCrypt)
-     * Mengambil maklumat peranan dan jawatan sekali.
+     * Finds a user by their identity card number (nombor_kp).
+     * Retrieves their associated role name and jawatan title in a single query.
+     * Used primary for login authentication.
+     * 
+     * @param kp identity card number (cleaned)
+     * @return populated Pengguna object, or null if not found
      */
     public Pengguna findByKP(String kp) {
         Pengguna user = null;
@@ -94,6 +111,12 @@ public class PenggunaDAO {
         return user;
     }
 
+    /**
+     * Retrieves a user by their ID, including their role and biro jawatan.
+     * 
+     * @param id the user ID
+     * @return the populated user object, or null if not found
+     */
     public Pengguna getPenggunaById(int id) {
         Pengguna user = null;
         String sql = "SELECT p.*, r.nama_peranan, j.nama_jawatan "
@@ -118,6 +141,13 @@ public class PenggunaDAO {
         return user;
     }
 
+    /**
+     * Updates a resident's own profile data, including socio-economic fields,
+     * GPS coordinates, profile photo, and income verification proof.
+     * 
+     * @param u the user model containing updated data
+     * @return true if update succeeded, false otherwise
+     */
     public boolean updateProfil(Pengguna u) {
         String sql = "UPDATE pengguna SET nama_penuh=?, nombor_telefon=?, email=?, nama_jalan=?, daerah=?, "
                 + "nombor_poskod=?, bandar=?, negeri=?, status_keluarga=?, pekerjaan=?, pendapatan=?, "
@@ -148,6 +178,13 @@ public class PenggunaDAO {
         }
     }
 
+    /**
+     * Updates a subset of resident fields. Used by administrative users (AJK/Ketua)
+     * when editing another resident's basic details.
+     * 
+     * @param u the user model containing updated details
+     * @return true if updated successfully
+     */
     public boolean updatePengguna(Pengguna u) {
         String sql = "UPDATE pengguna SET nombor_telefon=?, nama_jalan=?, bandar=?, "
                 + "nombor_poskod=?, negeri=?, status_keluarga=? WHERE id_pengguna=?";
@@ -168,6 +205,13 @@ public class PenggunaDAO {
         }
     }
 
+    /**
+     * Updates a user's password hash.
+     * 
+     * @param idPengguna the user ID
+     * @param hashedNewPassword BCrypt hashed password
+     * @return true if updated successfully
+     */
     public boolean updatePassword(int idPengguna, String hashedNewPassword) {
         String sql = "UPDATE pengguna SET kata_laluan=? WHERE id_pengguna=?";
         try (Connection conn = DBUtil.getConnection();
@@ -181,6 +225,11 @@ public class PenggunaDAO {
         }
     }
 
+    /**
+     * Retrieves all active users who hold the default 'Penduduk' role.
+     * 
+     * @return list of active residents
+     */
     public List<Pengguna> getAllActivePenduduk() {
         List<Pengguna> senarai = new ArrayList<>();
         String sql = "SELECT p.*, r.nama_peranan FROM pengguna p "
@@ -202,8 +251,9 @@ public class PenggunaDAO {
     }
 
     /**
-     * Mengambil SEMUA pengguna yang aktif (status = 1) tanpa menapis peranan.
-     * Digunakan untuk paparan Senarai Penduduk yang lengkap di dashboard AJK/Ketua.
+     * Retrieves all active users in the system sorted by role hierarchy and name.
+     * 
+     * @return list of all active users
      */
     public List<Pengguna> getAllActiveUsers() {
         List<Pengguna> senarai = new ArrayList<>();
@@ -227,14 +277,19 @@ public class PenggunaDAO {
         return senarai;
     }
 
+    /**
+     * Retrieves all active users holding the 'AJK Kampung' role.
+     * 
+     * @return list of active AJK members
+     */
     public List<Pengguna> getAllAJK() {
         List<Pengguna> senarai = new ArrayList<>();
         String sql = "SELECT p.*, r.nama_peranan, j.nama_jawatan, aj.id_jawatan FROM pengguna p "
-           + "JOIN pengguna_peranan pp ON p.id_pengguna = pp.id_pengguna "
-           + "JOIN peranan r ON pp.id_peranan = r.id_peranan "
-           + "LEFT JOIN ajk_jawatan aj ON p.id_pengguna = aj.id_pengguna " 
-           + "LEFT JOIN jawatan_ajk j ON aj.id_jawatan = j.id_jawatan "   
-           + "WHERE r.id_peranan = 3 AND p.status = 1";
+            + "JOIN pengguna_peranan pp ON p.id_pengguna = pp.id_pengguna "
+            + "JOIN peranan r ON pp.id_peranan = r.id_peranan "
+            + "LEFT JOIN ajk_jawatan aj ON p.id_pengguna = aj.id_pengguna " 
+            + "LEFT JOIN jawatan_ajk j ON aj.id_jawatan = j.id_jawatan "   
+            + "WHERE r.id_peranan = 3 AND p.status = 1";
 
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql); 
@@ -249,6 +304,9 @@ public class PenggunaDAO {
         return senarai;
     }
 
+    /**
+     * Maps a ResultSet row to a Pengguna domain model object.
+     */
     private Pengguna mapResultSetToPengguna(ResultSet rs) throws SQLException {
         Pengguna p = new Pengguna();
         p.setId_pengguna(rs.getInt("id_pengguna"));
@@ -275,7 +333,9 @@ public class PenggunaDAO {
             p.setNama_jawatan(rs.getString("nama_jawatan"));
             p.setId_jawatan(rs.getInt("id_jawatan"));
         } catch (SQLException e) {
-            // Field not present in query context
+            // Intentionally swallowed: not all callers JOIN peranan/jawatan tables.
+            // e.g., getAllActivePenduduk() only selects nama_peranan, not nama_jawatan.
+            // These fields remain null in that context, which is the expected behavior.
         }
 
         double lat = rs.getDouble("latitude");
@@ -286,6 +346,11 @@ public class PenggunaDAO {
         return p;
     }
     
+    /**
+     * Retrieves all residents with status = 2 (Pending approval).
+     * 
+     * @return list of pending residents
+     */
     public List<Pengguna> getPendingPenduduk() {
         List<Pengguna> senarai = new ArrayList<>();
         String sql = "SELECT p.*, r.nama_peranan FROM pengguna p "
@@ -306,6 +371,13 @@ public class PenggunaDAO {
         return senarai;
     }
     
+    /**
+     * Updates account status for a user.
+     * 
+     * @param idPengguna the user ID
+     * @param statusBaru the new status value (0=Rejected, 1=Active, 2=Pending)
+     * @return true if updated successfully
+     */
     public boolean updateStatus(int idPengguna, int statusBaru) {
         String sql = "UPDATE pengguna SET status = ?, dikemaskini_pada = CURRENT_TIMESTAMP WHERE id_pengguna = ?";
         
@@ -321,6 +393,11 @@ public class PenggunaDAO {
         }
     }
 
+    /**
+     * Counts all active residents, including both registered users and un-registered family members.
+     * 
+     * @return total count of residents
+     */
     public int countAll() {
         String sql = "SELECT "
                    + "(SELECT COUNT(*) FROM pengguna WHERE status = 1) + "
@@ -338,6 +415,12 @@ public class PenggunaDAO {
         return 0;
     }
 
+    /**
+     * Calculates the age distribution of all active users.
+     * Groupings: Kanak-kanak (0-17), Belia (18-30), Dewasa (31-45), Pertengahan (46-60), Warga Emas (60+).
+     * 
+     * @return map of age group names to counts
+     */
     public java.util.Map<String, Integer> getAgeDistribution() {
         java.util.Map<String, Integer> dist = new java.util.LinkedHashMap<>();
         dist.put("Kanak-kanak (0-17)", 0);
@@ -358,7 +441,7 @@ public class PenggunaDAO {
                      ") as temp";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 dist.put("Kanak-kanak (0-17)", rs.getInt("child"));
                 dist.put("Belia (18-30)", rs.getInt("youth"));
@@ -372,6 +455,12 @@ public class PenggunaDAO {
         return dist;
     }
 
+    /**
+     * Calculates the monthly income distribution of all active users.
+     * Groupings: < RM1,000, RM1,000 - RM2,500, RM2,500 - RM4,000, RM4,000 - RM6,000, > RM6,000.
+     * 
+     * @return map of income ranges to counts
+     */
     public java.util.Map<String, Integer> getIncomeDistribution() {
         java.util.Map<String, Integer> dist = new java.util.LinkedHashMap<>();
         dist.put("< RM1,000", 0);
@@ -389,7 +478,7 @@ public class PenggunaDAO {
                      "FROM pengguna WHERE status = 1";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 dist.put("< RM1,000", rs.getInt("r1"));
                 dist.put("RM1,000 - RM2,500", rs.getInt("r2"));
@@ -403,6 +492,12 @@ public class PenggunaDAO {
         return dist;
     }
 
+    /**
+     * Calculates the family status distribution of all active users.
+     * Groupings (e.g. Single, Married, Widow, Divorced).
+     * 
+     * @return map of family status names to counts
+     */
     public java.util.Map<String, Integer> getFamilyStatusDistribution() {
         java.util.Map<String, Integer> dist = new java.util.LinkedHashMap<>();
         String sql = "SELECT status_keluarga, COUNT(*) as count " +
@@ -410,7 +505,7 @@ public class PenggunaDAO {
                      "GROUP BY status_keluarga";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 dist.put(rs.getString("status_keluarga"), rs.getInt("count"));
             }
@@ -420,11 +515,16 @@ public class PenggunaDAO {
         return dist;
     }
 
+    /**
+     * Calculates the average monthly income of all active users.
+     * 
+     * @return average income double value
+     */
     public double getAverageIncome() {
         String sql = "SELECT AVG(pendapatan) FROM pengguna WHERE status = 1";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 return rs.getDouble(1);
             }
@@ -434,8 +534,13 @@ public class PenggunaDAO {
         return 0.0;
     }
 
-    // === NOTIFICATION HELPERS ===
-    
+    /**
+     * Retrieves active user IDs belonging to a specific system role.
+     * Used for routing targeted notifications.
+     * 
+     * @param namaPeranan role name (e.g., 'Ketua Kampung', 'AJK Kampung')
+     * @return list of user IDs
+     */
     public List<Integer> getIdsByPeranan(String namaPeranan) {
         List<Integer> list = new ArrayList<>();
         String sql = "SELECT p.id_pengguna FROM pengguna p "
@@ -456,6 +561,13 @@ public class PenggunaDAO {
         return list;
     }
 
+    /**
+     * Retrieves active user IDs belonging to a specific JKKK biro jawatan.
+     * Used for routing targeted notifications.
+     * 
+     * @param namaJawatan jawatan name (e.g., 'Biro Keselamatan', 'Biro Kebajikan & Sosial')
+     * @return list of user IDs
+     */
     public List<Integer> getIdsByJawatan(String namaJawatan) {
         List<Integer> list = new ArrayList<>();
         String sql = "SELECT aj.id_pengguna FROM ajk_jawatan aj "
@@ -476,12 +588,18 @@ public class PenggunaDAO {
         return list;
     }
 
+    /**
+     * Retrieves all active, non-deleted user IDs in the system.
+     * Used for broad notification dispatches.
+     * 
+     * @return list of user IDs
+     */
     public List<Integer> getAllActiveIds() {
         List<Integer> list = new ArrayList<>();
         String sql = "SELECT id_pengguna FROM pengguna WHERE status = 1 AND dipadam_pada IS NULL";
         try (Connection connection = DBUtil.getConnection();
-             PreparedStatement ps = connection.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+              PreparedStatement ps = connection.prepareStatement(sql);
+              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(rs.getInt("id_pengguna"));
             }

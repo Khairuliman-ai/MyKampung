@@ -3,6 +3,10 @@ package model;
 import java.math.BigDecimal;
 import java.util.Date;
 
+/**
+ * Represents a resident's family member (AhliKeluarga).
+ * Tracks relationships, ages, occupations, and incomes to determine welfare eligibility scoring.
+ */
 public class AhliKeluarga {
     private int id_ahli;
     private int id_pengguna;

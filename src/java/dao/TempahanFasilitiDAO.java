@@ -10,9 +10,20 @@ import model.TempahanFasiliti;
 import util.DBUtil;
 import util.StatusConstant;
 
+/**
+ * TempahanFasilitiDAO handles database CRUD operations for facility bookings.
+ * This includes saving new bookings, retrieving booking histories, checking for slot conflicts,
+ * validating active quotas, and aggregating booking statistics.
+ */
 public class TempahanFasilitiDAO {
 
-    // 1. Menyimpan rekod tempahan baru
+    /**
+     * Saves a new facility booking record in the database.
+     * Sets the creation timestamp automatically to CURRENT_TIMESTAMP.
+     * 
+     * @param t the facility booking model containing booking details
+     * @return true if the booking was saved successfully, false otherwise
+     */
     public boolean simpanTempahanBaru(TempahanFasiliti t) {
         // Mengikut struktur gambar DB: tarikh_tempah, masa_mula, masa_tamat, status, dibuat_pada
         String sql = "INSERT INTO tempahan_fasiliti (id_pengguna, id_fasiliti, tarikh_tempah, masa_mula, masa_tamat, status, catatan_pemohon, dibuat_pada) " +
@@ -43,7 +54,14 @@ public class TempahanFasilitiDAO {
         return status;
     }
 
-    // 2. Mendapatkan sejarah tempahan berdasarkan ID pengguna
+    /**
+     * Retrieves the booking history for a specific resident by their user ID.
+     * Joins with the facility table to fetch facility details (name, coordinates, image).
+     * Sorted by creation date descending.
+     * 
+     * @param idPengguna the resident's user ID
+     * @return list of facility booking records
+     */
     public List<TempahanFasiliti> dapatkanSejarahTempahanPenduduk(int idPengguna) {
         List<TempahanFasiliti> senarai = new ArrayList<>();
         String sql = "SELECT t.*, f.nama_fasiliti, f.latitude, f.longitude, f.gambar_fasiliti FROM tempahan_fasiliti t " +
@@ -71,6 +89,13 @@ public class TempahanFasilitiDAO {
         return senarai;
     }
 
+    /**
+     * Retrieves all facility bookings in the database.
+     * Joins with facility and pengguna tables to resolve facility name and user full name.
+     * Ordered by creation date descending.
+     * 
+     * @return list of all facility bookings
+     */
     public List<TempahanFasiliti> dapatkanSemuaTempahan() {
         List<TempahanFasiliti> senarai = new ArrayList<>();
         String sql = "SELECT t.*, f.nama_fasiliti, p.nama_penuh FROM tempahan_fasiliti t " +
@@ -93,6 +118,12 @@ public class TempahanFasilitiDAO {
         return senarai;
     }
 
+    /**
+     * Retrieves a single facility booking by its unique identifier.
+     * 
+     * @param id the booking ID
+     * @return the populated facility booking model, or null if not found
+     */
     public TempahanFasiliti dapatkanTempahanById(int id) {
         TempahanFasiliti t = null;
         String sql = "SELECT t.*, f.nama_fasiliti, p.nama_penuh FROM tempahan_fasiliti t " +
@@ -116,6 +147,14 @@ public class TempahanFasilitiDAO {
         return t;
     }
 
+    /**
+     * Updates the status and administrator notes/catatan for a facility booking.
+     * 
+     * @param id the booking ID
+     * @param status the new status string (e.g., LULUS, TOLAK)
+     * @param catatan administrative remarks
+     * @return true if updated successfully, false otherwise
+     */
     public boolean kemaskiniStatus(int id, String status, String catatan) {
         String sql = "UPDATE tempahan_fasiliti SET status=?, catatan_pentadbir=?, dikemaskini_pada=NOW() WHERE id_tempahan=?";
         try (Connection conn = DBUtil.getConnection();
@@ -130,6 +169,15 @@ public class TempahanFasilitiDAO {
         }
     }
 
+    /**
+     * Cancels a booking by changing its status to 'DIBATALKAN'.
+     * Validates that the requesting user owns the booking, the booking is current/future,
+     * and the status is currently either 'MENUNGGU' or 'LULUS'.
+     * 
+     * @param idTempahan the booking ID
+     * @param idPengguna the ID of the user requesting the cancellation
+     * @return true if the booking was successfully cancelled, false otherwise
+     */
     public boolean batalTempahan(int idTempahan, int idPengguna) {
         String sql = "UPDATE tempahan_fasiliti SET status='" + StatusConstant.TEMPAHAN_DIBATAL + "', dikemaskini_pada=NOW() " +
                      "WHERE id_tempahan=? AND id_pengguna=? " +
@@ -146,6 +194,16 @@ public class TempahanFasilitiDAO {
         }
     }
 
+    /**
+     * Checks for any time conflicts for a given facility on a specific date.
+     * A conflict occurs if there is an overlapping slot that is not rejected (TOLAK) or cancelled (DIBATAL).
+     * 
+     * @param idFasiliti the facility ID
+     * @param tarikh the date of booking
+     * @param mula the start time of the booking
+     * @param tamat the end time of the booking
+     * @return true if a conflict exists, false otherwise
+     */
     public boolean semakKonflikMasa(int idFasiliti, java.sql.Date tarikh, java.sql.Time mula, java.sql.Time tamat) {
         String sql = "SELECT COUNT(*) FROM tempahan_fasiliti " +
                      "WHERE id_fasiliti = ? AND tarikh_tempah = ? " +
@@ -174,6 +232,11 @@ public class TempahanFasilitiDAO {
         return false;
     }
 
+    /**
+     * Counts the total number of facility bookings in the database.
+     * 
+     * @return total booking count
+     */
     public int countAll() {
         String sql = "SELECT COUNT(*) FROM tempahan_fasiliti";
         try (Connection conn = DBUtil.getConnection();
@@ -186,6 +249,14 @@ public class TempahanFasilitiDAO {
         return 0;
     }
 
+    /**
+     * Retrieves the count of active bookings (approved or pending) scheduled in the future for a specific user and facility.
+     * Used to enforce fair usage quotas.
+     * 
+     * @param idPengguna the resident's user ID
+     * @param idFasiliti the facility ID
+     * @return count of active future bookings
+     */
     public int checkUserQuotaActive(int idPengguna, int idFasiliti) {
         String sql = "SELECT COUNT(*) FROM tempahan_fasiliti " +
                      "WHERE id_pengguna = ? AND id_fasiliti = ? " +
@@ -204,6 +275,14 @@ public class TempahanFasilitiDAO {
         return 0;
     }
 
+    /**
+     * Updates the status and rejection reason (alasan penolakan) for a booking.
+     * 
+     * @param id the booking ID
+     * @param status the new booking status
+     * @param alasan the rejection reason
+     * @return true if updated successfully, false otherwise
+     */
     public boolean updateStatusTempahan(int id, String status, String alasan) {
         String sql = "UPDATE tempahan_fasiliti SET status=?, alasan_penolakan=?, dikemaskini_pada=NOW() WHERE id_tempahan=?";
         try (Connection conn = DBUtil.getConnection();
@@ -218,6 +297,13 @@ public class TempahanFasilitiDAO {
         }
     }
 
+    /**
+     * Maps a database result set row to a TempahanFasiliti domain model.
+     * 
+     * @param rs the database ResultSet
+     * @return the populated TempahanFasiliti model
+     * @throws SQLException if a database error occurs during mapping
+     */
     private TempahanFasiliti mapRowBase(ResultSet rs) throws SQLException {
         TempahanFasiliti t = new TempahanFasiliti();
         t.setId_tempahan(rs.getInt("id_tempahan"));
@@ -233,6 +319,11 @@ public class TempahanFasilitiDAO {
         return t;
     }
 
+    /**
+     * Retrieves approved booking counts grouped by facility name.
+     * 
+     * @return a map linking facility names to approved booking counts
+     */
     public java.util.Map<String, Integer> getFasilitiUsageStats() {
         java.util.Map<String, Integer> stats = new java.util.LinkedHashMap<>();
         String sql = "SELECT f.nama_fasiliti, COUNT(*) as count " +
@@ -254,6 +345,11 @@ public class TempahanFasilitiDAO {
         return stats;
     }
 
+    /**
+     * Retrieves bookings status distributions, initializing keys with 0.
+     * 
+     * @return a map linking status names to booking counts
+     */
     public java.util.Map<String, Integer> getFasilitiStatusStats() {
         java.util.Map<String, Integer> stats = new java.util.LinkedHashMap<>();
         stats.put("LULUS", 0);
@@ -277,6 +373,12 @@ public class TempahanFasilitiDAO {
         return stats;
     }
 
+    /**
+     * Counts the number of bookings that match a specific status string.
+     * 
+     * @param status the status string
+     * @return the count of bookings
+     */
     public int countByStatus(String status) {
         String sql = "SELECT COUNT(*) FROM tempahan_fasiliti WHERE status = ?";
         try (Connection conn = DBUtil.getConnection();

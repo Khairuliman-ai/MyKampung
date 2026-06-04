@@ -27,6 +27,18 @@ import javax.servlet.http.Part;
         maxFileSize = 1024 * 1024 * 10, // 10MB
         maxRequestSize = 1024 * 1024 * 50 // 50MB
 )
+/**
+ * RegisterServlet handles new resident registrations.
+ * 
+ * <p><strong>Registration Flow:</strong></p>
+ * <ol>
+ *   <li>The resident submits registration details via the form in {@code auth.jsp}.</li>
+ *   <li>Password is securely hashed using BCrypt.</li>
+ *   <li>Verification PDF is uploaded to the server directory.</li>
+ *   <li>The resident account is created with status = 2 (Pending approval).</li>
+ *   <li>Account awaits manual verification and status activation by the Setiausaha.</li>
+ * </ol>
+ */
 public class RegisterServlet extends HttpServlet {
 
     @Override
@@ -35,44 +47,24 @@ public class RegisterServlet extends HttpServlet {
 
         try {
 
-            /*
-             * ============================================
-             * 1. TAKE INPUTS FROM REGISTER FORM IN auth.jsp
-             * ============================================
-             */
             
             String nama_penuh = request.getParameter("nama_penuh");
             String nombor_kp = request.getParameter("nombor_kp");
             String nombor_telefon = request.getParameter("nombor_telefon");
             String email = request.getParameter("email");
-            String kata_laluan_mentah = request.getParameter("kata_laluan"); // Password asal
+            String kata_laluan_mentah = request.getParameter("kata_laluan");
             String nama_jalan = request.getParameter("nama_jalan");
             String daerah = request.getParameter("daerah");
             String nombor_poskod = request.getParameter("nombor_poskod");
             String bandar = request.getParameter("bandar");
             String negeri = request.getParameter("negeri");
 
-            /*
-             * ===========================
-             * 2. HASHING PASSWORD (bcrypt)
-             * ===========================
-             */
             String hashedPassword = BCrypt.hashpw(kata_laluan_mentah, BCrypt.gensalt());
 
-            /*
-             * =========================
-             * 3. UPLOAD PDF
-             * =========================
-             */
             String fileName = FileUploadUtil.saveFile(
                 request.getPart("bukti_pdf"), AppConfig.DIR_LAMPIRAN_PENGGUNA, "bukti_" + nombor_kp + "_");
             if (fileName == null) fileName = "";
 
-            /*
-             * =========================
-             * 4. SET DATA TO MODEL
-             * =========================
-             */
             Pengguna p = new Pengguna();
             p.setNama_penuh(nama_penuh);
             p.setNombor_kp(nombor_kp);
@@ -85,9 +77,13 @@ public class RegisterServlet extends HttpServlet {
             p.setBandar(bandar);
             p.setNegeri(negeri);
             p.setLampiran_pengesahan(fileName);
-            p.setStatus(2); // Pending
+            // Initial account status set to 2 (Pending approval). Setiausaha must review
+            // and activate the account before the resident can log in.
+            p.setStatus(2);
 
-            // Extract Tarikh Lahir
+
+            // Parse date of birth from Malaysian IC (first 6 digits in format yyMMdd).
+            // Example: "960512-11-2032" -> "960512" -> May 12, 1996.
             if (nombor_kp != null && nombor_kp.length() >= 6) {
                 try {
                     String datePart = nombor_kp.substring(0, 6);
@@ -98,11 +94,6 @@ public class RegisterServlet extends HttpServlet {
                 }
             }
 
-            /*
-             * =========================
-             * 5. SAVE TO DATABASE
-             * =========================
-             */
             PenggunaDAO pDao = new PenggunaDAO();
             boolean isSuccess = pDao.daftarPengguna(p);
 

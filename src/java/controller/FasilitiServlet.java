@@ -39,6 +39,36 @@ import javax.servlet.annotation.MultipartConfig;
     maxFileSize = 5 * 1024 * 1024,       // 5MB
     maxRequestSize = 10 * 1024 * 1024    // 10MB
 )
+/**
+ * FasilitiServlet handles facility management and tempahan (bookings) lifecycle.
+ * It manages the catalog of village facilities, booking slot allocations,
+ * and approval workflows.
+ * 
+ * <p><strong>Auto-Approval Policy:</strong>
+ * Bookings with a duration of 2 hours or less are auto-approved to minimize
+ * administrative overhead, while longer bookings (half-day or full-day)
+ * require manual review by the Biro Sukan & Riadah.</p>
+ * 
+ * <h3>GET Routes (via PathInfo switch):</h3>
+ * <ul>
+ *   <li>/list - Resident catalog and personal booking history.</li>
+ *   <li>/urus - AJK/Staff management interface for facilities and bookings.</li>
+ *   <li>/slots - JSON endpoint returning available slots for a facility and date.</li>
+ *   <li>/tambah - Renders form to add a new facility (Staff only).</li>
+ *   <li>/kemaskini - Renders form to update a facility (Staff only).</li>
+ * </ul>
+ * 
+ * <h3>POST Routes:</h3>
+ * <ul>
+ *   <li>/mohon - Submits a booking request (verifies user booking quotas).</li>
+ *   <li>/batal - Allows a resident to cancel their own booking.</li>
+ *   <li>/approve - Approves a booking (Staff only).</li>
+ *   <li>/reject - Rejects a booking (Staff only).</li>
+ *   <li>/insert - Inserts new facility into DB (Staff only).</li>
+ *   <li>/update - Updates facility in DB (Staff only).</li>
+ *   <li>/delete - Deletes a facility from DB (Staff only).</li>
+ * </ul>
+ */
 public class FasilitiServlet extends HttpServlet {
 
     private static final String SAVE_DIR = AppConfig.DIR_GAMBAR_FASILITI;
@@ -189,7 +219,8 @@ public class FasilitiServlet extends HttpServlet {
             return;
         }
 
-        // 2. Check User Quota (Max 2 active bookings per facility)
+        // Quota: max 2 active bookings per user per facility, to ensure fair access
+        // for all kampung residents. Approved/Pending both count toward the quota.
         if (tempahanDAO.checkUserQuotaActive(user.getId_pengguna(), idFasiliti) >= 2) {
             response.sendRedirect(request.getContextPath() + "/fasiliti/list?error=quota");
             return;
@@ -402,7 +433,9 @@ public class FasilitiServlet extends HttpServlet {
                 }
             }
             
-            // Fallback: Jika tiada slot dalam DB untuk fasiliti ini, gunakan default lama
+            // Backward compatibility fallback: Older facilities added before the slot_fasiliti
+            // table was introduced have no DB slot records. Generate hardcoded 2-hour windows
+            // (08:00–24:00) so booking still works for them.
             if (slots.isEmpty() && dbSlots.isEmpty()) {
                 if ("2".equals(durasiStr)) {
                     int[][] windows = {{8, 10}, {10, 12}, {12, 14}, {14, 16}, {16, 18}, {18, 20}, {20, 22}, {22, 24}};

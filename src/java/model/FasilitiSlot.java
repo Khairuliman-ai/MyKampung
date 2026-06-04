@@ -2,6 +2,10 @@ package model;
 
 import java.sql.Time;
 
+/**
+ * Represents a pre-defined time slot option for facility bookings (FasilitiSlot).
+ * Encapsulates timing bounds and duration classifications (e.g. 1 hour, half day).
+ */
 public class FasilitiSlot {
     private int id_slot;
     private int id_fasiliti;

@@ -26,9 +26,15 @@ import javax.servlet.http.Part;
     maxFileSize = 1024 * 1024 * 10,      // 10MB
     maxRequestSize = 1024 * 1024 * 50    // 50MB
 )
+/**
+ * ProfileServlet manages the user profile area.
+ * It handles the retrieval and display of the resident's profile (including activity logs
+ * and family members), and processes updates such as password changes, general contact updates,
+ * profile photo uploads, family member registration, and income verification document submissions.
+ */
 public class ProfileServlet extends HttpServlet {
 
-    // 1. Method doGet: Untuk paparkan halaman profil
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {
@@ -57,7 +63,7 @@ public class ProfileServlet extends HttpServlet {
         }
     }
 
-    // 2. Method doPost: Untuk proses simpan kemaskini profil
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
             throws ServletException, IOException {

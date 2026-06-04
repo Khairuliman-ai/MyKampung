@@ -19,6 +19,16 @@ import java.math.BigDecimal;
     "/penduduk/urus", "/penduduk/approve", "/penduduk/reject", "/penduduk/update",
     "/ketua/urus", "/ketua/lantik", "/ketua/update", "/ketua/gugurkan", "/ketua/tambahJawatan"
 })
+/**
+ * UrusPendudukServlet handles administrative resident management.
+ * It manages two distinct sub-namespaces based on role access:
+ * <ul>
+ *   <li>{@code /penduduk/*} (Setiausaha only) - Handles approving/rejecting new residents and updating resident profile data.</li>
+ *   <li>{@code /ketua/*} (Ketua Kampung only) - Handles appointment of AJK members to specific portfolios, dismissing AJK members, and managing jawatan titles.</li>
+ * </ul>
+ * 
+ * <p><strong>Audit Logs:</strong> Actions such as profile updates log audit trails in the {@code activity_log} database table.</p>
+ */
 public class UrusPendudukServlet extends HttpServlet {
 
     private PenggunaDAO penggunaDAO;
@@ -47,7 +57,8 @@ public class UrusPendudukServlet extends HttpServlet {
                         p.setSenaraiAhliKeluarga(ahliKeluargaDAO.getByPenggunaId(p.getId_pengguna()));
                     }
                 }
-                // Ambil ahli keluarga yang belum berdaftar sebagai pengguna (untuk paparan senarai penduduk)
+                // Retrieve family members who are not registered as independent accounts.
+                // This ensures we can display the complete population of the village, including dependents.
                 List<AhliKeluarga> familyOnlyList = ahliKeluargaDAO.getAllNonRegistered();
 
                 request.setAttribute("pendingList", pendingList);
@@ -94,13 +105,13 @@ public class UrusPendudukServlet extends HttpServlet {
             penggunaDAO = new PenggunaDAO();
             dao.JawatanDAO jawatanDAO = new dao.JawatanDAO();
 
-            // 1. LOGIC LANTIK AJK
+            // --- Route: /ketua/lantik — Appoint AJK to jawatan ---
             if ("/ketua/lantik".equals(action)) {
                 int idPengguna = Integer.parseInt(request.getParameter("idPengguna"));
                 int idJawatan = Integer.parseInt(request.getParameter("idJawatan"));
                 
-                // Logic: Ketua Kampung must drop existing title holder before appointing new one
-                // We check if jawatan is already occupied (optional check if JSP already filters)
+                // Appointment exclusivity rule: A specific JKKK biro can only be assigned to one AJK at a time.
+                // If a biro is already occupied, the existing holder is automatically demoted.
                 boolean success = jawatanDAO.lantikAJK(idPengguna, idJawatan);
                 
                 if (success) {
@@ -110,7 +121,7 @@ public class UrusPendudukServlet extends HttpServlet {
                 }
             }
             
-            // 2. LOGIC GUGURKAN JAWATAN
+            // --- Route: /ketua/gugurkan — Dismiss AJK from jawatan ---
             else if ("/ketua/gugurkan".equals(action)) {
                 int idPengguna = Integer.parseInt(request.getParameter("idPengguna"));
                 int idJawatan = Integer.parseInt(request.getParameter("idJawatan"));
@@ -124,7 +135,7 @@ public class UrusPendudukServlet extends HttpServlet {
                 }
             }
             
-            // 3. LOGIC TAMBAH JAWATAN BARU
+            // --- Route: /ketua/tambahJawatan — Add new custom jawatan ---
             else if ("/ketua/tambahJawatan".equals(action)) {
                 String namaJawatan = request.getParameter("namaJawatan");
                 boolean success = jawatanDAO.tambahJawatan(namaJawatan);
@@ -136,7 +147,7 @@ public class UrusPendudukServlet extends HttpServlet {
                 }
             }
 
-            // 3. LOGIC UPDATE PROFIL (Oleh Admin/Ketua)
+            // --- Route: /penduduk/update or /ketua/update — Admin/Ketua update resident profile ---
             else if ("/penduduk/update".equals(action) || "/ketua/update".equals(action)) {
                 // ... (Existing update logic kept)
                 int idPengguna = Integer.parseInt(request.getParameter("idPengguna"));
@@ -213,13 +224,14 @@ public class UrusPendudukServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + redirect + "?status=updated");
             }
 
-            // 4. LOGIC APPROVE
+            // --- Route: /penduduk/approve — Approve pending registration ---
             else if ("/penduduk/approve".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("idPengguna"));
                 Pengguna p = penggunaDAO.getPenggunaById(id);
                 
                 if (penggunaDAO.updateStatus(id, 1)) {
-                    // Hantar emel di background thread
+                    // Send status notification email in a background thread to prevent SMTP latency
+                    // from blocking the main HTTP request-response cycle.
                     if (p != null && p.getEmail() != null) {
                         new Thread(() -> {
                             EmailUtil.sendRegistrationStatusEmail(p.getEmail(), p.getNama_penuh(), true);
@@ -229,13 +241,14 @@ public class UrusPendudukServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/penduduk/urus?status=approved");
             }
 
-            // 5. LOGIC REJECT
+            // --- Route: /penduduk/reject — Reject pending registration ---
             else if ("/penduduk/reject".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("idPengguna"));
                 Pengguna p = penggunaDAO.getPenggunaById(id);
                 
                 if (penggunaDAO.updateStatus(id, 0)) {
-                    // Hantar emel di background thread
+                    // Send status notification email in a background thread to prevent SMTP latency
+                    // from blocking the main HTTP request-response cycle.
                     if (p != null && p.getEmail() != null) {
                         new Thread(() -> {
                             EmailUtil.sendRegistrationStatusEmail(p.getEmail(), p.getNama_penuh(), false);

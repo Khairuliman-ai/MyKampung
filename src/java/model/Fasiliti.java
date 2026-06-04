@@ -2,6 +2,10 @@ package model;
 
 import java.sql.Timestamp;
 
+/**
+ * Represents a village facility (Fasiliti) available for resident booking.
+ * Contains location coordinates, status flags, occupancy state, and approval requirement configs.
+ */
 public class Fasiliti {
     private int id_fasiliti;
     private String nama_fasiliti;

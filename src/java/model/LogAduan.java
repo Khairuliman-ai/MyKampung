@@ -2,6 +2,10 @@ package model;
 
 import java.sql.Timestamp;
 
+/**
+ * Represents a log entry tracking a complaint's state transitions (LogAduan).
+ * Records old/new statuses, remarks, and referencing IDs of the actor.
+ */
 public class LogAduan {
     private int id_log_aduan;
     private int id_aduan;

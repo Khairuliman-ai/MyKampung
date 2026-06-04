@@ -46,7 +46,7 @@ public class DashboardServlet extends HttpServlet {
          */
         if (user == null || user.getStatus() != 1) {
             if (session != null) {
-                session.invalidate(); // Bersihkan sesi jika status tidak aktif
+                session.invalidate();
             }
             response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp?error=unauthorized");
             return;
@@ -303,7 +303,7 @@ public class DashboardServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Alirkan permintaan POST ke doGet
+        // Dashboard is read-only; POST only occurs from form-based redirects, so handle identically to GET
         doGet(request, response);
     }
 }

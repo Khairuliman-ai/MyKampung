@@ -1,4 +1,4 @@
-package controller; // Pastikan nama package sesuai dengan struktur projek awak
+package controller;
 
 import java.io.IOException;
 import java.security.SecureRandom;
@@ -12,10 +12,22 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import util.DBUtil; // Import class connection awak
-import util.EmailUtil;      // Import class hantar emel awak
+import util.DBUtil;
+import util.EmailUtil;
 
 @WebServlet("/ForgotPassServlet")
+/**
+ * ForgotPassServlet handles password recovery via a one-time password (OTP) flow.
+ * 
+ * <p><strong>OTP Recovery Flow:</strong></p>
+ * <ol>
+ *   <li>The system verifies that the submitted email and IC number match an active resident.</li>
+ *   <li>Enforces a 2-minute rate limit since the last OTP generation to prevent email spam.</li>
+ *   <li>Generates a secure 6-digit numeric OTP.</li>
+ *   <li>Persists the OTP token in the database with a 5-minute expiry timestamp.</li>
+ *   <li>Sends the OTP to the resident's registered email address via SMTP.</li>
+ * </ol>
+ */
 public class ForgotPassServlet extends HttpServlet {
 
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -41,8 +53,8 @@ public class ForgotPassServlet extends HttpServlet {
             ResultSet rs = psCheck.executeQuery();
 
             if (rs.next()) {
-                // 2. Semak Had Resend (2 Minit)
-                // Jika (expiry - 3 minit) > masa sekarang, bermakna belum cukup 2 minit sejak hantaran terakhir
+                // Rate Limiting: Prevent OTP spamming by enforcing a 2-minute cooldown.
+                // Expiry is set to 5 minutes, so subtracting 3 minutes gives the 2-minute limit.
                 Timestamp currentExpiry = rs.getTimestamp("token_expiry");
                 if (currentExpiry != null) {
                     long lastSentTime = currentExpiry.getTime() - (5 * 60 * 1000);
@@ -74,7 +86,8 @@ public class ForgotPassServlet extends HttpServlet {
 
         } catch (Exception e) {
             e.printStackTrace();
-            // Walaupun error, kita tak nak dedahkan ralat DB kepada user
+            // Security: Intentionally return a generic success message even if an exception occurs
+            // to prevent email enumeration attacks that reveal whether an email exists in the DB.
         }
 
         // 6. Hantar maklum balas JSON

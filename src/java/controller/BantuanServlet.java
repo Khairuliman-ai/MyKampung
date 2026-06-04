@@ -31,13 +31,34 @@ import javax.servlet.http.*;
         maxFileSize = 5 * 1024 * 1024,
         maxRequestSize = 10 * 1024 * 1024
 )
+/**
+ * BantuanServlet — Handles all welfare aid (Bantuan) operations.
+ * Documents the 3-stage review process (Penduduk → AJK Kebajikan → Ketua).
+ *
+ * <h3>GET Routes:</h3>
+ * <ul>
+ *   <li>/list — Role-based application listing (Penduduk, AJK, Ketua)</li>
+ *   <li>/mohon — Application form view</li>
+ *   <li>/edit — Edit existing application</li>
+ *   <li>/rasmi, /komuniti — Category-filtered views</li>
+ *   <li>/config — Eligibility rule configuration (staff only)</li>
+ * </ul>
+ *
+ * <h3>POST Routes:</h3>
+ * <ul>
+ *   <li>/apply — Submit new application</li>
+ *   <li>/reviewAJK — AJK document review</li>
+ *   <li>/keputusanKetua — Ketua approval/rejection</li>
+ *   <li>/config/save — Save eligibility rules</li>
+ * </ul>
+ */
 public class BantuanServlet extends HttpServlet {
 
     private static final String SAVE_DIR
             = AppConfig.DIR_LAMPIRAN_BANTUAN;
 
 
-    // ======================= GET =======================
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -53,12 +74,14 @@ public class BantuanServlet extends HttpServlet {
         String action = request.getPathInfo();
 
         try {
+            // --- Route: / (Default redirect to /list) ---
             if (action == null || "/".equals(action)) {
                 response.sendRedirect(request.getContextPath() + "/bantuan/list");
                 return;
             }
 
-            // ================== LIST ==================
+
+            // --- Route: /list — Role-based application listing ---
             if ("/list".equals(action)) {
                 PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
                 List<PermohonanBantuan> list;
@@ -84,7 +107,7 @@ public class BantuanServlet extends HttpServlet {
                     List<PermohonanBantuan> listBaru = pbDao.getByStatus("BARU");
                     List<PermohonanBantuan> listSejarah = pbDao.getSejarahPaginated(offset, pageSize);
 
-                    // Caching implemented: eligibility recalculated only on rules or profile change
+
 
                     int totalSejarahCount = pbDao.getSejarahCount();
                     int totalPagesSejarah = (int) Math.ceil((double) totalSejarahCount / pageSize);
@@ -103,13 +126,14 @@ public class BantuanServlet extends HttpServlet {
 
                 } else if ("Ketua Kampung".equalsIgnoreCase(user.getNama_peranan())) {
                     list = pbDao.getAll();
-                    // Caching implemented: eligibility recalculated only on rules or profile change
+
                     request.setAttribute("permohonanList", list);
                     request.getRequestDispatcher("/views/bantuan/urusBantuanKetua.jsp").forward(request, response);
                 } else {
                     response.sendRedirect(request.getContextPath() + "/dashboard?error=invalid_role");
                 }
-            } // ================== MOHON (ALL ROLES RESIDENT VIEW) ==================
+            }
+            // --- Route: /mohon — Application form view ---
             else if ("/mohon".equals(action)) {
                 if (isPendudukOrStaff(user)) {
                     PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
@@ -120,7 +144,8 @@ public class BantuanServlet extends HttpServlet {
                 } else {
                     response.sendRedirect(request.getContextPath() + "/dashboard?error=invalid_role");
                 }
-            } // ================== EDIT ==================
+            }
+            // --- Route: /edit — Edit existing application ---
             else if ("/edit".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
                 PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
@@ -136,7 +161,8 @@ public class BantuanServlet extends HttpServlet {
                 } else {
                     response.sendRedirect(request.getContextPath() + "/bantuan/list?error=access");
                 }
-            } // ================== RASMI ==================
+            }
+            // --- Route: /rasmi — Category-filtered (Rasmi) views ---
             else if ("/rasmi".equals(action)) {
                 if (!isPendudukOrStaff(user)) {
                     response.sendRedirect(request.getContextPath() + "/dashboard");
@@ -153,6 +179,7 @@ public class BantuanServlet extends HttpServlet {
                 request.setAttribute("senaraiJenisBantuan", senaraiRasmiDB); 
                 request.getRequestDispatcher("/views/bantuan/bantuanRas.jsp")
                         .forward(request, response);
+             // --- Route: /komuniti — Category-filtered (Komuniti) views ---
             } else if ("/komuniti".equals(action)) {
                 if (!isPendudukOrStaff(user)) {
                     response.sendRedirect(request.getContextPath() + "/dashboard");
@@ -170,6 +197,7 @@ public class BantuanServlet extends HttpServlet {
                 request.setAttribute("currentUser", user);
                 
                 request.getRequestDispatcher("/views/bantuan/bantuanKom.jsp").forward(request, response);
+             // --- Route: /delete — Delete application ---
             } else if ("/delete".equals(action)) {
                 if (isPendudukOrStaff(user)) {
                     PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
@@ -197,6 +225,7 @@ public class BantuanServlet extends HttpServlet {
                 } else {
                     response.sendRedirect(request.getContextPath() + "/bantuan/rasmi?error=denied");
                 }
+             // --- Route: /deleteAttachment — Delete attachment ---
             } else if ("/deleteAttachment".equals(action) && isPendudukOrStaff(user)) {
                 int idLampiran = Integer.parseInt(request.getParameter("idLampiran"));
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
@@ -227,7 +256,7 @@ public class BantuanServlet extends HttpServlet {
         }
     }
 
-    // ======================= POST =======================
+
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -250,7 +279,8 @@ public class BantuanServlet extends HttpServlet {
         try {
             PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
 
-            // ===================== 1. APPLY (PENDUDUK) =====================
+
+            // --- Route: /apply — Submit new application ---
             if ("/apply".equals(action) && isPendudukOrStaff(user)) {
 
                 BantuanLampiranDAO lampiranDao = new BantuanLampiranDAO();
@@ -339,7 +369,8 @@ public class BantuanServlet extends HttpServlet {
                 } else if ("komuniti".equalsIgnoreCase(source)) {
                     response.sendRedirect(request.getContextPath() + "/bantuan/komuniti?status=success");
                 } else {
-                    // Fallback to existing logic
+                    // No explicit source parameter — infer redirect target from bantuan category.
+                    // id_bantuan=999 is the sentinel for "Komuniti/Lain-lain" custom requests.
                     if (pb.getId_bantuan() == 999) {
                         response.sendRedirect(request.getContextPath() + "/bantuan/komuniti?status=success");
                     } else {
@@ -351,14 +382,16 @@ public class BantuanServlet extends HttpServlet {
                         }
                     }
                 }
-            } // ===================== 2. APPROVE / REJECT =====================
+            }
+            // --- Route: /approve or /reject — Review action ---
             else if ("/approve".equals(action) || "/reject".equals(action)) {
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 int status = "/approve".equals(action) ? 1 : 2;
 
                 pbDao.updateStatus(idPermohonan, status, request.getParameter("catatan"), null);
                 response.sendRedirect(request.getContextPath() + "/bantuan/list");
-            } // ===================== 3. UPDATE INFO (KETUA) =====================
+            }
+            // --- Route: /update — Update assistance info ---
             else if ("/update".equals(action)) {
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 String catatan = InputSanitizer.sanitize(request.getParameter("catatan"));
@@ -375,6 +408,7 @@ public class BantuanServlet extends HttpServlet {
                 pbDao.updateInfo(idPermohonan, catatan, fileName);
                 response.sendRedirect(request.getContextPath() + "/bantuan/list");
             } 
+            // --- Route: /updateMyRequest — Resident edits pending request ---
             else if ("/updateMyRequest".equals(action) && isPendudukOrStaff(user)) {
 
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
@@ -460,6 +494,7 @@ public class BantuanServlet extends HttpServlet {
                     }
                 }
             }
+            // --- Route: /reviewAJK — AJK document review ---
             else if ("/reviewAJK".equals(action)) {
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 String keputusan = request.getParameter("keputusan"); 
@@ -503,7 +538,9 @@ public class BantuanServlet extends HttpServlet {
                 }
 
                 response.sendRedirect(request.getContextPath() + "/bantuan/list?msg=reviewed");
-            } else if ("/keputusanKetua".equals(action)) {
+            }
+             // --- Route: /keputusanKetua — Ketua final approval decision ---
+            else if ("/keputusanKetua".equals(action)) {
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 String keputusan = request.getParameter("keputusan");
                 String ulasanKetua = InputSanitizer.sanitize(request.getParameter("ulasan"));
@@ -517,7 +554,9 @@ public class BantuanServlet extends HttpServlet {
 
                 BantuanLampiranDAO lampiranDao = new BantuanLampiranDAO();
                 Collection<Part> parts = request.getParts();
-                String firstFileName = null; // Still keep for backward compatibility in main table if needed
+                // FIXME: firstFileName is passed to updateStatus() but the DAO ignores the dokumen parameter.
+                // Remove this variable after confirming no other code path depends on it.
+                String firstFileName = null;
 
                 for (Part part : parts) {
                     if ("dokumenBalas".equals(part.getName()) && part.getSize() > 0) {
@@ -559,7 +598,8 @@ public class BantuanServlet extends HttpServlet {
                 response.sendRedirect(request.getContextPath() + "/bantuan/list?msg=decision_made");
             }
             
-            // ===================== CONFIG =====================
+
+            // --- Route: /config — Eligibility rule configuration view ---
             else if ("/config".equals(action)) {
                 String role = user.getNama_peranan();
                 if (!"AJK".equalsIgnoreCase(role) && !"Ketua Kampung".equalsIgnoreCase(role) && !"AJK Kampung".equalsIgnoreCase(role)) {
@@ -572,7 +612,8 @@ public class BantuanServlet extends HttpServlet {
                 request.getRequestDispatcher("/views/bantuan/urusBantuanConfig.jsp").forward(request, response);
             }
             
-            // ===================== CONFIG SAVE =====================
+
+            // --- Route: /config/save — Save eligibility configurations ---
             else if ("/config/save".equals(action)) {
                 String role = user.getNama_peranan();
                 if (!"AJK".equalsIgnoreCase(role) && !"Ketua Kampung".equalsIgnoreCase(role) && !"AJK Kampung".equalsIgnoreCase(role)) {
@@ -623,6 +664,7 @@ public class BantuanServlet extends HttpServlet {
                 }
             }
             
+            // --- Route: /tambahJenisBantuan or /kemaskiniJenisBantuan — Add/update aid types ---
             else if ("/tambahJenisBantuan".equals(action) || "/kemaskiniJenisBantuan".equals(action)) {
                 String role = user.getNama_peranan();
                 if (!"AJK".equalsIgnoreCase(role) && !"Ketua Kampung".equalsIgnoreCase(role) && !"AJK Kampung".equalsIgnoreCase(role)) {
@@ -661,7 +703,9 @@ public class BantuanServlet extends HttpServlet {
                 } else {
                     response.sendRedirect(request.getContextPath() + "/bantuan/list?error=db");
                 }
-            } else if ("/padamJenisBantuan".equals(action)) {
+            }
+             // --- Route: /padamJenisBantuan — Delete aid type ---
+            else if ("/padamJenisBantuan".equals(action)) {
                 String idStr = request.getParameter("id");
                 if (idStr != null) {
                     BantuanDAO bDao = new BantuanDAO();

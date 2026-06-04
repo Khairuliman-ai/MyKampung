@@ -1,5 +1,9 @@
 package model;
 
+/**
+ * Represents a village committee portfolio or biro title (JawatanAJK).
+ * Examples: Biro Keselamatan, Biro Kebajikan & Sosial.
+ */
 public class JawatanAJK {
     private int id_jawatan;
     private String nama_jawatan;

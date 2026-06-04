@@ -4,6 +4,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * Represents a welfare aid application (PermohonanBantuan).
+ * Holds applicant details, bank account details, and automatically calculated
+ * eligibility scores and flags computed by EligibilityService.
+ */
 public class PermohonanBantuan {
     private int id_permohonan;
     private int id_pengguna;
@@ -35,8 +40,14 @@ public class PermohonanBantuan {
     private List<BantuanLampiran> senaraiLampiran = new ArrayList<>();
 
     // Eligibility Fields
+    
+    /** The computed eligibility score between 0.0 and 100.0. */
     private Double eligibilityScore = 0.0;
+    
+    /** Priority tier assigned based on the eligibility score: TINGGI, SEDERHANA, or RENDAH. */
     private String eligibilityTier = "RENDAH";
+    
+    /** Risk or priority flag labels triggered during scoring evaluation. */
     private List<String> eligibilityFlags = new ArrayList<>();
 
     public Double getEligibilityScore() { return eligibilityScore; }

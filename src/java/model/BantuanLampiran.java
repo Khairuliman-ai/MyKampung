@@ -2,6 +2,10 @@ package model;
 
 import java.sql.Timestamp;
 
+/**
+ * Represents an uploaded attachment associated with a welfare assistance application (BantuanLampiran).
+ * Captures file names, upload source classifications (resident/admin), and upload timestamps.
+ */
 public class BantuanLampiran {
     private int id_lampiran;
     private int id_permohonan;

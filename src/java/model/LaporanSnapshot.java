@@ -2,6 +2,11 @@ package model;
 
 import java.sql.Timestamp;
 
+/**
+ * Represents a monthly demographic and activity snapshot (LaporanSnapshot).
+ * Aggregates village-wide stats (residents, welfare, complaints, facility bookings, average incomes)
+ * captured at the end of each calendar month.
+ */
 public class LaporanSnapshot {
     private int id_snapshot;
     private int tahun;

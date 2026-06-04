@@ -2,6 +2,10 @@ package model;
 
 import java.util.Date;
 
+/**
+ * Represents a user notification (Notifications).
+ * Stores target recipient references, category types, messaging content, routing links, and read/unread flags.
+ */
 public class Notifications {
     private int id_notification;
     private int id_pengguna;

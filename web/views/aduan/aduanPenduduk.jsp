@@ -337,15 +337,22 @@
                     <!-- Tajuk -->
                     <div>
                         <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Tajuk Aduan / Isu</label>
-                        <input type="text" name="tajuk" required max="100" placeholder="Contoh: Lampu jalan rosak di simpang lorong 2..." 
+                        <input type="text" name="tajuk" id="tajukInput" required max="100" placeholder="Contoh: Lampu jalan rosak di simpang lorong 2..." 
                                class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 focus:ring-2 focus:ring-emerald-500 focus:bg-white text-xs transition">
                     </div>
 
                     <!-- Kategori & Keutamaan -->
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider">Kategori & Keutamaan</label>
+                        <button type="button" onclick="getAICategories()" id="btnSuggestAI"
+                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:scale-105 active:scale-95 transition text-[10px] font-extrabold uppercase tracking-wider border border-emerald-100 shadow-sm">
+                            <i class="fas fa-magic"></i> Cadangan AI ✨
+                        </button>
+                    </div>
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Kategori Isu</label>
-                            <select name="id_kategori" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 focus:ring-2 focus:ring-emerald-500 focus:bg-white text-xs transition">
+                            <select name="id_kategori" id="kategoriSelect" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 focus:ring-2 focus:ring-emerald-500 focus:bg-white text-xs transition">
                                 <% if (kategoriList != null) { 
                                     for (KategoriAduan k : kategoriList) { %>
                                     <option value="<%= k.getId_kategori_aduan() %>"><%= k.getNama_kategori() %></option>
@@ -354,13 +361,21 @@
                         </div>
                         <div>
                             <label class="block text-[10px] font-black text-slate-400 uppercase tracking-wider mb-2">Tahap Keutamaan</label>
-                            <select name="keutamaan" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 focus:ring-2 focus:ring-emerald-500 focus:bg-white text-xs transition">
+                            <select name="keutamaan" id="keutamaanSelect" required class="w-full px-4 py-3 rounded-xl bg-slate-50 border border-slate-100 focus:ring-2 focus:ring-emerald-500 focus:bg-white text-xs transition">
                                 <option value="RENDAH">RENDAH</option>
                                 <option value="SEDERHANA" selected>SEDERHANA</option>
                                 <option value="TINGGI">TINGGI</option>
                                 <option value="KRITIKAL">KRITIKAL</option>
                             </select>
                         </div>
+                    </div>
+
+                    <!-- AI Suggestion Reason -->
+                    <div id="aiReasonContainer" class="hidden p-3.5 rounded-2xl bg-emerald-50/50 border border-emerald-100/50 text-[10px] text-emerald-800 font-medium transition-all duration-300">
+                        <div class="flex items-center gap-1.5 font-bold mb-1">
+                            <i class="fas fa-robot text-emerald-600 text-xs"></i> Ulasan Cadangan AI:
+                        </div>
+                        <p id="aiReasonText"></p>
                     </div>
 
                     <!-- Keterangan -->
@@ -597,6 +612,83 @@
             });
         <% } %>
     });
+
+    async function getAICategories() {
+        const tajuk = document.getElementById("tajukInput").value.trim();
+        const keterangan = document.getElementById("keteranganInput").value.trim();
+        
+        if (!tajuk && !keterangan) {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Input Diperlukan',
+                text: 'Sila masukkan tajuk atau keterangan aduan terlebih dahulu sebelum menggunakan cadangan AI.',
+                confirmButtonColor: '#10B981',
+                customClass: { popup: 'rounded-3xl' }
+            });
+            return;
+        }
+        
+        const btn = document.getElementById("btnSuggestAI");
+        const originalHtml = btn.innerHTML;
+        
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner animate-spin"></i> Memproses...';
+        
+        const aiReasonContainer = document.getElementById("aiReasonContainer");
+        const aiReasonText = document.getElementById("aiReasonText");
+        
+        try {
+            const url = '<%= request.getContextPath() %>/aduan/suggestAI?tajuk=' + encodeURIComponent(tajuk) + '&keterangan=' + encodeURIComponent(keterangan);
+            const response = await fetch(url);
+            
+            if (!response.ok) {
+                throw new Error("HTTP error " + response.status);
+            }
+            
+            const data = await response.json();
+            
+            if (data.id_kategori && data.keutamaan) {
+                // Update dropdown inputs
+                document.getElementById("kategoriSelect").value = data.id_kategori;
+                document.getElementById("keutamaanSelect").value = data.keutamaan;
+                
+                // Show reasoning
+                aiReasonText.innerText = data.reason || "Kategori dan keutamaan dicadangkan secara automatik oleh AI.";
+                aiReasonContainer.classList.remove("hidden");
+                
+                // Show a nice Toast notification
+                const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                        toast.addEventListener('mouseenter', Swal.stopTimer)
+                        toast.addEventListener('mouseleave', Swal.resumeTimer)
+                    }
+                });
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Cadangan AI Berjaya Ditambah!'
+                });
+            } else {
+                throw new Error("Format respon AI tidak sah.");
+            }
+        } catch (error) {
+            console.error(error);
+            Swal.fire({
+                icon: 'error',
+                title: 'Gagal Mendapatkan Cadangan AI',
+                text: 'Sila cuba sebentar lagi atau pilih kategori secara manual.',
+                confirmButtonColor: '#DC2626',
+                customClass: { popup: 'rounded-3xl' }
+            });
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = originalHtml;
+        }
+    }
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>

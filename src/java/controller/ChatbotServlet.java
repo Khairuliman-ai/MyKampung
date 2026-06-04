@@ -14,6 +14,11 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+/**
+ * ChatbotServlet integrates the Gemini AI model to provide conversational assistance (KampungBot).
+ * It manages session-based chat history, enforces a 12-message history cap (6 user-model turns)
+ * to keep payload sizes reasonable, and feeds custom context for personalized support.
+ */
 public class ChatbotServlet extends HttpServlet {
 
     @Override
@@ -87,6 +92,14 @@ public class ChatbotServlet extends HttpServlet {
         }
     }
 
+    /**
+     * Constructs a personalized system prompt for the Gemini AI model.
+     * Incorporates current user's name, role, and biro to enable personalized responses.
+     * Also feeds instructions and rules about the village management system.
+     * 
+     * @param user current authenticated user
+     * @return system prompt instructions
+     */
     private String buildSystemPrompt(Pengguna user) {
         StringBuilder sb = new StringBuilder();
         sb.append("Anda adalah 'KampungBot', pembantu maya pintar dan mesra bagi sistem 'MyKampung - Sistem Pengurusan Kampung Danan'.\n\n");

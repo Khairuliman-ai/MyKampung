@@ -6,8 +6,19 @@ import java.util.List;
 import model.Aduan;
 import util.DBUtil;
 
+/**
+ * AduanDAO handles database CRUD operations for the community complaint (aduan) system.
+ * Supports transaction handling for state transitions and audit logging,
+ * along with statistical data aggregation for analytics reporting.
+ */
 public class AduanDAO {
 
+    /**
+     * Base SELECT clause shared by all read queries. JOINs in:
+     * - pengguna (complainant's full name as nama_penuh)
+     * - kategori_aduan (category label as nama_kategori)
+     * - pengguna p2 (assigned handler's name as nama_pengendali, LEFT JOIN because unassigned complaints have NULL id_pengendali)
+     */
     private static final String BASE_SQL =
         "SELECT a.*, p.nama_penuh, k.nama_kategori, p2.nama_penuh as nama_pengendali " +
         "FROM aduan a " +
@@ -15,6 +26,13 @@ public class AduanDAO {
         "JOIN kategori_aduan k ON a.id_kategori_aduan = k.id_kategori_aduan " +
         "LEFT JOIN pengguna p2 ON a.id_pengendali = p2.id_pengguna ";
 
+    /**
+     * Inserts a new complaint record into the database.
+     * Initial status is set to 'SUBMITTED'.
+     * 
+     * @param aduan the complaint model to insert
+     * @return true if insertion succeeded, false otherwise
+     */
     public boolean insertAduan(Aduan aduan) {
         String sql = "INSERT INTO aduan (id_pengguna, id_kategori_aduan, tajuk, keterangan, status, keutamaan, gambar_aduan, id_pengendali) VALUES (?, ?, ?, ?, 'SUBMITTED', ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
@@ -35,6 +53,12 @@ public class AduanDAO {
         return false;
     }
 
+    /**
+     * Retrieves a single complaint by its ID, including mapped helper fields.
+     * 
+     * @param id the complaint ID
+     * @return the populated complaint model, or null if not found
+     */
     public Aduan getById(int id) {
         String sql = BASE_SQL + "WHERE a.id_aduan = ?";
         try (Connection conn = DBUtil.getConnection();
@@ -51,6 +75,12 @@ public class AduanDAO {
         return null;
     }
 
+    /**
+     * Retrieves all non-deleted complaints submitted by a specific resident.
+     * 
+     * @param idPengguna the resident's user ID
+     * @return list of matching complaints sorted by date descending
+     */
     public List<Aduan> getByPenduduk(int idPengguna) {
         List<Aduan> list = new ArrayList<>();
         String sql = BASE_SQL + "WHERE a.id_pengguna = ? AND a.dipadam_pada IS NULL ORDER BY a.dibuat_pada DESC";
@@ -68,6 +98,13 @@ public class AduanDAO {
         return list;
     }
 
+    /**
+     * Retrieves non-deleted complaints assigned to a specific AJK officer,
+     * or unassigned complaints in 'SUBMITTED' state.
+     * 
+     * @param idAJK the AJK officer's user ID
+     * @return list of complaints sorted by date descending
+     */
     public List<Aduan> getByPengendali(int idAJK) {
         List<Aduan> list = new ArrayList<>();
         String sql = BASE_SQL + "WHERE (a.id_pengendali = ? OR (a.id_pengendali IS NULL AND a.status = 'SUBMITTED')) " +
@@ -86,6 +123,12 @@ public class AduanDAO {
         return list;
     }
 
+    /**
+     * Retrieves the user ID of the AJK member assigned to a specific jawatan.
+     * 
+     * @param idJawatan the jawatan ID
+     * @return the AJK user ID, or null if no one is assigned
+     */
     public Integer getAJKIdByJawatan(int idJawatan) {
         String sql = "SELECT id_pengguna FROM ajk_jawatan WHERE id_jawatan = ? LIMIT 1";
         try (Connection conn = DBUtil.getConnection();
@@ -100,6 +143,13 @@ public class AduanDAO {
         return null;
     }
 
+    /**
+     * Retrieves the contact details (full name and phone) of the AJK assigned to a jawatan.
+     * Used for escalating issues or providing support contacts.
+     * 
+     * @param idJawatan the jawatan ID
+     * @return string array where index 0 is full name and index 1 is phone number
+     */
     public String[] getAJKDetailsByJawatan(int idJawatan) {
         String sql = "SELECT p.nama_penuh, p.nombor_telefon " +
                      "FROM pengguna p " +
@@ -119,12 +169,18 @@ public class AduanDAO {
         return new String[]{"Tiada AJK", ""};
     }
 
+    /**
+     * Retrieves all non-deleted complaints in the system.
+     * Used primarily by the Ketua Kampung.
+     * 
+     * @return list of all complaints sorted by date descending
+     */
     public List<Aduan> getAll() {
         List<Aduan> list = new ArrayList<>();
         String sql = BASE_SQL + "WHERE a.dipadam_pada IS NULL ORDER BY a.dibuat_pada DESC";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(mapRow(rs));
             }
@@ -134,6 +190,15 @@ public class AduanDAO {
         return list;
     }
 
+    /**
+     * Non-transactional status update. Updates status and optional remarks column.
+     * 
+     * @param id the complaint ID
+     * @param status the new status string
+     * @param catatanField the DB column name to update remarks (e.g. 'catatan_ajk')
+     * @param catatanValue the text of the remarks
+     * @return true if updated successfully
+     */
     public boolean updateStatus(int id, String status, String catatanField, String catatanValue) {
         String sql;
         if (catatanField != null && ("catatan_ajk".equals(catatanField) || "catatan_ketua".equals(catatanField) || "catatan_pentadbir".equals(catatanField))) {
@@ -158,7 +223,16 @@ public class AduanDAO {
     }
 
     /**
-     * Mengemaskini status aduan beserta rekod log aduan dalam satu transaksi atomik.
+     * Updates complaint status and records a change log entry inside a single database transaction.
+     * Enforces atomic consistency between the complaint table and log table.
+     * 
+     * @param id the complaint ID
+     * @param status the destination status
+     * @param catatanField the DB remarks column to update (e.g., 'catatan_ajk')
+     * @param catatanValue the remarks text
+     * @param idPelaku the user ID performing the change
+     * @param logCatatan audit trail details
+     * @return true if both operations committed successfully
      */
     public boolean updateStatusWithLog(int id, String status, String catatanField, String catatanValue, int idPelaku, String logCatatan) {
         String sqlUpdate;
@@ -180,7 +254,7 @@ public class AduanDAO {
             conn = DBUtil.getConnection();
             conn.setAutoCommit(false);
 
-            // 1. Dapatkan status lama
+            // Step 1: Read current status WITHIN the transaction to prevent TOCTOU race conditions
             String oldStatus = "SUBMITTED";
             psGet = conn.prepareStatement(sqlGetOldStatus);
             psGet.setInt(1, id);
@@ -189,7 +263,7 @@ public class AduanDAO {
                 oldStatus = rs.getString("status");
             }
 
-            // 2. Kemaskini status aduan
+            // Step 2: Apply the status change
             psUpdate = conn.prepareStatement(sqlUpdate);
             psUpdate.setString(1, status);
             if (catatanField != null && ("catatan_ajk".equals(catatanField) || "catatan_ketua".equals(catatanField) || "catatan_pentadbir".equals(catatanField))) {
@@ -201,7 +275,7 @@ public class AduanDAO {
             int affected = psUpdate.executeUpdate();
 
             if (affected > 0) {
-                // 3. Masukkan ke log aduan
+                // Step 3: Audit trail — log must succeed atomically with the status change
                 psLog = conn.prepareStatement(sqlInsertLog);
                 psLog.setInt(1, id);
                 psLog.setInt(2, idPelaku);
@@ -232,7 +306,13 @@ public class AduanDAO {
     }
 
     /**
-     * Membuka semula (Reopen) aduan yang selesai/ditolak. Menambah kaunter reopen_count secara atomik.
+     * Reopens a completed or rejected complaint.
+     * Enforces the JKKK business rule of a maximum of 2 reopens directly in the update logic.
+     * 
+     * @param id the complaint ID
+     * @param idPelaku the resident reopening the complaint
+     * @param logCatatan audit explanation
+     * @return true if reopened successfully (and reopen limit not exceeded)
      */
     public boolean reopenAduan(int id, int idPelaku, String logCatatan) {
         String sqlUpdate = "UPDATE aduan SET status = 'REOPENED', reopen_count = reopen_count + 1, dikemaskini_pada = NOW() WHERE id_aduan = ? AND reopen_count < 2";
@@ -249,7 +329,7 @@ public class AduanDAO {
             conn = DBUtil.getConnection();
             conn.setAutoCommit(false);
 
-            // 1. Dapatkan status lama
+            // Step 1: Read current status WITHIN the transaction to prevent TOCTOU race conditions
             String oldStatus = "RESOLVED";
             psGet = conn.prepareStatement(sqlGetOldStatus);
             psGet.setInt(1, id);
@@ -258,13 +338,13 @@ public class AduanDAO {
                 oldStatus = rs.getString("status");
             }
 
-            // 2. Kemaskini status dan tambah kaunter reopen
+            // Step 2: Apply status change and increment reopen count
             psUpdate = conn.prepareStatement(sqlUpdate);
             psUpdate.setInt(1, id);
             int affected = psUpdate.executeUpdate();
 
             if (affected > 0) {
-                // 3. Masukkan ke log aduan
+                // Step 3: Insert log record
                 psLog = conn.prepareStatement(sqlInsertLog);
                 psLog.setInt(1, id);
                 psLog.setInt(2, idPelaku);
@@ -294,7 +374,11 @@ public class AduanDAO {
     }
 
     /**
-     * Mengemaskini fail bukti penyelesaian aduan
+     * Updates the filename of the uploaded resolution proof (bukti selesai).
+     * 
+     * @param idAduan the complaint ID
+     * @param fileName resolution proof filename
+     * @return true if updated successfully
      */
     public boolean updateBuktiSelesai(int idAduan, String fileName) {
         String sql = "UPDATE aduan SET bukti_selesai = ? WHERE id_aduan = ?";
@@ -309,6 +393,13 @@ public class AduanDAO {
         return false;
     }
 
+    /**
+     * Manually assigns an AJK handler (pengendali) to a complaint.
+     * 
+     * @param idAduan the complaint ID
+     * @param idAJK user ID of the AJK member
+     * @return true if updated successfully
+     */
     public boolean assignPengendali(int idAduan, int idAJK) {
         String sql = "UPDATE aduan SET id_pengendali = ? WHERE id_aduan = ?";
         try (Connection conn = DBUtil.getConnection();
@@ -322,6 +413,9 @@ public class AduanDAO {
         return false;
     }
 
+    /**
+     * Maps a single row from a ResultSet into an Aduan model object.
+     */
     private Aduan mapRow(ResultSet rs) throws SQLException {
         Aduan a = new Aduan();
         a.setId_aduan(rs.getInt("id_aduan"));
@@ -349,6 +443,12 @@ public class AduanDAO {
         return a;
     }
 
+    /**
+     * Gathers counts of complaints grouped by their status.
+     * Used for building analytics reports.
+     * 
+     * @return map of status strings to counts
+     */
     public java.util.Map<String, Integer> getAduanSummaryStats() {
         java.util.Map<String, Integer> stats = new java.util.LinkedHashMap<>();
         stats.put("SUBMITTED", 0);
@@ -362,7 +462,7 @@ public class AduanDAO {
         String sql = "SELECT status, COUNT(*) as count FROM aduan WHERE dipadam_pada IS NULL GROUP BY status";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 String status = rs.getString("status");
                 if (status != null) {
@@ -375,6 +475,11 @@ public class AduanDAO {
         return stats;
     }
 
+    /**
+     * Gathers counts of complaints grouped by their category.
+     * 
+     * @return map of category names to counts
+     */
     public java.util.Map<String, Integer> getAduanCategoryStats() {
         java.util.Map<String, Integer> stats = new java.util.LinkedHashMap<>();
         String sql = "SELECT k.nama_kategori, COUNT(*) as count " +
@@ -384,7 +489,7 @@ public class AduanDAO {
                      "GROUP BY k.nama_kategori";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 stats.put(rs.getString("nama_kategori"), rs.getInt("count"));
             }
@@ -394,6 +499,11 @@ public class AduanDAO {
         return stats;
     }
 
+    /**
+     * Gathers counts of complaints grouped by their priority level.
+     * 
+     * @return map of priority levels to counts
+     */
     public java.util.Map<String, Integer> getAduanPriorityStats() {
         java.util.Map<String, Integer> stats = new java.util.LinkedHashMap<>();
         stats.put("RENDAH", 0);
@@ -404,7 +514,7 @@ public class AduanDAO {
         String sql = "SELECT keutamaan, COUNT(*) as count FROM aduan WHERE dipadam_pada IS NULL GROUP BY keutamaan";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 String p = rs.getString("keutamaan");
                 if (p != null) {
@@ -417,12 +527,18 @@ public class AduanDAO {
         return stats;
     }
 
+    /**
+     * Counts the total number of active/pending complaints.
+     * Active means status is NOT in (RESOLVED, REJECTED, CLOSED).
+     * 
+     * @return total count of active complaints
+     */
     public int countActiveAduan() {
         String sql = "SELECT COUNT(*) FROM aduan WHERE dipadam_pada IS NULL "
                    + "AND status NOT IN ('RESOLVED','REJECTED','CLOSED')";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -432,5 +548,3 @@ public class AduanDAO {
         return 0;
     }
 }
-
-

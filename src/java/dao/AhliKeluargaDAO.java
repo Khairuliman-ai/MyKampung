@@ -5,13 +5,30 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * AhliKeluargaDAO handles database operations for resident family members (ahli_keluarga).
+ * Family members are registered under a main user (head of household) for socio-economic tracking.
+ */
 public class AhliKeluargaDAO {
     private Connection conn;
 
+    /**
+     * Constructs an AhliKeluargaDAO with an active database connection.
+     * Used within transactional scopes.
+     * 
+     * @param conn the database connection to use
+     */
     public AhliKeluargaDAO(Connection conn) {
         this.conn = conn;
     }
 
+    /**
+     * Inserts a new family member record.
+     * 
+     * @param a the family member model containing details
+     * @return true if the insert succeeded, false otherwise
+     * @throws SQLException if a database error occurs
+     */
     public boolean addAhliKeluarga(AhliKeluarga a) throws SQLException {
         String sql = "INSERT INTO ahli_keluarga (id_pengguna, nama_penuh, nombor_kp, nombor_telefon, umur, hubungan, pekerjaan, pendapatan, pengesahan_pendapatan) "
                    + "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -29,6 +46,12 @@ public class AhliKeluargaDAO {
         }
     }
 
+    /**
+     * Retrieves all family members registered under a specific user ID.
+     * 
+     * @param idPengguna the user ID of the household head
+     * @return a list of AhliKeluarga records
+     */
     public List<AhliKeluarga> getByPenggunaId(int idPengguna) {
         List<AhliKeluarga> senarai = new ArrayList<>();
         String sql = "SELECT * FROM ahli_keluarga WHERE id_pengguna = ? ORDER BY id_ahli ASC";
@@ -57,6 +80,13 @@ public class AhliKeluargaDAO {
         return senarai;
     }
 
+    /**
+     * Deletes all family member records registered under a specific user ID.
+     * 
+     * @param idPengguna the user ID of the household head
+     * @return true if the delete operation succeeded
+     * @throws SQLException if a database error occurs
+     */
     public boolean deleteByPenggunaId(int idPengguna) throws SQLException {
         String sql = "DELETE FROM ahli_keluarga WHERE id_pengguna = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -66,9 +96,10 @@ public class AhliKeluargaDAO {
     }
 
     /**
-     * Mengira bilangan ahli keluarga yang TIDAK berdaftar sebagai pengguna aktif.
-     * Deduplikasi berdasarkan nombor_kp — ahli yang nombor_kp-nya sudah wujud
-     * dalam table pengguna (status aktif) tidak akan dikira semula.
+     * Counts family members who are not registered as active individual users in the system.
+     * Uses national IC number (nombor_kp) checks to avoid double-counting active residents.
+     * 
+     * @return count of non-registered family members
      */
     public int countNonRegistered() {
         String sql = "SELECT COUNT(*) FROM ahli_keluarga ak "
@@ -84,9 +115,11 @@ public class AhliKeluargaDAO {
     }
 
     /**
-     * Mengambil semua ahli keluarga yang TIDAK berdaftar sebagai pengguna aktif,
-     * berserta nama wakil keluarga (pengguna yang mendaftarkan mereka).
-     * Digunakan untuk paparan dalam senarai penduduk AJK/Ketua.
+     * Retrieves details of all family members who are not registered as active individual users.
+     * Joins with the pengguna table to resolve the full name of their household representative.
+     * Used by AJK/Ketua for comprehensive census reporting.
+     * 
+     * @return a list of non-registered AhliKeluarga records
      */
     public List<AhliKeluarga> getAllNonRegistered() {
         List<AhliKeluarga> senarai = new ArrayList<>();

@@ -2,6 +2,10 @@ package model;
 
 import java.util.Date;
 
+/**
+ * Represents a classification category for complaints (KategoriAduan).
+ * Stores category names, explanations, and placeholder template title suggestions.
+ */
 public class KategoriAduan {
     private int id_kategori_aduan;
     private String nama_kategori;

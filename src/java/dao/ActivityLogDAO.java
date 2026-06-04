@@ -6,14 +6,29 @@ import java.util.List;
 import model.ActivityLog;
 import util.DBUtil;
 
+/**
+ * ActivityLogDAO handles database operations for the activity audit trail (log_aktiviti).
+ * Tracks administrator actions taken on residents (e.g. status changes, approvals, demotions).
+ */
 public class ActivityLogDAO {
     
     private Connection conn;
     
+    /**
+     * Constructs an ActivityLogDAO with an active database connection.
+     * Used within external transactional contexts.
+     * 
+     * @param conn the database connection to use
+     */
     public ActivityLogDAO(Connection conn) {
         this.conn = conn;
     }
 
+    /**
+     * Inserts a new activity log record.
+     * 
+     * @param log the ActivityLog model containing the audit details
+     */
     public void insertLog(ActivityLog log) {
         String query = "INSERT INTO log_aktiviti (id_pengguna, id_admin, jenis_tindakan, keterangan_tindakan) VALUES (?, ?, ?, ?)";
         try (PreparedStatement ps = conn.prepareStatement(query)) {
@@ -27,6 +42,13 @@ public class ActivityLogDAO {
         }
     }
 
+    /**
+     * Retrieves all activity logs recorded for a specific resident, sorted by date descending.
+     * Joins with the pengguna table to resolve the actioning administrator's name.
+     * 
+     * @param residentId the resident's user ID
+     * @return a list of ActivityLog entries
+     */
     public List<ActivityLog> getLogsByResidentId(int residentId) {
         List<ActivityLog> logs = new ArrayList<>();
         String query = "SELECT al.*, p.nama_penuh as admin_name " +

@@ -6,9 +6,19 @@ import java.util.List;
 import model.JawatanAJK;
 import util.DBUtil;
 
+/**
+ * JawatanDAO handles database operations for managing AJK committee roles/titles (jawatan_ajk).
+ * Enforces transaction safety when appointing or dismissing AJK members, ensuring
+ * that role mappings in pengguna_peranan stay synchronized with ajk_jawatan.
+ */
 public class JawatanDAO {
 
-    // Ambil senarai semua jawatan berserta pemegang (jika ada)
+    /**
+     * Retrieves all available committee positions (jawatan_ajk) and their current holders.
+     * Temporary piggybacks the jawatan ID into the status field of the returned Pengguna model for UI mapping.
+     * 
+     * @return a list of Pengguna objects representing position holders and vacant titles
+     */
     public List<model.Pengguna> getJawatanHolders() {
         List<model.Pengguna> senarai = new ArrayList<>();
         String sql = "SELECT j.id_jawatan, j.nama_jawatan, p.id_pengguna, p.nama_penuh " +
@@ -32,7 +42,15 @@ public class JawatanDAO {
         return senarai;
     }
 
-    // Lantik Pengguna (Lantik: Update Peranan + Insert AJK_Jawatan)
+    /**
+     * Appoints a resident to a committee position.
+     * Runs inside a database transaction: inserts a record into ajk_jawatan
+     * and updates the user's role to AJK (role ID 3) in pengguna_peranan.
+     * 
+     * @param id_pengguna the user ID of the resident being appointed
+     * @param id_jawatan the jawatan ID to assign
+     * @return true if the appointment transaction committed successfully, false otherwise
+     */
     public boolean lantikAJK(int id_pengguna, int id_jawatan) {
         String sqlInsert = "INSERT INTO ajk_jawatan (id_pengguna, id_jawatan) VALUES (?, ?)";
         String sqlUpdateRole = "UPDATE pengguna_peranan SET id_peranan = 3 WHERE id_pengguna = ?";
@@ -59,7 +77,15 @@ public class JawatanDAO {
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 
-    // Gugurkan Jawatan (Delete from AJK_Jawatan + Revert Role to Penduduk ID 4)
+    /**
+     * Dismisses an AJK member from their committee position.
+     * Runs inside a database transaction: deletes their assignment from ajk_jawatan
+     * and reverts their role back to Penduduk (role ID 4) in pengguna_peranan.
+     * 
+     * @param id_pengguna the user ID of the AJK member being dismissed
+     * @param id_jawatan the jawatan ID to remove
+     * @return true if the dismissal transaction committed successfully, false otherwise
+     */
     public boolean gugurkanJawatan(int id_pengguna, int id_jawatan) {
         String sqlDelete = "DELETE FROM ajk_jawatan WHERE id_pengguna = ? AND id_jawatan = ?";
         String sqlUpdateRole = "UPDATE pengguna_peranan SET id_peranan = 4 WHERE id_pengguna = ?";
@@ -88,7 +114,13 @@ public class JawatanDAO {
         } catch (SQLException e) { e.printStackTrace(); return false; }
     }
 
-    // Ambil maklumat jawatan yang dipegang oleh seseorang
+    /**
+     * Retrieves the committee title name held by a specific user.
+     * Returns "Penduduk Biasa" if the user has no assigned committee role.
+     * 
+     * @param id_pengguna the user ID
+     * @return the name of the jawatan, or "Penduduk Biasa" if none
+     */
     public String getNamaJawatanPengguna(int id_pengguna) {
         String jawatan = "Penduduk Biasa";
         String sql = "SELECT j.nama_jawatan FROM jawatan_ajk j " +
@@ -105,6 +137,12 @@ public class JawatanDAO {
         return jawatan;
     }
 
+    /**
+     * Inserts a new committee position title into the database.
+     * 
+     * @param namaJawatan the name of the new position
+     * @return true if insertion succeeded, false otherwise
+     */
     public boolean tambahJawatan(String namaJawatan) {
         String sql = "INSERT INTO jawatan_ajk (nama_jawatan) VALUES (?)";
         try (Connection conn = DBUtil.getConnection();

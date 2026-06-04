@@ -12,13 +12,24 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * EligibilityService evaluates welfare assistance applications.
+ * Calculates eligibility scores using a configurable, weighted scoring model
+ * that rates household income, dependent counts, family status (e.g. single parents/disabled),
+ * and employment type. Categorizes applications into high, medium, or low priority tiers.
+ */
 public class EligibilityService {
 
-    // Default poverty threshold
+    /**
+     * Default poverty line income threshold (MYR) if none is configured in the database.
+     */
     private static final double DEFAULT_POVERTY_LINE = 2500.00;
 
     /**
-     * Retrieves poverty line threshold from dynamic system settings or returns default.
+     * Retrieves the poverty line threshold from dynamic system settings (bantuan_rule table).
+     * Falls back to a default value if not configured.
+     * 
+     * @return the poverty line threshold
      */
     public double getPovertyLine() {
         String sql = "SELECT weight FROM bantuan_rule WHERE rule_key = 'POVERTY_LINE'";
@@ -36,6 +47,10 @@ public class EligibilityService {
 
     /**
      * Updates the poverty line threshold in the database.
+     * Uses ON DUPLICATE KEY UPDATE to overwrite the configuration rule.
+     * 
+     * @param newPovertyLine the new poverty line threshold
+     * @return true if updated successfully, false otherwise
      */
     public boolean updatePovertyLine(double newPovertyLine) {
         String sql = "INSERT INTO bantuan_rule (rule_key, rule_name, weight) VALUES ('POVERTY_LINE', 'Had Pendapatan Paras Kemiskinan', ?) " +
@@ -51,7 +66,10 @@ public class EligibilityService {
     }
 
     /**
-     * Retrieve all weights and configuration rules from the database.
+     * Retrieves all scoring factor weights and config rules from the database.
+     * Initialized with hardcoded defaults in case database retrieval fails.
+     * 
+     * @return a map linking rule keys to their respective weights
      */
     public Map<String, Double> getRuleWeights() {
         Map<String, Double> weights = new HashMap<>();
@@ -75,7 +93,11 @@ public class EligibilityService {
     }
 
     /**
-     * Updates rule weights in the database.
+     * Updates all rule weights in the database in a batch.
+     * Enforces database transaction safety by using batch updates and manual commit/rollback control.
+     * 
+     * @param newWeights a map linking rule keys to new weights
+     * @return true if all updates committed successfully, false otherwise
      */
     public boolean updateRuleWeights(Map<String, Double> newWeights) {
         String sql = "INSERT INTO bantuan_rule (rule_key, rule_name, weight) VALUES (?, ?, ?) " +
@@ -112,7 +134,16 @@ public class EligibilityService {
     }
 
     /**
-     * Calculates the eligibility score, tier, and generates flags for a given PermohonanBantuan.
+     * Evaluates a welfare application and updates its eligibility score, tier, and warning flags.
+     * Scoring weights are retrieved dynamically from getRuleWeights().
+     * Points are allocated across 4 dimensions:
+     * 1. Income Factor (40% weight): Scored relative to poverty line multipliers (B40 thresholds).
+     * 2. Dependent Factor (25% weight): Scored by family size (from AhliKeluarga database census).
+     * 3. Family Status (20% weight): Single parents/OKU receive maximum points.
+     * 4. Employment (15% weight): Informal sectors or unemployed receive higher scores.
+     * 
+     * @param pb the assistance application model to evaluate
+     * @return the updated assistance application model with calculated score, tier, and flags
      */
     public PermohonanBantuan calculateEligibilityScore(PermohonanBantuan pb) {
         if (pb == null) return null;
@@ -233,7 +264,9 @@ public class EligibilityService {
     }
 
     /**
-     * Get all list of rules from the DB.
+     * Retrieves a list of all active welfare eligibility rules and weights from the database.
+     * 
+     * @return list of BantuanRule objects sorted by key
      */
     public List<BantuanRule> getRulesList() {
         List<BantuanRule> rules = new ArrayList<>();

@@ -22,6 +22,30 @@ import util.InputSanitizer;
     maxFileSize = 5 * 1024 * 1024,       // 5MB
     maxRequestSize = 10 * 1024 * 1024    // 10MB
 )
+/**
+ * HebahanServlet handles community announcements (hebahan).
+ * It enables the Biro Hebahan staff to draft, upload banner images for, and publish announcements,
+ * and allows residents to search and view published announcements.
+ * 
+ * <p><strong>Broadcast Notification Trigger:</strong>
+ * When an announcement status is transitioned to "Published", it automatically
+ * triggers a system-wide broadcast notification to all active residents.</p>
+ * 
+ * <h3>GET Routes (PathInfo):</h3>
+ * <ul>
+ *   <li>/list (or default) - Catalog listing. Residents see published only; Biro Hebahan sees all drafts and published.</li>
+ *   <li>/detail - Detailed announcement view.</li>
+ *   <li>/tambah - Renders form to create a new announcement (Biro Hebahan only).</li>
+ *   <li>/kemaskini - Renders edit form for a draft/announcement (Biro Hebahan only).</li>
+ * </ul>
+ * 
+ * <h3>POST Routes:</h3>
+ * <ul>
+ *   <li>/insert - Saves a new announcement draft or published state (Biro Hebahan only).</li>
+ *   <li>/update - Saves edits to an announcement (Biro Hebahan only).</li>
+ *   <li>/delete - Deletes an announcement (Biro Hebahan only).</li>
+ * </ul>
+ */
 public class HebahanServlet extends HttpServlet {
 
     private static final String SAVE_DIR = AppConfig.DIR_GAMBAR_HEBAHAN;

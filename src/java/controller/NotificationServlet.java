@@ -11,6 +11,21 @@ import javax.servlet.http.HttpSession;
 import model.Notifications;
 import model.Pengguna;
 
+/**
+ * NotificationServlet handles HTTP JSON API endpoints for user notifications.
+ * 
+ * <h3>GET Routes (PathInfo):</h3>
+ * <ul>
+ *   <li>/count - Returns JSON object containing the number of unread notifications for the user.</li>
+ *   <li>/list - Returns JSON array of the most recent 20 notifications for the user.</li>
+ * </ul>
+ * 
+ * <h3>POST Routes:</h3>
+ * <ul>
+ *   <li>/baca - Marks a specific notification as read.</li>
+ *   <li>/bacaSemua - Marks all notifications for the current user as read.</li>
+ * </ul>
+ */
 public class NotificationServlet extends HttpServlet {
 
     @Override

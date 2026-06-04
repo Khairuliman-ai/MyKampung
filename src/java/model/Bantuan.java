@@ -3,6 +3,10 @@ package model;
 import java.util.Date;
 import java.math.BigDecimal;
 
+/**
+ * Represents a welfare aid program (Bantuan) setup by the village committee.
+ * Captures allocations, descriptions, classifications, and documentation requirements.
+ */
 public class Bantuan {
     private int id_bantuan;
     private String nama_bantuan;

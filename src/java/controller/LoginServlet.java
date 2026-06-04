@@ -36,11 +36,6 @@ public class LoginServlet extends HttpServlet {
 
         try {
 
-            /*
-             * =========================
-             * 1. INPUT PROCESSING
-             * =========================
-             */
 
             String kp = request.getParameter("nombor_kp");
             String passwordInput = request.getParameter("kata_laluan");
@@ -48,16 +43,11 @@ public class LoginServlet extends HttpServlet {
             // Normalize IC number by removing non-numeric characters
             String noKpClean = (kp != null) ? kp.replaceAll("[^0-9]", "") : "";
 
-            /*
-             * =========================
-             * 2. USER AUTHENTICATION
-             * =========================
-             */
 
             PenggunaDAO dao = new PenggunaDAO();
             Pengguna user = dao.findByKP(noKpClean);
 
-            // Validate user existence and password hash
+
             boolean isAuthenticated = user != null && BCrypt.checkpw(passwordInput, user.getKata_laluan());
 
             if (!isAuthenticated) {
@@ -66,11 +56,6 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
 
-            /*
-             * =========================
-             * 3. ACCOUNT STATUS CHECK
-             * =========================
-             */
 
             if (user.getStatus() != 1) {
                 request.setAttribute("errorMessage", "Akaun anda belum diaktifkan. Sila semak emel anda untuk jika Setiausaha telah meluluskan atau menolak pendaftaran anda.");
@@ -78,25 +63,15 @@ public class LoginServlet extends HttpServlet {
                 return;
             }
 
-            /*
-             * =========================
-             * 4. SESSION CREATION
-             * =========================
-             */
 
             HttpSession session = request.getSession();
             session.setAttribute("currentUser", user);
 
-            // Redirect authenticated user to dashboard
+
             response.sendRedirect("DashboardServlet");
 
         } catch (Exception e) {
 
-            /*
-             * =========================
-             * DATABASE ERROR HANDLING
-             * =========================
-             */
 
             e.printStackTrace();
             request.setAttribute("errorMessage", "Ralat sistem pangkalan data.");

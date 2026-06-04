@@ -1,5 +1,9 @@
 package util;
 
+/**
+ * StatusConstant defines application-wide constant values for status strings and user role names.
+ * Serves as the single source of truth to ensure consistency across controllers, filters, services, and DAOs.
+ */
 public class StatusConstant {
     
     // Generic Status

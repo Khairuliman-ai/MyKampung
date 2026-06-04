@@ -10,8 +10,19 @@ import model.Fasiliti;
 import util.DBUtil;
 import util.StatusConstant;
 
+/**
+ * FasilitiDAO handles database CRUD operations for village facilities.
+ * This includes listing active/inactive facilities, retrieving facility coordinates,
+ * updating attributes, soft-deletion, and calculating live occupancy counts.
+ */
 public class FasilitiDAO {
 
+    /**
+     * Retrieves all active facilities from the database.
+     * Computes the current occupancy status based on active approved bookings.
+     * 
+     * @return a list of active Fasiliti objects
+     */
     public List<Fasiliti> dapatkanSemuaFasiliti() {
         List<Fasiliti> senarai = new ArrayList<>();
         String sql = "SELECT f.*, " +
@@ -54,6 +65,12 @@ public class FasilitiDAO {
         return senarai;
     }
 
+    /**
+     * Retrieves a single facility by its unique identifier.
+     * 
+     * @param id the unique facility ID
+     * @return the populated Fasiliti model, or null if not found
+     */
     public Fasiliti dapatkanFasilitiById(int id) {
         Fasiliti f = null;
         String sql = "SELECT * FROM fasiliti WHERE id_fasiliti = ?";
@@ -86,6 +103,12 @@ public class FasilitiDAO {
         return f;
     }
 
+    /**
+     * Inserts a new facility record into the database, setting its initial status to active.
+     * 
+     * @param f the facility model to insert
+     * @return true if the insert succeeded, false otherwise
+     */
     public boolean tambahFasiliti(Fasiliti f) {
         String sql = "INSERT INTO fasiliti (nama_fasiliti, lokasi, status, latitude, longitude, requires_approval, gambar_fasiliti) VALUES (?, ?, '" + StatusConstant.FASILITI_AKTIF + "', ?, ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
@@ -103,6 +126,12 @@ public class FasilitiDAO {
         }
     }
 
+    /**
+     * Updates an existing facility's details and sets the dikemaskini_pada field to NOW().
+     * 
+     * @param f the facility model containing updated values
+     * @return true if the update was successful, false otherwise
+     */
     public boolean kemaskiniFasiliti(Fasiliti f) {
         String sql = "UPDATE fasiliti SET nama_fasiliti=?, lokasi=?, status=?, latitude=?, longitude=?, requires_approval=?, gambar_fasiliti=?, dikemaskini_pada=NOW() WHERE id_fasiliti=?";
         try (Connection conn = DBUtil.getConnection();
@@ -122,6 +151,12 @@ public class FasilitiDAO {
         }
     }
 
+    /**
+     * Soft-deletes a facility by setting its status to inactive and dipadam_pada to NOW().
+     * 
+     * @param id the facility ID to deactivate
+     * @return true if the status update succeeded, false otherwise
+     */
     public boolean padamFasiliti(int id) {
         String sql = "UPDATE fasiliti SET status='" + StatusConstant.FASILITI_TIDAK_AKTIF + "', dipadam_pada=NOW() WHERE id_fasiliti=?";
         try (Connection conn = DBUtil.getConnection();
@@ -134,6 +169,12 @@ public class FasilitiDAO {
         }
     }
 
+    /**
+     * Retrieves all facilities in the database, including inactive/soft-deleted ones.
+     * Computes occupancy stats based on current time.
+     * 
+     * @return a list of all facilities
+     */
     public List<Fasiliti> dapatkanSemuaTermasukTidakAktif() {
         List<Fasiliti> senarai = new ArrayList<>();
         String sql = "SELECT f.*, " +

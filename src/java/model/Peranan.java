@@ -1,5 +1,9 @@
 package model;
 
+/**
+ * Represents a security access role (Peranan).
+ * Maps role identifiers (e.g. 1=Ketua Kampung, 4=Penduduk) to role names.
+ */
 public class Peranan {
     private int id_peranan;
     private String nama_peranan;

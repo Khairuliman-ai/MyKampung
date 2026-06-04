@@ -9,8 +9,19 @@ import java.util.List;
 import model.FasilitiSlot;
 import util.DBUtil;
 
+/**
+ * FasilitiSlotDAO handles database operations for pre-defined booking slots (fasiliti_slot).
+ * Used to fetch standardized timing slot options for different booking durations (e.g. hourly, half-day).
+ */
 public class FasilitiSlotDAO {
     
+    /**
+     * Retrieves pre-defined timing slots for a facility filtered by the booking duration class.
+     * 
+     * @param idFasiliti the unique facility ID
+     * @param durasi the duration classification string (e.g., '1_JAM', 'SEPARUH_HARI')
+     * @return a list of pre-defined FasilitiSlot timings
+     */
     public List<FasilitiSlot> getSlotsByFasilitiAndDurasi(int idFasiliti, String durasi) {
         List<FasilitiSlot> list = new ArrayList<>();
         String sql = "SELECT * FROM fasiliti_slot WHERE id_fasiliti = ? AND durasi = ?";

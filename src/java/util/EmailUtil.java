@@ -4,19 +4,34 @@ import java.security.SecureRandom;
 import java.util.Base64;
 import java.sql.*;
 import java.util.Properties;
-import javax.mail.*; // Pastikan JAR sudah dimasukkan dalam Libraries
+import javax.mail.*;
 import javax.mail.internet.*;
 
+/**
+ * EmailUtil handles email transmission and password-recovery token lifecycle logic.
+ * Reads SMTP credentials dynamically from config.properties to send account status updates and OTP verification emails via Gmail.
+ */
 public class EmailUtil {
 
-    // 1. Method untuk jana OTP 6 digit
+    /**
+     * Generates a random 6-digit One-Time Password (OTP).
+     * Uses SecureRandom for cryptographic safety.
+     * 
+     * @return a 6-digit OTP string
+     */
     public static String generateOTP() {
         SecureRandom random = new SecureRandom();
         int otp = 100000 + random.nextInt(900000);
         return String.valueOf(otp);
     }
 
-    // 2. Method untuk simpan ke Database
+    /**
+     * Stores a password reset token in the database with an expiration timestamp set to 30 minutes in the future.
+     * 
+     * @param email the user's registered email
+     * @param token the OTP reset token
+     * @return true if the database update succeeded, false otherwise
+     */
     public static boolean saveTokenToDB(String email, String token) {
         boolean isSuccess = false;
         long expiryTimeMs = System.currentTimeMillis() + (30 * 60 * 1000);
@@ -36,7 +51,11 @@ public class EmailUtil {
         return isSuccess;
     }
 
-    // Helper method untuk memuatkan konfigurasi emel daripada config.properties
+    /**
+     * Loads SMTP configurations from the config.properties classpath resource.
+     * 
+     * @return populated Properties object
+     */
     private static Properties loadEmailConfig() {
         Properties config = new Properties();
         try (java.io.InputStream input = EmailUtil.class.getClassLoader().getResourceAsStream("config.properties")) {
@@ -51,7 +70,13 @@ public class EmailUtil {
         return config;
     }
 
-    // 3. Method untuk HANTAR EMEL (Guna App Password Google awak secara selamat)
+    /**
+     * Sends a password reset OTP verification email to the recipient.
+     * Configures a TLS-based mail session to connect to Google SMTP on port 587.
+     * 
+     * @param recipientEmail the target user's email address
+     * @param token the OTP string
+     */
     public static void sendResetEmail(String recipientEmail, String token) {
         Properties emailConfig = loadEmailConfig();
         final String myEmail = emailConfig.getProperty("smtp.email", "YOUR_EMAIL_HERE");
@@ -89,7 +114,11 @@ public class EmailUtil {
     }
 
     /**
-     * Method untuk hantar notifikasi status pendaftaran (Lulus/Tolak)
+     * Sends an email notification to a resident indicating whether their registration has been approved or rejected.
+     * 
+     * @param recipientEmail the resident's email
+     * @param namaPenuh the resident's full name
+     * @param isApproved true if approved, false if rejected
      */
     public static void sendRegistrationStatusEmail(String recipientEmail, String namaPenuh, boolean isApproved) {
         Properties emailConfig = loadEmailConfig();

@@ -1,5 +1,9 @@
 package model;
 
+/**
+ * Represents a dynamic eligibility scoring rule configurations (BantuanRule).
+ * Maps factor keys (e.g. INCOME_FACTOR) to descriptive names and weight scores.
+ */
 public class BantuanRule {
     private String ruleKey;
     private String ruleName;

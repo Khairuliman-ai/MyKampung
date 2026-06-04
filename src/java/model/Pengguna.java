@@ -5,10 +5,18 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * Represents a registered resident (Pengguna) of the village.
+ * Models account credentials, profile details, geographical coordinates, and socio-economic census data
+ * used for calculating welfare assistance eligibility.
+ */
 public class Pengguna {
 
     private int id_pengguna;
+    
+    /** Lazy-loaded list of family members registered under this resident. Used for eligibility scoring. */
     private List<AhliKeluarga> senaraiAhliKeluarga = new ArrayList<>();
+    
     private String nama_penuh;
     private String nombor_kp;
     private String nombor_telefon;
@@ -17,7 +25,10 @@ public class Pengguna {
     private String status_keluarga;
     private String pekerjaan;
     private BigDecimal pendapatan;
+    
+    /** Relative filepath to the uploaded income verification document (PDF/Image). */
     private String pengesahan_pendapatan;
+    
     private String lampiran_pengesahan;
     private String email;
     private String foto_profil;
@@ -37,7 +48,9 @@ public class Pengguna {
     private Date dibuat_pada;
     private Date dikemaskini_pada;
     private Date dipadam_pada;
-    private int status;  // users authentication
+    
+    /** Authentication and registration status: 0 = Rejected, 1 = Active, 2 = Pending Approval. */
+    private int status;
 
     // Variable Tambahan (Untuk Logik Dashboard/Role)
     private String nama_peranan; // Diambil dari table 'peranan'

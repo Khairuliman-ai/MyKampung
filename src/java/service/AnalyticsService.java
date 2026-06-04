@@ -7,8 +7,21 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 
+/**
+ * AnalyticsService aggregates census, complaint, welfare, and facility booking data
+ * for role-based analytics dashboards. Construct prompts for monthly AI report generation.
+ */
 public class AnalyticsService {
 
+    /**
+     * Aggregates stats and distribution metrics from various DAOs based on the user's role and assigned biro.
+     * Enforces strict data separation so AJK members only see metrics relevant to their biro,
+     * while the Ketua Kampung has access to all statistics and historical monthly snapshots.
+     * 
+     * @param role the user's role name (e.g. Ketua Kampung, AJK Kampung)
+     * @param biro the user's assigned biro name (e.g. Setiausaha, Biro Kebajikan & Sosial)
+     * @return a map of aggregated statistical data objects
+     */
     public Map<String, Object> getAnalyticsDataForRole(String role, String biro) {
         Map<String, Object> data = new HashMap<>();
         
@@ -68,6 +81,15 @@ public class AnalyticsService {
         return data;
     }
 
+    /**
+     * Constructs a structured text prompt for the Gemini AI containing aggregated village metrics.
+     * Instructs the AI model to generate a formal monthly report in Malay targeted to JKKK committees
+     * and district offices. Focuses on the selected report type category (welfare, complaints, facilities, or general summary).
+     * 
+     * @param data the aggregated village metrics map
+     * @param reportType the focus type of the report (e.g., 'kebajikan', 'aduan', 'fasiliti', or general 'ringkasan')
+     * @return the constructed AI system prompt string
+     */
     public String buildAIPrompt(Map<String, Object> data, String reportType) {
         StringBuilder sb = new StringBuilder();
         sb.append("Anda adalah Antigravity, sistem kecerdasan buatan pembantu Ketua Kampung Danan yang sangat profesional. ");

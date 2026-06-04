@@ -2,11 +2,19 @@ package model;
 
 import java.util.Date;
 
+/**
+ * Represents a community complaint or suggestion (Aduan).
+ * Tracks the lifecycle of a complaint as it is reviewed by AJK members, resolved,
+ * closed, or reopened.
+ */
 public class Aduan {
     private int id_aduan;
     private int id_pengguna;
     private int id_kategori_aduan;
+    
+    /** The user ID of the AJK member assigned to resolve this complaint. Nullable if unassigned. */
     private Integer id_pengendali;
+    
     private String tajuk;
     private String keterangan;
     private String status;
@@ -16,7 +24,10 @@ public class Aduan {
     private String catatan_pentadbir;
     private String catatan_ajk;
     private String catatan_ketua;
+    
+    /** Counter for how many times the resident has reopened this complaint. Regulated by JKKK policy (max 2). */
     private int reopen_count;
+    
     private Date dibuat_pada;
     private Date dikemaskini_pada;
     private Date dipadam_pada;

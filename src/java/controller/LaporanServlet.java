@@ -17,6 +17,17 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.*;
 
 @WebServlet(name = "LaporanServlet", urlPatterns = {"/laporan/view", "/laporan/ai/generate", "/laporan/snapshot/save"})
+/**
+ * LaporanServlet manages report aggregation, monthly snapshots, and AI analytics generation.
+ * It provides role-based statistics on population, complaints, welfare requests, and facility bookings.
+ * 
+ * <h3>Endpoints:</h3>
+ * <ul>
+ *   <li>{@code /laporan/view} - Compiles role-based analytics data and forwards to the reports view JSP.</li>
+ *   <li>{@code /laporan/ai/generate} - Triggers Gemini AI to analyze raw metrics and generate a PDF executive report (Ketua Kampung only).</li>
+ *   <li>{@code /laporan/snapshot/save} - Persists the current month's analytics snapshot to the database for historical audit trail (Ketua Kampung only).</li>
+ * </ul>
+ */
 public class LaporanServlet extends HttpServlet {
 
     private static final Logger LOGGER = Logger.getLogger(LaporanServlet.class.getName());

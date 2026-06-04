@@ -2,6 +2,10 @@ package model;
 
 import java.util.Date;
 
+/**
+ * Represents a community announcement (Hebahan).
+ * Stores broadcast metadata, categories, duration, and the author's reference.
+ */
 public class Hebahan {
     private int id_hebahan;
     private int id_pengguna;

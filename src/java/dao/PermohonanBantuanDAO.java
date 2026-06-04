@@ -6,9 +6,20 @@ import java.util.ArrayList;
 import java.util.List;
 import model.PermohonanBantuan;
 
+/**
+ * PermohonanBantuanDAO handles database CRUD operations for the welfare assistance (Bantuan) system.
+ * Manages the multi-stage application lifecycle (BARU -> MENUNGGU_AJK -> MENUNGGU_KETUA -> LULUS/DITOLAK),
+ * along with eligibility score retrieval and analytics stats on welfare distribution.
+ */
 public class PermohonanBantuanDAO {
     private BantuanLampiranDAO lampiranDao = new BantuanLampiranDAO();
 
+    /**
+     * Retrieves all applications submitted by a specific resident.
+     * 
+     * @param idPenduduk user ID of the resident
+     * @return list of assistance applications with populated attachments
+     */
     public List<PermohonanBantuan> getByPenduduk(int idPenduduk) {
         List<PermohonanBantuan> list = new ArrayList<>();
         String sql = "SELECT pb.*, b.nama_bantuan, b.jenis_bantuan FROM permohonan_bantuan pb JOIN bantuan b ON pb.id_bantuan = b.id_bantuan WHERE pb.id_pengguna = ?";
@@ -28,6 +39,13 @@ public class PermohonanBantuanDAO {
         return list;
     }
 
+    /**
+     * Retrieves applications submitted by a resident filtered by aid category.
+     * 
+     * @param idPenduduk user ID of the resident
+     * @param kategori aid category (e.g. 'RASMI', 'KOMUNITI')
+     * @return list of matching applications
+     */
     public List<PermohonanBantuan> getByPendudukAndKategori(int idPenduduk, String kategori) {
         List<PermohonanBantuan> list = new ArrayList<>();
         String sql = "SELECT pb.*, b.nama_bantuan, b.jenis_bantuan " +
@@ -51,10 +69,22 @@ public class PermohonanBantuanDAO {
         return list;
     }
 
+    /**
+     * Retrieves all applications in the system.
+     * 
+     * @return list of all applications
+     */
     public List<PermohonanBantuan> getAll() {
         return getAllPaginated(0, Integer.MAX_VALUE);
     }
 
+    /**
+     * Retrieves paginated applications in the system. Includes complainant details.
+     * 
+     * @param offset database pagination offset
+     * @param limit maximum records to retrieve
+     * @return list of paginated applications
+     */
     public List<PermohonanBantuan> getAllPaginated(int offset, int limit) {
         List<PermohonanBantuan> list = new ArrayList<>();
         String sql = "SELECT pb.*, b.nama_bantuan, b.jenis_bantuan, p.nama_penuh, p.nombor_kp, p.nombor_telefon, p.status_keluarga, p.pekerjaan, p.pendapatan " +
@@ -90,6 +120,12 @@ public class PermohonanBantuanDAO {
         return list;
     }
 
+    /**
+     * Retrieves applications matching a specific status. Includes user profile details.
+     * 
+     * @param status aid application status string
+     * @return list of matching applications
+     */
     public List<PermohonanBantuan> getByStatus(String status) {
         List<PermohonanBantuan> list = new ArrayList<>();
         String sql = "SELECT pb.*, b.nama_bantuan, b.jenis_bantuan, p.nama_penuh, p.nombor_kp, p.nombor_telefon, p.status_keluarga, p.pekerjaan, p.pendapatan " +
@@ -120,6 +156,13 @@ public class PermohonanBantuanDAO {
         return list;
     }
 
+    /**
+     * Retrieves historically processed applications (status != 'BARU') in a paginated manner.
+     * 
+     * @param offset pagination offset
+     * @param limit maximum records
+     * @return list of historical applications
+     */
     public List<PermohonanBantuan> getSejarahPaginated(int offset, int limit) {
         List<PermohonanBantuan> list = new ArrayList<>();
         String sql = "SELECT pb.*, b.nama_bantuan, b.jenis_bantuan, p.nama_penuh, p.nombor_kp, p.nombor_telefon, p.status_keluarga, p.pekerjaan, p.pendapatan " +
@@ -152,11 +195,16 @@ public class PermohonanBantuanDAO {
         return list;
     }
 
+    /**
+     * Counts the total number of historically processed applications.
+     * 
+     * @return total count
+     */
     public int getSejarahCount() {
         String sql = "SELECT COUNT(*) FROM permohonan_bantuan WHERE status != 'BARU'";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) return rs.getInt(1);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -164,6 +212,12 @@ public class PermohonanBantuanDAO {
         return 0;
     }
 
+    /**
+     * Retrieves a single application by its ID.
+     * 
+     * @param idPermohonan the application ID
+     * @return populated assistance application object, or null if not found
+     */
     public PermohonanBantuan getById(int idPermohonan) {
         String sql = "SELECT pb.*, b.nama_bantuan, b.jenis_bantuan FROM permohonan_bantuan pb JOIN bantuan b ON pb.id_bantuan = b.id_bantuan WHERE pb.id_permohonan = ?";
         try (Connection conn = DBUtil.getConnection();
@@ -182,6 +236,13 @@ public class PermohonanBantuanDAO {
         return null;
     }
 
+    /**
+     * Deletes an application, but only if it belongs to the requesting resident.
+     * 
+     * @param idPermohonan the application ID
+     * @param idPenduduk the resident's user ID
+     * @return true if deletion succeeded
+     */
     public boolean deleteByIdAndPenduduk(int idPermohonan, int idPenduduk) {
         String sql = "DELETE FROM permohonan_bantuan WHERE id_permohonan = ? AND id_pengguna = ?";
         try (Connection conn = DBUtil.getConnection();
@@ -195,6 +256,12 @@ public class PermohonanBantuanDAO {
         return false;
     }
     
+    /**
+     * Inserts a new assistance application with pre-calculated eligibility scores.
+     * 
+     * @param pb the application model containing request and eligibility details
+     * @return the auto-generated database ID of the inserted application, or -1 if failed
+     */
     public int insertPermohonan(PermohonanBantuan pb) {
         String flagsStr = "[]";
         if (pb.getEligibilityFlags() != null && !pb.getEligibilityFlags().isEmpty()) {
@@ -234,6 +301,12 @@ public class PermohonanBantuanDAO {
         return -1;
     }
 
+    /**
+     * Updates an existing application request, resetting its status back to 'BARU' for re-evaluation.
+     * 
+     * @param pb the application details
+     * @return true if updated successfully
+     */
     public boolean updatePermohonan(PermohonanBantuan pb) {
         String flagsStr = "[]";
         if (pb.getEligibilityFlags() != null && !pb.getEligibilityFlags().isEmpty()) {
@@ -266,6 +339,15 @@ public class PermohonanBantuanDAO {
         return false;
     }
 
+    /**
+     * Updates the eligibility scores and reasons on an application.
+     * 
+     * @param idPermohonan the application ID
+     * @param score computed eligibility score
+     * @param tier computed eligibility tier label
+     * @param flags JSON list of eligibility audit flags/rules triggered
+     * @return true if updated successfully
+     */
     public boolean updateEligibilityData(int idPermohonan, double score, String tier, List<String> flags) {
         String flagsStr = "[]";
         if (flags != null && !flags.isEmpty()) {
@@ -292,8 +374,19 @@ public class PermohonanBantuanDAO {
         return false;
     }
 
+    /**
+     * Updates the status of an application.
+     * 
+     * @param idPermohonan application ID
+     * @param statusInt status index code (1=LULUS, 2=DIKEMBALIKAN, 3=MENUNGGU_KETUA, 4=DITOLAK)
+     * @param ulasanAdmin evaluation remarks
+     * @param dokumenSokongan legacy document attachment path (ignored by sql query)
+     * @return true if updated successfully
+     */
     public boolean updateStatus(int idPermohonan, int statusInt, String ulasanAdmin, String dokumenSokongan) {
-        // Map int to Enum String
+        // Legacy mapping: Early forms submitted status as int codes (1=Approved, 2=Returned, etc.).
+        // Retained for backward compatibility with the AJK review and Ketua decision forms.
+        // TODO: Refactor forms to submit status strings directly and remove this mapping.
         String statusStr = "BARU";
         if (statusInt == 1) statusStr = "LULUS";
         else if (statusInt == 2) statusStr = "DIKEMBALIKAN";
@@ -313,6 +406,14 @@ public class PermohonanBantuanDAO {
         return false;
     }
 
+    /**
+     * Updates basic application remarks.
+     * 
+     * @param idPermohonan application ID
+     * @param catatan new remarks
+     * @param dokumen legacy document parameter
+     * @return true if updated successfully
+     */
     public boolean updateInfo(int idPermohonan, String catatan, String dokumen) {
         String sql = "UPDATE permohonan_bantuan SET catatan_pemohon = ?, dikemaskini_pada = NOW() WHERE id_permohonan = ?";
         try (Connection conn = DBUtil.getConnection();
@@ -326,6 +427,9 @@ public class PermohonanBantuanDAO {
         return false;
     }
 
+    /**
+     * Maps a ResultSet row to a PermohonanBantuan model object.
+     */
     private PermohonanBantuan mapRow(ResultSet rs) throws SQLException {
         PermohonanBantuan pb = new PermohonanBantuan();
         pb.setId_permohonan(rs.getInt("id_permohonan"));
@@ -371,11 +475,16 @@ public class PermohonanBantuanDAO {
         return pb;
     }
 
+    /**
+     * Counts all assistance applications in the system.
+     * 
+     * @return total count
+     */
     public int countAll() {
         String sql = "SELECT COUNT(*) FROM permohonan_bantuan";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) return rs.getInt(1);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -383,6 +492,11 @@ public class PermohonanBantuanDAO {
         return 0;
     }
 
+    /**
+     * Gathers counts of assistance applications grouped by their status.
+     * 
+     * @return map of status names to counts
+     */
     public java.util.Map<String, Integer> getBantuanSummaryStats() {
         java.util.Map<String, Integer> stats = new java.util.LinkedHashMap<>();
         stats.put("BARU", 0);
@@ -394,7 +508,7 @@ public class PermohonanBantuanDAO {
         String sql = "SELECT status, COUNT(*) as count FROM permohonan_bantuan GROUP BY status";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 String status = rs.getString("status");
                 if (status != null) {
@@ -407,6 +521,11 @@ public class PermohonanBantuanDAO {
         return stats;
     }
 
+    /**
+     * Gathers counts of assistance applications grouped by aid category.
+     * 
+     * @return map of aid types to counts
+     */
     public java.util.Map<String, Integer> getBantuanTypeRatio() {
         java.util.Map<String, Integer> ratio = new java.util.LinkedHashMap<>();
         ratio.put("RASMI", 0);
@@ -418,7 +537,7 @@ public class PermohonanBantuanDAO {
                      "GROUP BY b.jenis_bantuan";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 String type = rs.getString("jenis_bantuan");
                 if (type != null) {
@@ -431,6 +550,11 @@ public class PermohonanBantuanDAO {
         return ratio;
     }
 
+    /**
+     * Gathers counts of applications grouped by eligibility score brackets.
+     * 
+     * @return map of score range labels to counts
+     */
     public java.util.Map<String, Integer> getBantuanScoreDistribution() {
         java.util.Map<String, Integer> dist = new java.util.LinkedHashMap<>();
         dist.put("0-20%", 0);
@@ -448,7 +572,7 @@ public class PermohonanBantuanDAO {
                      "FROM permohonan_bantuan";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+              ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 dist.put("0-20%", rs.getInt("b1"));
                 dist.put("21-40%", rs.getInt("b2"));
@@ -462,6 +586,9 @@ public class PermohonanBantuanDAO {
         return dist;
     }
 
+    /**
+     * Populates list of assistance applications with their dynamically loaded attachments.
+     */
     private void populateAttachments(List<PermohonanBantuan> list) {
         if (list == null || list.isEmpty()) return;
         List<Integer> ids = new ArrayList<>();
