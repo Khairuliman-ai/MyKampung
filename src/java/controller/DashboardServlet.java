@@ -18,7 +18,6 @@ import model.Aduan;
 import model.Hebahan;
 import model.PermohonanBantuan;
 import model.TempahanFasiliti;
-import model.Pengguna;
 import java.sql.Connection;
 import java.util.List;
 import java.util.ArrayList;

@@ -13,7 +13,6 @@ import model.ActivityLog;
 import util.DBUtil;
 import util.EmailUtil;
 import java.sql.Connection;
-import java.math.BigDecimal;
 
 @WebServlet(name = "UrusPendudukServlet", urlPatterns = {
     "/penduduk/urus", "/penduduk/approve", "/penduduk/reject", "/penduduk/update",

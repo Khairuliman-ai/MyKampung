@@ -1,7 +1,6 @@
 package controller;
 
 import model.Pengguna;
-import model.BantuanRule;
 import service.EligibilityService;
 
 import java.io.IOException;

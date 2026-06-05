@@ -1,10 +1,6 @@
 package service;
 
 import dao.*;
-import model.*;
-import util.DBUtil;
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.*;
 
 /**
@@ -90,6 +86,7 @@ public class AnalyticsService {
      * @param reportType the focus type of the report (e.g., 'kebajikan', 'aduan', 'fasiliti', or general 'ringkasan')
      * @return the constructed AI system prompt string
      */
+    @SuppressWarnings("unchecked")
     public String buildAIPrompt(Map<String, Object> data, String reportType) {
         StringBuilder sb = new StringBuilder();
         sb.append("Anda adalah Antigravity, sistem kecerdasan buatan pembantu Ketua Kampung Danan yang sangat profesional. ");

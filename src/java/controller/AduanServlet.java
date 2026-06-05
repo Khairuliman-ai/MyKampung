@@ -3,10 +3,7 @@ package controller;
 import dao.AduanDAO;
 import dao.KategoriAduanDAO;
 import dao.LogAduanDAO;
-import dao.PenggunaDAO;
-import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.List;
 import javax.servlet.ServletException;
@@ -23,7 +20,6 @@ import model.Pengguna;
 import model.StatusAduan;
 import util.AppConfig;
 import util.FileUploadUtil;
-import util.DBUtil;
 import util.InputSanitizer;
 
 /**
@@ -207,7 +203,6 @@ public class AduanServlet extends HttpServlet {
         }
         String pathInfo = request.getPathInfo();
         AduanDAO aduanDAO = new AduanDAO();
-        LogAduanDAO logDAO = new LogAduanDAO();
 
         try {
             if ("/submit".equals(pathInfo)) {

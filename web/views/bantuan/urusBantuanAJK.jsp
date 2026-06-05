@@ -50,9 +50,7 @@
         </div>
     </div>
 
-    <!-- Carian & Penapis Section -->
     <div class="flex flex-col md:flex-row gap-4 mb-8">
-        <!-- Search Input -->
         <div class="flex-1 relative group">
             <div class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-purple group-focus-within:scale-110 transition-all duration-300 pointer-events-none">
                 <i class="fas fa-search text-sm"></i>
@@ -61,7 +59,6 @@
                    class="w-full pl-14 pr-6 py-4 rounded-[2rem] bg-white border border-gray-100 focus:ring-4 focus:ring-purple-50 focus:border-brand-purple text-xs font-semibold shadow-sm transition-all outline-none placeholder:text-gray-300">
         </div>
         
-        <!-- Category Filter -->
         <div class="w-full md:w-64 relative group">
             <div class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-purple group-focus-within:scale-110 transition-all duration-300 pointer-events-none">
                 <i class="fas fa-tags text-sm"></i>
@@ -76,7 +73,6 @@
             </div>
         </div>
 
-        <!-- Date Filter -->
         <div class="w-full md:w-64 relative group">
             <div class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-purple group-focus-within:scale-110 transition-all duration-300 pointer-events-none">
                 <i class="far fa-calendar-alt text-sm"></i>
@@ -84,7 +80,6 @@
             <input type="date" id="filterDate" onchange="filterData()" class="w-full pl-14 pr-6 py-4 rounded-[2rem] bg-white border border-gray-100 focus:ring-4 focus:ring-purple-50 focus:border-brand-purple text-xs font-semibold shadow-sm transition-all outline-none text-gray-700">
         </div>
 
-        <!-- Reset Button -->
         <button onclick="resetFilters()" class="px-6 py-4 rounded-[2rem] bg-white border border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-100 focus:ring-4 focus:ring-red-50 text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-2" title="Reset Tapisan">
             <i class="fas fa-sync-alt text-xs"></i>
             <span>Reset</span>
@@ -121,7 +116,6 @@
         </nav>
     </div>
 
-    <!-- TAB 1: PERMOHONAN BARU -->
     <div id="content-baru" class="block">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
@@ -141,12 +135,7 @@
                             for (PermohonanBantuan pb : listBaru) {
                                 String namaBantuanDisplay = (pb.getNama_bantuan() != null) ? pb.getNama_bantuan() : "Lain-lain";
                                 String dateDisplay = (pb.getDibuat_pada() != null) ? sdf.format(pb.getDibuat_pada()) : "-";
-                        %>
-                        <tr class="hover:bg-gray-50/50 transition data-row-filter cursor-pointer group" 
-                            data-search="<%= pb.getNama_penuh() %> #<%= pb.getId_permohonan() %>" 
-                            data-category="<%= (pb.getJenis_bantuan() != null) ? pb.getJenis_bantuan() : "" %>"
-                            data-date="<%= (pb.getDibuat_pada() != null) ? sdfFull.format(pb.getDibuat_pada()) : "" %>"
-                            <% 
+                                
                                 StringBuilder sbDocs = new StringBuilder();
                                 StringBuilder sbDocsAdmin = new StringBuilder();
                                 if(pb.getSenaraiLampiran() != null) {
@@ -162,31 +151,55 @@
                                 }
                                 String jsDokumen = sbDocs.toString();
                                 String jsDokumenAdmin = sbDocsAdmin.toString();
-                            %>
+
+                                String dataSearch = (pb.getNama_penuh() != null ? pb.getNama_penuh() : "") + " #" + pb.getId_permohonan();
+                                String dataCategory = pb.getJenis_bantuan() != null ? pb.getJenis_bantuan() : "";
+                                String dataDate = pb.getDibuat_pada() != null ? sdfFull.format(pb.getDibuat_pada()) : "";
+                                String dataBantuan = pb.getNama_bantuan() != null ? pb.getNama_bantuan().replace("\"", "&quot;") : "Lain-lain";
+                                String dataPemohon = pb.getNama_penuh() != null ? pb.getNama_penuh().replace("\"", "&quot;") : "TIADA NAMA";
+                                String dataKet = pb.getCatatan_pemohon() != null ? pb.getCatatan_pemohon().replace("\"", "&quot;") : "";
+                                String dataBank = pb.getNama_bank() != null ? pb.getNama_bank().replace("\"", "&quot;") : "";
+                                String dataAkaun = pb.getNombor_akaun() != null ? pb.getNombor_akaun().replace("\"", "&quot;") : "";
+                                String dataPenbank = pb.getPenyata_bank() != null ? pb.getPenyata_bank() : "";
+                                String dataIc = pb.getNombor_kp() != null ? pb.getNombor_kp() : "";
+                                String dataPhone = pb.getNombor_telefon() != null ? pb.getNombor_telefon() : "";
+                                String dataStatusk = pb.getStatus_keluarga() != null ? pb.getStatus_keluarga() : "";
+                                String dataKerja = pb.getPekerjaan() != null ? pb.getPekerjaan() : "";
+                                String dataGaji = pb.getPendapatanFormatted() != null ? pb.getPendapatanFormatted() : "RM 0.00";
+                                String dataKategori = pb.getJenis_bantuan() != null ? pb.getJenis_bantuan() : "";
+                                String dataUlasan = pb.getCatatan_pentadbir() != null ? pb.getCatatan_pentadbir().replace("\"", "&quot;") : "";
+                                double dataScore = pb.getEligibilityScore() != null ? pb.getEligibilityScore() : 0.0;
+                                String dataTier = pb.getEligibilityTier() != null ? pb.getEligibilityTier() : "";
+                                String dataFlags = pb.getEligibilityFlags() != null ? String.join(",", pb.getEligibilityFlags()) : "";
+                        %>
+                        <tr class="hover:bg-gray-50/50 transition data-row-filter cursor-pointer group" 
+                            data-search="<%= dataSearch %>" 
+                            data-category="<%= dataCategory %>"
+                            data-date="<%= dataDate %>"
                             data-id="<%= pb.getId_permohonan() %>"
-                            data-bantuan="<%= (pb.getNama_bantuan() != null ? pb.getNama_bantuan().replace("\"", "&quot;") : "Lain-lain") %>"
-                            data-pemohon="<%= pb.getNama_penuh().replace("\"", "&quot;") %>"
-                            data-ket="<%= (pb.getCatatan_pemohon() != null ? pb.getCatatan_pemohon().replace("\"", "&quot;") : "") %>"
+                            data-bantuan="<%= dataBantuan %>"
+                            data-pemohon="<%= dataPemohon %>"
+                            data-ket="<%= dataKet %>"
                             data-dok="<%= jsDokumen %>"
-                            data-bank="<%= (pb.getNama_bank() != null ? pb.getNama_bank().replace("\"", "&quot;") : "") %>"
-                            data-akaun="<%= (pb.getNombor_akaun() != null ? pb.getNombor_akaun().replace("\"", "&quot;") : "") %>"
-                            data-penbank="<%= (pb.getPenyata_bank() != null ? pb.getPenyata_bank() : "") %>"
+                            data-bank="<%= dataBank %>"
+                            data-akaun="<%= dataAkaun %>"
+                            data-penbank="<%= dataPenbank %>"
                             data-showaction="true"
-                            data-ic="<%= (pb.getNombor_kp() != null ? pb.getNombor_kp() : "") %>"
-                            data-phone="<%= (pb.getNombor_telefon() != null ? pb.getNombor_telefon() : "") %>"
-                            data-statusk="<%= (pb.getStatus_keluarga() != null ? pb.getStatus_keluarga() : "") %>"
-                            data-kerja="<%= (pb.getPekerjaan() != null ? pb.getPekerjaan() : "") %>"
-                            data-gaji="<%= pb.getPendapatanFormatted() %>"
-                            data-kategori="<%= pb.getJenis_bantuan() %>"
-                            data-ulasan="<%= (pb.getCatatan_pentadbir() != null ? pb.getCatatan_pentadbir().replace("\"", "&quot;") : "") %>"
+                            data-ic="<%= dataIc %>"
+                            data-phone="<%= dataPhone %>"
+                            data-statusk="<%= dataStatusk %>"
+                            data-kerja="<%= dataKerja %>"
+                            data-gaji="<%= dataGaji %>"
+                            data-kategori="<%= dataKategori %>"
+                            data-ulasan="<%= dataUlasan %>"
                             data-dokadmin="<%= jsDokumenAdmin %>"
-                            data-score="<%= pb.getEligibilityScore() != null ? pb.getEligibilityScore() : 0.0 %>"
-                            data-tier="<%= pb.getEligibilityTier() != null ? pb.getEligibilityTier() : "" %>"
-                            data-flags="<%= pb.getEligibilityFlags() != null ? String.join(",", pb.getEligibilityFlags()) : "" %>"
+                            data-score="<%= dataScore %>"
+                            data-tier="<%= dataTier %>"
+                            data-flags="<%= dataFlags %>"
                             onclick="viewDetail(this)">
                             <td class="p-4 text-sm text-gray-400 font-medium"><%= noBaru++ %></td>
                             <td class="p-4 text-sm text-gray-500"><%= dateDisplay %></td>
-                            <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-brand-purple transition-colors"><%= (pb.getNama_penuh() != null) ? pb.getNama_penuh() : "TIADA NAMA" %></td>
+                            <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-brand-purple transition-colors"><%= dataPemohon %></td>
                             <td class="p-4 text-sm text-gray-600"><%= namaBantuanDisplay %></td>
                             <td class="p-4 text-center">
                                 <% if ("RASMI".equalsIgnoreCase(pb.getJenis_bantuan())) { %>
@@ -206,14 +219,11 @@
                 </table>
             </div>
             
-            <!-- Pagination Footer for Permohonan Baharu -->
             <div id="footerBaru" class="p-6 bg-white border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
-                <!-- Will be populated dynamically by JS -->
-            </div>
+                </div>
         </div>
     </div>
 
-    <!-- TAB 2: SEJARAH -->
     <div id="content-sejarah" class="hidden">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
@@ -231,12 +241,7 @@
                     <tbody class="divide-y divide-gray-100">
                         <% if (!listSejarah.isEmpty()) { 
                             int noSejarah = (currentPage - 1) * 10 + 1;
-                            for (PermohonanBantuan pb : listSejarah) { %>
-                        <tr class="hover:bg-gray-50/50 transition data-row-filter cursor-pointer group"
-                            data-search="<%= pb.getNama_penuh() %> #<%= pb.getId_permohonan() %>" 
-                            data-category="<%= (pb.getJenis_bantuan() != null) ? pb.getJenis_bantuan() : "" %>"
-                            data-date="<%= (pb.getDibuat_pada() != null) ? sdfFull.format(pb.getDibuat_pada()) : "" %>"
-                            <% 
+                            for (PermohonanBantuan pb : listSejarah) { 
                                 StringBuilder sbDocsH = new StringBuilder();
                                 StringBuilder sbDocsAdminH = new StringBuilder();
                                 if(pb.getSenaraiLampiran() != null) {
@@ -252,31 +257,55 @@
                                 }
                                 String jsDokumenH = sbDocsH.toString();
                                 String jsDokumenAdminH = sbDocsAdminH.toString();
-                            %>
+
+                                String dataSearchH = (pb.getNama_penuh() != null ? pb.getNama_penuh() : "") + " #" + pb.getId_permohonan();
+                                String dataCategoryH = pb.getJenis_bantuan() != null ? pb.getJenis_bantuan() : "";
+                                String dataDateH = pb.getDibuat_pada() != null ? sdfFull.format(pb.getDibuat_pada()) : "";
+                                String dataBantuanH = pb.getNama_bantuan() != null ? pb.getNama_bantuan().replace("\"", "&quot;") : "Lain-lain";
+                                String dataPemohonH = pb.getNama_penuh() != null ? pb.getNama_penuh().replace("\"", "&quot;") : "TIADA NAMA";
+                                String dataKetH = pb.getCatatan_pemohon() != null ? pb.getCatatan_pemohon().replace("\"", "&quot;") : "";
+                                String dataBankH = pb.getNama_bank() != null ? pb.getNama_bank().replace("\"", "&quot;") : "";
+                                String dataAkaunH = pb.getNombor_akaun() != null ? pb.getNombor_akaun().replace("\"", "&quot;") : "";
+                                String dataPenbankH = pb.getPenyata_bank() != null ? pb.getPenyata_bank() : "";
+                                String dataIcH = pb.getNombor_kp() != null ? pb.getNombor_kp() : "";
+                                String dataPhoneH = pb.getNombor_telefon() != null ? pb.getNombor_telefon() : "";
+                                String dataStatuskH = pb.getStatus_keluarga() != null ? pb.getStatus_keluarga() : "";
+                                String dataKerjaH = pb.getPekerjaan() != null ? pb.getPekerjaan() : "";
+                                String dataGajiH = pb.getPendapatanFormatted() != null ? pb.getPendapatanFormatted() : "RM 0.00";
+                                String dataKategoriH = pb.getJenis_bantuan() != null ? pb.getJenis_bantuan() : "";
+                                String dataUlasanH = pb.getCatatan_pentadbir() != null ? pb.getCatatan_pentadbir().replace("\"", "&quot;") : "";
+                                double dataScoreH = pb.getEligibilityScore() != null ? pb.getEligibilityScore() : 0.0;
+                                String dataTierH = pb.getEligibilityTier() != null ? pb.getEligibilityTier() : "";
+                                String dataFlagsH = pb.getEligibilityFlags() != null ? String.join(",", pb.getEligibilityFlags()) : "";
+                        %>
+                        <tr class="hover:bg-gray-50/50 transition data-row-filter cursor-pointer group"
+                            data-search="<%= dataSearchH %>" 
+                            data-category="<%= dataCategoryH %>"
+                            data-date="<%= dataDateH %>"
                             data-id="<%= pb.getId_permohonan() %>"
-                            data-bantuan="<%= (pb.getNama_bantuan() != null ? pb.getNama_bantuan().replace("\"", "&quot;") : "Lain-lain") %>"
-                            data-pemohon="<%= pb.getNama_penuh().replace("\"", "&quot;") %>"
-                            data-ket="<%= (pb.getCatatan_pemohon() != null ? pb.getCatatan_pemohon().replace("\"", "&quot;") : "") %>"
+                            data-bantuan="<%= dataBantuanH %>"
+                            data-pemohon="<%= dataPemohonH %>"
+                            data-ket="<%= dataKetH %>"
                             data-dok="<%= jsDokumenH %>"
-                            data-bank="<%= (pb.getNama_bank() != null ? pb.getNama_bank().replace("\"", "&quot;") : "") %>"
-                            data-akaun="<%= (pb.getNombor_akaun() != null ? pb.getNombor_akaun().replace("\"", "&quot;") : "") %>"
-                            data-penbank="<%= (pb.getPenyata_bank() != null ? pb.getPenyata_bank() : "") %>"
+                            data-bank="<%= dataBankH %>"
+                            data-akaun="<%= dataAkaunH %>"
+                            data-penbank="<%= dataPenbankH %>"
                             data-showaction="false"
-                            data-ic="<%= (pb.getNombor_kp() != null ? pb.getNombor_kp() : "") %>"
-                            data-phone="<%= (pb.getNombor_telefon() != null ? pb.getNombor_telefon() : "") %>"
-                            data-statusk="<%= (pb.getStatus_keluarga() != null ? pb.getStatus_keluarga() : "") %>"
-                            data-kerja="<%= (pb.getPekerjaan() != null ? pb.getPekerjaan() : "") %>"
-                            data-gaji="<%= pb.getPendapatanFormatted() %>"
-                            data-kategori="<%= pb.getJenis_bantuan() %>"
-                            data-ulasan="<%= (pb.getCatatan_pentadbir() != null ? pb.getCatatan_pentadbir().replace("\"", "&quot;") : "") %>"
+                            data-ic="<%= dataIcH %>"
+                            data-phone="<%= dataPhoneH %>"
+                            data-statusk="<%= dataStatuskH %>"
+                            data-kerja="<%= dataKerjaH %>"
+                            data-gaji="<%= dataGajiH %>"
+                            data-kategori="<%= dataKategoriH %>"
+                            data-ulasan="<%= dataUlasanH %>"
                             data-dokadmin="<%= jsDokumenAdminH %>"
-                            data-score="<%= pb.getEligibilityScore() != null ? pb.getEligibilityScore() : 0.0 %>"
-                            data-tier="<%= pb.getEligibilityTier() != null ? pb.getEligibilityTier() : "" %>"
-                            data-flags="<%= pb.getEligibilityFlags() != null ? String.join(",", pb.getEligibilityFlags()) : "" %>"
+                            data-score="<%= dataScoreH %>"
+                            data-tier="<%= dataTierH %>"
+                            data-flags="<%= dataFlagsH %>"
                             onclick="viewDetail(this)">
                             <td class="p-4 text-sm text-gray-400 font-medium"><%= noSejarah++ %></td>
-                            <td class="p-4 text-sm text-gray-500"><%= sdf.format(pb.getDibuat_pada()) %></td>
-                            <td class="p-4 text-sm font-bold text-gray-700 group-hover:text-brand-purple transition-colors"><%= pb.getNama_penuh() %></td>
+                            <td class="p-4 text-sm text-gray-500"><%= pb.getDibuat_pada() != null ? sdf.format(pb.getDibuat_pada()) : "-" %></td>
+                            <td class="p-4 text-sm font-bold text-gray-700 group-hover:text-brand-purple transition-colors"><%= dataPemohonH %></td>
                             <td class="p-4 text-sm text-gray-600"><%= pb.getNama_bantuan() %></td>
                             <td class="p-4 text-center">
                                 <% if ("RASMI".equalsIgnoreCase(pb.getJenis_bantuan())) { %>
@@ -307,7 +336,6 @@
                 </table>
             </div>
 
-            <!-- Pagination Footer for Sejarah -->
             <div class="p-6 bg-white border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
                 <div class="text-xs text-gray-500 font-medium">
                     Menunjukkan halaman <span class="text-gray-900 font-bold"><%= currentPage %></span> daripada <span class="text-gray-900 font-bold"><%= totalPages %></span> 
@@ -351,11 +379,10 @@
                         </button>
                     <% } %>
 
-                    <!-- Lompat Ke Page Selector -->
                     <div class="flex items-center gap-1.5 text-xs text-gray-500 font-medium border-l border-gray-200 pl-4 ml-2">
                         <span>Lompat ke:</span>
                         <input type="number" min="1" max="<%= totalPages %>" value="<%= currentPage %>" 
-                               onkeypress="if(event.key === 'Enter') { const p = parseInt(this.value); if(p >= 1 && p <= <%= totalPages %>) { window.location.href = '?page=' + p; } }"
+                               id="jumpPageInput"
                                class="w-12 h-9 px-2 text-center bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 outline-none focus:ring-2 focus:ring-brand-purple focus:border-brand-purple [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
                     </div>
                 </div>
@@ -363,7 +390,6 @@
         </div>
     </div>
 
-    <!-- TAB 3: JENIS BANTUAN -->
     <div id="content-jenis" class="hidden">
         <div class="flex justify-between items-center mb-6">
             <h3 class="font-bold text-lg text-gray-800">Senarai Konfigurasi Bantuan</h3>
@@ -386,7 +412,10 @@
                 <tbody class="divide-y divide-gray-100">
                     <% if (senaraiBantuan != null && !senaraiBantuan.isEmpty()) { 
                         int noJenis = 1;
-                        for (Bantuan b : senaraiBantuan) { %>
+                        for (Bantuan b : senaraiBantuan) { 
+                            String dataNama = b.getNama_bantuan() != null ? b.getNama_bantuan().replace("\"", "&quot;") : "";
+                            String dataSyarat = b.getSyarat_dokumen() != null ? b.getSyarat_dokumen().replace("\"", "&quot;") : "";
+                    %>
                     <tr class="hover:bg-gray-50/50 transition group data-jenis-row" data-category="<%= b.getJenis_bantuan() %>">
                         <td class="p-4 text-sm text-gray-400 font-medium"><%= noJenis++ %></td>
                         <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-brand-purple transition-colors"><%= b.getNama_bantuan() %></td>
@@ -403,7 +432,12 @@
                         </td>
                         <td class="p-4 text-center">
                             <div class="flex justify-center gap-2">
-                                <button onclick="openEditBantuanModal('<%= b.getId_bantuan() %>', '<%= b.getNama_bantuan().replace("'", "\\'") %>', '<%= b.getJenis_bantuan() %>', '<%= b.getJumlah_bantuan() %>', '<%= (b.getSyarat_dokumen() != null ? b.getSyarat_dokumen().replace("'", "\\'") : "") %>')" 
+                                <button data-id="<%= b.getId_bantuan() %>"
+                                        data-nama="<%= dataNama %>"
+                                        data-jenis="<%= b.getJenis_bantuan() %>"
+                                        data-peruntukan="<%= b.getJumlah_bantuan() %>"
+                                        data-syarat="<%= dataSyarat %>"
+                                        onclick="openEditBantuanModalFromBtn(this)"
                                         class="w-9 h-9 flex items-center justify-center rounded-xl text-blue-600 hover:bg-blue-50/80 border border-transparent hover:border-blue-100 shadow-sm transition-all" title="Edit">
                                     <i class="fas fa-edit text-xs"></i>
                                 </button>
@@ -426,15 +460,12 @@
                 </tbody>
             </table>
             
-            <!-- Pagination Footer for Jenis Bantuan -->
             <div id="footerJenis" class="p-6 bg-white border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
-                <!-- Will be populated dynamically by JS -->
-            </div>
+                </div>
         </div>
     </div>
 </div>
 
-<!-- Right Aside Bar (Summary) -->
 <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
     <div class="mb-8">
         <h3 class="font-bold text-lg text-gray-800">Rumusan Bantuan</h3>
@@ -505,16 +536,14 @@
         </div>
         <p class="text-[10px] text-gray-500 leading-relaxed italic">
             "Bantuan yang tepat kepada mereka yang layak adalah tanggungjawab bersama."
-</p>
+        </p>
     </div>
 </aside>
 
-<!-- MODAL: DETAIL PERMOHONAN (INCLUDING BANK) -->
 <div id="modalDetail" class="fixed inset-0 z-50 hidden" role="dialog">
     <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal('modalDetail')"></div>
     <div class="flex min-h-screen items-center justify-center p-4">
         <div class="relative w-full max-w-3xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 flex flex-col max-h-[90vh]">
-            <!-- Modal Header with Gradient (Fixed) -->
             <div class="bg-gradient-to-r from-brand-purple to-brand-secondary px-8 py-6 text-white relative shrink-0">
                 <div class="absolute top-0 right-0 p-6 opacity-10">
                     <i class="fas fa-file-invoice text-8xl rotate-12"></i>
@@ -530,10 +559,8 @@
                 </div>
             </div>
 
-            <!-- Scrollable Content Area -->
             <div class="p-8 overflow-y-auto custom-scrollbar flex-1">
                 <div class="space-y-8">
-                    <!-- Profile Section -->
                     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-gray-100 pb-6">
                         <div class="space-y-1">
                             <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Maklumat Pemohon</p>
@@ -551,16 +578,13 @@
                         </div>
                     </div>
 
-                    <!-- Eligibility Score Panel -->
                     <div class="bg-gradient-to-r from-slate-50 to-slate-100/50 p-6 rounded-[2rem] border border-slate-200/60 shadow-sm mb-6 flex flex-col md:flex-row items-center gap-6">
-                        <!-- Score Circle -->
                         <div class="relative flex items-center justify-center shrink-0">
                             <div id="detScoreBadge" class="w-24 h-24 rounded-full flex flex-col items-center justify-center border-4 shadow-inner bg-white">
                                 <span id="detScoreValue" class="text-3xl font-black text-slate-800">0</span>
                                 <span class="text-[9px] font-bold text-gray-400 uppercase tracking-widest">SKOR</span>
                             </div>
                         </div>
-                        <!-- Score Info & Bar -->
                         <div class="flex-1 w-full space-y-2">
                             <div class="flex justify-between items-center">
                                 <div>
@@ -569,20 +593,15 @@
                                 </div>
                                 <span id="detTierBadge" class="px-3 py-1 rounded-xl text-[10px] font-black uppercase tracking-wider"></span>
                             </div>
-                            <!-- Progress Bar -->
                             <div class="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
                                 <div id="detScoreProgress" class="h-full rounded-full transition-all duration-500" style="width: 0%"></div>
                             </div>
-                            <!-- Indicator flags -->
                             <div id="detFlagsContainer" class="flex flex-wrap gap-2 pt-1">
-                                <!-- Dynamic Flags -->
-                            </div>
+                                </div>
                         </div>
                     </div>
 
-                    <!-- Main Content Grid -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        <!-- Socio-Economic Card -->
                         <div class="space-y-4">
                             <h5 class="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                                 <i class="fas fa-chart-pie text-indigo-400"></i> Profil Sosio-Ekonomi
@@ -603,7 +622,6 @@
                             </div>
                         </div>
 
-                        <!-- Bank Information Card -->
                         <div class="space-y-4">
                             <h5 class="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                                 <i class="fas fa-university text-blue-400"></i> Maklumat Perbankan
@@ -631,13 +649,11 @@
                         </div>
                     </div>
 
-                    <!-- AI Decision Support and Recommendation Box -->
                     <div id="aiSupportDiv" class="space-y-4 pt-6 border-t border-gray-100">
                         <h5 class="text-[11px] font-bold text-brand-purple uppercase tracking-widest flex items-center gap-2">
                             <i class="fas fa-robot"></i> Sokongan Keputusan AI & Had Kelayakan
                         </h5>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <!-- Syor Automatik -->
                             <div class="md:col-span-2 p-6 rounded-3xl border flex flex-col justify-between" id="aiRecommendCard">
                                 <div>
                                     <div class="flex items-center justify-between mb-3">
@@ -651,15 +667,13 @@
                                     <p class="text-[10px] text-rose-500 font-bold"><i class="fas fa-magic"></i> Templat sebab penolakan automatik telah sedia dijana.</p>
                                 </div>
                             </div>
-                            <!-- Senarai Semak Manual -->
                             <div class="p-6 rounded-3xl border border-slate-200/80 bg-slate-50 flex flex-col justify-between" id="manualChecklistCard">
                                 <div>
                                     <h5 class="text-xs font-bold text-slate-700 uppercase tracking-wide mb-3 flex items-center gap-1.5">
                                         <i class="fas fa-tasks text-slate-500"></i> Semakan Manual AJK
                                     </h5>
                                     <div class="space-y-2.5" id="checklistContainer">
-                                        <!-- Dynamic Checkboxes -->
-                                    </div>
+                                        </div>
                                 </div>
                                 <div class="mt-4 pt-2 text-[10px] text-gray-400 font-medium">
                                     *Sahkan semua kriteria untuk menyokong.
@@ -668,7 +682,6 @@
                         </div>
                     </div>
                     
-                    <!-- Feedback Section (Admin Feedback) -->
                     <div id="ulasanDiv" class="space-y-4 pt-4 border-t border-gray-100 hidden">
                         <h5 class="text-[11px] font-bold text-orange-400 uppercase tracking-widest flex items-center gap-2">
                             <i class="fas fa-comment-dots"></i> Maklum Balas Semasa
@@ -681,7 +694,6 @@
                         </div>
                     </div>
 
-                    <!-- Bottom Section: Keterangan & Documents -->
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
                         <div class="space-y-3">
                             <h5 class="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
@@ -698,29 +710,25 @@
                             <h5 class="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                                 <i class="fas fa-folder-open text-gray-400"></i> Dokumen Sokongan
                             </h5>
-                        <div id="dokumenList" class="flex flex-wrap gap-2">
-                            <!-- Dynamic Documents -->
-                        </div>
-                        <%-- Template hidden separate from the list to prevent destruction --%>
-                        <div class="hidden">
-                            <a id="detDokMain" href="#" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-100 transition shadow-sm border border-red-100">
-                                <i class="fas fa-file-pdf"></i> PDF
-                            </a>
+                            <div id="dokumenList" class="flex flex-wrap gap-2">
+                                </div>
+                            <%-- Template hidden separate from the list to prevent destruction --%>
+                            <div class="hidden">
+                                <a id="detDokMain" href="#" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-100 transition shadow-sm border border-red-100">
+                                    <i class="fas fa-file-pdf"></i> PDF
+                                </a>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                    <!-- Admin Documents Section -->
                     <div id="detAdminDokSection" class="space-y-4 pt-4 border-t border-gray-100 hidden">
                         <label class="block text-[10px] font-bold text-brand-purple uppercase tracking-widest mb-2">Dokumen Maklum Balas (Ketua Kampung)</label>
                         <div id="dokumenAdminList" class="flex flex-wrap gap-2">
-                            <!-- Dynamic Admin Files -->
-                        </div>
+                            </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Enhanced Footer / Action Bar (Fixed) -->
             <div class="bg-slate-50 p-8 flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-slate-100 shrink-0">
                 <button onclick="closeModal('modalDetail')" class="order-2 sm:order-1 text-sm font-bold text-slate-400 hover:text-slate-600 transition-colors px-4 py-2">
                     Kembali ke Senarai
@@ -739,7 +747,6 @@
     </div>
 </div>
 
-<!-- MODAL: TAMBAH JENIS BANTUAN -->
 <div id="modalTambahBantuan" class="fixed inset-0 z-50 hidden" role="dialog">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeModal('modalTambahBantuan')"></div>
     <div class="flex min-h-full items-center justify-center p-4">
@@ -779,7 +786,6 @@
     </div>
 </div>
 
-<!-- MODAL: EDIT JENIS BANTUAN -->
 <div id="modalEditBantuan" class="fixed inset-0 z-50 hidden" role="dialog">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeModal('modalEditBantuan')"></div>
     <div class="flex min-h-full items-center justify-center p-4">
@@ -819,7 +825,6 @@
     </div>
 </div>
 
-<!-- MODAL: TINDAKAN (LENGKAP/TAK LENGKAP) -->
 <div id="modalTindakan" class="fixed inset-0 z-50 hidden" role="dialog">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75" onclick="closeModal('modalTindakan')"></div>
     <div class="flex min-h-full items-center justify-center p-4">
@@ -881,7 +886,7 @@
         if (paginator.currentPage > totalPages) {
             paginator.currentPage = totalPages;
         }
-        if (paginator.currentPage < 1) {
+        if (!(paginator.currentPage >= 1)) {
             paginator.currentPage = 1;
         }
 
@@ -893,7 +898,7 @@
         const endIndex = startIndex + paginator.itemsPerPage;
 
         visibleRows.forEach((row, index) => {
-            if (index >= startIndex && index < endIndex) {
+            if (index >= startIndex && !(index >= endIndex)) {
                 row.style.display = '';
             }
         });
@@ -916,62 +921,75 @@
         const startPage = Math.max(1, currentPage - 2);
         const endPage = Math.min(totalPages, startPage + 4);
         
-        for (let i = startPage; i <= endPage; i++) {
+        for (let i = startPage; !(i > endPage); i++) {
             if (i === currentPage) {
-                pagesHtml += `
-                    <button type="button" class="w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold bg-brand-purple text-white shadow-lg shadow-purple-100">
-                        \${i}
-                    </button>
-                `;
+                pagesHtml += '<button type="button" class="w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold bg-brand-purple text-white shadow-lg shadow-purple-100">' +
+                             i +
+                             '</button>';
             } else {
-                pagesHtml += `
-                    <button type="button" onclick="setClientPage('\${tableId}', \${i})" class="w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold bg-white text-gray-500 hover:bg-gray-50 border border-gray-100 transition">
-                        \${i}
-                    </button>
-                `;
+                pagesHtml += '<button type="button" onclick="setClientPage(\'' + tableId + '\', ' + i + ')" class="w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold bg-white text-gray-500 hover:bg-gray-50 border border-gray-100 transition">' +
+                             i +
+                             '</button>';
             }
         }
 
-        footer.innerHTML = `
-            <div class="text-xs text-gray-500 font-medium">
-                Menunjukkan halaman <span class="text-gray-900 font-bold">\${currentPage}</span> daripada <span class="text-gray-900 font-bold">\${totalPages}</span> 
-                (\${totalItems} rekod keseluruhan)
-            </div>
-            
-            <div class="flex items-center gap-2">
-                \${currentPage > 1 ? `
-                    <button type="button" onclick="setClientPage('\${tableId}', \${currentPage - 1})" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 transition flex items-center gap-2">
-                        <i class="fas fa-chevron-left"></i> Sebelumnya
-                    </button>
-                ` : `
-                    <button disabled class="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-300 cursor-not-allowed flex items-center gap-2">
-                        <i class="fas fa-chevron-left"></i> Sebelumnya
-                    </button>
-                `}
+        let leftBtnHtml = '';
+        if (currentPage > 1) {
+            leftBtnHtml = '<button type="button" onclick="setClientPage(\'' + tableId + '\', ' + (currentPage - 1) + ')" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 transition flex items-center gap-2">' +
+                          '<i class="fas fa-chevron-left"></i> Sebelumnya' +
+                          '</button>';
+        } else {
+            leftBtnHtml = '<button disabled class="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-300 cursor-not-allowed flex items-center gap-2">' +
+                          '<i class="fas fa-chevron-left"></i> Sebelumnya' +
+                          '</button>';
+        }
 
-                <div class="flex items-center gap-1">
-                    \${pagesHtml}
-                </div>
+        let rightBtnHtml = '';
+        if (currentPage !== totalPages) {
+            rightBtnHtml = '<button type="button" onclick="setClientPage(\'' + tableId + '\', ' + (currentPage + 1) + ')" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 transition flex items-center gap-2">' +
+                           'Seterusnya <i class="fas fa-chevron-right"></i>' +
+                           '</button>';
+        } else {
+            rightBtnHtml = '<button disabled class="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-300 cursor-not-allowed flex items-center gap-2">' +
+                           'Seterusnya <i class="fas fa-chevron-right"></i>' +
+                           '</button>';
+        }
 
-                \${currentPage < totalPages ? `
-                    <button type="button" onclick="setClientPage('\${tableId}', \${currentPage + 1})" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 transition flex items-center gap-2">
-                        Seterusnya <i class="fas fa-chevron-right"></i>
-                    </button>
-                ` : `
-                    <button disabled class="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-300 cursor-not-allowed flex items-center gap-2">
-                        Seterusnya <i class="fas fa-chevron-right"></i>
-                    </button>
-                `}
+        footer.innerHTML = 
+            '<div class="text-xs text-gray-500 font-medium">' +
+            '    Menunjukkan halaman <span class="text-gray-900 font-bold">' + currentPage + '</span> daripada <span class="text-gray-900 font-bold">' + totalPages + '</span> ' +
+            '    (' + totalItems + ' rekod keseluruhan)' +
+            '</div>' +
+            '' +
+            '<div class="flex items-center gap-2">' +
+            '    ' + leftBtnHtml +
+            '' +
+            '    <div class="flex items-center gap-1">' +
+            '        ' + pagesHtml +
+            '    </div>' +
+            '' +
+            '    ' + rightBtnHtml +
+            '' +
+            '    ' +
+            '    <div class="flex items-center gap-1.5 text-xs text-gray-500 font-medium border-l border-gray-200 pl-4 ml-2">' +
+            '        <span>Lompat ke:</span>' +
+            '        <input type="number" min="1" max="' + totalPages + '" value="' + currentPage + '" ' +
+            '               id="page-jump-' + tableId + '" ' +
+            '               class="w-12 h-9 px-2 text-center bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 outline-none focus:ring-2 focus:ring-brand-purple focus:border-brand-purple [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">' +
+            '    </div>' +
+            '</div>';
 
-                <!-- Lompat Ke Page Selector -->
-                <div class="flex items-center gap-1.5 text-xs text-gray-500 font-medium border-l border-gray-200 pl-4 ml-2">
-                    <span>Lompat ke:</span>
-                    <input type="number" min="1" max="\${totalPages}" value="\${currentPage}" 
-                           onkeypress="if(event.key === 'Enter') { const p = parseInt(this.value); if(p >= 1 && p <= \${totalPages}) { setClientPage('\${tableId}', p); } }"
-                           class="w-12 h-9 px-2 text-center bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 outline-none focus:ring-2 focus:ring-brand-purple focus:border-brand-purple [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">
-                </div>
-            </div>
-        `;
+        const jumpInput = document.getElementById('page-jump-' + tableId);
+        if (jumpInput) {
+            jumpInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    const p = parseInt(this.value);
+                    if (p >= 1 && p <= totalPages) {
+                        setClientPage(tableId, p);
+                    }
+                }
+            });
+        }
     }
 
     function setClientPage(tableId, page) {
@@ -996,7 +1014,7 @@
         // Filter tableBaru rows
         const baruRows = document.querySelectorAll('#tableBaru tbody tr:not(.empty-state-row)');
         baruRows.forEach(row => {
-            const rowSearch = row.getAttribute('data-search').toLowerCase();
+            const rowSearch = row.getAttribute('data-search') ? row.getAttribute('data-search').toLowerCase() : '';
             const rowCategory = row.getAttribute('data-category');
             const rowDate = row.getAttribute('data-date');
 
@@ -1014,7 +1032,7 @@
         const sejarahRows = document.querySelectorAll('#tableSejarah tbody tr:not(.empty-state-row)');
         let sejarahVisibleCount = 0;
         sejarahRows.forEach(row => {
-            const rowSearch = row.getAttribute('data-search').toLowerCase();
+            const rowSearch = row.getAttribute('data-search') ? row.getAttribute('data-search').toLowerCase() : '';
             const rowCategory = row.getAttribute('data-category');
             const rowDate = row.getAttribute('data-date');
 
@@ -1073,6 +1091,19 @@
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('page')) {
             switchTab('sejarah');
+        }
+
+        const jumpPageInput = document.getElementById('jumpPageInput');
+        if (jumpPageInput) {
+            jumpPageInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    const p = parseInt(this.value);
+                    const maxPage = parseInt(this.getAttribute('max'));
+                    if (p >= 1 && !(p > maxPage)) {
+                        window.location.href = '?page=' + p;
+                    }
+                }
+            });
         }
     });
 
@@ -1185,7 +1216,7 @@
                 cardClass = 'bg-rose-50/40 border-rose-100 p-6 rounded-3xl border flex flex-col justify-between';
                 badgeClass = 'px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider bg-rose-100 text-rose-700';
                 
-                if (scoreVal < 35) {
+                if (!(scoreVal >= 35)) {
                     if (aiAutoRejectionInfo) aiAutoRejectionInfo.classList.remove('hidden');
                 } else {
                     if (aiAutoRejectionInfo) aiAutoRejectionInfo.classList.add('hidden');
@@ -1202,41 +1233,36 @@
             let checklistHtml = '';
             
             if (kategori !== 'RASMI') {
-                checklistHtml += `
-                    <label class="flex items-start gap-2.5 cursor-pointer group text-xs text-slate-600 font-medium">
-                        <input type="checkbox" class="mt-0.5 rounded text-brand-purple focus:ring-brand-purple">
-                        <span>Sahkan akaun perbankan: <strong class="text-slate-800">` + (bank || "-") + ` (` + (akaun || "-") + `)</strong></span>
-                    </label>
-                `;
+                checklistHtml += 
+                    '<label class="flex items-start gap-2.5 cursor-pointer group text-xs text-slate-600 font-medium">' +
+                    '    <input type="checkbox" class="mt-0.5 rounded text-brand-purple focus:ring-brand-purple">' +
+                    '    <span>Sahkan akaun perbankan: <strong class="text-slate-800">' + (bank || "-") + ' (' + (akaun || "-") + ')</strong></span>' +
+                    '</label>';
             } else {
-                checklistHtml += `
-                    <label class="flex items-start gap-2.5 cursor-pointer group text-xs text-slate-600 font-medium">
-                        <input type="checkbox" class="mt-0.5 rounded text-brand-purple focus:ring-brand-purple">
-                        <span>Sahkan bukti pendapatan kasar bulanan: <strong class="text-indigo-600">` + (gaji || 'RM 0.00') + `</strong></span>
-                    </label>
-                `;
+                checklistHtml += 
+                    '<label class="flex items-start gap-2.5 cursor-pointer group text-xs text-slate-600 font-medium">' +
+                    '    <input type="checkbox" class="mt-0.5 rounded text-brand-purple focus:ring-brand-purple">' +
+                    '    <span>Sahkan bukti pendapatan kasar bulanan: <strong class="text-indigo-600">' + (gaji || 'RM 0.00') + '</strong></span>' +
+                    '</label>';
             }
             
-            checklistHtml += `
-                <label class="flex items-start gap-2.5 cursor-pointer group text-xs text-slate-600 font-medium">
-                    <input type="checkbox" class="mt-0.5 rounded text-brand-purple focus:ring-brand-purple">
-                    <span>Sahkan status keluarga: <strong class="text-slate-800">` + (statusK || "-") + `</strong></span>
-                </label>
-            `;
+            checklistHtml += 
+                '<label class="flex items-start gap-2.5 cursor-pointer group text-xs text-slate-600 font-medium">' +
+                '    <input type="checkbox" class="mt-0.5 rounded text-brand-purple focus:ring-brand-purple">' +
+                '    <span>Sahkan status keluarga: <strong class="text-slate-800">' + (statusK || "-") + '</strong></span>' +
+                '</label>';
             
-            checklistHtml += `
-                <label class="flex items-start gap-2.5 cursor-pointer group text-xs text-slate-600 font-medium">
-                    <input type="checkbox" class="mt-0.5 rounded text-brand-purple focus:ring-brand-purple">
-                    <span>Verifikasi status pekerjaan: <strong class="text-slate-800">` + (kerja || "-") + `</strong></span>
-                </label>
-            `;
+            checklistHtml += 
+                '<label class="flex items-start gap-2.5 cursor-pointer group text-xs text-slate-600 font-medium">' +
+                '    <input type="checkbox" class="mt-0.5 rounded text-brand-purple focus:ring-brand-purple">' +
+                '    <span>Verifikasi status pekerjaan: <strong class="text-slate-800">' + (kerja || "-") + '</strong></span>' +
+                '</label>';
             
-            checklistHtml += `
-                <label class="flex items-start gap-2.5 cursor-pointer group text-xs text-slate-600 font-medium">
-                    <input type="checkbox" class="mt-0.5 rounded text-brand-purple focus:ring-brand-purple">
-                    <span>Sahkan kesahihan dokumen lampiran PDF</span>
-                </label>
-            `;
+            checklistHtml += 
+                '<label class="flex items-start gap-2.5 cursor-pointer group text-xs text-slate-600 font-medium">' +
+                '    <input type="checkbox" class="mt-0.5 rounded text-brand-purple focus:ring-brand-purple">' +
+                '    <span>Sahkan kesahihan dokumen lampiran PDF</span>' +
+                '</label>';
             
             checklistContainer.innerHTML = checklistHtml;
             
@@ -1293,7 +1319,7 @@
             btn.innerText = "Hantar Semula";
             btn.className = "px-6 py-2 bg-red-500 text-white rounded-xl font-bold shadow-md hover:bg-red-600";
             ulasan.required = true;
-            if (currentScore < 35) {
+            if (!(currentScore >= 35)) {
                 ulasan.value = "DITOLAK/DIKEMBALIKAN: Skor kelayakan permohonan (" + currentScore.toFixed(0) + "%) adalah di bawah paras minima kelayakan. Sila hubungi AJK jika maklumat sosio-ekonomi (pendapatan/pekerjaan/ahli keluarga) perlu dikemaskini.";
             } else {
                 ulasan.value = "";
@@ -1309,6 +1335,11 @@
         document.getElementById('editPeruntukan').value = amount;
         document.getElementById('editSyarat').value = syarat;
         openModal('modalEditBantuan');
+    }
+
+    function openEditBantuanModalFromBtn(btn) {
+        const d = btn.dataset;
+        openEditBantuanModal(d.id, d.nama, d.jenis, d.peruntukan, d.syarat);
     }
 
     function viewDetail(row) {
@@ -1345,8 +1376,8 @@
             }
         }
         
-        const bank = d.bank;
-        const akaun = d.akaun;
+        const bankVal = d.bank;
+        const akaunVal = d.akaun;
         const penBank = d.penbank;
         const dok = d.dok;
         const dokAdmin = d.dokadmin;
@@ -1356,39 +1387,37 @@
         const bankCard = document.getElementById('bankCard');
         if (bankCard) {
             if (kategori === "RASMI") {
-                bankCard.innerHTML = `
-                    <div class="flex flex-col items-center justify-center h-full text-center p-4">
-                        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-500 mb-3">
-                            <i class="fas fa-info-circle text-xl"></i>
-                        </div>
-                        <p class="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Bantuan Rasmi</p>
-                        <p class="text-xs text-blue-600 font-medium mt-1 italic leading-relaxed">Maklumat perbankan tidak diperlukan atau dikendalikan oleh agensi luar.</p>
-                    </div>
-                `;
+                bankCard.innerHTML = 
+                    '<div class="flex flex-col items-center justify-center h-full text-center p-4">' +
+                    '    <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-500 mb-3">' +
+                    '        <i class="fas fa-info-circle text-xl"></i>' +
+                    '    </div>' +
+                    '    <p class="text-[10px] font-bold text-blue-400 uppercase tracking-wider">Bantuan Rasmi</p>' +
+                    '    <p class="text-xs text-blue-600 font-medium mt-1 italic leading-relaxed">Maklumat perbankan tidak diperlukan atau dikendalikan oleh agensi luar.</p>' +
+                    '</div>';
             } else {
                 const pbUrl = (penBank && penBank !== "null") ? ctx + '/file/bantuan/' + penBank : '#';
                 const pbClass = (penBank && penBank !== "null") ? '' : 'opacity-50 pointer-events-none';
                 
-                bankCard.innerHTML = `
-                    <div class="absolute -right-4 -bottom-4 opacity-5">
-                        <i class="fas fa-credit-card text-7xl"></i>
-                    </div>
-                    <div class="space-y-4 relative z-10">
-                        <div>
-                            <p class="text-[10px] text-blue-400 font-bold uppercase mb-1">Nama Bank</p>
-                            <p class="font-bold text-blue-900 uppercase tracking-wide text-lg">\${(bank && bank !== "null") ? bank : "-"}</p>
-                        </div>
-                        <div>
-                            <p class="text-[10px] text-blue-400 font-bold uppercase mb-1">Nombor Akaun</p>
-                            <p class="font-bold text-blue-900 text-xl tracking-widest">\${(akaun && akaun !== "null") ? akaun : "-"}</p>
-                        </div>
-                        <div class="pt-2">
-                            <a href="\${pbUrl}" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-blue-600 rounded-xl text-xs font-bold shadow-sm border border-blue-100 hover:shadow-md transition-all \${pbClass}">
-                                <i class="fas fa-file-invoice-dollar"></i> Lihat Penyata Bank
-                            </a>
-                        </div>
-                    </div>
-                `;
+                bankCard.innerHTML = 
+                    '<div class="absolute -right-4 -bottom-4 opacity-5">' +
+                    '    <i class="fas fa-credit-card text-7xl"></i>' +
+                    '</div>' +
+                    '<div class="space-y-4 relative z-10">' +
+                    '    <div>' +
+                    '        <p class="text-[10px] text-blue-400 font-bold uppercase mb-1">Nama Bank</p>' +
+                    '        <p class="font-bold text-blue-900 uppercase tracking-wide text-lg">' + ((bankVal && bankVal !== "null") ? bankVal : "-") + '</p>' +
+                    '    </div>' +
+                    '    <div>' +
+                    '        <p class="text-[10px] text-blue-400 font-bold uppercase mb-1">Nombor Akaun</p>' +
+                    '        <p class="font-bold text-blue-900 text-xl tracking-widest">' + ((akaunVal && akaunVal !== "null") ? akaunVal : "-") + '</p>' +
+                    '    </div>' +
+                    '    <div class="pt-2">' +
+                    '        <a href="' + pbUrl + '" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-white text-blue-600 rounded-xl text-xs font-bold shadow-sm border border-blue-100 hover:shadow-md transition-all ' + pbClass + '">' +
+                    '            <i class="fas fa-file-invoice-dollar"></i> Lihat Penyata Bank' +
+                    '        </a>' +
+                    '    </div>' +
+                    '</div>';
             }
         }
         

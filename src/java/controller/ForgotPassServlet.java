@@ -1,12 +1,10 @@
 package controller;
 
 import java.io.IOException;
-import java.security.SecureRandom;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Timestamp;
-import java.util.Base64;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -41,7 +39,6 @@ public class ForgotPassServlet extends HttpServlet {
             icInput = icInput.replace("-", "").trim();
         }
         
-        String message = "Jika butiran tersebut wujud dalam sistem, kod OTP telah dihantar. Sila semak emel anda.";
 
         try (Connection conn = DBUtil.getConnection()) {
             

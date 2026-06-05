@@ -167,6 +167,7 @@ public class LaporanServlet extends HttpServlet {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void handleSaveSnapshot(HttpServletRequest request, HttpServletResponse response, Pengguna user)
             throws ServletException, IOException {
         

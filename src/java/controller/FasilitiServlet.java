@@ -18,14 +18,12 @@ import java.sql.Connection;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.sql.Date;
 import java.sql.Time;
 import java.util.ArrayList;
 import java.util.List;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -466,7 +464,6 @@ public class FasilitiServlet extends HttpServlet {
             
 
 
-            long nowMillis = System.currentTimeMillis();
             java.time.LocalDate todayLD = java.time.LocalDate.now(java.time.ZoneId.of("Asia/Kuala_Lumpur"));
             java.time.LocalTime nowLT = java.time.LocalTime.now(java.time.ZoneId.of("Asia/Kuala_Lumpur"));
             java.time.LocalDate requestedLD = tarikh.toLocalDate();

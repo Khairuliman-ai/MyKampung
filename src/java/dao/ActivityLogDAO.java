@@ -4,7 +4,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import model.ActivityLog;
-import util.DBUtil;
 
 /**
  * ActivityLogDAO handles database operations for the activity audit trail (log_aktiviti).

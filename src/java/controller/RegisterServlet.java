@@ -4,13 +4,10 @@ import model.Pengguna;
 import dao.PenggunaDAO;
 import util.AppConfig;
 import util.FileUploadUtil;
-import util.DBUtil;
 
 
 import org.mindrot.jbcrypt.BCrypt;
-import java.io.File;
 import java.io.IOException;
-import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.servlet.ServletException;
@@ -19,7 +16,6 @@ import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 
 @WebServlet("/RegisterServlet")
 @MultipartConfig(

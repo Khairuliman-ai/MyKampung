@@ -17,7 +17,6 @@ import util.DBUtil;
 
 import java.util.List;
 import javax.servlet.annotation.MultipartConfig;
-import java.io.File;
 import javax.servlet.http.Part;
 
 @WebServlet(urlPatterns = {"/profil/view", "/profil/update"})
