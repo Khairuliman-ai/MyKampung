@@ -13,5 +13,6 @@
               minIdle="5"
               maxWait="10000"
               validationQuery="SELECT 1"
-              testOnBorrow="true"/>
+              testOnBorrow="true"
+              closeMethod="close"/>
 </Context>

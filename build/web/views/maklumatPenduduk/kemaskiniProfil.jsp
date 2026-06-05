@@ -934,11 +934,10 @@
         document.getElementById('m_pendapatan').value = '';
         
         // Re-create the file input inside modal to clear selection
-        document.getElementById('modalFileContainer').innerHTML = `
-            <i class="fas fa-file-invoice-dollar absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-green-600 transition-colors"></i>
-            <input type="file" id="modalFile" accept=".pdf,.png,.jpg,.jpeg" 
-                class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-gray-800 text-xs font-semibold transition-all file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-green-100 file:text-green-600 hover:file:bg-green-200 file:cursor-pointer">
-        `;
+        document.getElementById('modalFileContainer').innerHTML = 
+            "<i class='fas fa-file-invoice-dollar absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-green-600 transition-colors'></i>" +
+            "<input type='file' id='modalFile' accept='.pdf,.png,.jpg,.jpeg' " +
+            "    class='w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-150 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-gray-800 text-xs font-semibold transition-all file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-green-100 file:text-green-600 hover:file:bg-green-200 file:cursor-pointer'>";
 
         document.getElementById('addFamilyModal').classList.remove('hidden');
     }
@@ -961,11 +960,10 @@
         document.getElementById('m_pendapatan').value = card.querySelector('.f-pendapatan').value;
 
         // Clear modal file input selection
-        document.getElementById('modalFileContainer').innerHTML = `
-            <i class="fas fa-file-invoice-dollar absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-green-600 transition-colors"></i>
-            <input type="file" id="modalFile" accept=".pdf,.png,.jpg,.jpeg" 
-                class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-gray-800 text-xs font-semibold transition-all file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-green-100 file:text-green-600 hover:file:bg-green-200 file:cursor-pointer">
-        `;
+        document.getElementById('modalFileContainer').innerHTML = 
+            "<i class='fas fa-file-invoice-dollar absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-green-600 transition-colors'></i>" +
+            "<input type='file' id='modalFile' accept='.pdf,.png,.jpg,.jpeg' " +
+            "    class='w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-150 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-gray-800 text-xs font-semibold transition-all file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-[10px] file:font-black file:bg-green-100 file:text-green-600 hover:file:bg-green-200 file:cursor-pointer'>";
 
         document.getElementById('addFamilyModal').classList.remove('hidden');
     }
@@ -1050,19 +1048,18 @@
                 card.querySelector('.f-pengesahan-existing').value = '';
 
                 // Move/append new file input to card
-                fileInput.id = `f_file_\${idx}`;
-                fileInput.name = `f_pengesahan_pendapatan_\${idx}`;
+                fileInput.id = 'f_file_' + idx;
+                fileInput.name = 'f_pengesahan_pendapatan_' + idx;
                 fileInput.style.display = 'none';
                 fileInput.className = 'hidden';
                 card.appendChild(fileInput);
 
                 // Update document badge inside card
-                card.querySelector('.card-display-dokumen').innerHTML = `
-                    <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 text-[10px] font-bold animate-in zoom-in-95 duration-200">
-                        <i class="fas fa-file-invoice-dollar text-xs"></i>
-                        Fail Baru Dimuat Naik
-                    </span>
-                `;
+                card.querySelector('.card-display-dokumen').innerHTML = 
+                    "<span class='inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 text-[10px] font-bold animate-in zoom-in-95 duration-200'>" +
+                    "    <i class='fas fa-file-invoice-dollar text-xs'></i>" +
+                    "    Fail Baru Dimuat Naik" +
+                    "</span>";
             }
 
             hideAddFamilyModal();
@@ -1077,85 +1074,89 @@
         const idx = familyCounter++;
 
         const card = document.createElement('div');
-        card.id = `familyCard_\${idx}`;
+        card.id = 'familyCard_' + idx;
         card.className = 'family-row group relative bg-white hover:bg-green-50/10 rounded-3xl p-6 border border-gray-150 shadow-sm hover:shadow-md hover:border-green-300 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center gap-6 animate-in slide-in-from-bottom-4 duration-300';
         
-        card.innerHTML = `
-            <input type="hidden" name="f_index[]" class="f-index" value="\${idx}">
-            <input type="hidden" name="f_nama[]" class="f-nama" value="\${escapeHtml(nama)}">
-            <input type="hidden" name="f_kp[]" class="f-kp" value="\${escapeHtml(kp)}">
-            <input type="hidden" name="f_tel[]" class="f-tel" value="\${escapeHtml(tel)}">
-            <input type="hidden" name="f_umur[]" class="f-umur" value="\${umur}">
-            <input type="hidden" name="f_hubungan[]" class="f-hubungan" value="\${escapeHtml(hubungan)}">
-            <input type="hidden" name="f_pekerjaan[]" class="f-pekerjaan" value="\${escapeHtml(pekerjaan)}">
-            <input type="hidden" name="f_pendapatan[]" class="f-pendapatan" value="\${pendapatan}">
-            <input type="hidden" name="f_pengesahan_existing[]" class="f-pengesahan-existing" value="">
+        let docBadgeHtml = '';
+        if (hasFile) {
+            docBadgeHtml = "<span class='inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 text-[10px] font-bold'>" +
+                           "    <i class='fas fa-file-invoice-dollar text-xs'></i>" +
+                           "    Fail Dimuat Naik" +
+                           "</span>";
+        } else {
+            docBadgeHtml = "<span class='inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-400 text-[10px] font-bold'>" +
+                           "    <i class='fas fa-exclamation-circle text-xs'></i>" +
+                           "    Tiada Dokumen" +
+                           "</span>";
+        }
 
-            <div class="w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center text-2xl shadow-sm border border-gray-100 group-hover:scale-105 transition-transform shrink-0">
-                <i class="card-icon fas \${iconClass}"></i>
-            </div>
-
-            <div class="flex-1 min-w-0">
-                <div class="flex flex-wrap items-center gap-2 mb-2">
-                    <h5 class="card-display-nama text-sm font-extrabold text-gray-900 truncate">\${escapeHtml(nama)}</h5>
-                    <span class="card-display-hubungan inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-700 border border-green-200">
-                        \${escapeHtml(hubungan)}
-                    </span>
-                    <span class="card-display-umur inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gray-50 text-gray-600 border border-gray-200">
-                        \${umur} Tahun
-                    </span>
-                </div>
-
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-semibold text-gray-500">
-                    <div>
-                        <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">No. KP</span>
-                        <span class="card-display-kp text-gray-800">\${kp ? escapeHtml(kp) : '-'}</span>
-                    </div>
-                    <div>
-                        <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">No. Telefon</span>
-                        <span class="card-display-tel text-gray-800">\${tel ? escapeHtml(tel) : '-'}</span>
-                    </div>
-                    <div>
-                        <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Pekerjaan</span>
-                        <span class="card-display-pekerjaan text-gray-800">\${pekerjaan ? escapeHtml(pekerjaan) : 'Tiada'}</span>
-                    </div>
-                    <div>
-                        <span class="block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5">Pendapatan</span>
-                        <span class="card-display-pendapatan text-gray-800 font-bold text-blue-600">\${incomeFormatted}</span>
-                    </div>
-                </div>
-            </div>
-
-            <div class="flex items-center gap-3 w-full md:w-auto shrink-0 md:justify-end border-t md:border-t-0 pt-4 md:pt-0">
-                <div class="card-display-dokumen flex items-center shrink-0">
-                    \${hasFile ? `
-                    <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 text-[10px] font-bold">
-                        <i class="fas fa-file-invoice-dollar text-xs"></i>
-                        Fail Dimuat Naik
-                    </span>` : `
-                    <span class="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-400 text-[10px] font-bold">
-                        <i class="fas fa-exclamation-circle text-xs"></i>
-                        Tiada Dokumen
-                    </span>`}
-                </div>
-
-                <button type="button" onclick="editFamilyMember('familyCard_\${idx}')" 
-                    class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shrink-0" 
-                    title="Kemaskini Ahli Keluarga">
-                    <i class="fas fa-pencil-alt text-sm"></i>
-                </button>
-
-                <button type="button" onclick="removeFamilyRow(this)" 
-                    class="w-10 h-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shrink-0" 
-                    title="Hapus Ahli Keluarga">
-                    <i class="fas fa-trash-alt text-sm"></i>
-                </button>
-            </div>
-        `;
+        card.innerHTML = 
+            "<input type='hidden' name='f_index[]' class='f-index' value='" + idx + "'>" +
+            "<input type='hidden' name='f_nama[]' class='f-nama' value='" + escapeHtml(nama) + "'>" +
+            "<input type='hidden' name='f_kp[]' class='f-kp' value='" + escapeHtml(kp) + "'>" +
+            "<input type='hidden' name='f_tel[]' class='f-tel' value='" + escapeHtml(tel) + "'>" +
+            "<input type='hidden' name='f_umur[]' class='f-umur' value='" + umur + "'>" +
+            "<input type='hidden' name='f_hubungan[]' class='f-hubungan' value='" + escapeHtml(hubungan) + "'>" +
+            "<input type='hidden' name='f_pekerjaan[]' class='f-pekerjaan' value='" + escapeHtml(pekerjaan) + "'>" +
+            "<input type='hidden' name='f_pendapatan[]' class='f-pendapatan' value='" + pendapatan + "'>" +
+            "<input type='hidden' name='f_pengesahan_existing[]' class='f-pengesahan-existing' value=''>" +
+            "" +
+            "<div class='w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center text-2xl shadow-sm border border-gray-100 group-hover:scale-105 transition-transform shrink-0'>" +
+            "    <i class='card-icon fas " + iconClass + "'></i>" +
+            "</div>" +
+            "" +
+            "<div class='flex-1 min-w-0'>" +
+            "    <div class='flex flex-wrap items-center gap-2 mb-2'>" +
+            "        <h5 class='card-display-nama text-sm font-extrabold text-gray-900 truncate'>" + escapeHtml(nama) + "</h5>" +
+            "        <span class='card-display-hubungan inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-700 border border-green-200'>" +
+            "            " + escapeHtml(hubungan) + "" +
+            "        </span>" +
+            "        <span class='card-display-umur inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gray-50 text-gray-600 border border-gray-200'>" +
+            "            " + umur + " Tahun" +
+            "        </span>" +
+            "    </div>" +
+            "" +
+            "    <div class='grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-semibold text-gray-500'>" +
+            "        <div>" +
+            "            <span class='block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5'>No. KP</span>" +
+            "            <span class='card-display-kp text-gray-800'>" + (kp ? escapeHtml(kp) : '-') + "</span>" +
+            "        </div>" +
+            "        <div>" +
+            "            <span class='block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5'>No. Telefon</span>" +
+            "            <span class='card-display-tel text-gray-800'>" + (tel ? escapeHtml(tel) : '-') + "</span>" +
+            "        </div>" +
+            "        <div>" +
+            "            <span class='block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5'>Pekerjaan</span>" +
+            "            <span class='card-display-pekerjaan text-gray-800'>" + (pekerjaan ? escapeHtml(pekerjaan) : 'Tiada') + "</span>" +
+            "        </div>" +
+            "        <div>" +
+            "            <span class='block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5'>Pendapatan</span>" +
+            "            <span class='card-display-pendapatan text-gray-800 font-bold text-blue-600'>" + incomeFormatted + "</span>" +
+            "        </div>" +
+            "    </div>" +
+            "</div>" +
+            "" +
+            "<div class='flex items-center gap-3 w-full md:w-auto shrink-0 md:justify-end border-t md:border-t-0 pt-4 md:pt-0'>" +
+            "    <div class='card-display-dokumen flex items-center shrink-0'>" +
+            "        " + docBadgeHtml +
+            "    </div>" +
+            "" +
+            "    <button type='button' onclick='editFamilyMember(\"familyCard_" + idx + "\")' " +
+            "        class='w-10 h-10 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shrink-0' " +
+            "        title='Kemaskini Ahli Keluarga'>" +
+            "        <i class='fas fa-pencil-alt text-sm'></i>" +
+            "    </button>" +
+            "" +
+            "    <button type='button' onclick='removeFamilyRow(this)' " +
+            "        class='w-10 h-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shrink-0' " +
+            "        title='Hapus Ahli Keluarga'>" +
+            "        <i class='fas fa-trash-alt text-sm'></i>" +
+            "    </button>" +
+            "</div>";
 
         if (hasFile) {
-            fileInput.id = `f_file_\${idx}`;
-            fileInput.name = `f_pengesahan_pendapatan_\${idx}`;
+            fileInput.id = 'f_file_' + idx;
+            fileInput.name = 'f_pengesahan_pendapatan_' + idx;
             fileInput.style.display = 'none';
             fileInput.className = 'hidden';
             card.appendChild(fileInput);
@@ -1172,15 +1173,14 @@
             row.remove();
             const container = document.getElementById('familyContainer');
             if (container.querySelectorAll('.family-row').length === 0) {
-                container.innerHTML = `
-                    <div id="emptyFamily" class="text-center py-12 bg-gray-50/50 rounded-3xl border-2 border-dashed border-gray-200 animate-in fade-in duration-300">
-                        <div class="w-14 h-14 rounded-full bg-white mx-auto flex items-center justify-center text-gray-300 mb-3 shadow-inner">
-                            <i class="fas fa-users text-xl"></i>
-                        </div>
-                        <p class="text-xs text-gray-400 font-bold uppercase tracking-wider">Tiada Maklumat Ahli Keluarga</p>
-                        <p class="text-[10px] text-gray-400 mt-1">Sila klik "+ Tambah Ahli" di atas untuk mula mengisi.</p>
-                    </div>
-                `;
+                container.innerHTML = 
+                    "<div id='emptyFamily' class='text-center py-12 bg-gray-50/50 rounded-3xl border-2 border-dashed border-gray-200 animate-in fade-in duration-300'>" +
+                    "    <div class='w-14 h-14 rounded-full bg-white mx-auto flex items-center justify-center text-gray-300 mb-3 shadow-inner'>" +
+                    "        <i class='fas fa-users text-xl'></i>" +
+                    "    </div>" +
+                    "    <p class='text-xs text-gray-400 font-bold uppercase tracking-wider'>Tiada Maklumat Ahli Keluarga</p>" +
+                    "    <p class='text-[10px] text-gray-400 mt-1'>Sila klik \"+ Tambah Ahli\" di atas untuk mula mengisi.</p>" +
+                    "</div>";
             }
         }, 300);
     }
@@ -1259,7 +1259,7 @@
                 searchContext += ", Pasir Puteh, Kelantan, Malaysia";
             }
 
-            const url = `https://nominatim.openstreetmap.org/search?format=json&q=\${encodeURIComponent(searchContext)}&limit=1`;
+            const url = 'https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(searchContext) + '&limit=1';
 
             fetch(url, {
                 headers: {
@@ -1295,7 +1295,7 @@
                     });
                 } else {
                     // Cuba carian tanpa konteks tambahan jika gagal
-                    return fetch(`https://nominatim.openstreetmap.org/search?format=json&q=\${encodeURIComponent(query)}&limit=1`)
+                    return fetch('https://nominatim.openstreetmap.org/search?format=json&q=' + encodeURIComponent(query) + '&limit=1')
                         .then(res => res.json())
                         .then(secondData => {
                             if (secondData && secondData.length > 0) {

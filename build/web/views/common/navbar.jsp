@@ -238,7 +238,7 @@
                 <div class="w-6 text-center">
                     <i class="fas fa-users <%= (currentPath.contains("/ketua/urus")) ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
-                <span class="nav-label font-medium text-sm">Direktori Penduduk</span>
+                <span class="nav-label font-medium text-sm">Senarai Penduduk</span>
             </a>
 
             <a href="<%= contextPath %>/bantuan/list" 
