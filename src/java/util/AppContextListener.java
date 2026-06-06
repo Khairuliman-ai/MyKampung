@@ -24,12 +24,26 @@ public class AppContextListener implements ServletContextListener {
     public void contextDestroyed(ServletContextEvent sce) {
         System.out.println("MyKampung web application context destroying. Starting resource cleanup...");
 
-        // 1. Gracefully shut down the MySQL AbandonedConnectionCleanupThread
+        // 1. Gracefully shut down the MySQL AbandonedConnectionCleanupThread using reflection
         try {
-            com.mysql.cj.jdbc.AbandonedConnectionCleanupThread.checkedShutdown();
-            System.out.println("MySQL AbandonedConnectionCleanupThread shut down successfully.");
-        } catch (Throwable t) {
-            System.err.println("Error shutting down MySQL AbandonedConnectionCleanupThread: " + t.getMessage());
+            Class<?> cleanupThreadClass = Class.forName("com.mysql.cj.jdbc.AbandonedConnectionCleanupThread");
+            java.lang.reflect.Method checkedShutdownMethod = cleanupThreadClass.getMethod("checkedShutdown");
+            checkedShutdownMethod.invoke(null);
+            System.out.println("MySQL AbandonedConnectionCleanupThread shut down successfully via reflection.");
+        } catch (ClassNotFoundException e) {
+            // Under older MySQL driver versions, it might be in a different package, or not used.
+            try {
+                Class<?> oldCleanupThreadClass = Class.forName("com.mysql.jdbc.AbandonedConnectionCleanupThread");
+                java.lang.reflect.Method shutdownMethod = oldCleanupThreadClass.getMethod("shutdown");
+                shutdownMethod.invoke(null);
+                System.out.println("MySQL legacy AbandonedConnectionCleanupThread shut down successfully via reflection.");
+            } catch (ClassNotFoundException ex) {
+                System.out.println("MySQL AbandonedConnectionCleanupThread class not found (not using MySQL or driver registered at server level).");
+            } catch (Exception ex) {
+                System.err.println("Error shutting down legacy MySQL AbandonedConnectionCleanupThread: " + ex.getMessage());
+            }
+        } catch (Exception e) {
+            System.err.println("Error shutting down MySQL AbandonedConnectionCleanupThread: " + e.getMessage());
         }
 
         // 2. Deregister JDBC drivers registered by this web app's classloader
