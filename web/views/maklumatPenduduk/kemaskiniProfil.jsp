@@ -311,7 +311,7 @@
                     <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 pb-4">
                         <div class="flex items-center gap-4">
                             <div class="w-10 h-10 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-lg shadow-inner flex-shrink-0">
-                                <i class="fas fa-users-medical text-xl"></i>
+                                <i class="fas fa-users text-xl"></i>
                             </div>
                             <div>
                                 <h4 class="text-base font-bold text-slate-800">Maklumat Ahli Keluarga</h4>
@@ -500,7 +500,7 @@
                             </div>
                         </div>
                         <div class="hidden md:block text-[9px] bg-red-50 text-red-600 font-bold px-3 py-1.5 rounded-lg border border-red-100">
-                            DRAG MARKER PADA PETA
+                            TARIK PENANDA PADA PETA
                         </div>
                     </div>
 
@@ -613,7 +613,7 @@
             <button onclick="showChangePassModal()" class="w-full group relative p-4 rounded-[1.5rem] bg-blue-50/50 border border-blue-100 hover:bg-blue-100/50 transition-all text-left overflow-hidden">
                 <div class="relative z-10 flex items-center gap-4">
                     <div class="w-10 h-10 rounded-xl bg-white shadow-sm flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
-                        <i class="fas fa-key-skeleton"></i>
+                        <i class="fas fa-key"></i>
                     </div>
                     <div>
                         <p class="text-xs font-bold text-gray-900">Tukar Kata Laluan</p>
@@ -696,7 +696,7 @@
         
         <div class="text-center mb-8">
             <div class="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 text-2xl mx-auto mb-4 shadow-inner">
-                <i class="fas fa-shield-keyhole"></i>
+                <i class="fas fa-user-shield"></i>
             </div>
             <h3 class="text-2xl font-black text-gray-900 tracking-tight">Tukar Kata Laluan</h3>
             <p class="text-gray-500 text-sm mt-1 font-medium">Sila pastikan kata laluan anda kukuh.</p>

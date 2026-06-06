@@ -16,7 +16,7 @@ import java.sql.Connection;
 
 @WebServlet(name = "UrusPendudukServlet", urlPatterns = {
     "/penduduk/urus", "/penduduk/approve", "/penduduk/reject", "/penduduk/update",
-    "/ketua/urus", "/ketua/lantik", "/ketua/update", "/ketua/gugurkan", "/ketua/tambahJawatan"
+    "/ketua/urus", "/ketua/lantik", "/ketua/update", "/ketua/gugurkan"
 })
 /**
  * UrusPendudukServlet handles administrative resident management.
@@ -133,18 +133,7 @@ public class UrusPendudukServlet extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/ketua/urus?status=error");
                 }
             }
-            
-            // --- Route: /ketua/tambahJawatan — Add new custom jawatan ---
-            else if ("/ketua/tambahJawatan".equals(action)) {
-                String namaJawatan = request.getParameter("namaJawatan");
-                boolean success = jawatanDAO.tambahJawatan(namaJawatan);
-                
-                if (success) {
-                    response.sendRedirect(request.getContextPath() + "/ketua/urus?status=tambahJawatanSuccess");
-                } else {
-                    response.sendRedirect(request.getContextPath() + "/ketua/urus?status=error");
-                }
-            }
+
 
             // --- Route: /penduduk/update or /ketua/update — Admin/Ketua update resident profile ---
             else if ("/penduduk/update".equals(action) || "/ketua/update".equals(action)) {

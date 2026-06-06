@@ -13,14 +13,10 @@
             <h2 class="text-3xl font-extrabold text-gray-900 tracking-tight">Pusat Kawalan Komuniti</h2>
             <p class="text-gray-500 mt-1 flex items-center gap-2">
                 <span class="flex h-2 w-2 rounded-full bg-green-500"></span>
-                Sistem Pengurusan Ahli JKKK & Penduduk Kampung Danan
+                Sistem Pengurusan AJK & Penduduk Kampung Danan
             </p>
         </div>
         <div class="flex flex-wrap gap-3">
-            <button onclick="openModal('modalTambahJawatan')" class="bg-white hover:bg-gray-50 text-gray-700 border border-gray-200 px-5 py-2.5 rounded-2xl font-bold text-sm transition-all duration-200 shadow-sm flex items-center gap-2 group">
-                <i class="fas fa-briefcase text-gray-400 group-hover:text-brand-purple transition-colors"></i> 
-                <span>Tambah Jawatan</span>
-            </button>
             <button onclick="openModal('modalLantik')" class="bg-brand-purple hover:bg-brand-purpleHover text-white px-6 py-2.5 rounded-2xl font-bold text-sm transition-all duration-200 shadow-lg shadow-md flex items-center gap-2 transform hover:-translate-y-0.5">
                 <i class="fas fa-user-plus"></i>
                 <span>Lantik AJK Baharu</span>
@@ -46,11 +42,6 @@
             <div class="bg-blue-50 border-l-4 border-blue-500 text-blue-700 p-4 mb-6 rounded-r-xl shadow-sm flex items-center gap-3">
                 <i class="fas fa-user-shield"></i>
                 <p class="text-sm font-bold">AJK Baharu berjaya dilantik!</p>
-            </div>
-        <% } else if (request.getParameter("status").equals("tambahJawatanSuccess")) { %>
-            <div class="bg-indigo-50 border-l-4 border-indigo-500 text-indigo-700 p-4 mb-6 rounded-r-xl shadow-sm flex items-center gap-3">
-                <i class="fas fa-briefcase"></i>
-                <p class="text-sm font-bold">Jawatan baharu berjaya ditambah ke dalam sistem!</p>
             </div>
         <% } else if (request.getParameter("status").equals("dropSuccess")) { %>
             <div class="bg-orange-50 border-l-4 border-orange-500 text-orange-700 p-4 mb-6 rounded-r-xl shadow-sm flex items-center gap-3">
@@ -96,7 +87,7 @@
                             <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest w-16">No.</th>
                             <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">Informasi AJK</th>
                             <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">Jawatan & Tanggungjawab</th>
-                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">Hubungan</th>
+                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">No. Telefon</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -214,7 +205,7 @@
                             <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest w-16">No.</th>
                             <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">Informasi Penduduk</th>
                             <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">Alamat Kediaman</th>
-                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">Hubungan</th>
+                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">No. Telefon</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-gray-100">
@@ -325,12 +316,12 @@
                             </td>
                             <td class="p-5">
                                 <div class="flex flex-col">
-                                    <span class="text-xs text-gray-400 italic">Ikut wakil keluarga</span>
+                                    <span class="text-xs text-gray-400 italic">RUJUK WAKIL</span>
                                 </div>
                             </td>
                             <td class="p-5 text-sm">
                                 <span class="px-3 py-1 rounded-full bg-green-50 text-green-600 text-[10px] font-black uppercase tracking-widest border border-green-100">
-                                    Ahli Keluarga
+                                    RUJUK WAKIL
                                 </span>
                             </td>
                         </tr>
@@ -479,9 +470,6 @@
             </div>
             <h4 class="font-bold text-sm mb-2 relative z-10">Tip Pengurusan</h4>
             <p class="text-[11px] leading-relaxed opacity-80 relative z-10 font-medium">Pastikan maklumat koordinat GPS penduduk dikemaskini untuk memudahkan urusan kecemasan dan bantuan.</p>
-            <button class="mt-4 text-[10px] font-bold bg-white/20 hover:bg-white/30 px-4 py-2 rounded-xl transition-colors relative z-10">
-                Lihat Panduan
-            </button>
         </div>
     </div>
 </aside>
@@ -550,7 +538,8 @@
                     </div>
                     <div class="flex items-center gap-2 px-1">
                         <i class="fas fa-info-circle text-brand-purple text-[10px]"></i>
-                        <p class="text-[10px] text-gray-400 font-medium italic">Jawatan yang diisi perlu dikosongkan dahulu.</p>
+                        <p class="text-[10px] text-gray-400 font-medium italic">Gugurkan mana-mana jawatan sedia ada terlebih dahulu sebelum melantik jawatan baharu
+                        </p>
                     </div>
                 </div>
 
@@ -569,41 +558,7 @@
     </div>
 </div>
 
-<!-- Modal: Tambah Jawatan Baru -->
-<div id="modalTambahJawatan" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
-    <div class="absolute inset-0 bg-gray-900/40 backdrop-blur-md" onclick="closeModal('modalTambahJawatan')"></div>
-    <div class="relative min-h-screen flex items-center justify-center p-4">
-        <div class="bg-white rounded-[2.5rem] shadow-2xl w-full max-w-md overflow-hidden transform transition-all">
-            <div class="bg-gradient-to-r from-indigo-600 to-blue-500 p-8 text-white relative">
-                <h3 class="text-2xl font-black tracking-tight">Struktur Baharu</h3>
-                <p class="text-xs font-medium opacity-80 mt-1">Tambahkan jawatan untuk memperluas birokrasi.</p>
-                <button onclick="closeModal('modalTambahJawatan')" class="absolute top-8 right-8 text-white/50 hover:text-white transition-colors">
-                    <i class="fas fa-times text-xl"></i>
-                </button>
-            </div>
-            
-            <form action="<%= request.getContextPath() %>/ketua/tambahJawatan" method="post" class="p-8 space-y-6" onsubmit="return confirmAction(event, 'Tambah Jawatan?', 'Adakah anda mahu menambah jawatan baru ke dalam sistem?', 'Ya, Tambah', '#4F46E5')">
-                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
-                <div class="space-y-2">
-                    <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Nama Jawatan / Biro</label>
-                    <input type="text" name="namaJawatan" required placeholder="Contoh: Biro Inovasi Komuniti" 
-                           class="w-full px-5 py-4 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-4 focus:ring-indigo-100 focus:border-indigo-500 text-sm font-bold transition-all outline-none">
-                </div>
 
-                <div class="pt-4 flex gap-4">
-                    <button type="button" onclick="closeModal('modalTambahJawatan')" 
-                            class="flex-1 px-6 py-4 bg-gray-50 text-gray-500 font-bold rounded-2xl hover:bg-gray-100 transition-colors">
-                        Batal
-                    </button>
-                    <button type="submit" 
-                            class="flex-[2] px-6 py-4 bg-indigo-600 text-white font-black rounded-2xl shadow-xl shadow-indigo-100 hover:bg-indigo-700 transition-all transform hover:-translate-y-1">
-                        Tambah Jawatan
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 
 <!-- Modal Zoom Foto -->
 <div id="modalZoom" class="fixed inset-0 z-[100] hidden flex items-center justify-center p-4" onclick="closeModal('modalZoom')">
@@ -819,7 +774,7 @@
                     <!-- Maklumat Ahli Keluarga -->
                     <div class="md:col-span-2 space-y-4">
                         <h5 class="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                            <i class="fas fa-users-medical text-green-500"></i> Maklumat Ahli Keluarga
+                            <i class="fas fa-users text-green-500"></i> Maklumat Ahli Keluarga
                         </h5>
                         <div id="infoFamilyContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- Dynamic Content -->

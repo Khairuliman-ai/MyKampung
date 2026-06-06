@@ -460,7 +460,7 @@
                     <!-- Maklumat Ahli Keluarga -->
                     <div class="md:col-span-2 space-y-4">
                         <h5 class="text-[11px] font-black text-gray-400 uppercase tracking-widest flex items-center gap-2">
-                            <i class="fas fa-users-medical text-green-500"></i> Maklumat Ahli Keluarga
+                            <i class="fas fa-users text-green-500"></i> Maklumat Ahli Keluarga
                         </h5>
                         <div id="infoFamilyContainer" class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <!-- Dynamic Content -->
