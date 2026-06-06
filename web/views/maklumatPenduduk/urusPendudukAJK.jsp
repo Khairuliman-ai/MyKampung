@@ -477,7 +477,7 @@
         <div class="bg-gray-50 rounded-3xl p-6 border border-gray-100 relative overflow-hidden group">
             <i class="fas fa-info-circle absolute -right-2 -bottom-2 text-gray-200 text-6xl opacity-20"></i>
             <p class="text-xs text-gray-500 leading-relaxed relative z-10 font-medium">
-                Sila pastikan maklumat penduduk disemak dengan teliti sebelum meluluskan pendaftaran. Penduduk yang ditolak perlu mendaftar semula dengan maklumat yang betul.
+                Sila pastikan maklumat penduduk disemak dengan teliti sebelum meluluskan pendaftaran. Pastikan alamat rumah yang dilampirkan adalah sah. Penduduk yang ditolak perlu mendaftar semula dengan maklumat yang betul.
             </p>
         </div>
     </div>

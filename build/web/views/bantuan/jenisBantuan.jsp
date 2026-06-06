@@ -65,7 +65,7 @@
                     <h3 class="text-xl font-extrabold text-slate-800 mb-3 group-hover:text-brand-purple transition-colors">Bantuan Komuniti</h3>
                     
                     <p class="text-slate-500 text-xs leading-relaxed mb-8 font-medium">
-                        Sumbangan kebajikan tempatan termasuk khairat kematian, dana kecemasan bencana, dan pelbagai inisiatif gotong-royong kampung.
+                        Bantuan kebajikan dalaman yang diuruskan oleh jawatankuasa kampung menggunakan tabung komuniti setempat. Ini termasuk khairat kematian penduduk, bantuan kilat bencana alam (banjir/kebakaran), bantuan sara hidup kecemasan, serta dana aktiviti kemasyarakatan kampung.
                     </p>
                 </div>
 
@@ -94,7 +94,7 @@
                     <h3 class="text-xl font-extrabold text-slate-800 mb-3 group-hover:text-brand-purple transition-colors">Bantuan Rasmi</h3>
                     
                     <p class="text-slate-500 text-xs leading-relaxed mb-8 font-medium">
-                        Urusan rasmi kerajaan merangkumi permohonan kebajikan JKM, surat sokongan Ketua Kampung, pengesahan pendapatan, dan khidmat agensi luar.
+                        Permohonan bantuan rasmi di peringkat kerajaan (JKM, MAIK, Zakat) atau swasta. Urusan merangkumi penyediaan surat sokongan pengesahan pendapatan daripada Ketua Kampung, permohonan skim sara hidup bulanan agensi luar, serta surat sokongan kebajikan sekolah anak-anak.
                     </p>
                 </div>
 
@@ -111,7 +111,7 @@
     <!-- Help & Contacts Section -->
     <div class="mt-16 text-center animate-in fade-in slide-in-from-bottom-2 duration-700">
         <p class="text-sm text-slate-400 font-medium">
-            Ada kemusykilan lain? 
+            Ada pertanyaan lain? 
             <% if (!telKetua.isEmpty() && !waKetuaNumber.isEmpty()) { %>
                 <a href="https://wa.me/<%= waKetuaNumber %>" target="_blank" class="text-brand-purple hover:text-brand-purpleHover font-bold hover:underline transition-all inline-flex items-center gap-2 mt-2 bg-white px-5 py-2.5 rounded-full border border-slate-100 shadow-sm hover:shadow-md ml-1.5 cursor-pointer">
                     <i class="fab fa-whatsapp text-emerald-500 text-base animate-bounce"></i> 
@@ -128,94 +128,70 @@
 <!-- Right Side Glassmorphic Sidebar -->
 <aside class="w-80 bg-white/80 border-l border-slate-100 backdrop-blur-md hidden xl:flex flex-col p-8 overflow-y-auto h-full shrink-0">
     <div class="mb-8">
-        <h3 class="font-black text-lg text-slate-800 tracking-tight">Status Permohonan</h3>
-        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Urusan Kebajikan Aktif</p>
+        <h3 class="font-black text-lg text-slate-800 tracking-tight">Panduan & Syarat</h3>
+        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Sila Sediakan Sebelum Memohon</p>
     </div>
 
-    <!-- Active List -->
-    <div class="flex flex-col gap-4 flex-1">
-        <% 
-            List<PermohonanBantuan> pList = (List<PermohonanBantuan>) request.getAttribute("permohonanList");
-            int activeCount = 0;
-            if (pList != null) {
-                for (PermohonanBantuan pb : pList) {
-                    String s = pb.getStatus();
-                    if ("BARU".equalsIgnoreCase(s) || "DIKEMBALIKAN".equalsIgnoreCase(s) || "MENUNGGU_KETUA".equalsIgnoreCase(s)) {
-                        activeCount++;
-                        
-                        // Set up dynamic visual steps
-                        int progressPct = 33;
-                        String progressColor = "bg-blue-500";
-                        String statusMsg = "Dalam semakan Biro...";
-                        String statusClass = "bg-blue-50 border-blue-100 text-blue-600";
-                        String statusLabel = "PROSES";
-                        
-                        if ("DIKEMBALIKAN".equalsIgnoreCase(s)) {
-                            progressPct = 50;
-                            progressColor = "bg-amber-500";
-                            statusMsg = "Perlukan kemaskini dokumen";
-                            statusClass = "bg-amber-50 border-amber-100 text-amber-600";
-                            statusLabel = "TINDAKAN";
-                        } else if ("MENUNGGU_KETUA".equalsIgnoreCase(s)) {
-                            progressPct = 75;
-                            progressColor = "bg-purple-500";
-                            statusMsg = "Menunggu kelulusan Ketua...";
-                            statusClass = "bg-purple-50 border-purple-100 text-brand-purple";
-                            statusLabel = "SEMAKAN";
-                        }
-        %>
-            <div class="bg-white/60 border border-slate-100 rounded-3xl p-5 shadow-sm transition-all hover:border-brand-purple/30 hover:bg-white group relative overflow-hidden">
-                <div class="flex justify-between items-start mb-3">
-                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-wider block max-w-[120px] truncate"><%= pb.getNama_bantuan() %></span>
-                    <span class="text-[9px] px-2.5 py-0.5 rounded-md font-black tracking-wide border <%= statusClass %>">
-                        <%= statusLabel %>
-                    </span>
-                </div>
-                
-                <h4 class="text-xs font-bold text-slate-700 mb-2">ID: #<%= pb.getId_permohonan() %></h4>
-                
-                <!-- Dynamic Progress Indicator -->
-                <div class="space-y-1.5 mb-2.5">
-                    <div class="w-full bg-slate-100 h-1.5 rounded-full overflow-hidden">
-                        <div class="h-full rounded-full transition-all duration-500 <%= progressColor %>" style="width: <%= progressPct %>%;"></div>
-                    </div>
-                    <div class="flex items-center justify-between text-[9px] text-slate-400 font-bold">
-                        <span>Peringkat Semakan</span>
-                        <span><%= progressPct %>%</span>
-                    </div>
-                </div>
+    <!-- Interactive Step List -->
+    <div class="flex flex-col gap-6 flex-1">
+        <!-- Checklist Dokumen -->
+        <div class="bg-indigo-50/50 border border-indigo-100 rounded-3xl p-5 shadow-sm transition-all hover:bg-indigo-50">
+            <h4 class="text-xs font-black text-indigo-700 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <i class="fas fa-folder-open text-sm"></i> Dokumen Wajib
+            </h4>
+            <ul class="space-y-3.5 text-[11px] text-slate-600 font-medium">
+                <li class="flex items-start gap-2">
+                    <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[8px] font-black shrink-0 mt-0.5"><i class="fas fa-check"></i></span>
+                    <span>Salinan Kad Pengenalan (MyKad) pemohon & tanggungan.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[8px] font-black shrink-0 mt-0.5"><i class="fas fa-check"></i></span>
+                    <span>Penyata Gaji terkini atau Borang Pengesahan Pendapatan.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="w-4 h-4 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[8px] font-black shrink-0 mt-0.5"><i class="fas fa-check"></i></span>
+                    <span>Borang yang ingin disahkan oleh Ketua Kampung.</span>
+                </li>
+            </ul>
+        </div>
 
-                <!-- Clock / Status footer -->
-                <div class="flex items-center gap-1.5 text-[10px] text-slate-400 font-medium">
-                    <i class="far fa-clock text-[9px] text-brand-purple"></i>
-                    <span><%= statusMsg %></span>
+        <!-- Langkah-langkah Permohonan -->
+        <div class="space-y-4">
+            <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fas fa-tasks text-sm text-brand-purple"></i> Langkah Permohonan
+            </h4>
+            <div class="relative pl-6 space-y-5 before:absolute before:left-[7px] before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
+                <!-- Step 1 -->
+                <div class="relative">
+                    <div class="absolute -left-8 top-0.5 w-4 h-4 rounded-full bg-brand-purple text-white flex items-center justify-center text-[9px] font-bold ring-4 ring-white">1</div>
+                    <h5 class="text-xs font-bold text-slate-700">Pilih Kategori Bantuan</h5>
+                    <p class="text-[10px] text-slate-400 leading-relaxed mt-0.5">Sama ada <strong>Bantuan Komuniti</strong> (Tabung Kampung) atau <strong>Bantuan Rasmi</strong> (Agensi Kerajaan/Swasta).</p>
+                </div>
+                <!-- Step 2 -->
+                <div class="relative">
+                    <div class="absolute -left-8 top-0.5 w-4 h-4 rounded-full bg-brand-purple text-white flex items-center justify-center text-[9px] font-bold ring-4 ring-white">2</div>
+                    <h5 class="text-xs font-bold text-slate-700">Isi Borang & Muat Naik Dokumen</h5>
+                    <p class="text-[10px] text-slate-400 leading-relaxed mt-0.5">Sediakan maklumat peribadi, maklumat sosio-ekonomi keluarga serta slip pengesahan pendapatan.</p>
+                </div>
+                <!-- Step 3 -->
+                <div class="relative">
+                    <div class="absolute -left-8 top-0.5 w-4 h-4 rounded-full bg-brand-purple text-white flex items-center justify-center text-[9px] font-bold ring-4 ring-white">3</div>
+                    <h5 class="text-xs font-bold text-slate-700">Semakan Biro & Pengerusi</h5>
+                    <p class="text-[10px] text-slate-400 leading-relaxed mt-0.5">AJK Biro akan menyemak kelayakan sosio-ekonomi sebelum disokong dan diluluskan oleh Ketua Kampung.</p>
                 </div>
             </div>
-        <% 
-                    }
-                }
-            } 
-            if (activeCount == 0) {
-        %>
-            <!-- Premium Empty State -->
-            <div class="text-center py-12 px-4 bg-slate-50 border border-slate-100/50 rounded-3xl flex flex-col items-center justify-center my-auto">
-                <div class="w-16 h-16 bg-white border border-slate-100 rounded-2xl flex items-center justify-center mb-4 text-slate-300 shadow-sm">
-                    <i class="fas fa-inbox text-2xl"></i>
-                </div>
-                <h4 class="font-extrabold text-sm text-slate-800">Tiada Permohonan Aktif</h4>
-                <p class="text-[11px] text-slate-400 mt-1 max-w-[180px] mx-auto leading-relaxed font-medium">Sejarah dan status kebajikan aktif anda akan dipaparkan di sini.</p>
-            </div>
-        <% } %>
+        </div>
     </div>
 
     <!-- Informational Tip Card -->
     <div class="mt-8 bg-brand-accent border border-brand-secondary/10 rounded-3xl p-6 relative overflow-hidden group hover:border-brand-secondary/20 transition-all duration-300 shrink-0">
         <div class="absolute -right-4 -top-4 w-16 h-16 bg-brand-purple/5 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
         <h4 class="font-black text-brand-purple text-xs uppercase tracking-widest mb-2 relative z-10 flex items-center gap-1.5">
-            <i class="fas fa-lightbulb"></i> Tahukah Anda?
+            <i class="fas fa-handshake"></i> Sokongan Kami
+            <span class="flex h-1.5 w-1.5 rounded-full bg-emerald-500 animate-ping"></span>
         </h4>
         <p class="text-[11px] text-slate-500 leading-relaxed relative z-10 font-medium">
-            Sebarang permohonan Bantuan JKM memerlukan maklumat pendapatan yang disahkan sahih berserta dokumen sokongan lengkap untuk semakan pejabat kebajikan daerah.
+            Permohonan yang diluluskan akan disalurkan terus ke akaun pemohon atau diserahkan secara tunai oleh wakil Biro Kebajikan Kampung Danan.
         </p>
     </div>
 </aside>
