@@ -24,9 +24,8 @@ import java.util.ArrayList;
 import java.util.stream.Collectors;
 
 /**
- * DashboardServlet bertindak sebagai pengawal (Gatekeeper) untuk menghantar
- * pengguna ke paparan dashboard yang betul berdasarkan peranan dan biro
- * masing-masing.
+ * DashboardServlet acts as a controller (Gatekeeper) to direct users to 
+ * the correct dashboard view based on their respective roles and biros.
  */
 @WebServlet("/DashboardServlet")
 public class DashboardServlet extends HttpServlet {
@@ -35,13 +34,13 @@ public class DashboardServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        // 1. Dapatkan session sedia ada (jangan cipta session baru jika tiada)
+        // 1. Get the existing session (do not create a new session if none exists)
         HttpSession session = request.getSession(false);
         Pengguna user = (session != null) ? (Pengguna) session.getAttribute("currentUser") : null;
 
         /**
-         * * 2. Sekuriti Tahap 1: Semakan Sesi dan Status Pengguna
-         * Jika sesi tamat, atau user null, atau status bukan 1 (Aktif), tamatkan sesi.
+         * * 2. Security Level 1: Session and User Status Check
+         * If the session has expired, user is null, or status is not 1 (Active), invalidate the session.
          */
         if (user == null || user.getStatus() != 1) {
             if (session != null) {
@@ -51,12 +50,11 @@ public class DashboardServlet extends HttpServlet {
             return;
         }
 
-        // 3. Ambil maklumat Peranan dan Biro (Data diperoleh melalui JOIN di
-        // PenggunaDAO) [cite: 22, 38]
+        // 3. Retrieve Role and Biro details (Data obtained via JOIN in PenggunaDAO)
         String peranan = user.getNama_peranan();
         String biro = user.getNama_jawatan();
 
-        // --- 4. LOGIK ROUTING DASHBOARD (MVC Forwarding) ---
+        // --- 4. DASHBOARD ROUTING LOGIC (MVC Forwarding) ---
 
         if ("Pentadbir Sistem".equals(peranan)) {
             request.getRequestDispatcher("/admin/dashboard.jsp").forward(request, response);
@@ -103,9 +101,8 @@ public class DashboardServlet extends HttpServlet {
             request.getRequestDispatcher("/views/dashboard/ketuaDashboard.jsp").forward(request, response);
         } else if ("AJK Kampung".equals(peranan)) {
             /**
-             * Penapis Biro Spesifik:
-             * Memastikan AJK Keselamatan, Kebajikan, dll. pergi ke dashboard portfolio
-             * masing-masing.
+             * Specific Biro Filter:
+             * Ensures Security, Welfare, etc. AJK go to their respective portfolio dashboards.
              */
             if ("Setiausaha".equals(biro)) {
                 AduanDAO aduanDao = new AduanDAO();
@@ -304,7 +301,7 @@ public class DashboardServlet extends HttpServlet {
 
             request.getRequestDispatcher("/views/dashboard/pendudukDashboard.jsp").forward(request, response);
         } else {
-            // Jika peranan tidak dikenali, hantar balik ke login
+            // If the role is unrecognized, redirect back to login
             if (session != null) session.invalidate();
             response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp");
         }

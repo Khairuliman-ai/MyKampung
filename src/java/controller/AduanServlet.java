@@ -229,7 +229,7 @@ public class AduanServlet extends HttpServlet {
                 aduan.setId_pengendali(ajkId);
 
                 if (aduanDAO.insertAduan(aduan)) {
-                    // Trigger Notifikasi ke AJK Biro Keselamatan
+                    // Trigger notification to the Security Biro AJK
                     service.NotificationService.notifyByJawatan("Biro Keselamatan", "ADUAN", "Aduan Baru Diterima",
                         "Aduan '" + aduan.getTajuk() + "' telah dihantar oleh " + user.getNama_penuh(), "/aduan/list");
                     response.sendRedirect(request.getContextPath() + "/aduan/list?status=success");
@@ -249,13 +249,13 @@ public class AduanServlet extends HttpServlet {
                     return;
                 }
 
-                // Sekuriti & Keizinan: Hanya AJK Kampung & Ketua Kampung sahaja
+                // Security & Authorization: Only AJK Kampung & Ketua Kampung are allowed
                 if (!"AJK Kampung".equalsIgnoreCase(role) && !"Ketua Kampung".equalsIgnoreCase(role)) {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Akses Ditolak");
                     return;
                 }
 
-                // Validasi Server-Side State Transition menggunakan StatusAduan enum
+                // Server-side state transition validation using StatusAduan enum
                 try {
                     StatusAduan currentEnum = StatusAduan.valueOf(aduan.getStatus() != null ? aduan.getStatus() : "SUBMITTED");
                     StatusAduan nextEnum = StatusAduan.valueOf(nextStatus);
@@ -269,7 +269,7 @@ public class AduanServlet extends HttpServlet {
                     return;
                 }
 
-                // Menguruskan Bukti Selesai bagi status RESOLVED
+                // Manage the completion proof (bukti selesai) for RESOLVED status
                 String buktiSelesaiFileName = aduan.getBukti_selesai();
                 if ("RESOLVED".equals(nextStatus)) {
                     String contentType = request.getContentType();
@@ -288,7 +288,7 @@ public class AduanServlet extends HttpServlet {
                         }
                     }
 
-                    // AJK Kampung (Biro Keselamatan) & Ketua Kampung diwajibkan untuk muat naik bukti
+                    // AJK Kampung (Biro Keselamatan) & Ketua Kampung are required to upload proof
                     if ("AJK Kampung".equalsIgnoreCase(role) || "Ketua Kampung".equalsIgnoreCase(role)) {
                         if (buktiSelesaiFileName == null || buktiSelesaiFileName.trim().isEmpty()) {
                             response.sendRedirect(request.getContextPath() + "/aduan/list?error=missing_bukti");
@@ -309,11 +309,11 @@ public class AduanServlet extends HttpServlet {
 
                 // Update status and log atomically (database transaction) to prevent inconsistencies.
                 if (aduanDAO.updateStatusWithLog(idAduan, nextStatus, catatanField, sanitisedCatatan, user.getId_pengguna(), logCatatan)) {
-                    // Trigger Notifikasi
+                    // Trigger notification
                     service.NotificationService.notifyUser(aduan.getId_pengguna(), "ADUAN", "Status Aduan Dikemaskini",
                         "Aduan '" + aduan.getTajuk() + "' -> " + nextStatus, "/aduan/list");
 
-                    // Jika di-escalate ke Ketua Kampung, hantar notifikasi ke Ketua Kampung
+                    // If escalated to Ketua Kampung, send notification to Ketua Kampung
                     if ("ESCALATED_TO_KETUA".equals(nextStatus) || "UNDER_REVIEW_KETUA".equals(nextStatus)) {
                         service.NotificationService.notifyByPeranan("Ketua Kampung", "ADUAN", "Aduan Telah Diserahkan",
                             "Aduan '" + aduan.getTajuk() + "' memerlukan tindakan Ketua Kampung", "/aduan/list");
@@ -334,13 +334,13 @@ public class AduanServlet extends HttpServlet {
                     return;
                 }
 
-                // Keizinan: Hanya penduduk (pemilik asal aduan) sahaja dibenarkan
+                // Authorization: Only the resident (original complainant) is allowed
                 if (!"Penduduk".equalsIgnoreCase(role) || aduan.getId_pengguna() != user.getId_pengguna()) {
                     response.sendError(HttpServletResponse.SC_FORBIDDEN, "Akses Ditolak");
                     return;
                 }
 
-                // Validasi status aduan (mesti RESOLVED, REJECTED, atau CLOSED)
+                // Validate complaint status (must be RESOLVED, REJECTED, or CLOSED)
                 String currentStatus = aduan.getStatus();
                 if (!"RESOLVED".equalsIgnoreCase(currentStatus) && !"REJECTED".equalsIgnoreCase(currentStatus) && !"CLOSED".equalsIgnoreCase(currentStatus)) {
                     response.sendRedirect(request.getContextPath() + "/aduan/list?error=cannot_reopen");
@@ -358,9 +358,9 @@ public class AduanServlet extends HttpServlet {
                 String sanitisedCatatan = InputSanitizer.sanitize(catatan);
                 String logCatatan = "Aduan dibuka semula oleh Pengadu. Sebab: " + (sanitisedCatatan != null && !sanitisedCatatan.trim().isEmpty() ? sanitisedCatatan : "Tiada catatan.");
 
-                // Jalankan proses reopen secara atomik
+                // Execute the reopen process atomically
                 if (aduanDAO.reopenAduan(idAduan, user.getId_pengguna(), logCatatan)) {
-                    // Trigger Notifikasi ke AJK Biro Keselamatan
+                    // Trigger notification to Security Biro AJK
                     service.NotificationService.notifyByJawatan("Biro Keselamatan", "ADUAN", "Aduan Dibuka Semula",
                         "Aduan '" + aduan.getTajuk() + "' telah dibuka semula oleh " + user.getNama_penuh(), "/aduan/list");
                     response.sendRedirect(request.getContextPath() + "/aduan/list?msg=reopened");
@@ -368,7 +368,7 @@ public class AduanServlet extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/aduan/list?error=db");
                 }
             } else {
-                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Tindakan tidak sah");
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid action");
             }
         } catch (Exception e) {
             e.printStackTrace();
