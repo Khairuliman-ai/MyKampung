@@ -16,6 +16,7 @@ import java.sql.Connection;
 
 @WebServlet(name = "UrusPendudukServlet", urlPatterns = {
     "/penduduk/urus", "/penduduk/approve", "/penduduk/reject", "/penduduk/update",
+    "/penduduk/deactivate", "/penduduk/activate",
     "/ketua/urus", "/ketua/lantik", "/ketua/update", "/ketua/gugurkan"
 })
 /**
@@ -56,12 +57,19 @@ public class UrusPendudukServlet extends HttpServlet {
                         p.setSenaraiAhliKeluarga(ahliKeluargaDAO.getByPenggunaId(p.getId_pengguna()));
                     }
                 }
+                List<Pengguna> inactiveList = penggunaDAO.getInactiveUsers();
+                if (inactiveList != null) {
+                    for (Pengguna p : inactiveList) {
+                        p.setSenaraiAhliKeluarga(ahliKeluargaDAO.getByPenggunaId(p.getId_pengguna()));
+                    }
+                }
                 // Retrieve family members who are not registered as independent accounts.
                 // This ensures we can display the complete population of the village, including dependents.
                 List<AhliKeluarga> familyOnlyList = ahliKeluargaDAO.getAllNonRegistered();
 
                 request.setAttribute("pendingList", pendingList);
                 request.setAttribute("activeList", activeList);
+                request.setAttribute("inactiveList", inactiveList);
                 request.setAttribute("familyOnlyList", familyOnlyList);
                 request.getRequestDispatcher("/views/maklumatPenduduk/urusPendudukAJK.jsp").forward(request, response);
             } 
@@ -244,6 +252,29 @@ public class UrusPendudukServlet extends HttpServlet {
                     }
                 }
                 response.sendRedirect(request.getContextPath() + "/penduduk/urus?status=rejected");
+            }
+
+            // --- Route: /penduduk/deactivate — Deactivate user account ---
+            else if ("/penduduk/deactivate".equals(action)) {
+                int id = Integer.parseInt(request.getParameter("idPengguna"));
+                Pengguna targetUser = penggunaDAO.getPenggunaById(id);
+                if (targetUser != null && "Ketua Kampung".equals(targetUser.getNama_peranan())) {
+                    response.sendRedirect(request.getContextPath() + "/penduduk/urus?status=error");
+                } else if (penggunaDAO.updateStatus(id, 0)) {
+                    response.sendRedirect(request.getContextPath() + "/penduduk/urus?status=deactivated");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/penduduk/urus?status=error");
+                }
+            }
+
+            // --- Route: /penduduk/activate — Activate user account ---
+            else if ("/penduduk/activate".equals(action)) {
+                int id = Integer.parseInt(request.getParameter("idPengguna"));
+                if (penggunaDAO.updateStatus(id, 1)) {
+                    response.sendRedirect(request.getContextPath() + "/penduduk/urus?status=activated");
+                } else {
+                    response.sendRedirect(request.getContextPath() + "/penduduk/urus?status=error");
+                }
             }
 
         } catch (Exception e) {

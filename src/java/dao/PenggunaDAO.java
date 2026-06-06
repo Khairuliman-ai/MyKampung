@@ -589,6 +589,33 @@ public class PenggunaDAO {
     }
 
     /**
+     * Retrieves all inactive users in the system.
+     * 
+     * @return list of inactive users
+     */
+    public List<Pengguna> getInactiveUsers() {
+        List<Pengguna> senarai = new ArrayList<>();
+        String sql = "SELECT p.*, r.nama_peranan, j.nama_jawatan, aj.id_jawatan FROM pengguna p "
+                   + "JOIN pengguna_peranan pp ON p.id_pengguna = pp.id_pengguna "
+                   + "JOIN peranan r ON pp.id_peranan = r.id_peranan "
+                   + "LEFT JOIN ajk_jawatan aj ON p.id_pengguna = aj.id_pengguna "
+                   + "LEFT JOIN jawatan_ajk j ON aj.id_jawatan = j.id_jawatan "
+                   + "WHERE p.status = 0 "
+                   + "ORDER BY r.id_peranan ASC, p.nama_penuh ASC";
+
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql); 
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                senarai.add(mapResultSetToPengguna(rs));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return senarai;
+    }
+
+    /**
      * Retrieves all active, non-deleted user IDs in the system.
      * Used for broad notification dispatches.
      * 

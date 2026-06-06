@@ -21,8 +21,12 @@
     <% 
         List<Pengguna> pendingList = (List<Pengguna>) request.getAttribute("pendingList");
         List<Pengguna> activeList = (List<Pengguna>) request.getAttribute("activeList");
+        List<Pengguna> inactiveList = (List<Pengguna>) request.getAttribute("inactiveList");
         List<AhliKeluarga> familyOnlyList = (List<AhliKeluarga>) request.getAttribute("familyOnlyList");
         int totalMerged = ((activeList != null) ? activeList.size() : 0) + ((familyOnlyList != null) ? familyOnlyList.size() : 0);
+        
+        Pengguna currentAJK = (Pengguna) session.getAttribute("currentUser");
+        int currentAJKId = (currentAJK != null) ? currentAJK.getId_pengguna() : 0;
     %>
 
     <% if (request.getParameter("status") != null) { %>
@@ -34,7 +38,12 @@
             
             if (status.equals("updated")) msg = "Profil penduduk telah dikemaskini!";
             else if (status.equals("approved")) msg = "Pendaftaran penduduk telah diluluskan!";
-            else if (status.equals("rejected")) {
+            else if (status.equals("activated")) msg = "Akaun penduduk telah diaktifkan semula!";
+            else if (status.equals("deactivated")) {
+                alertClass = "bg-orange-50 border-orange-500 text-orange-700";
+                icon = "fa-user-slash";
+                msg = "Akaun penduduk telah dinyahaktifkan.";
+            } else if (status.equals("rejected")) {
                 alertClass = "bg-orange-50 border-orange-500 text-orange-700";
                 icon = "fa-user-minus";
                 msg = "Pendaftaran penduduk telah ditolak.";
@@ -58,6 +67,13 @@
             <button onclick="switchTab('active')" id="tab-active" 
                     class="py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center gap-2 transition-colors">
                 <i class="fas fa-users"></i> Senarai Penduduk
+            </button>
+            <button onclick="switchTab('inactive')" id="tab-inactive" 
+                    class="py-4 px-1 border-b-2 border-transparent font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 flex items-center gap-2 transition-colors">
+                <i class="fas fa-user-slash"></i> Tidak Aktif
+                <% if(inactiveList != null && !inactiveList.isEmpty()) { %>
+                    <span class="bg-gray-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full"><%= inactiveList.size() %></span>
+                <% } %>
             </button>
         </nav>
     </div>
@@ -211,7 +227,8 @@
                             data-email="<%= (p.getEmail() != null) ? p.getEmail() : "Tiada" %>"
                             data-foto="<%= (p.getFoto_profil() != null) ? p.getFoto_profil() : "default_avatar.png" %>"
                             data-family="<%= sbFam.toString() %>"
-                            data-role="<%= p.getNama_peranan() %>">
+                            data-role="<%= p.getNama_peranan() %>"
+                            data-statusval="1">
                             <td class="p-5 text-sm text-gray-400 font-medium"><%= countActive++ %></td>
                             <td class="p-5">
                                 <div class="flex items-center gap-4">
@@ -303,6 +320,112 @@
             </div>
         </div>
     </div>
+
+    <!-- Tab: Inactive Residents -->
+    <div id="content-inactive" class="hidden animate-in fade-in slide-in-from-bottom-2 duration-300">
+        <div class="mb-4">
+            <div class="relative group">
+                <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400 group-focus-within:text-brand-purple transition-colors">
+                    <i class="fas fa-search text-sm"></i>
+                </span>
+                <input type="text" id="searchInactive" placeholder="Cari nama, No. KP atau alamat penduduk tidak aktif..." 
+                       class="w-full pl-11 pr-4 py-3 rounded-2xl bg-white border border-gray-100 focus:ring-4 focus:ring-purple-100 focus:border-brand-purple text-sm shadow-sm transition-all outline-none">
+            </div>
+        </div>
+
+        <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse" id="tableInactive">
+                    <thead>
+                        <tr class="bg-gray-50/50 border-b border-gray-100">
+                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest w-16">No.</th>
+                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">Informasi Penduduk</th>
+                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest">Alamat Kediaman</th>
+                            <th class="p-5 text-[11px] font-extrabold text-gray-400 uppercase tracking-widest text-center">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <% 
+                        int countInactive = 1;
+                        if (inactiveList != null && !inactiveList.isEmpty()) {
+                            for (Pengguna p : inactiveList) { 
+                                // Serialize family info
+                                StringBuilder sbFam = new StringBuilder();
+                                if (p.getSenaraiAhliKeluarga() != null) {
+                                    for (model.AhliKeluarga ak : p.getSenaraiAhliKeluarga()) {
+                                        if (sbFam.length() > 0) sbFam.append(";;");
+                                        sbFam.append(ak.getNama_penuh()).append("::")
+                                             .append(ak.getHubungan()).append("::")
+                                             .append(ak.getUmur()).append("::")
+                                             .append((ak.getPekerjaan() != null) ? ak.getPekerjaan() : "Tiada").append("::")
+                                             .append((ak.getPendapatan() != null) ? ak.getPendapatan() : "0.00").append("::")
+                                             .append((ak.getPengesahan_pendapatan() != null) ? ak.getPengesahan_pendapatan() : "");
+                                    }
+                                }
+                        %>
+                        <tr class="hover:bg-gray-50 transition-all group cursor-pointer" 
+                            onclick="showUserInfo(this)"
+                            data-id="<%= p.getId_pengguna() %>"
+                            data-nama="<%= p.getNama_penuh() %>"
+                            data-kp="<%= p.getNombor_kp() %>"
+                            data-tel="<%= p.getNombor_telefon() %>"
+                            data-jalan="<%= p.getNama_jalan() %>"
+                            data-bandar="<%= (p.getBandar() != null) ? p.getBandar() : "-" %>"
+                            data-poskod="<%= (p.getNombor_poskod() != null) ? p.getNombor_poskod() : "-" %>"
+                            data-negeri="<%= (p.getNegeri() != null) ? p.getNegeri() : "-" %>"
+                            data-tarikh="<%= (p.getTarikh_lahir() != null) ? new java.text.SimpleDateFormat("yyyy-MM-dd").format(p.getTarikh_lahir()) : "-" %>"
+                            data-statusk="<%= (p.getStatus_keluarga() != null) ? p.getStatus_keluarga() : "-" %>"
+                            data-lat="<%= p.getLatitude() %>"
+                            data-lon="<%= p.getLongitude() %>"
+                            data-jawatan="<%= (p.getNama_jawatan() != null) ? p.getNama_jawatan() : p.getNama_peranan() %>"
+                            data-pekerjaan="<%= (p.getPekerjaan() != null) ? p.getPekerjaan() : "Tiada" %>"
+                            data-pendapatan="<%= p.getPendapatan() %>"
+                            data-pengesahan="<%= (p.getPengesahan_pendapatan() != null) ? p.getPengesahan_pendapatan() : "" %>"
+                            data-email="<%= (p.getEmail() != null) ? p.getEmail() : "Tiada" %>"
+                            data-foto="<%= (p.getFoto_profil() != null) ? p.getFoto_profil() : "default_avatar.png" %>"
+                            data-family="<%= sbFam.toString() %>"
+                            data-role="<%= p.getNama_peranan() %>"
+                            data-statusval="0">
+                            <td class="p-5 text-sm text-gray-400 font-medium"><%= countInactive++ %></td>
+                            <td class="p-5">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-11 h-11 rounded-2xl bg-gray-50 text-gray-400 flex items-center justify-center text-sm font-bold border border-gray-100 group-hover:bg-red-500 group-hover:text-white transition-all">
+                                        <%= (p.getNama_penuh() != null && !p.getNama_penuh().isEmpty()) ? p.getNama_penuh().substring(0,1).toUpperCase() : "U" %>
+                                    </div>
+                                    <div>
+                                        <div class="text-sm font-bold text-gray-800 search-col"><%= p.getNama_penuh() %></div>
+                                        <div class="text-[11px] text-gray-400 font-medium mt-0.5 search-col flex items-center gap-2">
+                                            <i class="fas fa-id-card text-[10px]"></i> <%= p.getNombor_kp() %>
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-5">
+                                <div class="flex flex-col">
+                                    <span class="text-xs font-bold text-gray-700 search-col"><%= p.getNama_jalan() %></span>
+                                    <span class="text-[10px] text-gray-400"><%= p.getNombor_poskod() %> <%= p.getBandar() %></span>
+                                </div>
+                            </td>
+                            <td class="p-5 text-center">
+                                <span class="px-3 py-1 rounded-full bg-red-50 text-red-600 text-[10px] font-black uppercase tracking-widest border border-red-100">
+                                    Tidak Aktif
+                                </span>
+                            </td>
+                        </tr>
+                        <% } 
+                        } else { %>
+                        <tr>
+                            <td colspan="4" class="p-20 text-center text-gray-400">
+                                <i class="fas fa-user-slash text-3xl mb-4 block opacity-30"></i>
+                                <p class="font-bold italic">Tiada data penduduk tidak aktif.</p>
+                            </td>
+                        </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </div>
 
 <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
@@ -335,6 +458,16 @@
             <div>
                 <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Menunggu Kelulusan</p>
                 <h4 class="font-black text-2xl text-gray-900"><%= (pendingList != null) ? pendingList.size() : 0 %></h4>
+            </div>
+        </div>
+
+        <div class="bg-amber-50/50 p-5 rounded-[2rem] border border-amber-100/50 flex items-center gap-4 group hover:bg-amber-50 transition-colors">
+            <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                <i class="fas fa-user-slash text-lg"></i>
+            </div>
+            <div>
+                <p class="text-[10px] text-gray-400 font-black uppercase tracking-widest">Akaun Nyahaktif</p>
+                <h4 class="font-black text-2xl text-gray-900"><%= (inactiveList != null) ? inactiveList.size() : 0 %></h4>
             </div>
         </div>
     </div>
@@ -504,7 +637,25 @@
             <!-- Action Footer -->
             <div class="p-8 bg-gray-50 border-t border-gray-100 shrink-0 flex flex-col md:flex-row justify-between items-center gap-4">
                 <button onclick="closeModal('modalInfoUser')" class="text-gray-400 hover:text-gray-600 font-bold text-sm transition order-2 md:order-1">Tutup Profil</button>
-                <div class="flex gap-3 order-1 md:order-2 w-full md:w-auto">
+                <div class="flex gap-3 order-1 md:order-2 w-full md:w-auto items-center">
+                    <!-- Deactivate Form -->
+                    <form id="infoFormDeactivate" action="<%= request.getContextPath() %>/penduduk/deactivate" method="post" onsubmit="return confirmAction(event, 'Nyahaktif Akaun?', 'Adakah anda pasti untuk menyahaktifkan akaun penduduk ini?', 'Ya, Nyahaktifkan', '#EF4444')" class="m-0 hidden">
+                        <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
+                        <input type="hidden" name="idPengguna" id="deactivateId">
+                        <button type="submit" class="px-6 py-3 bg-red-50 text-red-500 border border-red-100 rounded-2xl font-bold text-[10px] hover:bg-red-500 hover:text-white transition-all flex items-center justify-center gap-2 uppercase tracking-wide">
+                            <i class="fas fa-user-slash text-xs"></i> Nyahaktif Akaun
+                        </button>
+                    </form>
+                    
+                    <!-- Activate Form -->
+                    <form id="infoFormActivate" action="<%= request.getContextPath() %>/penduduk/activate" method="post" onsubmit="return confirmAction(event, 'Aktifkan Akaun?', 'Adakah anda pasti untuk mengaktifkan akaun penduduk ini?', 'Ya, Aktifkan', '#10B981')" class="m-0 hidden">
+                        <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
+                        <input type="hidden" name="idPengguna" id="activateId">
+                        <button type="submit" class="px-6 py-3 bg-green-50 text-green-600 border border-green-100 rounded-2xl font-bold text-[10px] hover:bg-green-600 hover:text-white transition-all flex items-center justify-center gap-2 uppercase tracking-wide">
+                            <i class="fas fa-user-check text-xs"></i> Aktifkan Akaun
+                        </button>
+                    </form>
+
                     <button id="infoBtnEdit" class="flex-1 md:flex-none px-10 py-3 bg-brand-purple text-white rounded-2xl font-bold text-sm shadow-lg shadow-purple-100 hover:bg-brand-purpleHover transition-all flex items-center justify-center gap-2">
                         <i class="fas fa-user-edit"></i> Kemaskini Profil
                     </button>
@@ -772,10 +923,36 @@
                 </div>
             `;
         }
-        
-        // Navigation Link
+             // Navigation Link
         const navUrl = `https://www.google.com/maps/search/?api=1&query=\${d.lat},\${d.lon}`;
         document.getElementById('infoNav').href = navUrl;
+
+        // Toggle activation/deactivation forms based on user status
+        const formDeactivate = document.getElementById('infoFormDeactivate');
+        const formActivate = document.getElementById('infoFormActivate');
+        const statusVal = d.statusval;
+        const currentAJKId = <%= currentAJKId %>;
+
+        if (parseInt(d.id) === currentAJKId) {
+            // Cannot deactivate oneself
+            formDeactivate.classList.add('hidden');
+            formActivate.classList.add('hidden');
+        } else if (d.role === 'Ketua Kampung') {
+            // Cannot deactivate the Ketua Kampung
+            formDeactivate.classList.add('hidden');
+            formActivate.classList.add('hidden');
+        } else if (statusVal === '1') {
+            formDeactivate.classList.remove('hidden');
+            formActivate.classList.add('hidden');
+            document.getElementById('deactivateId').value = d.id;
+        } else if (statusVal === '0') {
+            formDeactivate.classList.add('hidden');
+            formActivate.classList.remove('hidden');
+            document.getElementById('activateId').value = d.id;
+        } else {
+            formDeactivate.classList.add('hidden');
+            formActivate.classList.add('hidden');
+        }
 
         document.getElementById('infoBtnEdit').onclick = () => {
             closeModal('modalInfoUser');
@@ -830,6 +1007,7 @@
 
         document.getElementById('content-pending').classList.add('hidden');
         document.getElementById('content-active').classList.add('hidden');
+        document.getElementById('content-inactive').classList.add('hidden');
         document.getElementById('content-' + tabName).classList.remove('hidden');
     }
 
@@ -842,6 +1020,18 @@
             row.style.display = text.includes(val) ? '' : 'none';
         });
     });
+
+    if (document.getElementById('searchInactive')) {
+        document.getElementById('searchInactive').addEventListener('keyup', function() {
+            let val = this.value.toLowerCase();
+            let rows = document.querySelectorAll('#tableInactive tbody tr');
+            rows.forEach(row => {
+                let text = "";
+                row.querySelectorAll('.search-col').forEach(col => text += col.innerText.toLowerCase() + " ");
+                row.style.display = text.includes(val) ? '' : 'none';
+            });
+        });
+    }
 
     function openEditModal(id, nama, kp, tel, jalan, bandar, poskod, negeri, tarikh, statusKeluarga) {
         document.getElementById('editId').value = id;
