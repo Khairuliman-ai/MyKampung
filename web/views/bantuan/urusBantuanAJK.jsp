@@ -368,7 +368,7 @@
                                 <% } else if ("MENUNGGU_KETUA".equalsIgnoreCase(pb.getStatus())) { %>
                                     <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-purple-500 text-white uppercase shadow-sm">DIMAJUKAN</span>
                                 <% } else if ("DIKEMBALIKAN".equalsIgnoreCase(pb.getStatus())) { %>
-                                    <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-orange-500 text-white uppercase shadow-sm">KEMBALI</span>
+                                    <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-orange-500 text-white uppercase shadow-sm">DIKEMBALIKAN</span>
                                 <% } else { %>
                                     <span class="px-3 py-1 rounded-full text-[10px] font-bold bg-red-500 text-white uppercase shadow-sm">DITOLAK</span>
                                 <% } %>
@@ -850,12 +850,16 @@
                             <h5 class="text-[11px] font-bold text-gray-400 uppercase tracking-widest flex items-center gap-2">
                                 <i class="fas fa-folder-open text-gray-400"></i> Dokumen Sokongan
                             </h5>
-                            <div id="dokumenList" class="flex flex-wrap gap-2">
+                            <div id="dokumenList" class="space-y-2">
                                 </div>
                             <%-- Template hidden separate from the list to prevent destruction --%>
                             <div class="hidden">
-                                <a id="detDokMain" href="#" target="_blank" class="inline-flex items-center gap-2 px-4 py-2.5 bg-red-50 text-red-600 rounded-xl text-xs font-bold hover:bg-red-100 transition shadow-sm border border-red-100">
-                                    <i class="fas fa-file-pdf"></i> PDF
+                                <a id="detDokMain" href="#" target="_blank" class="flex items-center gap-3 p-3 bg-white border border-gray-100 rounded-2xl hover:border-red-200 transition group">
+                                    <div class="w-8 h-8 bg-red-50 rounded-xl flex items-center justify-center text-red-500 shadow-sm group-hover:scale-110 transition">
+                                        <i class="fas fa-file-pdf text-xs"></i>
+                                    </div>
+                                    <span class="text-[10px] font-bold text-gray-700 truncate max-w-[120px]">Fail_Sokongan.pdf</span>
+                                    <i class="fas fa-external-link-alt ml-auto text-gray-300 text-[10px]"></i>
                                 </a>
                             </div>
                         </div>
@@ -863,7 +867,7 @@
 
                     <div id="detAdminDokSection" class="space-y-4 pt-4 border-t border-gray-100 hidden">
                         <label class="block text-[10px] font-bold text-brand-purple uppercase tracking-widest mb-2">Dokumen Maklum Balas (Ketua Kampung)</label>
-                        <div id="dokumenAdminList" class="flex flex-wrap gap-2">
+                        <div id="dokumenAdminList" class="space-y-2">
                             </div>
                     </div>
                 </div>
@@ -1586,7 +1590,7 @@
                     newLink.id = "";
                     newLink.classList.remove('hidden');
                     newLink.href = ctx + "/file/bantuan/" + f;
-                    newLink.innerHTML = '<i class="fas fa-file-pdf"></i> PDF';
+                    newLink.querySelector('span').innerText = decodeURIComponent(f).split('_').slice(1).join('_') || decodeURIComponent(f);
                     dokumenList.appendChild(newLink);
                 });
             }
@@ -1604,11 +1608,24 @@
                     const newLink = template.cloneNode(true);
                     newLink.id = "";
                     newLink.classList.remove('hidden');
-                    newLink.classList.replace('bg-red-50', 'bg-purple-50');
-                    newLink.classList.replace('text-red-600', 'text-brand-purple');
-                    newLink.classList.replace('border-red-100', 'border-purple-100');
+                    
+                    // Swap red styling for purple branding
+                    newLink.classList.replace('bg-white', 'bg-purple-50');
+                    newLink.classList.replace('border-gray-100', 'border-purple-100');
+                    newLink.classList.replace('hover:border-red-200', 'hover:border-purple-200');
+                    
+                    const iconDiv = newLink.querySelector('div');
+                    if (iconDiv) {
+                        iconDiv.classList.replace('bg-red-50', 'bg-purple-100');
+                        iconDiv.classList.replace('text-red-500', 'text-brand-purple');
+                        const icon = iconDiv.querySelector('i');
+                        if (icon) {
+                            icon.className = "fas fa-check-circle text-xs";
+                        }
+                    }
+                    
                     newLink.href = ctx + "/file/bantuan/" + f;
-                    newLink.innerHTML = '<i class="fas fa-check-circle"></i> ' + decodeURIComponent(f).split('_').slice(2).join('_');
+                    newLink.querySelector('span').innerText = decodeURIComponent(f).split('_').slice(2).join('_') || decodeURIComponent(f);
                     adminDokList.appendChild(newLink);
                 });
             } else {

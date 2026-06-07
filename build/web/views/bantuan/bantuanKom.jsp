@@ -129,16 +129,13 @@
                             <td class="p-4 text-sm text-gray-600"><%= displayDate %></td>
                             <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-brand-purple"><%= pb.getNama_bantuan() %></td>
                             <td class="p-4 text-center">
-                                <% 
-                                    String badgeClass = "bg-blue-500"; 
-                                    if ("LULUS".equals(status)) badgeClass = "bg-green-500";
-                                    else if ("DITOLAK".equals(status)) badgeClass = "bg-red-500";
-                                    else if ("DIKEMBALIKAN".equals(status)) badgeClass = "bg-orange-500";
-                                    else if ("MENUNGGU_KETUA".equals(status)) badgeClass = "bg-purple-500";
-                                %>
-                                <span class="px-3 py-1 rounded-full text-[10px] font-bold <%= badgeClass %> text-white uppercase">
-                                    <%= status.replace("_", " ") %>
-                                </span>
+                                <% if ("DIKEMBALIKAN".equalsIgnoreCase(status)) { %> 
+                                    <span class="px-3 py-1 rounded-full bg-orange-500 text-white text-[10px] font-bold uppercase whitespace-nowrap">Dikembalikan</span>
+                                <% } else if ("MENUNGGU_KETUA".equalsIgnoreCase(status)) { %> 
+                                    <span class="px-3 py-1 rounded-full bg-purple-500 text-white text-[10px] font-bold uppercase whitespace-nowrap">Semakan Ketua</span> 
+                                <% } else { %>
+                                    <span class="px-3 py-1 rounded-full bg-blue-500 text-white text-[10px] font-bold uppercase whitespace-nowrap">Dihantar</span>
+                                <% } %>
                             </td>
                             <td class="p-4 text-center">
                                 <div class="flex justify-center gap-2" onclick="event.stopPropagation()">
@@ -153,7 +150,7 @@
                                             <i class="fas fa-trash text-xs"></i>
                                         </a>
                                      <% } else { %>
-                                        <span class="text-[10px] text-gray-400 italic">Tiada tindakan</span>
+                                        <span class="text-[10px] text-gray-400 italic">Terkunci</span>
                                      <% } %>
                                 </div>
                             </td>
@@ -222,12 +219,11 @@
                         <td class="p-4 text-sm text-gray-500"><%= displayDate %></td>
                         <td class="p-4 text-sm font-bold text-gray-700 group-hover:text-brand-purple"><%= pb.getNama_bantuan() %></td>
                         <td class="p-4 text-center">
-                            <% 
-                                String sBadge = "LULUS".equals(sStatus) ? "bg-green-500" : "bg-red-500";
-                            %>
-                            <span class="px-3 py-1 rounded-full text-[10px] font-bold <%= sBadge %> text-white uppercase">
-                                <%= sStatus %>
-                            </span>
+                             <% if ("LULUS".equalsIgnoreCase(sStatus)) { %> 
+                                 <span class="px-3 py-1 rounded-full bg-green-500 text-white text-[10px] font-bold uppercase whitespace-nowrap">Disokong</span>
+                             <% } else { %> 
+                                 <span class="px-3 py-1 rounded-full bg-red-500 text-white text-[10px] font-bold uppercase whitespace-nowrap">Ditolak</span>
+                             <% } %>
                         </td>
                     </tr>
                     <% } } %>

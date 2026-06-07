@@ -146,7 +146,7 @@
                             <td class="p-4 text-sm font-bold text-gray-800 group-hover:text-brand-purple"><%= pb.getNama_bantuan() %></td>
                             <td class="p-4 text-center">
                                 <% if ("DIKEMBALIKAN".equalsIgnoreCase(status)) { %> 
-                                    <span class="px-3 py-1 rounded-full bg-orange-500 text-white text-[10px] font-bold uppercase whitespace-nowrap">Kembali</span>
+                                    <span class="px-3 py-1 rounded-full bg-orange-500 text-white text-[10px] font-bold uppercase whitespace-nowrap">Dikembalikan</span>
                                 <% } else if ("MENUNGGU_KETUA".equalsIgnoreCase(status)) { %> 
                                     <span class="px-3 py-1 rounded-full bg-purple-500 text-white text-[10px] font-bold uppercase whitespace-nowrap">Semakan Ketua</span> 
                                 <% } else { %>
