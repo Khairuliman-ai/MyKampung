@@ -439,40 +439,73 @@
 </div>
 
 <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col flex-shrink-0 p-8 overflow-y-auto h-full">
-    <div class="flex justify-between items-start mb-8">
-        <h3 class="font-bold text-lg text-gray-800">Info Penting</h3>
+    <div class="mb-8">
+        <h3 class="font-black text-lg text-slate-800 tracking-tight">Garis Panduan Agensi</h3>
+        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Permohonan Bantuan Rasmi</p>
     </div>
 
-    <div class="space-y-6">
-        <div class="flex gap-4">
-            <div class="w-10 h-10 rounded-full bg-purple-50 text-brand-purple flex-shrink-0 flex items-center justify-center font-bold text-lg"><i class="fas fa-id-card"></i></div>
-            <div>
-                <h4 class="font-bold text-sm text-gray-800">Salinan Dokumen</h4>
-                <p class="text-xs text-gray-500 mt-1 leading-relaxed">Pastikan salinan Kad Pengenalan dan Slip Gaji disahkan oleh Pegawai Kerajaan Kumpulan A atau Penghulu.</p>
-            </div>
+    <div class="flex flex-col gap-6 flex-1">
+        <!-- Had Siling Bantuan -->
+        <div class="bg-indigo-50/50 border border-indigo-100 rounded-3xl p-5 shadow-sm transition-all hover:bg-indigo-50">
+            <h4 class="text-xs font-black text-indigo-700 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <i class="fas fa-university text-sm"></i> Saluran Bantuan Utama
+            </h4>
+            <ul class="space-y-3.5 text-[11px] text-slate-600 font-medium">
+                <li class="flex items-start gap-2 border-b border-dashed border-indigo-100 pb-2">
+                    <span class="w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[8px] font-black shrink-0 mt-0.5"><i class="fas fa-landmark"></i></span>
+                    <div>
+                        <span class="text-slate-700 font-bold">Jabatan Kebajikan Masyarakat (JKM):</span>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Bantuan warga emas, kebajikan kanak-kanak & elaun OKU.</p>
+                    </div>
+                </li>
+                <li class="flex items-start gap-2 border-b border-dashed border-indigo-100 pb-2">
+                    <span class="w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[8px] font-black shrink-0 mt-0.5"><i class="fas fa-mosque"></i></span>
+                    <div>
+                        <span class="text-slate-700 font-bold">Baitulmal / MAIK:</span>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Bantuan sara hidup asnaf, bantuan modal kerja & zakat perubatan.</p>
+                    </div>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="w-4 h-4 rounded-full bg-indigo-100 text-indigo-600 flex items-center justify-center text-[8px] font-black shrink-0 mt-0.5"><i class="fas fa-file-signature"></i></span>
+                    <div>
+                        <span class="text-slate-700 font-bold">Surat Sokongan Ketua Kampung:</span>
+                        <p class="text-[10px] text-slate-400 mt-0.5">Pengesahan pendapatan penduduk & pengesahan mastautin kariah.</p>
+                    </div>
+                </li>
+            </ul>
         </div>
 
-        <div class="flex gap-4">
-            <div class="w-10 h-10 rounded-full bg-blue-50 text-blue-600 flex-shrink-0 flex items-center justify-center font-bold text-lg"><i class="fas fa-file-pdf"></i></div>
-            <div>
-                <h4 class="font-bold text-sm text-gray-800">Format Fail</h4>
-                <p class="text-xs text-gray-500 mt-1 leading-relaxed">Semua dokumen sokongan wajib dimuat naik dalam format <strong>PDF</strong> sahaja.</p>
-            </div>
-        </div>
-        
-        <div class="flex gap-4">
-            <div class="w-10 h-10 rounded-full bg-green-50 text-green-600 flex-shrink-0 flex items-center justify-center font-bold text-lg"><i class="fas fa-user-check"></i></div>
-            <div>
-                <h4 class="font-bold text-sm text-gray-800">Pengesahan</h4>
-                <p class="text-xs text-gray-500 mt-1 leading-relaxed">Permohonan akan disemak oleh AJK sebelum dimajukan ke peringkat atasan.</p>
-            </div>
+        <!-- Prosedur Cop Pengesahan -->
+        <div class="space-y-4">
+            <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fas fa-stamp text-sm text-brand-purple"></i> Pengesahan Dokumen
+            </h4>
+            <ul class="space-y-3.5 text-[11px] text-slate-600 leading-relaxed font-medium">
+                <li class="flex items-start gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-purple shrink-0 mt-1.5"></span>
+                    <span>Semua dokumen wajib muat naik dalam format <strong>PDF</strong> sahaja.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-purple shrink-0 mt-1.5"></span>
+                    <span>Pastikan dokumen sensitif (slip gaji, bil utiliti, kad pengenalan) telah <strong>disahkan & dicop</strong> oleh Ketua Kampung.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-purple shrink-0 mt-1.5"></span>
+                    <span>Tujuan pengesahan mestilah jelas (contoh: Permohonan MAIK/JKM).</span>
+                </li>
+            </ul>
         </div>
     </div>
 
-    <div class="mt-auto bg-gray-50 rounded-2xl p-6 border border-gray-100">
-        <h4 class="font-bold text-gray-700 mb-2 text-sm">Masalah Permohonan?</h4>
-        <p class="text-xs text-gray-500 mb-4">Hubungi Setiausaha AJK untuk pertanyaan lanjut mengenai status anda.</p>
-        <button class="w-full bg-white border border-gray-200 text-gray-700 py-2 rounded-xl text-xs font-bold hover:bg-gray-100 transition">Hubungi SU</button>
+    <!-- Informational Tip Card -->
+    <div class="mt-8 bg-brand-accent border border-brand-secondary/10 rounded-3xl p-6 relative overflow-hidden group hover:border-brand-secondary/20 transition-all duration-300 shrink-0">
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-brand-purple/5 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+        <h4 class="font-black text-brand-purple text-xs uppercase tracking-widest mb-2 relative z-10 flex items-center gap-1.5">
+            <i class="fas fa-clock"></i> Tempoh Semakan
+        </h4>
+        <p class="text-[11px] text-slate-500 leading-relaxed relative z-10 font-medium">
+            Permohonan surat sokongan atau cop pengesahan biasanya diproses dalam tempoh 2-3 hari bekerja oleh pejabat Ketua Kampung Danan.
+        </p>
     </div>
 </aside>
 

@@ -113,6 +113,10 @@ public class BantuanServlet extends HttpServlet {
                     BantuanDAO bDao = new BantuanDAO();
                     List<Bantuan> senaraiBantuan = bDao.getAllBantuan();
                     
+                    service.EligibilityService es = new service.EligibilityService();
+                    request.setAttribute("rules", es.getRulesList());
+                    request.setAttribute("povertyLine", es.getPovertyLine());
+
                     request.setAttribute("listBaru", listBaru);
                     request.setAttribute("listSejarah", listSejarah);
                     request.setAttribute("senaraiBantuan", senaraiBantuan);
@@ -124,6 +128,10 @@ public class BantuanServlet extends HttpServlet {
 
                 } else if ("Ketua Kampung".equalsIgnoreCase(user.getNama_peranan())) {
                     list = pbDao.getAll();
+
+                    service.EligibilityService es = new service.EligibilityService();
+                    request.setAttribute("rules", es.getRulesList());
+                    request.setAttribute("povertyLine", es.getPovertyLine());
 
                     request.setAttribute("permohonanList", list);
                     request.getRequestDispatcher("/views/bantuan/urusBantuanKetua.jsp").forward(request, response);
@@ -238,15 +246,7 @@ public class BantuanServlet extends HttpServlet {
                 
                 response.sendRedirect(request.getContextPath() + "/bantuan/edit?id=" + idPermohonan + "&status=doc_deleted");
             } else if ("/config".equals(action)) {
-                String role = user.getNama_peranan();
-                if (!"AJK".equalsIgnoreCase(role) && !"Ketua Kampung".equalsIgnoreCase(role) && !"AJK Kampung".equalsIgnoreCase(role)) {
-                    response.sendRedirect(request.getContextPath() + "/dashboard?error=unauthorized");
-                    return;
-                }
-                service.EligibilityService es = new service.EligibilityService();
-                request.setAttribute("rules", es.getRulesList());
-                request.setAttribute("povertyLine", es.getPovertyLine());
-                request.getRequestDispatcher("/views/bantuan/urusBantuanConfig.jsp").forward(request, response);
+                response.sendRedirect(request.getContextPath() + "/bantuan/list");
             }
 
         } catch (Exception e) {
@@ -599,15 +599,7 @@ public class BantuanServlet extends HttpServlet {
 
             // --- Route: /config — Eligibility rule configuration view ---
             else if ("/config".equals(action)) {
-                String role = user.getNama_peranan();
-                if (!"AJK".equalsIgnoreCase(role) && !"Ketua Kampung".equalsIgnoreCase(role) && !"AJK Kampung".equalsIgnoreCase(role)) {
-                    response.sendRedirect(request.getContextPath() + "/dashboard?error=unauthorized");
-                    return;
-                }
-                service.EligibilityService es = new service.EligibilityService();
-                request.setAttribute("rules", es.getRulesList());
-                request.setAttribute("povertyLine", es.getPovertyLine());
-                request.getRequestDispatcher("/views/bantuan/urusBantuanConfig.jsp").forward(request, response);
+                response.sendRedirect(request.getContextPath() + "/bantuan/list");
             }
             
 
@@ -628,7 +620,7 @@ public class BantuanServlet extends HttpServlet {
                     // Total weight must equal 100
                     double total = wIncome + wDependent + wFamily + wEmployment;
                     if (Math.abs(total - 100.0) > 0.001) {
-                        response.sendRedirect(request.getContextPath() + "/bantuan/config?error=weight_sum");
+                        response.sendRedirect(request.getContextPath() + "/bantuan/list?config_error=weight_sum");
                         return;
                     }
 
@@ -653,12 +645,12 @@ public class BantuanServlet extends HttpServlet {
                                     pb.getEligibilityTier(), pb.getEligibilityFlags());
                             }
                         }
-                        response.sendRedirect(request.getContextPath() + "/bantuan/config?status=success");
+                        response.sendRedirect(request.getContextPath() + "/bantuan/list?status=config_success");
                     } else {
-                        response.sendRedirect(request.getContextPath() + "/bantuan/config?error=db");
+                        response.sendRedirect(request.getContextPath() + "/bantuan/list?config_error=db");
                     }
                 } catch (NumberFormatException e) {
-                    response.sendRedirect(request.getContextPath() + "/bantuan/config?error=invalid_input");
+                    response.sendRedirect(request.getContextPath() + "/bantuan/list?config_error=invalid_input");
                 }
             }
             

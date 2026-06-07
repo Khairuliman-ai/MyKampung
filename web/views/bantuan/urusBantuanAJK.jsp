@@ -6,6 +6,9 @@
 <%@ page import="model.Bantuan" %>
 <%@ page import="model.Pengguna" %>
 <%@ page import="java.net.URLEncoder" %>
+<%@ page import="model.BantuanRule" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
 
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
@@ -31,6 +34,23 @@
 
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     SimpleDateFormat sdfFull = new SimpleDateFormat("yyyy-MM-dd");
+
+    // Rules configuration
+    List<BantuanRule> rules = (List<BantuanRule>) request.getAttribute("rules");
+    Double povertyLine = (Double) request.getAttribute("povertyLine");
+    if (povertyLine == null) povertyLine = 2500.0;
+
+    Map<String, Double> weightsMap = new HashMap<>();
+    if (rules != null) {
+        for (BantuanRule r : rules) {
+            weightsMap.put(r.getRuleKey(), r.getWeight());
+        }
+    }
+
+    double wIncome = weightsMap.getOrDefault("INCOME_FACTOR", 40.0);
+    double wDependent = weightsMap.getOrDefault("DEPENDENT_FACTOR", 25.0);
+    double wFamily = weightsMap.getOrDefault("FAMILY_STATUS_FACTOR", 20.0);
+    double wEmployment = weightsMap.getOrDefault("EMPLOYMENT_STATUS_FACTOR", 15.0);
 %>
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth h-full bg-[#F7F7F9]">
@@ -42,11 +62,11 @@
         </div>
         
         <div class="flex items-center gap-3">
-            <a href="<%= request.getContextPath() %>/bantuan/config" 
+            <button onclick="openModal('modalConfig')" 
                class="inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white border border-gray-100 text-gray-700 hover:text-brand-purple hover:border-purple-200 shadow-sm transition-all text-xs font-black uppercase tracking-wider">
                 <i class="fas fa-sliders-h text-brand-purple"></i>
                 Konfigurasi Kelayakan
-            </a>
+            </button>
         </div>
     </div>
 
@@ -93,6 +113,34 @@
                 <span class="font-bold">Berjaya!</span> Rekod telah dikemaskini.
             </div>
             <button onclick="this.parentElement.remove()" class="ml-auto text-green-500 hover:text-green-700"><i class="fas fa-times"></i></button>
+        </div>
+    <% } %>
+
+    <% if ("config_success".equals(request.getParameter("status"))) { %>
+        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm animate-fade-in">
+            <i class="fas fa-check-circle text-lg"></i>
+            <div>
+                <span class="font-bold">Konfigurasi Berjaya Disimpan!</span> Enjin scoring kelayakan telah dikemaskini secara langsung menggunakan berat aturan baharu.
+            </div>
+            <button onclick="this.parentElement.remove()" class="ml-auto text-green-500 hover:text-green-700"><i class="fas fa-times"></i></button>
+        </div>
+    <% } %>
+
+    <% if (request.getParameter("config_error") != null) { %>
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm animate-fade-in">
+            <i class="fas fa-exclamation-circle text-lg"></i>
+            <div>
+                <span class="font-bold">Ralat Menyimpan Konfigurasi!</span> 
+                <% String cfgErr = request.getParameter("config_error"); %>
+                <% if ("weight_sum".equals(cfgErr)) { %>
+                    Jumlah berat aturan mestilah bersamaan dengan 100%. Sila semak semula pembahagian berat anda.
+                <% } else if ("invalid_input".equals(cfgErr)) { %>
+                    Input tidak sah. Sila masukkan nilai nombor sahaja.
+                <% } else { %>
+                    Masalah pangkalan data. Sila cuba seketika lagi.
+                <% } %>
+            </div>
+            <button onclick="this.parentElement.remove()" class="ml-auto text-red-500 hover:text-red-700"><i class="fas fa-times"></i></button>
         </div>
     <% } %>
 
@@ -466,76 +514,168 @@
     </div>
 </div>
 
-<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
+<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full shrink-0">
     <div class="mb-8">
         <h3 class="font-bold text-lg text-gray-800">Rumusan Bantuan</h3>
-        <p class="text-xs text-gray-400 font-medium">Status permohonan semasa</p>
+        <p class="text-xs text-gray-400 font-medium">Analisis data & status permohonan semasa</p>
     </div>
 
-    <div class="space-y-4 mb-10">
-        <div class="bg-gray-50 p-4 rounded-2xl flex items-center justify-between border border-gray-100 shadow-sm">
-            <div>
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Perlu Semakan</p>
-                <h4 class="font-bold text-xl text-gray-800"><%= listBaru.size() %></h4>
-            </div>
-            <div class="w-10 h-10 rounded-xl bg-purple-100 text-brand-purple flex items-center justify-center">
-                <i class="fas fa-clipboard-check"></i>
-            </div>
-        </div>
-        <div class="bg-gray-50 p-4 rounded-2xl flex items-center justify-between border border-gray-100 shadow-sm">
-            <div>
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Jumlah Sejarah</p>
-                <h4 class="font-bold text-xl text-gray-800"><%= listSejarah.size() %></h4>
-            </div>
-            <div class="w-10 h-10 rounded-xl bg-gray-100 text-gray-500 flex items-center justify-center">
-                <i class="fas fa-history"></i>
+    <!-- Small stat cards -->
+    <div class="grid grid-cols-2 gap-3 mb-6">
+        <div class="bg-purple-50/40 p-4 rounded-2xl border border-purple-100 flex flex-col gap-1 shadow-sm">
+            <span class="text-[9px] text-brand-purple font-bold uppercase tracking-wider">Perlu Semakan</span>
+            <div class="flex items-center justify-between mt-1">
+                <span class="font-black text-xl text-brand-purple"><%= listBaru.size() %></span>
+                <i class="fas fa-clipboard-check text-brand-purple opacity-30"></i>
             </div>
         </div>
-        <div class="bg-gray-50 p-4 rounded-2xl flex items-center justify-between border border-gray-100 shadow-sm">
-            <div>
-                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Jenis Bantuan</p>
-                <h4 class="font-bold text-xl text-gray-800"><%= (senaraiBantuan != null) ? senaraiBantuan.size() : 0 %></h4>
-            </div>
-            <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center">
-                <i class="fas fa-cog"></i>
+        
+        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 flex flex-col gap-1 shadow-sm">
+            <span class="text-[9px] text-gray-400 font-bold uppercase tracking-wider">Rekod Sejarah</span>
+            <div class="flex items-center justify-between mt-1">
+                <span class="font-black text-xl text-gray-800"><%= totalCount %></span>
+                <i class="fas fa-history text-slate-500 opacity-30"></i>
             </div>
         </div>
     </div>
 
-    <div class="mb-10">
-        <h3 class="font-bold text-sm text-gray-800 mb-4 uppercase tracking-widest">Panduan AJK</h3>
-        <div class="space-y-6 relative">
-            <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-gray-100"></div>
+    <%
+        int totalRasmi = 0;
+        int totalKomuniti = 0;
+        if (listBaru != null) {
+            for (PermohonanBantuan pb : listBaru) {
+                if ("RASMI".equalsIgnoreCase(pb.getJenis_bantuan())) {
+                    totalRasmi++;
+                } else {
+                    totalKomuniti++;
+                }
+            }
+        }
+        if (listSejarah != null) {
+            for (PermohonanBantuan pb : listSejarah) {
+                if ("RASMI".equalsIgnoreCase(pb.getJenis_bantuan())) {
+                    totalRasmi++;
+                } else {
+                    totalKomuniti++;
+                }
+            }
+        }
+    %>
+
+    <!-- Active Rules Card -->
+    <div class="bg-indigo-50/40 p-5 rounded-[2rem] border border-indigo-100/50 flex flex-col gap-4 mb-6 group hover:bg-indigo-50/70 transition-all">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center shadow-sm">
+                <i class="fas fa-sliders-h text-sm"></i>
+            </div>
+            <div>
+                <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest leading-none mb-1">Enjin Kelayakan</p>
+                <h4 class="font-black text-xs text-gray-800">Wajaran Aturan Kelayakan</h4>
+            </div>
+        </div>
+        
+        <div class="space-y-2.5 pt-1">
+            <!-- Poverty Line -->
+            <div class="flex justify-between items-center text-[11px] pb-1 border-b border-indigo-100/30">
+                <span class="text-indigo-600 font-bold">Garis Kemiskinan</span>
+                <span class="font-black text-indigo-700">RM <%= String.format("%,.2f", povertyLine) %></span>
+            </div>
             
-            <div class="relative pl-10">
-                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-brand-purple flex items-center justify-center font-bold text-xs border-2 border-brand-purple z-10">1</div>
-                <h4 class="font-bold text-xs text-gray-800 uppercase">Semak Dokumen</h4>
-                <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Pastikan semua lampiran PDF yang dihantar oleh penduduk adalah lengkap dan sahih.</p>
+            <!-- Income factor -->
+            <div class="space-y-1">
+                <div class="flex justify-between text-[10px]">
+                    <span class="text-gray-500 font-medium">Pendapatan Rendah</span>
+                    <span class="font-bold text-blue-600"><%= (int)wIncome %>%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div class="bg-blue-500 h-full rounded-full" style="width: <%= wIncome %>%"></div>
+                </div>
             </div>
 
-            <div class="relative pl-10">
-                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-gray-400 flex items-center justify-center font-bold text-xs border-2 border-gray-100 z-10">2</div>
-                <h4 class="font-bold text-xs text-gray-800 uppercase">Majukan Kes</h4>
-                <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Permohonan yang lengkap akan dimajukan kepada Ketua Kampung untuk kelulusan akhir.</p>
+            <!-- Dependent factor -->
+            <div class="space-y-1">
+                <div class="flex justify-between text-[10px]">
+                    <span class="text-gray-500 font-medium">Bilangan Tanggungan</span>
+                    <span class="font-bold text-emerald-600"><%= (int)wDependent %>%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div class="bg-emerald-500 h-full rounded-full" style="width: <%= wDependent %>%"></div>
+                </div>
             </div>
 
-            <div class="relative pl-10">
-                <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-white text-gray-400 flex items-center justify-center font-bold text-xs border-2 border-gray-100 z-10">3</div>
-                <h4 class="font-bold text-xs text-gray-800 uppercase">Maklum Balas</h4>
-                <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Gunakan fungsi 'Kembali' jika terdapat dokumen yang kurang lengkap untuk penduduk kemaskini.</p>
+            <!-- Family factor -->
+            <div class="space-y-1">
+                <div class="flex justify-between text-[10px]">
+                    <span class="text-gray-500 font-medium">Ibu Tunggal / OKU</span>
+                    <span class="font-bold text-amber-600"><%= (int)wFamily %>%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div class="bg-amber-500 h-full rounded-full" style="width: <%= wFamily %>%"></div>
+                </div>
+            </div>
+
+            <!-- Employment factor -->
+            <div class="space-y-1">
+                <div class="flex justify-between text-[10px]">
+                    <span class="text-gray-500 font-medium">Status Pengangguran</span>
+                    <span class="font-bold text-indigo-600"><%= (int)wEmployment %>%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div class="bg-indigo-500 h-full rounded-full" style="width: <%= wEmployment %>%"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="p-6 bg-brand-purple/5 rounded-3xl border border-brand-purple/10">
-        <div class="flex items-center gap-3 mb-3">
-            <div class="w-8 h-8 rounded-lg bg-brand-purple text-white flex items-center justify-center">
+    <!-- Aid Category Distribution -->
+    <div class="bg-slate-50 p-5 rounded-[2rem] border border-slate-150 flex flex-col gap-3 mb-6">
+        <h4 class="text-[9px] text-gray-400 font-black uppercase tracking-widest leading-none mb-1">Pembahagian Kategori Bantuan</h4>
+        
+        <div class="flex items-center justify-between text-xs text-gray-600">
+            <span class="flex items-center gap-1.5 font-medium"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Bantuan Rasmi</span>
+            <span class="font-bold text-gray-800"><%= totalRasmi %> Kes</span>
+        </div>
+        
+        <div class="flex items-center justify-between text-xs text-gray-600">
+            <span class="flex items-center gap-1.5 font-medium"><span class="w-2 h-2 rounded-full bg-teal-500"></span> Bantuan Komuniti</span>
+            <span class="font-bold text-gray-800"><%= totalKomuniti %> Kes</span>
+        </div>
+    </div>
+
+    <div class="mb-6">
+        <h3 class="font-bold text-xs text-gray-800 mb-3 uppercase tracking-widest">SOP Kelulusan AJK</h3>
+        <div class="space-y-4 relative">
+            <div class="absolute left-3 top-1.5 bottom-1.5 w-0.5 bg-gray-150"></div>
+            
+            <div class="relative pl-8 text-xs">
+                <div class="absolute left-0 top-0.5 w-6 h-6 rounded-full bg-white text-brand-purple flex items-center justify-center font-bold text-[10px] border border-brand-purple z-10">1</div>
+                <h4 class="font-bold text-gray-800">Semakan Integriti Dokumen</h4>
+                <p class="text-[10px] text-gray-500 mt-0.5 leading-relaxed">Sahkan keaslian penyata bank, kad pengenalan & penyata pendapatan penduduk.</p>
+            </div>
+
+            <div class="relative pl-8 text-xs">
+                <div class="absolute left-0 top-0.5 w-6 h-6 rounded-full bg-white text-gray-400 flex items-center justify-center font-bold text-[10px] border border-gray-150 z-10">2</div>
+                <h4 class="font-bold text-gray-800">Ulasan & Kelayakan</h4>
+                <p class="text-[10px] text-gray-500 mt-0.5 leading-relaxed">Berikan catatan ringkas kelayakan fizikal/sosial berdasarkan lawatan ajk.</p>
+            </div>
+
+            <div class="relative pl-8 text-xs">
+                <div class="absolute left-0 top-0.5 w-6 h-6 rounded-full bg-white text-gray-400 flex items-center justify-center font-bold text-[10px] border border-gray-150 z-10">3</div>
+                <h4 class="font-bold text-gray-800">Majukan Permohonan</h4>
+                <p class="text-[10px] text-gray-500 mt-0.5 leading-relaxed">Tindakan 'Lengkap' akan menolak permohonan ke Ketua Kampung secara automatik.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-5 bg-brand-purple/5 rounded-[2rem] border border-brand-purple/10">
+        <div class="flex items-center gap-2.5 mb-2">
+            <div class="w-7 h-7 rounded-lg bg-brand-purple text-white flex items-center justify-center text-xs shadow-sm">
                 <i class="fas fa-info-circle"></i>
             </div>
             <h4 class="font-bold text-xs text-gray-800">Nota Integriti</h4>
         </div>
         <p class="text-[10px] text-gray-500 leading-relaxed italic">
-            "Bantuan yang tepat kepada mereka yang layak adalah tanggungjawab bersama."
+            "Kebajikan penduduk adalah amanah kita. Pastikan pengagihan dibuat secara telus."
         </p>
     </div>
 </aside>
@@ -1478,6 +1618,187 @@
 
         openModal('modalDetail');
     }
+</script>
+
+<!-- MODAL: KONFIGURASI KELAYAKAN -->
+<div id="modalConfig" class="fixed inset-0 z-50 hidden" role="dialog">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal('modalConfig')"></div>
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative w-full max-w-2xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 flex flex-col max-h-[90vh]">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-brand-purple to-brand-secondary px-8 py-6 text-white relative z-10 shrink-0">
+                <div class="absolute top-0 right-0 p-6 opacity-10">
+                    <i class="fas fa-sliders-h text-8xl rotate-12"></i>
+                </div>
+                <div class="flex justify-between items-start relative z-10">
+                    <div>
+                        <span class="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border border-white/20">Konfigurasi Aturan Kelayakan</span>
+                        <h3 class="text-2xl font-bold mt-2">Penyelarasan Enjin Kelayakan</h3>
+                    </div>
+                    <button onclick="closeModal('modalConfig')" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all text-white">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scrollable Content Area -->
+            <form id="configForm" action="<%= request.getContextPath() %>/bantuan/config/save" method="post" class="overflow-y-auto custom-scrollbar flex-1 p-8 space-y-6">
+                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
+                
+                <!-- SECTION 1: Poverty Line Threshold -->
+                <div class="bg-slate-50 rounded-3xl p-6 border border-slate-100 relative overflow-hidden">
+                    <div class="relative z-10 flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-lg shadow-sm shrink-0">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-base font-bold text-gray-800 mb-1">Paras Pendapatan Kemiskinan</h4>
+                            <p class="text-gray-500 text-xs leading-relaxed mb-4">Had bulanan isi rumah yang digunapakai sebagai garis kemiskinan mengikut garis panduan KKM.</p>
+                            
+                            <div class="max-w-xs">
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2">Had Kemiskinan (RM)</label>
+                                <div class="relative rounded-2xl shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <span class="text-gray-400 font-bold text-sm">RM</span>
+                                    </div>
+                                    <input type="number" step="0.01" name="povertyLine" id="povertyLine" value="<%= String.format("%.2f", povertyLine) %>" 
+                                           class="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-2xl text-gray-800 font-bold placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-purple focus:border-brand-purple sm:text-sm" required />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Dynamic Eligibility Weight Factors -->
+                <div class="space-y-4">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-2xl bg-purple-50 text-brand-purple flex items-center justify-center text-lg shadow-sm shrink-0">
+                            <i class="fas fa-sliders-h"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-base font-bold text-gray-800 mb-1">Berat Faktor Kelayakan</h4>
+                            <p class="text-gray-500 text-xs leading-relaxed">Kepentingan (weightage) wajaran kelayakan. <strong>Jumlah berat mestilah tepat 100%</strong>.</p>
+                        </div>
+                    </div>
+
+                    <!-- Rule Sliders -->
+                    <div class="space-y-4 mt-4">
+                        <!-- Rule 1: Income -->
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 transition-all">
+                            <div class="flex justify-between items-center mb-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                    <span class="text-xs font-bold text-gray-800">Faktor Pendapatan Rendah</span>
+                                </div>
+                                <span class="text-xs font-extrabold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full"><span id="valIncome"><%= (int)wIncome %></span>%</span>
+                            </div>
+                            <input type="range" min="0" max="100" name="weightIncome" id="weightIncome" value="<%= (int)wIncome %>" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-purple" oninput="updateSliders()" />
+                        </div>
+
+                        <!-- Rule 2: Dependents -->
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 transition-all">
+                            <div class="flex justify-between items-center mb-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                    <span class="text-xs font-bold text-gray-800">Faktor Bilangan Tanggungan</span>
+                                </div>
+                                <span class="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full"><span id="valDependent"><%= (int)wDependent %></span>%</span>
+                            </div>
+                            <input type="range" min="0" max="100" name="weightDependent" id="weightDependent" value="<%= (int)wDependent %>" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-purple" oninput="updateSliders()" />
+                        </div>
+
+                        <!-- Rule 3: Family Status -->
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 transition-all">
+                            <div class="flex justify-between items-center mb-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                                    <span class="text-xs font-bold text-gray-800">Faktor Status Ibu Tunggal/OKU</span>
+                                </div>
+                                <span class="text-xs font-extrabold text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full"><span id="valFamily"><%= (int)wFamily %></span>%</span>
+                            </div>
+                            <input type="range" min="0" max="100" name="weightFamily" id="weightFamily" value="<%= (int)wFamily %>" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-purple" oninput="updateSliders()" />
+                        </div>
+
+                        <!-- Rule 4: Employment -->
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 transition-all">
+                            <div class="flex justify-between items-center mb-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                                    <span class="text-xs font-bold text-gray-800">Faktor Pengangguran</span>
+                                </div>
+                                <span class="text-xs font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full"><span id="valEmployment"><%= (int)wEmployment %></span>%</span>
+                            </div>
+                            <input type="range" min="0" max="100" name="weightEmployment" id="weightEmployment" value="<%= (int)wEmployment %>" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-purple" oninput="updateSliders()" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer Area (Inside Form for submit) -->
+                <div class="pt-6 border-t border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div id="sumCircle" class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all shadow-sm">
+                            <span id="valTotal">100</span>%
+                        </div>
+                        <div class="text-left">
+                            <p class="text-xs font-bold text-gray-800">Jumlah Pembahagian</p>
+                            <p id="sumMessage" class="text-[10px] transition-colors"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <button type="button" onclick="closeModal('modalConfig')" class="px-5 py-2.5 rounded-2xl text-xs font-bold text-gray-500 bg-gray-100 hover:bg-gray-200 transition">Batal</button>
+                        <button type="submit" id="btnSubmit" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-xs font-bold text-white shadow-lg transition-all transform hover:scale-[1.02] focus:outline-none">
+                            <i class="fas fa-save"></i> Simpan Konfigurasi
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function updateSliders() {
+        const income = parseInt(document.getElementById('weightIncome').value) || 0;
+        const dependent = parseInt(document.getElementById('weightDependent').value) || 0;
+        const family = parseInt(document.getElementById('weightFamily').value) || 0;
+        const employment = parseInt(document.getElementById('weightEmployment').value) || 0;
+
+        document.getElementById('valIncome').innerText = income;
+        document.getElementById('valDependent').innerText = dependent;
+        document.getElementById('valFamily').innerText = family;
+        document.getElementById('valEmployment').innerText = employment;
+
+        const total = income + dependent + family + employment;
+        document.getElementById('valTotal').innerText = total;
+
+        const circle = document.getElementById('sumCircle');
+        const message = document.getElementById('sumMessage');
+        const button = document.getElementById('btnSubmit');
+
+        if (total === 100) {
+            circle.className = 'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all shadow-sm bg-emerald-100 text-emerald-600 border border-emerald-200';
+            message.innerText = 'Sempurna! Pembahagian adalah tepat 100%.';
+            message.className = 'text-xs text-emerald-600 font-bold';
+            
+            button.disabled = false;
+            button.className = 'inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-xs font-bold text-white bg-brand-purple hover:bg-brand-purple/95 shadow-lg shadow-purple-100 hover:shadow-xl transition-all transform hover:scale-[1.02] cursor-pointer';
+        } else {
+            circle.className = 'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all shadow-sm bg-rose-100 text-rose-600 border border-rose-200';
+            message.innerText = 'Nilai semisal mesti ' + (total > 100 ? 'kurang ' + (total - 100) : 'tambah ' + (100 - total)) + '% untuk mencukupi 100%.';
+            message.className = 'text-xs text-rose-600 font-bold';
+            
+            button.disabled = true;
+            button.className = 'inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-xs font-bold text-gray-400 bg-gray-100 border border-gray-200 shadow-none cursor-not-allowed';
+        }
+    }
+
+    // Run once on load
+    window.addEventListener('DOMContentLoaded', updateSliders);
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>

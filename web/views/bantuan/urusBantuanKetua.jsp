@@ -5,58 +5,65 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="model.PermohonanBantuan" %>
 <%@ page import="java.net.URLEncoder" %>
+<%@ page import="model.BantuanRule" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
 
 <%@ include file="/views/common/header.jsp" %>
 <%@ include file="/views/common/navbar.jsp" %>
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth h-full bg-[#F7F7F9]">
 
-    <header class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div class="mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
             <h2 class="text-2xl font-bold text-gray-800">Pengesahan Ketua Kampung</h2>
             <p class="text-gray-500 text-sm">Semak dan luluskan permohonan yang telah disahkan oleh AJK.</p>
         </div>
-
-        <div class="flex flex-wrap items-center gap-3">
-            <a href="<%= request.getContextPath() %>/bantuan/config"
-                class="inline-flex items-center gap-2 px-4 py-2.5 rounded-2xl bg-white border border-gray-200 text-gray-700 hover:text-brand-purple hover:border-purple-200 shadow-sm transition-all text-xs font-bold">
+        
+        <div class="flex items-center gap-3">
+            <button onclick="openModal('modalConfig')"
+                class="inline-flex items-center gap-2 px-5 py-3.5 rounded-2xl bg-white border border-gray-100 text-gray-700 hover:text-brand-purple hover:border-purple-200 shadow-sm transition-all text-xs font-black uppercase tracking-wider">
                 <i class="fas fa-sliders-h text-brand-purple"></i>
                 Konfigurasi Kelayakan
-            </a>
+            </button>
+        </div>
+    </div>
 
-            <!-- Professional Filter Bar -->
-            <div class="bg-white p-3 rounded-2xl shadow-sm border border-gray-100 flex flex-wrap items-center gap-3">
-                <div class="relative">
-                    <i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-xs"></i>
-                    <input type="text" id="searchPemohon" onkeyup="filterData()"
-                        placeholder="Cari pemohon/ID..."
-                        class="pl-9 pr-4 py-2 bg-gray-50 border-none rounded-xl text-xs focus:ring-2 focus:ring-brand-purple w-48">
-                </div>
-
-                <select id="filterKategori" onchange="filterData()"
-                    class="bg-gray-50 border-none rounded-xl text-xs focus:ring-2 focus:ring-brand-purple py-2 px-3 pr-8">
-                    <option value="ALL">Semua Kategori</option>
-                    <option value="RASMI">Bantuan Rasmi</option>
-                    <option value="KOMUNITI">Bantuan Komuniti</option>
-                </select>
-
-                <div class="flex items-center gap-2 bg-gray-50 px-3 py-1.5 rounded-xl border border-transparent focus-within:border-brand-purple/30 transition">
-                    <i class="fas fa-calendar-alt text-gray-400 text-[10px]"></i>
-                    <input type="date" id="filterDateStart" onchange="filterData()"
-                        class="bg-transparent border-none p-0 text-[10px] focus:ring-0">
-                    <span class="text-gray-300">-</span>
-                    <input type="date" id="filterDateEnd" onchange="filterData()"
-                        class="bg-transparent border-none p-0 text-[10px] focus:ring-0">
-                </div>
-
-                <button onclick="resetFilters()"
-                    class="p-2 text-gray-400 hover:text-red-500 transition tooltip"
-                    title="Reset Tapisan">
-                    <i class="fas fa-sync-alt text-xs"></i>
-                </button>
+    <div class="flex flex-col md:flex-row gap-4 mb-8">
+        <div class="flex-1 relative group">
+            <div class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-purple group-focus-within:scale-110 transition-all duration-300 pointer-events-none">
+                <i class="fas fa-search text-sm"></i>
+            </div>
+            <input type="text" id="searchPemohon" onkeyup="filterData()" placeholder="Cari pemohon atau ID permohonan..." 
+                   class="w-full pl-14 pr-6 py-4 rounded-[2rem] bg-white border border-gray-100 focus:ring-4 focus:ring-purple-50 focus:border-brand-purple text-xs font-semibold shadow-sm transition-all outline-none placeholder:text-gray-300">
+        </div>
+        
+        <div class="w-full md:w-64 relative group">
+            <div class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-purple group-focus-within:scale-110 transition-all duration-300 pointer-events-none">
+                <i class="fas fa-tags text-sm"></i>
+            </div>
+            <select id="filterKategori" onchange="filterData()" class="w-full pl-14 pr-10 py-4 rounded-[2rem] bg-white border border-gray-100 focus:ring-4 focus:ring-purple-50 focus:border-brand-purple text-xs font-semibold shadow-sm transition-all outline-none text-gray-700 appearance-none">
+                <option value="ALL">Semua Kategori</option>
+                <option value="RASMI">Bantuan Rasmi</option>
+                <option value="KOMUNITI">Bantuan Komuniti</option>
+            </select>
+            <div class="absolute right-6 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">
+                <i class="fas fa-chevron-down text-xs"></i>
             </div>
         </div>
-    </header>
+
+        <div class="w-full md:w-64 relative group">
+            <div class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-brand-purple group-focus-within:scale-110 transition-all duration-300 pointer-events-none">
+                <i class="far fa-calendar-alt text-sm"></i>
+            </div>
+            <input type="date" id="filterDate" onchange="filterData()" class="w-full pl-14 pr-6 py-4 rounded-[2rem] bg-white border border-gray-100 focus:ring-4 focus:ring-purple-50 focus:border-brand-purple text-xs font-semibold shadow-sm transition-all outline-none text-gray-700">
+        </div>
+
+        <button onclick="resetFilters()" class="px-6 py-4 rounded-[2rem] bg-white border border-gray-100 text-gray-400 hover:text-red-500 hover:border-red-100 focus:ring-4 focus:ring-red-50 text-xs font-bold shadow-sm transition-all flex items-center justify-center gap-2" title="Reset Tapisan">
+            <i class="fas fa-sync-alt text-xs"></i>
+            <span>Reset</span>
+        </button>
+    </div>
 
     <% if (request.getParameter("msg") != null) { %>
         <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm">
@@ -82,6 +89,34 @@
         </div>
     <% } %>
 
+    <% if ("config_success".equals(request.getParameter("status"))) { %>
+        <div class="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm animate-fade-in">
+            <i class="fas fa-check-circle text-lg"></i>
+            <div>
+                <span class="font-bold">Konfigurasi Berjaya Disimpan!</span> Enjin scoring kelayakan telah dikemaskini secara langsung menggunakan berat aturan baharu.
+            </div>
+            <button onclick="this.parentElement.remove()" class="ml-auto text-green-500 hover:text-green-700"><i class="fas fa-times"></i></button>
+        </div>
+    <% } %>
+
+    <% if (request.getParameter("config_error") != null) { %>
+        <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl mb-6 flex items-center gap-3 shadow-sm animate-fade-in">
+            <i class="fas fa-exclamation-circle text-lg"></i>
+            <div>
+                <span class="font-bold">Ralat Menyimpan Konfigurasi!</span> 
+                <% String cfgErr = request.getParameter("config_error"); %>
+                <% if ("weight_sum".equals(cfgErr)) { %>
+                    Jumlah berat aturan mestilah bersamaan dengan 100%. Sila semak semula pembahagian berat anda.
+                <% } else if ("invalid_input".equals(cfgErr)) { %>
+                    Input tidak sah. Sila masukkan nilai nombor sahaja.
+                <% } else { %>
+                    Masalah pangkalan data. Sila cuba seketika lagi.
+                <% } %>
+            </div>
+            <button onclick="this.parentElement.remove()" class="ml-auto text-red-500 hover:text-red-700"><i class="fas fa-times"></i></button>
+        </div>
+    <% } %>
+
     <%
         // Logic Pengasingan Data
         List<PermohonanBantuan> list = (List<PermohonanBantuan>) request.getAttribute("permohonanList");
@@ -99,6 +134,23 @@
                 }
             }
         }
+
+        // Rules configuration
+        List<BantuanRule> rules = (List<BantuanRule>) request.getAttribute("rules");
+        Double povertyLine = (Double) request.getAttribute("povertyLine");
+        if (povertyLine == null) povertyLine = 2500.0;
+
+        Map<String, Double> weightsMap = new HashMap<>();
+        if (rules != null) {
+            for (BantuanRule r : rules) {
+                weightsMap.put(r.getRuleKey(), r.getWeight());
+            }
+        }
+
+        double wIncome = weightsMap.getOrDefault("INCOME_FACTOR", 40.0);
+        double wDependent = weightsMap.getOrDefault("DEPENDENT_FACTOR", 25.0);
+        double wFamily = weightsMap.getOrDefault("FAMILY_STATUS_FACTOR", 20.0);
+        double wEmployment = weightsMap.getOrDefault("EMPLOYMENT_STATUS_FACTOR", 15.0);
     %>
 
     <div class="mb-8 border-b border-gray-200">
@@ -219,13 +271,13 @@
                                 <% } %>
                             </td>
                         </tr>
-                        <% } } else { %>
-                            <tr>
-                                <td colspan="5" class="p-8 text-center text-gray-400">
-                                    <i class="fas fa-check-double text-3xl mb-2 block opacity-50"></i>Tiada permohonan tertunggak.
-                                </td>
-                            </tr>
-                        <% } %>
+                        <% } } %>
+                        <tr id="tablePending-empty" class="<%= (listPending != null && !listPending.isEmpty()) ? "hidden" : "" %> empty-state-row">
+                            <td colspan="5" class="p-12 text-center text-gray-400">
+                                <i class="fas fa-inbox text-4xl mb-4 block opacity-20 text-gray-300"></i>
+                                <span class="block mt-2 font-medium">Tiada permohonan tertunggak.</span>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -342,13 +394,13 @@
                                 <% } %>
                             </td>
                         </tr>
-                        <% } } else { %>
-                            <tr class="no-data">
-                                <td colspan="6" class="p-8 text-center text-gray-400">
-                                    <i class="fas fa-archive text-3xl mb-2 block opacity-50"></i>Tiada rekod sejarah.
-                                </td>
-                            </tr>
-                        <% } %>
+                        <% } } %>
+                        <tr id="tableSejarah-empty" class="<%= (listSejarah != null && !listSejarah.isEmpty()) ? "hidden" : "" %> empty-state-row">
+                            <td colspan="6" class="p-12 text-center text-gray-400">
+                                <i class="fas fa-archive text-4xl mb-4 block opacity-20 text-gray-300"></i>
+                                <span class="block mt-2 font-medium">Tiada rekod sejarah.</span>
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -649,39 +701,223 @@
     </div>
 </div>
 
+<!-- MODAL: KONFIGURASI KELAYAKAN -->
+<div id="modalConfig" class="fixed inset-0 z-50 hidden" role="dialog">
+    <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal('modalConfig')"></div>
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative w-full max-w-2xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 flex flex-col max-h-[90vh]">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-brand-purple to-brand-secondary px-8 py-6 text-white relative z-10 shrink-0">
+                <div class="absolute top-0 right-0 p-6 opacity-10">
+                    <i class="fas fa-sliders-h text-8xl rotate-12"></i>
+                </div>
+                <div class="flex justify-between items-start relative z-10">
+                    <div>
+                        <span class="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border border-white/20">Konfigurasi Aturan Kelayakan</span>
+                        <h3 class="text-2xl font-bold mt-2">Penyelarasan Enjin Kelayakan</h3>
+                    </div>
+                    <button onclick="closeModal('modalConfig')" class="w-10 h-10 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all text-white">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Scrollable Content Area -->
+            <form id="configForm" action="<%= request.getContextPath() %>/bantuan/config/save" method="post" class="overflow-y-auto custom-scrollbar flex-1 p-8 space-y-6">
+                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
+                
+                <!-- SECTION 1: Poverty Line Threshold -->
+                <div class="bg-slate-50 rounded-3xl p-6 border border-slate-100 relative overflow-hidden">
+                    <div class="relative z-10 flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-2xl bg-blue-50 text-blue-500 flex items-center justify-center text-lg shadow-sm shrink-0">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="flex-1">
+                            <h4 class="text-base font-bold text-gray-800 mb-1">Paras Pendapatan Kemiskinan</h4>
+                            <p class="text-gray-500 text-xs leading-relaxed mb-4">Had bulanan isi rumah yang digunapakai sebagai garis kemiskinan mengikut garis panduan KKM.</p>
+                            
+                            <div class="max-w-xs">
+                                <label class="block text-[10px] font-bold text-gray-500 uppercase mb-2">Had Kemiskinan (RM)</label>
+                                <div class="relative rounded-2xl shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                        <span class="text-gray-400 font-bold text-sm">RM</span>
+                                    </div>
+                                    <input type="number" step="0.01" name="povertyLine" id="povertyLine" value="<%= String.format("%.2f", povertyLine) %>" 
+                                           class="block w-full pl-12 pr-4 py-3 border border-gray-200 rounded-2xl text-gray-800 font-bold placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-brand-purple focus:border-brand-purple sm:text-sm" required />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SECTION 2: Dynamic Eligibility Weight Factors -->
+                <div class="space-y-4">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-2xl bg-purple-50 text-brand-purple flex items-center justify-center text-lg shadow-sm shrink-0">
+                            <i class="fas fa-sliders-h"></i>
+                        </div>
+                        <div>
+                            <h4 class="text-base font-bold text-gray-800 mb-1">Berat Faktor Kelayakan</h4>
+                            <p class="text-gray-500 text-xs leading-relaxed">Kepentingan (weightage) wajaran kelayakan. <strong>Jumlah berat mestilah tepat 100%</strong>.</p>
+                        </div>
+                    </div>
+
+                    <!-- Rule Sliders -->
+                    <div class="space-y-4 mt-4">
+                        <!-- Rule 1: Income -->
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 transition-all">
+                            <div class="flex justify-between items-center mb-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                                    <span class="text-xs font-bold text-gray-800">Faktor Pendapatan Rendah</span>
+                                </div>
+                                <span class="text-xs font-extrabold text-blue-600 bg-blue-50 px-2.5 py-0.5 rounded-full"><span id="valIncome"><%= (int)wIncome %></span>%</span>
+                            </div>
+                            <input type="range" min="0" max="100" name="weightIncome" id="weightIncome" value="<%= (int)wIncome %>" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-purple" oninput="updateSliders()" />
+                        </div>
+
+                        <!-- Rule 2: Dependents -->
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 transition-all">
+                            <div class="flex justify-between items-center mb-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                                    <span class="text-xs font-bold text-gray-800">Faktor Bilangan Tanggungan</span>
+                                </div>
+                                <span class="text-xs font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-0.5 rounded-full"><span id="valDependent"><%= (int)wDependent %></span>%</span>
+                            </div>
+                            <input type="range" min="0" max="100" name="weightDependent" id="weightDependent" value="<%= (int)wDependent %>" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-purple" oninput="updateSliders()" />
+                        </div>
+
+                        <!-- Rule 3: Family Status -->
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 transition-all">
+                            <div class="flex justify-between items-center mb-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                                    <span class="text-xs font-bold text-gray-800">Faktor Status Ibu Tunggal/OKU</span>
+                                </div>
+                                <span class="text-xs font-extrabold text-amber-600 bg-amber-50 px-2.5 py-0.5 rounded-full"><span id="valFamily"><%= (int)wFamily %></span>%</span>
+                            </div>
+                            <input type="range" min="0" max="100" name="weightFamily" id="weightFamily" value="<%= (int)wFamily %>" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-purple" oninput="updateSliders()" />
+                        </div>
+
+                        <!-- Rule 4: Employment -->
+                        <div class="bg-gray-50 p-4 rounded-2xl border border-gray-100 transition-all">
+                            <div class="flex justify-between items-center mb-1">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+                                    <span class="text-xs font-bold text-gray-800">Faktor Pengangguran</span>
+                                </div>
+                                <span class="text-xs font-extrabold text-indigo-600 bg-indigo-50 px-2.5 py-0.5 rounded-full"><span id="valEmployment"><%= (int)wEmployment %></span>%</span>
+                            </div>
+                            <input type="range" min="0" max="100" name="weightEmployment" id="weightEmployment" value="<%= (int)wEmployment %>" 
+                                   class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-brand-purple" oninput="updateSliders()" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Footer Area (Inside Form for submit) -->
+                <div class="pt-6 border-t border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+                    <div class="flex items-center gap-3">
+                        <div id="sumCircle" class="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all shadow-sm">
+                            <span id="valTotal">100</span>%
+                        </div>
+                        <div class="text-left">
+                            <p class="text-xs font-bold text-gray-800">Jumlah Pembahagian</p>
+                            <p id="sumMessage" class="text-[10px] transition-colors"></p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-2">
+                        <button type="button" onclick="closeModal('modalConfig')" class="px-5 py-2.5 rounded-2xl text-xs font-bold text-gray-500 bg-gray-100 hover:bg-gray-200 transition">Batal</button>
+                        <button type="submit" id="btnSubmit" class="inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-xs font-bold text-white shadow-lg transition-all transform hover:scale-[1.02] focus:outline-none">
+                            <i class="fas fa-save"></i> Simpan Konfigurasi
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
     let currentKategori = "";
 
     function resetFilters() {
         document.getElementById('searchPemohon').value = '';
         document.getElementById('filterKategori').value = 'ALL';
-        document.getElementById('filterDateStart').value = '';
-        document.getElementById('filterDateEnd').value = '';
+        document.getElementById('filterDate').value = '';
         filterData();
     }
 
     function filterData() {
         const search = document.getElementById('searchPemohon').value.toLowerCase();
         const category = document.getElementById('filterKategori').value;
-        const dateStart = document.getElementById('filterDateStart').value;
-        const dateEnd = document.getElementById('filterDateEnd').value;
+        const dateVal = document.getElementById('filterDate').value;
 
-        const rows = document.querySelectorAll('.data-row-filter');
-        rows.forEach(row => {
-            const rowSearch = row.getAttribute('data-search').toLowerCase();
+        // Filter tablePending rows
+        const pendingRows = document.querySelectorAll('#tablePending tbody tr:not(.empty-state-row)');
+        let pendingVisibleCount = 0;
+        pendingRows.forEach(row => {
+            const rowSearch = row.getAttribute('data-search') ? row.getAttribute('data-search').toLowerCase() : '';
             const rowCategory = row.getAttribute('data-category');
-            const rowDate = row.getAttribute('data-date'); // YYYY-MM-DD
+            const rowDate = row.getAttribute('data-date');
 
             let show = true;
 
             if (search && !rowSearch.includes(search)) show = false;
             if (category !== 'ALL' && rowCategory !== category) show = false;
+            if (dateVal && rowDate !== dateVal) show = false;
 
-            if (dateStart && !(rowDate >= dateStart)) show = false;
-            if (dateEnd && rowDate > dateEnd) show = false;
-
-            row.style.display = show ? '' : 'none';
+            if (show) {
+                row.style.display = '';
+                pendingVisibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
         });
+
+        const pendingEmpty = document.getElementById('tablePending-empty');
+        if (pendingEmpty) {
+            if (pendingVisibleCount === 0) {
+                pendingEmpty.classList.remove('hidden');
+            } else {
+                pendingEmpty.classList.add('hidden');
+            }
+        }
+
+        // Filter tableSejarah rows
+        const sejarahRows = document.querySelectorAll('#tableSejarah tbody tr:not(.empty-state-row)');
+        let sejarahVisibleCount = 0;
+        sejarahRows.forEach(row => {
+            const rowSearch = row.getAttribute('data-search') ? row.getAttribute('data-search').toLowerCase() : '';
+            const rowCategory = row.getAttribute('data-category');
+            const rowDate = row.getAttribute('data-date');
+
+            let show = true;
+
+            if (search && !rowSearch.includes(search)) show = false;
+            if (category !== 'ALL' && rowCategory !== category) show = false;
+            if (dateVal && rowDate !== dateVal) show = false;
+
+            if (show) {
+                row.style.display = '';
+                sejarahVisibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        const sejarahEmpty = document.getElementById('tableSejarah-empty');
+        if (sejarahEmpty) {
+            if (sejarahVisibleCount === 0) {
+                sejarahEmpty.classList.remove('hidden');
+            } else {
+                sejarahEmpty.classList.add('hidden');
+            }
+        }
     }
 
     function switchTab(name) {
@@ -1002,7 +1238,43 @@
         openModal('modalKeputusan');
     }
 
-    // Functions centralized in footer.jsp
+    function updateSliders() {
+        const income = parseInt(document.getElementById('weightIncome').value) || 0;
+        const dependent = parseInt(document.getElementById('weightDependent').value) || 0;
+        const family = parseInt(document.getElementById('weightFamily').value) || 0;
+        const employment = parseInt(document.getElementById('weightEmployment').value) || 0;
+
+        document.getElementById('valIncome').innerText = income;
+        document.getElementById('valDependent').innerText = dependent;
+        document.getElementById('valFamily').innerText = family;
+        document.getElementById('valEmployment').innerText = employment;
+
+        const total = income + dependent + family + employment;
+        document.getElementById('valTotal').innerText = total;
+
+        const circle = document.getElementById('sumCircle');
+        const message = document.getElementById('sumMessage');
+        const button = document.getElementById('btnSubmit');
+
+        if (total === 100) {
+            circle.className = 'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all shadow-sm bg-emerald-100 text-emerald-600 border border-emerald-200';
+            message.innerText = 'Sempurna! Pembahagian adalah tepat 100%.';
+            message.className = 'text-xs text-emerald-600 font-bold';
+            
+            button.disabled = false;
+            button.className = 'inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-xs font-bold text-white bg-brand-purple hover:bg-brand-purple/95 shadow-lg shadow-purple-100 hover:shadow-xl transition-all transform hover:scale-[1.02] cursor-pointer';
+        } else {
+            circle.className = 'w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all shadow-sm bg-rose-100 text-rose-600 border border-rose-200';
+            message.innerText = 'Nilai semisal mesti ' + (total > 100 ? 'kurang ' + (total - 100) : 'tambah ' + (100 - total)) + '% untuk mencukupi 100%.';
+            message.className = 'text-xs text-rose-600 font-bold';
+            
+            button.disabled = true;
+            button.className = 'inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-xs font-bold text-gray-400 bg-gray-100 border border-gray-200 shadow-none cursor-not-allowed';
+        }
+    }
+
+    // Run once on load
+    window.addEventListener('DOMContentLoaded', updateSliders);
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>

@@ -250,15 +250,6 @@
                 <span class="nav-label font-medium text-sm">Sokongan Bantuan</span>
             </a>
 
-            <a href="<%= contextPath %>/bantuan/config" 
-               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
-               <%= currentPath.contains("/bantuan/config") ? activeClass : inactiveClass %>">
-                <div class="w-6 text-center">
-                    <i class="fas fa-sliders-h <%= currentPath.contains("/bantuan/config") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
-                </div>
-                <span class="nav-label font-medium text-sm">Konfigurasi Kelayakan</span>
-            </a>
-
             <a href="<%= contextPath %>/aduan/list" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/aduan/list") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">
@@ -354,14 +345,6 @@
                     <i class="fas fa-tasks <%= currentPath.contains("/bantuan/list") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
                 </div>
                 <span class="nav-label font-medium text-sm">Semakan Bantuan</span>
-            </a>
-            <a href="<%= contextPath %>/bantuan/config" 
-               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 
-               <%= currentPath.contains("/bantuan/config") ? activeClass : inactiveClass %>">
-                <div class="w-6 text-center">
-                    <i class="fas fa-sliders-h <%= currentPath.contains("/bantuan/config") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
-                </div>
-                <span class="nav-label font-medium text-sm">Konfigurasi Kelayakan</span>
             </a>
             <% } %>
 

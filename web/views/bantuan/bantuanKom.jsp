@@ -235,29 +235,70 @@
 
 </div>
 
-<!-- SIDE PANEL: LANGKAH -->
-<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
-    <h3 class="font-bold text-lg text-gray-800 mb-8">Langkah Permohonan</h3>
-    <div class="space-y-8 relative">
-        <div class="absolute left-4 top-2 bottom-2 w-0.5 bg-gray-100"></div>
-        
-        <div class="relative pl-10">
-            <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-purple-100 text-brand-purple flex items-center justify-center font-bold text-xs border-2 border-white shadow-sm">1</div>
-            <h4 class="font-bold text-sm text-gray-800">Pilih Bantuan</h4>
-            <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Klik "Buat Permohonan Baru" dan pilih kategori bantuan yang ingin dimohon.</p>
+<!-- SIDE PANEL: MAKLUMAT KELAYAKAN & DANA -->
+<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full shrink-0">
+    <div class="mb-8">
+        <h3 class="font-black text-lg text-slate-800 tracking-tight">Kriteria & Had Dana</h3>
+        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Panduan Bantuan Komuniti</p>
+    </div>
+
+    <div class="flex flex-col gap-6 flex-1">
+        <!-- Had Siling Bantuan -->
+        <div class="bg-emerald-50/50 border border-emerald-100 rounded-3xl p-5 shadow-sm transition-all hover:bg-emerald-50">
+            <h4 class="text-xs font-black text-emerald-700 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <i class="fas fa-coins text-sm"></i> Anggaran Kadar Bantuan
+            </h4>
+            <ul class="space-y-3.5 text-[11px] text-slate-600 font-medium">
+                <li class="flex items-start justify-between gap-2 border-b border-dashed border-emerald-100 pb-2">
+                    <span class="text-slate-700 font-bold">Khairat Kematian:</span>
+                    <span class="text-emerald-600 font-black">RM 500.00</span>
+                </li>
+                <li class="flex items-start justify-between gap-2 border-b border-dashed border-emerald-100 pb-2">
+                    <span class="text-slate-700 font-bold">Bantuan Bencana:</span>
+                    <span class="text-emerald-600 font-black">Sehingga RM 1,000</span>
+                </li>
+                <li class="flex items-start justify-between gap-2 border-b border-dashed border-emerald-100 pb-2">
+                    <span class="text-slate-700 font-bold">Kos Perubatan:</span>
+                    <span class="text-emerald-600 font-black">Sehingga RM 500</span>
+                </li>
+                <li class="flex items-start justify-between gap-2">
+                    <span class="text-slate-700 font-bold">Pendidikan/Kemasukan IPT:</span>
+                    <span class="text-emerald-600 font-black">RM 200.00</span>
+                </li>
+            </ul>
         </div>
 
-        <div class="relative pl-10">
-            <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-purple-100 text-brand-purple flex items-center justify-center font-bold text-xs border-2 border-white shadow-sm">2</div>
-            <h4 class="font-bold text-sm text-gray-800">Lengkapkan Borang</h4>
-            <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Semak maklumat peribadi anda, masukkan butiran akaun bank dan muat naik dokumen sokongan PDF.</p>
+        <!-- Syarat Kelayakan -->
+        <div class="space-y-4">
+            <h4 class="text-xs font-black text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+                <i class="fas fa-user-shield text-sm text-brand-purple"></i> Syarat Kelayakan
+            </h4>
+            <ul class="space-y-3.5 text-[11px] text-slate-600 leading-relaxed font-medium">
+                <li class="flex items-start gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-purple shrink-0 mt-1.5"></span>
+                    <span>Merupakan penduduk <strong>berdaftar</strong> di Kampung Danan dengan status profil "Aktif".</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-purple shrink-0 mt-1.5"></span>
+                    <span>Pendapatan isi rumah di bawah paras kriteria (diutamakan golongan B40, asnaf, atau miskin tegar).</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="w-1.5 h-1.5 rounded-full bg-brand-purple shrink-0 mt-1.5"></span>
+                    <span>Mempunyai bukti sokongan rasmi (sijil kematian, laporan polis bagi bencana, surat tawaran belajar, dll).</span>
+                </li>
+            </ul>
         </div>
+    </div>
 
-        <div class="relative pl-10">
-            <div class="absolute left-0 top-0 w-8 h-8 rounded-full bg-purple-100 text-brand-purple flex items-center justify-center font-bold text-xs border-2 border-white shadow-sm">3</div>
-            <h4 class="font-bold text-sm text-gray-800">Tunggu Semakan</h4>
-            <p class="text-[10px] text-gray-500 mt-1 leading-relaxed">Permohonan anda akan disemak oleh Biro Kebajikan (AJK) sebelum dimajukan kepada Ketua Kampung.</p>
-        </div>
+    <!-- Informational Tip Card -->
+    <div class="mt-8 bg-brand-accent border border-brand-secondary/10 rounded-3xl p-6 relative overflow-hidden group hover:border-brand-secondary/20 transition-all duration-300 shrink-0">
+        <div class="absolute -right-4 -top-4 w-16 h-16 bg-brand-purple/5 rounded-full opacity-50 group-hover:scale-110 transition-transform"></div>
+        <h4 class="font-black text-brand-purple text-xs uppercase tracking-widest mb-2 relative z-10 flex items-center gap-1.5">
+            <i class="fas fa-info-circle"></i> Info Dana Kampung
+        </h4>
+        <p class="text-[11px] text-slate-500 leading-relaxed relative z-10 font-medium">
+            Dana Bantuan Komuniti ini disumbangkan oleh hasil kutipan kebajikan kariah kampung, zakat setempat, serta sumbangan khas individu persendirian.
+        </p>
     </div>
 </aside>
 
