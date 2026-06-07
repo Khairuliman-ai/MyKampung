@@ -174,10 +174,6 @@
     </div>
 
     <div id="content-pending" class="block">
-        <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
-            <div class="w-2 h-6 bg-orange-500 rounded-full"></div>
-            Senarai Permohonan
-        </h3>
 
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
@@ -286,13 +282,6 @@
 
     <!-- TAB 2: SEJARAH -->
     <div id="content-sejarah" class="hidden">
-        <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
-            <div class="w-2 h-6 bg-gray-400 rounded-full"></div>
-            Rekod Sejarah Keputusan 
-            <span class="bg-gray-100 text-gray-400 text-xs px-2 py-1 rounded-lg ml-2 font-normal">
-                <%= listSejarah.size() %>
-            </span>
-        </h3>
 
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
@@ -408,43 +397,185 @@
     </div>
 </div>
 
-<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col flex-shrink-0 p-8 overflow-y-auto h-full">
-    <div class="flex justify-between items-start mb-8">
-        <h3 class="font-bold text-lg text-gray-800">Statistik Semasa</h3>
+    <%
+        int approvedCount = 0;
+        int rejectedCount = 0;
+        int totalRasmi = 0;
+        int totalKomuniti = 0;
+        
+        if (listPending != null) {
+            for (PermohonanBantuan pb : listPending) {
+                if ("RASMI".equalsIgnoreCase(pb.getJenis_bantuan())) {
+                    totalRasmi++;
+                } else {
+                    totalKomuniti++;
+                }
+            }
+        }
+        if (listSejarah != null) {
+            for (PermohonanBantuan pb : listSejarah) {
+                if ("LULUS".equalsIgnoreCase(pb.getStatus())) {
+                    approvedCount++;
+                } else if ("DITOLAK".equalsIgnoreCase(pb.getStatus())) {
+                    rejectedCount++;
+                }
+                
+                if ("RASMI".equalsIgnoreCase(pb.getJenis_bantuan())) {
+                    totalRasmi++;
+                } else {
+                    totalKomuniti++;
+                }
+            }
+        }
+    %>
+
+<aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col flex-shrink-0 p-8 overflow-y-auto h-full shrink-0">
+    <div class="mb-8">
+        <h3 class="font-bold text-lg text-gray-800">Rumusan Kebajikan</h3>
+        <p class="text-xs text-gray-400 font-medium">Analisis status permohonan semasa</p>
     </div>
 
-    <div class="space-y-4">
-        <div class="bg-gray-50 p-4 rounded-2xl flex items-center justify-between">
-            <div>
-                <p class="text-xs text-gray-500 font-bold uppercase">Menunggu</p>
-                <h4 class="font-bold text-xl text-gray-800">
-                    <%= listPending.size() %>
-                </h4>
-            </div>
-            <div class="w-10 h-10 rounded-full bg-orange-100 text-orange-500 flex items-center justify-center font-bold">
-                <i class="fas fa-clock"></i>
+    <!-- Small stat cards -->
+    <div class="grid grid-cols-2 gap-3 mb-4">
+        <div class="bg-purple-50/40 p-4 rounded-2xl border border-purple-100 flex flex-col gap-1 shadow-sm">
+            <span class="text-[9px] text-brand-purple font-bold uppercase tracking-wider">Menunggu</span>
+            <div class="flex items-center justify-between mt-1">
+                <span class="font-black text-xl text-brand-purple"><%= listPending.size() %></span>
+                <i class="fas fa-clock text-brand-purple opacity-30"></i>
             </div>
         </div>
-
-        <div class="bg-gray-50 p-4 rounded-2xl flex items-center justify-between">
-            <div>
-                <p class="text-xs text-gray-500 font-bold uppercase">Selesai</p>
-                <h4 class="font-bold text-xl text-gray-800">
-                    <%= listSejarah.size() %>
-                </h4>
+        
+        <div class="bg-emerald-50/40 p-4 rounded-2xl border border-emerald-100 flex flex-col gap-1 shadow-sm">
+            <span class="text-[9px] text-emerald-600 font-bold uppercase tracking-wider">Diluluskan</span>
+            <div class="flex items-center justify-between mt-1">
+                <span class="font-black text-xl text-emerald-600"><%= approvedCount %></span>
+                <i class="fas fa-check text-emerald-600 opacity-30"></i>
             </div>
-            <div class="w-10 h-10 rounded-full bg-green-100 text-green-500 flex items-center justify-center font-bold">
-                <i class="fas fa-check-double"></i>
+        </div>
+    </div>
+    
+    <div class="bg-rose-50/40 p-4 rounded-2xl border border-rose-100 flex flex-col gap-1 shadow-sm mb-6">
+        <div class="flex justify-between items-center">
+            <span class="text-[9px] text-rose-600 font-bold uppercase tracking-wider">Permohonan Ditolak</span>
+            <span class="font-black text-lg text-rose-600"><%= rejectedCount %> kes</span>
+        </div>
+    </div>
+
+    <!-- Active Rules Card -->
+    <div class="bg-indigo-50/40 p-5 rounded-[2rem] border border-indigo-100/50 flex flex-col gap-4 mb-6 group hover:bg-indigo-50/70 transition-all">
+        <div class="flex items-center gap-3">
+            <div class="w-9 h-9 bg-indigo-100 text-indigo-600 rounded-xl flex items-center justify-center shadow-sm">
+                <i class="fas fa-sliders-h text-sm"></i>
+            </div>
+            <div>
+                <p class="text-[9px] text-gray-400 font-black uppercase tracking-widest leading-none mb-1">Enjin Kelayakan</p>
+                <h4 class="font-black text-xs text-gray-800">Aturan Pemarkahan</h4>
+            </div>
+        </div>
+        
+        <div class="space-y-2.5 pt-1">
+            <!-- Poverty Line -->
+            <div class="flex justify-between items-center text-[11px] pb-1 border-b border-indigo-100/30">
+                <span class="text-indigo-600 font-bold">Garis Kemiskinan</span>
+                <span class="font-black text-indigo-700">RM <%= String.format("%,.2f", povertyLine) %></span>
+            </div>
+            
+            <!-- Income factor -->
+            <div class="space-y-1">
+                <div class="flex justify-between text-[10px]">
+                    <span class="text-gray-500 font-medium">Pendapatan Rendah</span>
+                    <span class="font-bold text-blue-600"><%= (int)wIncome %>%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div class="bg-blue-500 h-full rounded-full" style="width: <%= wIncome %>%"></div>
+                </div>
+            </div>
+
+            <!-- Dependent factor -->
+            <div class="space-y-1">
+                <div class="flex justify-between text-[10px]">
+                    <span class="text-gray-500 font-medium">Bilangan Tanggungan</span>
+                    <span class="font-bold text-emerald-600"><%= (int)wDependent %>%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div class="bg-emerald-500 h-full rounded-full" style="width: <%= wDependent %>%"></div>
+                </div>
+            </div>
+
+            <!-- Family factor -->
+            <div class="space-y-1">
+                <div class="flex justify-between text-[10px]">
+                    <span class="text-gray-500 font-medium">Ibu Tunggal / OKU</span>
+                    <span class="font-bold text-amber-600"><%= (int)wFamily %>%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div class="bg-amber-500 h-full rounded-full" style="width: <%= wFamily %>%"></div>
+                </div>
+            </div>
+
+            <!-- Employment factor -->
+            <div class="space-y-1">
+                <div class="flex justify-between text-[10px]">
+                    <span class="text-gray-500 font-medium">Status Pengangguran</span>
+                    <span class="font-bold text-indigo-600"><%= (int)wEmployment %>%</span>
+                </div>
+                <div class="w-full bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                    <div class="bg-indigo-500 h-full rounded-full" style="width: <%= wEmployment %>%"></div>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="mt-auto bg-purple-50 rounded-2xl p-6 relative overflow-hidden">
-        <div class="absolute -right-4 -top-4 w-16 h-16 bg-purple-200 rounded-full opacity-50"></div>
-        <h4 class="font-bold text-brand-purple mb-2 relative z-10 text-sm">Panduan Kelulusan</h4>
-        <p class="text-xs text-gray-600 leading-relaxed relative z-10 mb-2">1. Semak maklumat pemohon.</p>
-        <p class="text-xs text-gray-600 leading-relaxed relative z-10 mb-2">2. Sahkan kelayakan berdasarkan kriteria bantuan.</p>
-        <p class="text-xs text-gray-600 leading-relaxed relative z-10">3. Muat naik memo/surat sokongan jika perlu.</p>
+    <!-- Aid Category Distribution -->
+    <div class="bg-slate-50 p-5 rounded-[2rem] border border-slate-150 flex flex-col gap-3 mb-6">
+        <h4 class="text-[9px] text-gray-400 font-black uppercase tracking-widest leading-none mb-1">Pembahagian Kategori</h4>
+        
+        <div class="flex items-center justify-between text-xs text-gray-600">
+            <span class="flex items-center gap-1.5 font-medium"><span class="w-2 h-2 rounded-full bg-blue-500"></span> Bantuan Rasmi</span>
+            <span class="font-bold text-gray-800"><%= totalRasmi %> Kes</span>
+        </div>
+        
+        <div class="flex items-center justify-between text-xs text-gray-600">
+            <span class="flex items-center gap-1.5 font-medium"><span class="w-2 h-2 rounded-full bg-teal-500"></span> Bantuan Komuniti</span>
+            <span class="font-bold text-gray-800"><%= totalKomuniti %> Kes</span>
+        </div>
+    </div>
+
+    <div class="mb-6">
+        <h3 class="font-bold text-xs text-gray-800 mb-3 uppercase tracking-widest">SOP Pengesahan Ketua</h3>
+        <div class="space-y-4 relative">
+            <div class="absolute left-3 top-1.5 bottom-1.5 w-0.5 bg-gray-150"></div>
+            
+            <div class="relative pl-8 text-xs">
+                <div class="absolute left-0 top-0.5 w-6 h-6 rounded-full bg-white text-brand-purple flex items-center justify-center font-bold text-[10px] border border-brand-purple z-10">1</div>
+                <h4 class="font-bold text-gray-800">Semak Wajaran Skor</h4>
+                <p class="text-[10px] text-gray-500 mt-0.5 leading-relaxed">Nilai skor yang dihitung secara automatik oleh enjin pemarkahan kelayakan.</p>
+            </div>
+
+            <div class="relative pl-8 text-xs">
+                <div class="absolute left-0 top-0.5 w-6 h-6 rounded-full bg-white text-gray-400 flex items-center justify-center font-bold text-[10px] border border-gray-150 z-10">2</div>
+                <h4 class="font-bold text-gray-800">Baca Rekomendasi AJK</h4>
+                <p class="text-[10px] text-gray-500 mt-0.5 leading-relaxed">Rujuk catatan ulasan dari Biro Kebajikan yang menyemak dokumen pemohon.</p>
+            </div>
+
+            <div class="relative pl-8 text-xs">
+                <div class="absolute left-0 top-0.5 w-6 h-6 rounded-full bg-white text-gray-400 flex items-center justify-center font-bold text-[10px] border border-gray-150 z-10">3</div>
+                <h4 class="font-bold text-gray-800">Keputusan & Ulasan Memo</h4>
+                <p class="text-[10px] text-gray-500 mt-0.5 leading-relaxed">Luluskan permohonan atau tolak dengan menyatakan sebab maklum balas yang jelas.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="p-5 bg-brand-purple/5 rounded-[2rem] border border-brand-purple/10">
+        <div class="flex items-center gap-2.5 mb-2">
+            <div class="w-7 h-7 rounded-lg bg-brand-purple text-white flex items-center justify-center text-xs shadow-sm">
+                <i class="fas fa-info-circle"></i>
+            </div>
+            <h4 class="font-bold text-xs text-gray-800">Nota Kepimpinan</h4>
+        </div>
+        <p class="text-[10px] text-gray-500 leading-relaxed italic">
+            "Keadilan sosial bermula dengan ketelusan keputusan. Luluskan dengan cermat."
+        </p>
     </div>
 </aside>
 

@@ -101,10 +101,6 @@
     </div>
 
     <div id="content-proses" class="block">
-        <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
-            <div class="w-2 h-6 bg-blue-500 rounded-full"></div>
-            Permohonan Sedang Diproses
-        </h3>
         
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
@@ -174,52 +170,22 @@
                                     <% } %>
                                 </div>
                             </td>
+                        <% } } %>
+                        <tr id="tableProses-empty" class="<%= !listProses.isEmpty() ? "hidden" : "" %> empty-state-row">
+                            <td colspan="5" class="p-12 text-center text-gray-400">
+                                <i class="fas fa-inbox text-4xl mb-4 block opacity-20"></i>Tiada permohonan sedang diproses.
+                            </td>
                         </tr>
-                        <% } } else { %>
-                            <tr class="no-data"><td colspan="5" class="p-12 text-center text-gray-400"><i class="fas fa-inbox text-3xl mb-2 block opacity-50"></i>Tiada permohonan sedang diproses.</td></tr>
-                        <% } %>
                     </tbody>
                 </table>
-        </div>
-    </div>
-</div>
-
-<div id="content-sejarah" class="hidden">
-        <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100 mb-8">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Carian Pantas</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="fas fa-search"></i></span>
-                        <input type="text" id="searchInput" onkeyup="filterData()" placeholder="Nama bantuan, keterangan..." 
-                               class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-purple text-gray-800 text-sm transition-all">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Tarikh Mohon</label>
-                    <div class="relative">
-                        <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-gray-400"><i class="far fa-calendar-alt"></i></span>
-                        <input type="date" id="dateFilter" onchange="filterData()"
-                               class="w-full pl-11 pr-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-purple text-gray-800 text-sm transition-all">
-                    </div>
-                </div>
-                 <div>
-                    <label class="block text-xs font-bold text-gray-500 mb-2 uppercase tracking-wider">Status Sejarah</label>
-                    <div class="relative">
-                        <select id="statusFilter" onchange="filterData()" class="w-full px-4 py-3 rounded-xl bg-gray-50 border-none focus:ring-2 focus:ring-brand-purple text-gray-800 text-sm appearance-none">
-                            <option value="all">Semua Status</option>
-                            <option value="LULUS">Lulus (Disokong)</option>
-                            <option value="DITOLAK">Ditolak</option>
-                        </select>
-                    </div>
-                </div>
+            </div>
+            <div id="footerProses" class="p-6 bg-white border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
             </div>
         </div>
-        <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
-            <div class="w-2 h-6 bg-gray-400 rounded-full"></div>
-            Rekod Sejarah Terdahulu
-        </h3>
-        
+    </div>
+
+<div id="content-sejarah" class="hidden">
+
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse" id="tableSejarah">
@@ -264,6 +230,8 @@
                             String jsDokumenAdmin = sbDocsAdmin.toString();
                     %>
                     <tr class="data-row hover:bg-gray-50 transition cursor-pointer group" 
+                        data-date="<%= pb.getDibuat_pada() != null ? sdfFull.format(pb.getDibuat_pada()) : "" %>"
+                        data-status="<%= sStatus %>"
                         onclick="openDetailModal('<%= jsNama %>', '<%= displayDate %>', '<%= sStatus %>', '<%= jsCatatan %>', '<%= jsUlasan %>', '<%= jsBank %>', '<%= jsAkaun %>', '<%= jsPenyata %>', '<%= jsDokumen %>', '<%= jsDokumenAdmin %>')">
                         <td class="p-4 text-sm text-gray-400 font-medium"><%= noS++ %></td>
                         <td class="p-4 text-sm text-gray-500 whitespace-nowrap"><%= displayDate %></td>
@@ -276,11 +244,16 @@
                             <% } %>
                         </td>
                     </tr>
-                    <% } } else { %>
-                        <tr class="no-data"><td colspan="4" class="p-12 text-center text-gray-400"><i class="fas fa-archive text-3xl mb-2 block opacity-50"></i>Tiada sejarah permohonan.</td></tr>
-                    <% } %>
+                    <% } } %>
+                    <tr id="tableSejarah-empty" class="<%= !listSejarah.isEmpty() ? "hidden" : "" %> empty-state-row">
+                        <td colspan="4" class="p-12 text-center text-gray-400">
+                            <i class="fas fa-archive text-4xl mb-4 block opacity-20"></i>Tiada sejarah permohonan.
+                        </td>
+                    </tr>
                 </tbody>
             </table>
+            </div>
+            <div id="footerSejarah" class="p-6 bg-white border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
             </div>
         </div>
     </div>
@@ -614,7 +587,8 @@
                             </div>
                             <div>
                                 <label class="text-[10px] text-gray-400 uppercase font-bold">Lampiran Dokumen (PDF)</label>
-                                <input type="file" name="dokumenSokongan" accept="application/pdf" multiple required class="block w-full text-[10px] text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-purple-100 file:text-brand-purple mt-1">
+                                <input type="file" id="dokumenSokongan" name="dokumenSokongan" accept="application/pdf" multiple required class="block w-full text-[10px] text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-purple-100 file:text-brand-purple mt-1">
+                                <div id="selectedFilesList" class="mt-2 space-y-2"></div>
                                 <p class="text-[8px] text-blue-500 mt-1 italic font-bold">Sila sertakan Borang Permohonan dan dokumen yang perlu dicop (Slip Gaji, Salinan IC dan etc.)</p>
                             </div>
                         </div>
@@ -853,34 +827,201 @@
         }
     }
 
-    // Filter Logic
-    function filterData() {
-        const searchVal = document.getElementById("searchInput").value.toLowerCase();
-        const dateVal = document.getElementById("dateFilter").value;
-        const statusVal = document.getElementById("statusFilter").value;
-        const rows = document.querySelectorAll(".data-row");
 
-        rows.forEach(row => {
-            const rowDate = row.getAttribute("data-date");
-            const status = row.getAttribute("data-status");
-            let textContent = "";
-            row.querySelectorAll(".search-col").forEach(col => {
-                textContent += col.innerText.toLowerCase() + " ";
+    // File upload removal logic
+    (function() {
+        const fileInput = document.getElementById('dokumenSokongan');
+        const container = document.getElementById('selectedFilesList');
+        if (!fileInput || !container) return;
+
+        let selectedFiles = [];
+
+        fileInput.addEventListener('change', function() {
+            for (let i = 0; i < this.files.length; i++) {
+                selectedFiles.push(this.files[i]);
+            }
+            this.value = ''; // Clear input to allow re-selection
+            updateDisplay();
+        });
+
+        function updateDisplay() {
+            container.innerHTML = '';
+            const dt = new DataTransfer();
+            
+            selectedFiles.forEach((file, index) => {
+                dt.items.add(file);
+                
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between p-3 bg-gray-50 border border-gray-150 rounded-2xl text-[10px] font-bold';
+                item.innerHTML = `
+                    <span class="truncate max-w-[200px] text-gray-700">
+                        <i class="fas fa-file-pdf text-red-500 mr-2 text-xs"></i>\${file.name} (\${(file.size/1024).toFixed(1)} KB)
+                    </span>
+                    <button type="button" class="w-7 h-7 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition flex items-center justify-center active:scale-95 shrink-0">
+                        <i class="fas fa-trash-alt text-[10px]"></i>
+                    </button>
+                `;
+                
+                item.querySelector('button').onclick = function() {
+                    selectedFiles.splice(index, 1);
+                    updateDisplay();
+                };
+                
+                container.appendChild(item);
             });
 
-            let showRow = true;
-            if (dateVal !== "" && rowDate !== dateVal) showRow = false;
-            
-            // Filter Status (Logic Asal dikekalkan: Status 1=Lulus, Status 2=Ditolak dalam konteks sejarah)
-            if (statusVal !== "all") {
-                if (status !== statusVal) showRow = false;
-            }
-            
-            if (searchVal !== "" && !textContent.includes(searchVal)) showRow = false;
+            // Sync the DataTransfer files list to input file files
+            fileInput.files = dt.files;
+        }
+    })();
 
-            row.style.display = showRow ? "" : "none";
-        });
+    // Client-side Pagination Logic
+    const clientPaginators = {};
+
+    function initClientPagination(tableId, footerId, itemsPerPage = 10) {
+        clientPaginators[tableId] = {
+            footerId: footerId,
+            itemsPerPage: itemsPerPage,
+            currentPage: 1
+        };
+        updateClientPagination(tableId);
     }
+
+    function updateClientPagination(tableId) {
+        const paginator = clientPaginators[tableId];
+        if (!paginator) return;
+
+        const table = document.getElementById(tableId);
+        const footer = document.getElementById(paginator.footerId);
+        if (!table || !footer) return;
+
+        const tbody = table.querySelector('tbody');
+        const allRows = Array.from(tbody.querySelectorAll('tr:not(.empty-state-row)'));
+        const visibleRows = allRows.filter(row => row.getAttribute('data-search-hidden') !== 'true');
+
+        const totalItems = visibleRows.length;
+        const totalPages = Math.ceil(totalItems / paginator.itemsPerPage) || 1;
+
+        if (paginator.currentPage > totalPages) {
+            paginator.currentPage = totalPages;
+        }
+        if (!(paginator.currentPage >= 1)) {
+            paginator.currentPage = 1;
+        }
+
+        allRows.forEach(row => {
+            row.style.display = 'none';
+        });
+
+        const startIndex = (paginator.currentPage - 1) * paginator.itemsPerPage;
+        const endIndex = startIndex + paginator.itemsPerPage;
+
+        visibleRows.forEach((row, index) => {
+            if (index >= startIndex && !(index >= endIndex)) {
+                row.style.display = '';
+            }
+        });
+
+        // Show/hide empty state
+        const emptyRow = document.getElementById(tableId + '-empty');
+        if (emptyRow) {
+            if (totalItems === 0) {
+                emptyRow.classList.remove('hidden');
+            } else {
+                emptyRow.classList.add('hidden');
+            }
+        }
+
+        renderClientFooter(tableId, footer, paginator.currentPage, totalPages, totalItems);
+    }
+
+    function renderClientFooter(tableId, footer, currentPage, totalPages, totalItems) {
+        let pagesHtml = '';
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, startPage + 4);
+        
+        for (let i = startPage; !(i > endPage); i++) {
+            if (i === currentPage) {
+                pagesHtml += '<button type="button" class="w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold bg-brand-purple text-white shadow-lg shadow-purple-100">' +
+                             i +
+                             '</button>';
+            } else {
+                pagesHtml += '<button type="button" onclick="setClientPage(\'' + tableId + '\', ' + i + ')" class="w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold bg-white text-gray-500 hover:bg-gray-50 border border-gray-100 transition">' +
+                             i +
+                             '</button>';
+            }
+        }
+
+        let leftBtnHtml = '';
+        if (currentPage > 1) {
+            leftBtnHtml = '<button type="button" onclick="setClientPage(\'' + tableId + '\', ' + (currentPage - 1) + ')" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 transition flex items-center gap-2">' +
+                          '<i class="fas fa-chevron-left"></i> Sebelumnya' +
+                          '</button>';
+        } else {
+            leftBtnHtml = '<button disabled class="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-300 cursor-not-allowed flex items-center gap-2">' +
+                          '<i class="fas fa-chevron-left"></i> Sebelumnya' +
+                          '</button>';
+        }
+
+        let rightBtnHtml = '';
+        if (currentPage !== totalPages) {
+            rightBtnHtml = '<button type="button" onclick="setClientPage(\'' + tableId + '\', ' + (currentPage + 1) + ')" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 transition flex items-center gap-2">' +
+                           'Seterusnya <i class="fas fa-chevron-right"></i>' +
+                           '</button>';
+        } else {
+            rightBtnHtml = '<button disabled class="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-300 cursor-not-allowed flex items-center gap-2">' +
+                           'Seterusnya <i class="fas fa-chevron-right"></i>' +
+                           '</button>';
+        }
+
+        footer.innerHTML = 
+            '<div class="text-xs text-gray-500 font-medium">' +
+            '    Menunjukkan halaman <span class="text-gray-900 font-bold">' + currentPage + '</span> daripada <span class="text-gray-900 font-bold">' + totalPages + '</span> ' +
+            '    (' + totalItems + ' rekod keseluruhan)' +
+            '</div>' +
+            '' +
+            '<div class="flex items-center gap-2">' +
+            '    ' + leftBtnHtml +
+            '' +
+            '    <div class="flex items-center gap-1">' +
+            '        ' + pagesHtml +
+            '    </div>' +
+            '' +
+            '    ' + rightBtnHtml +
+            '' +
+            '    ' +
+            '    <div class="flex items-center gap-1.5 text-xs text-gray-500 font-medium border-l border-gray-200 pl-4 ml-2">' +
+            '        <span>Lompat ke:</span>' +
+            '        <input type="number" min="1" max="' + totalPages + '" value="' + currentPage + '" ' +
+            '               id="page-jump-' + tableId + '" ' +
+            '               class="w-12 h-9 px-2 text-center bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 outline-none focus:ring-2 focus:ring-brand-purple focus:border-brand-purple [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">' +
+            '    </div>' +
+            '</div>';
+
+        const jumpInput = document.getElementById('page-jump-' + tableId);
+        if (jumpInput) {
+            jumpInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    const p = parseInt(this.value);
+                    if (p >= 1 && p <= totalPages) {
+                        setClientPage(tableId, p);
+                    }
+                }
+            });
+        }
+    }
+
+    function setClientPage(tableId, page) {
+        if (clientPaginators[tableId]) {
+            clientPaginators[tableId].currentPage = page;
+            updateClientPagination(tableId);
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+        initClientPagination('tableProses', 'footerProses', 10);
+        initClientPagination('tableSejarah', 'footerSejarah', 10);
+    });
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>

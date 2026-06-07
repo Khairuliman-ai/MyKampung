@@ -64,7 +64,7 @@
             <p class="text-gray-500 text-sm">Sistem bantuan kebajikan digital untuk warga Kampung Danan.</p>
         </div>
         <button onclick="openWizard()" class="bg-brand-purple hover:bg-brand-purpleHover text-white px-6 py-3 rounded-2xl font-bold text-sm transition shadow-lg shadow-purple-100 flex items-center gap-2">
-            <i class="fas fa-plus-circle"></i> Buat Permohonan Baru
+            <i class="fas fa-plus-circle"></i> Mohon Baru
         </button>
     </div>
 
@@ -88,7 +88,7 @@
     <div id="content-proses" class="block">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
             <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
+                <table class="w-full text-left border-collapse" id="tableProses">
                     <thead>
                         <tr class="bg-gray-50 border-b border-gray-100">
                             <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-16">No.</th>
@@ -158,11 +158,16 @@
                                 </div>
                             </td>
                         </tr>
-                        <% } } else { %>
-                        <tr><td colspan="7" class="p-12 text-center text-gray-400">Tiada permohonan aktif.</td></tr>
-                        <% } %>
+                        <% } } %>
+                        <tr id="tableProses-empty" class="<%= !listProses.isEmpty() ? "hidden" : "" %> empty-state-row">
+                            <td colspan="5" class="p-12 text-center text-gray-400">
+                                <i class="fas fa-inbox text-4xl mb-4 block opacity-20"></i>Tiada permohonan aktif.
+                            </td>
+                        </tr>
                     </tbody>
                 </table>
+            </div>
+            <div id="footerProses" class="p-6 bg-white border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
             </div>
         </div>
     </div>
@@ -170,7 +175,7 @@
     <!-- TAB: SEJARAH -->
     <div id="content-sejarah" class="hidden">
         <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left border-collapse" id="tableSejarah">
                 <thead>
                     <tr class="bg-gray-50 border-b border-gray-100">
                         <th class="p-4 text-xs font-bold text-gray-400 uppercase tracking-wider w-16">No.</th>
@@ -225,11 +230,16 @@
                             </span>
                         </td>
                     </tr>
-                    <% } } else { %>
-                    <tr><td colspan="4" class="p-12 text-center text-gray-400">Tiada sejarah permohonan.</td></tr>
-                    <% } %>
+                    <% } } %>
+                    <tr id="tableSejarah-empty" class="<%= !listSejarah.isEmpty() ? "hidden" : "" %> empty-state-row">
+                        <td colspan="4" class="p-12 text-center text-gray-400">
+                            <i class="fas fa-history text-4xl mb-4 block opacity-20"></i>Tiada sejarah permohonan.
+                        </td>
+                    </tr>
                 </tbody>
             </table>
+            <div id="footerSejarah" class="p-6 bg-white border-t border-gray-100 flex flex-col md:flex-row items-center justify-between gap-4">
+            </div>
         </div>
     </div>
 
@@ -559,7 +569,8 @@
                             </div>
                             <div>
                                 <label class="text-[10px] text-gray-400 uppercase font-bold">Lampiran Dokumen (PDF)</label>
-                                <input type="file" name="dokumenSokongan" accept="application/pdf" multiple required class="block w-full text-[10px] text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-purple-100 file:text-brand-purple mt-1">
+                                <input type="file" id="dokumenSokongan" name="dokumenSokongan" accept="application/pdf" multiple required class="block w-full text-[10px] text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-purple-100 file:text-brand-purple mt-1">
+                                <div id="selectedFilesList" class="mt-2 space-y-2"></div>
                                 <p class="text-[8px] text-gray-400 mt-1 italic">Boleh pilih lebih daripada satu fail.</p>
                             </div>
                         </div>
@@ -573,7 +584,7 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-blue-50/30 p-6 rounded-3xl border border-blue-50">
                             <div>
                                 <label class="text-[10px] text-gray-500 uppercase font-bold">Nama Bank</label>
-                                <input type="text" name="namaBank" required placeholder="Contoh: Maybank, CIMB, Bank Islam" class="w-full bg-white border rounded-xl text-sm px-4 py-3 mt-1 outline-none focus:ring-2 focus:ring-blue-400 transition shadow-sm font-bold">
+                                <input type="text" name="namaBank" required placeholder="Contoh: Maybank, CIMB, Bank Islam" onkeypress="return !/[0-9]/.test(event.key)" oninput="this.value = this.value.replace(/[0-9]/g, '')" class="w-full bg-white border rounded-xl text-sm px-4 py-3 mt-1 outline-none focus:ring-2 focus:ring-blue-400 transition shadow-sm font-bold">
                             </div>
                             <div>
                                 <label class="text-[10px] text-gray-500 uppercase font-bold">Nombor Akaun</label>
@@ -582,9 +593,17 @@
                             <div class="md:col-span-2">
                                 <label class="text-[10px] text-gray-500 uppercase font-bold">Muat Naik Penyata Bank (Bukti Kewujudan Akaun)</label>
                                 <div class="mt-2 flex items-center gap-4">
-                                    <div class="flex-1 bg-white p-3 rounded-xl border border-dashed border-blue-300 flex items-center gap-3">
+                                    <div class="flex-1 bg-white p-3 rounded-xl border border-dashed border-blue-300 flex items-center gap-3 relative animate-in fade-in duration-200" id="penyataUploadBox">
                                         <i class="fas fa-file-invoice-dollar text-blue-400 text-xl"></i>
-                                        <input type="file" name="penyataBank" accept="application/pdf" required class="text-xs text-gray-400">
+                                        <input type="file" id="penyataBankInput" name="penyataBank" accept="application/pdf" required class="text-xs text-gray-400">
+                                    </div>
+                                    <div id="penyataFilePreview" class="hidden flex-1 bg-white p-3 rounded-xl border border-blue-300 flex items-center justify-between text-[10px] font-bold animate-in zoom-in-95 duration-200">
+                                        <span class="truncate max-w-[280px] text-gray-700">
+                                            <i class="fas fa-file-pdf text-red-500 mr-2 text-xs"></i><span id="penyataFileName">-</span>
+                                        </span>
+                                        <button type="button" id="btnDeletePenyata" class="w-7 h-7 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition flex items-center justify-center active:scale-95 shrink-0">
+                                            <i class="fas fa-trash-alt text-[10px]"></i>
+                                        </button>
                                     </div>
                                     <p class="text-[9px] text-gray-400 w-32 leading-tight">Pastikan nama pada penyata bank sama dengan nama pemohon.</p>
                                 </div>
@@ -787,6 +806,227 @@
             }
         }
     }
+
+    // File upload removal logic
+    (function() {
+        const fileInput = document.getElementById('dokumenSokongan');
+        const container = document.getElementById('selectedFilesList');
+        if (!fileInput || !container) return;
+
+        let selectedFiles = [];
+
+        fileInput.addEventListener('change', function() {
+            for (let i = 0; i < this.files.length; i++) {
+                selectedFiles.push(this.files[i]);
+            }
+            this.value = ''; // Clear input to allow re-selection
+            updateDisplay();
+        });
+
+        function updateDisplay() {
+            container.innerHTML = '';
+            const dt = new DataTransfer();
+            
+            selectedFiles.forEach((file, index) => {
+                dt.items.add(file);
+                
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between p-3 bg-gray-50 border border-gray-150 rounded-2xl text-[10px] font-bold';
+                item.innerHTML = `
+                    <span class="truncate max-w-[200px] text-gray-700">
+                        <i class="fas fa-file-pdf text-red-500 mr-2 text-xs"></i>\${file.name} (\${(file.size/1024).toFixed(1)} KB)
+                    </span>
+                    <button type="button" class="w-7 h-7 rounded-lg bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition flex items-center justify-center active:scale-95 shrink-0">
+                        <i class="fas fa-trash-alt text-[10px]"></i>
+                    </button>
+                `;
+                
+                item.querySelector('button').onclick = function() {
+                    selectedFiles.splice(index, 1);
+                    updateDisplay();
+                };
+                
+                container.appendChild(item);
+            });
+
+            // Sync the DataTransfer files list to input file files
+            fileInput.files = dt.files;
+        }
+    })();
+
+    // Single penyataBank file upload removal logic
+    (function() {
+        const penyataInput = document.getElementById('penyataBankInput');
+        const penyataBox = document.getElementById('penyataUploadBox');
+        const penyataPreview = document.getElementById('penyataFilePreview');
+        const penyataName = document.getElementById('penyataFileName');
+        const btnDeletePenyata = document.getElementById('btnDeletePenyata');
+
+        if (penyataInput && penyataBox && penyataPreview && penyataName && btnDeletePenyata) {
+            penyataInput.addEventListener('change', function() {
+                if (this.files && this.files.length > 0) {
+                    penyataName.innerText = this.files[0].name;
+                    penyataBox.classList.add('hidden');
+                    penyataPreview.classList.remove('hidden');
+                }
+            });
+
+            btnDeletePenyata.addEventListener('click', function() {
+                penyataInput.value = ''; // Clear selected file
+                penyataName.innerText = '-';
+                penyataPreview.classList.add('hidden');
+                penyataBox.classList.remove('hidden');
+            });
+        }
+    })();
+
+    // Client-side Pagination Logic
+    const clientPaginators = {};
+
+    function initClientPagination(tableId, footerId, itemsPerPage = 10) {
+        clientPaginators[tableId] = {
+            footerId: footerId,
+            itemsPerPage: itemsPerPage,
+            currentPage: 1
+        };
+        updateClientPagination(tableId);
+    }
+
+    function updateClientPagination(tableId) {
+        const paginator = clientPaginators[tableId];
+        if (!paginator) return;
+
+        const table = document.getElementById(tableId);
+        const footer = document.getElementById(paginator.footerId);
+        if (!table || !footer) return;
+
+        const tbody = table.querySelector('tbody');
+        const allRows = Array.from(tbody.querySelectorAll('tr:not(.empty-state-row)'));
+        const visibleRows = allRows.filter(row => row.getAttribute('data-search-hidden') !== 'true');
+
+        const totalItems = visibleRows.length;
+        const totalPages = Math.ceil(totalItems / paginator.itemsPerPage) || 1;
+
+        if (paginator.currentPage > totalPages) {
+            paginator.currentPage = totalPages;
+        }
+        if (!(paginator.currentPage >= 1)) {
+            paginator.currentPage = 1;
+        }
+
+        allRows.forEach(row => {
+            row.style.display = 'none';
+        });
+
+        const startIndex = (paginator.currentPage - 1) * paginator.itemsPerPage;
+        const endIndex = startIndex + paginator.itemsPerPage;
+
+        visibleRows.forEach((row, index) => {
+            if (index >= startIndex && !(index >= endIndex)) {
+                row.style.display = '';
+            }
+        });
+
+        // Show/hide empty state
+        const emptyRow = document.getElementById(tableId + '-empty');
+        if (emptyRow) {
+            if (totalItems === 0) {
+                emptyRow.classList.remove('hidden');
+            } else {
+                emptyRow.classList.add('hidden');
+            }
+        }
+
+        renderClientFooter(tableId, footer, paginator.currentPage, totalPages, totalItems);
+    }
+
+    function renderClientFooter(tableId, footer, currentPage, totalPages, totalItems) {
+        let pagesHtml = '';
+        const startPage = Math.max(1, currentPage - 2);
+        const endPage = Math.min(totalPages, startPage + 4);
+        
+        for (let i = startPage; !(i > endPage); i++) {
+            if (i === currentPage) {
+                pagesHtml += '<button type="button" class="w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold bg-brand-purple text-white shadow-lg shadow-purple-100">' +
+                             i +
+                             '</button>';
+            } else {
+                pagesHtml += '<button type="button" onclick="setClientPage(\'' + tableId + '\', ' + i + ')" class="w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold bg-white text-gray-500 hover:bg-gray-50 border border-gray-100 transition">' +
+                             i +
+                             '</button>';
+            }
+        }
+
+        let leftBtnHtml = '';
+        if (currentPage > 1) {
+            leftBtnHtml = '<button type="button" onclick="setClientPage(\'' + tableId + '\', ' + (currentPage - 1) + ')" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 transition flex items-center gap-2">' +
+                          '<i class="fas fa-chevron-left"></i> Sebelumnya' +
+                          '</button>';
+        } else {
+            leftBtnHtml = '<button disabled class="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-300 cursor-not-allowed flex items-center gap-2">' +
+                          '<i class="fas fa-chevron-left"></i> Sebelumnya' +
+                          '</button>';
+        }
+
+        let rightBtnHtml = '';
+        if (currentPage !== totalPages) {
+            rightBtnHtml = '<button type="button" onclick="setClientPage(\'' + tableId + '\', ' + (currentPage + 1) + ')" class="px-4 py-2 bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-50 transition flex items-center gap-2">' +
+                           'Seterusnya <i class="fas fa-chevron-right"></i>' +
+                           '</button>';
+        } else {
+            rightBtnHtml = '<button disabled class="px-4 py-2 bg-gray-50 border border-gray-100 rounded-xl text-xs font-bold text-gray-300 cursor-not-allowed flex items-center gap-2">' +
+                           'Seterusnya <i class="fas fa-chevron-right"></i>' +
+                           '</button>';
+        }
+
+        footer.innerHTML = 
+            '<div class="text-xs text-gray-500 font-medium">' +
+            '    Menunjukkan halaman <span class="text-gray-900 font-bold">' + currentPage + '</span> daripada <span class="text-gray-900 font-bold">' + totalPages + '</span> ' +
+            '    (' + totalItems + ' rekod keseluruhan)' +
+            '</div>' +
+            '' +
+            '<div class="flex items-center gap-2">' +
+            '    ' + leftBtnHtml +
+            '' +
+            '    <div class="flex items-center gap-1">' +
+            '        ' + pagesHtml +
+            '    </div>' +
+            '' +
+            '    ' + rightBtnHtml +
+            '' +
+            '    ' +
+            '    <div class="flex items-center gap-1.5 text-xs text-gray-500 font-medium border-l border-gray-200 pl-4 ml-2">' +
+            '        <span>Lompat ke:</span>' +
+            '        <input type="number" min="1" max="' + totalPages + '" value="' + currentPage + '" ' +
+            '               id="page-jump-' + tableId + '" ' +
+            '               class="w-12 h-9 px-2 text-center bg-white border border-gray-200 rounded-xl text-xs font-bold text-gray-700 outline-none focus:ring-2 focus:ring-brand-purple focus:border-brand-purple [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none">' +
+            '    </div>' +
+            '</div>';
+
+        const jumpInput = document.getElementById('page-jump-' + tableId);
+        if (jumpInput) {
+            jumpInput.addEventListener('keypress', function(event) {
+                if (event.key === 'Enter') {
+                    const p = parseInt(this.value);
+                    if (p >= 1 && p <= totalPages) {
+                        setClientPage(tableId, p);
+                    }
+                }
+            });
+        }
+    }
+
+    function setClientPage(tableId, page) {
+        if (clientPaginators[tableId]) {
+            clientPaginators[tableId].currentPage = page;
+            updateClientPagination(tableId);
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+        initClientPagination('tableProses', 'footerProses', 10);
+        initClientPagination('tableSejarah', 'footerSejarah', 10);
+    });
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>
