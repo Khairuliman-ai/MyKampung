@@ -194,6 +194,7 @@
                             <div class="relative">
                                 <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-brand-purple transition-colors"></i>
                                 <input type="text" name="nama_penuh" value="<%= pDetail.getNama_penuh()%>" required 
+                                    onkeypress="return !/[0-9]/.test(event.key)" oninput="this.value = this.value.replace(/[0-9]/g, '')"
                                     class="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple text-slate-800 text-sm font-semibold transition-all">
                             </div>
                         </div>
@@ -227,6 +228,8 @@
                             <div class="relative">
                                 <i class="fas fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-brand-purple transition-colors"></i>
                                 <input type="email" name="email" value="<%= (pDetail.getEmail() != null) ? pDetail.getEmail() : ""%>" required 
+                                    pattern="[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}" 
+                                    title="Format emel tidak sah. Sila ikuti format cth: ali.03_bantuan@v2-kampung.edu.my"
                                     class="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-brand-purple/20 focus:border-brand-purple text-slate-800 text-sm font-semibold transition-all">
                             </div>
                         </div>
@@ -268,6 +271,7 @@
                             <div class="relative">
                                 <i class="fas fa-briefcase absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-blue-600 transition-colors"></i>
                                 <input type="text" name="pekerjaan" value="<%= (pDetail.getPekerjaan() != null) ? pDetail.getPekerjaan() : ""%>" 
+                                    onkeypress="return /^[a-zA-Z\s'-]$/.test(event.key)" oninput="this.value = this.value.replace(/[^a-zA-Z\s'-]/g, '')"
                                     class="w-full pl-12 pr-4 py-4 rounded-2xl bg-slate-50 border-transparent focus:bg-white focus:ring-2 focus:ring-blue-600/20 focus:border-blue-600 text-slate-800 text-sm font-semibold transition-all">
                             </div>
                         </div>
@@ -753,7 +757,7 @@
                 <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Nama Penuh <span class="text-red-500">*</span></label>
                 <div class="relative">
                     <i class="fas fa-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-green-600 transition-colors"></i>
-                    <input type="text" id="m_nama" placeholder="Nama penuh ahli keluarga" class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-sm font-semibold transition-all">
+                    <input type="text" id="m_nama" placeholder="Nama penuh ahli keluarga" onkeypress="return !/[0-9]/.test(event.key)" oninput="this.value = this.value.replace(/[0-9]/g, '')" class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-sm font-semibold transition-all">
                 </div>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -802,7 +806,7 @@
                     <label class="block text-xs font-bold text-gray-400 uppercase tracking-widest mb-2 px-1">Pekerjaan</label>
                     <div class="relative">
                         <i class="fas fa-briefcase absolute left-4 top-1/2 -translate-y-1/2 text-gray-300 group-focus-within:text-green-600 transition-colors"></i>
-                        <input type="text" id="m_pekerjaan" placeholder="Suri Rumah, Pelajar, dll." class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-sm font-semibold transition-all">
+                        <input type="text" id="m_pekerjaan" placeholder="Suri Rumah, Pelajar, dll." onkeypress="return /^[a-zA-Z\s'-]$/.test(event.key)" oninput="this.value = this.value.replace(/[^a-zA-Z\s'-]/g, '')" class="w-full pl-12 pr-4 py-3.5 rounded-2xl bg-gray-50 border border-gray-100 focus:bg-white focus:ring-2 focus:ring-green-500/20 focus:border-green-500 text-sm font-semibold transition-all">
                     </div>
                 </div>
                 <div class="group">
@@ -875,6 +879,52 @@
         e.preventDefault();
         const form = e.target;
         
+        const namaInput = form.querySelector('input[name="nama_penuh"]');
+        if (namaInput && /[0-9]/.test(namaInput.value)) {
+            Swal.fire({
+                title: 'Ralat Nama',
+                text: 'Nama Penuh tidak boleh mengandungi nombor.',
+                icon: 'error',
+                confirmButtonColor: confirmButtonColor,
+                customClass: {
+                    popup: 'rounded-[2rem]',
+                    confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                }
+            });
+            return false;
+        }
+
+        const emailInput = form.querySelector('input[name="email"]');
+        const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        if (emailInput && !emailRegex.test(emailInput.value)) {
+            Swal.fire({
+                title: 'Ralat Emel',
+                text: 'Format emel tidak sah. Sila ikuti format cth: ali.03_bantuan@v2-kampung.edu.my',
+                icon: 'error',
+                confirmButtonColor: confirmButtonColor,
+                customClass: {
+                    popup: 'rounded-[2rem]',
+                    confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                }
+            });
+            return false;
+        }
+
+        const pekerjaanInput = form.querySelector('input[name="pekerjaan"]');
+        if (pekerjaanInput && /[^a-zA-Z\s'-]/.test(pekerjaanInput.value)) {
+            Swal.fire({
+                title: 'Ralat Pekerjaan',
+                text: 'Pekerjaan hanya boleh mengandungi huruf, ruang kosong dan tanda sempang.',
+                icon: 'error',
+                confirmButtonColor: confirmButtonColor,
+                customClass: {
+                    popup: 'rounded-[2rem]',
+                    confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                }
+            });
+            return false;
+        }
+
         Swal.fire({
             title: title,
             text: text,
@@ -988,12 +1038,41 @@
             return;
         }
 
+        if (/[0-9]/.test(nama)) {
+            Swal.fire({
+                title: 'Ralat Nama',
+                text: 'Nama Penuh ahli keluarga tidak boleh mengandungi nombor.',
+                icon: 'warning',
+                confirmButtonColor: '#10B981',
+                customClass: {
+                    popup: 'rounded-[2rem]',
+                    confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                }
+            });
+            return;
+        }
+
         const kp = document.getElementById('m_kp').value.trim();
         const tel = document.getElementById('m_tel').value.trim();
         const umurVal = document.getElementById('m_umur').value;
         const umur = umurVal ? parseInt(umurVal) : 0;
         const hubungan = document.getElementById('m_hubungan').value;
         const pekerjaan = document.getElementById('m_pekerjaan').value.trim();
+
+        if (pekerjaan && /[^a-zA-Z\s'-]/.test(pekerjaan)) {
+            Swal.fire({
+                title: 'Ralat Pekerjaan',
+                text: 'Pekerjaan ahli keluarga hanya boleh mengandungi huruf, ruang kosong dan tanda sempang.',
+                icon: 'warning',
+                confirmButtonColor: '#10B981',
+                customClass: {
+                    popup: 'rounded-[2rem]',
+                    confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                }
+            });
+            return;
+        }
+
         const pendapatanVal = document.getElementById('m_pendapatan').value;
         const pendapatan = pendapatanVal ? parseFloat(pendapatanVal) : 0.0;
         const fileInput = document.getElementById('modalFile');
