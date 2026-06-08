@@ -112,7 +112,7 @@
                                             <i class="fas fa-pen text-xs"></i>
                                         </button>
                                         <a href="<%= contextPath %>/fasiliti/padam?id=<%= f.getId_fasiliti() %>" 
-                                           onclick="return confirm('Adakah anda pasti mahu memadam fasiliti ini?')"
+                                           onclick="confirmPadamFasiliti(event, this.href)"
                                            class="w-8 h-8 flex items-center justify-center text-red-600 hover:bg-red-100 rounded-lg transition" title="Padam">
                                             <i class="fas fa-trash text-xs"></i>
                                         </a>
@@ -169,7 +169,7 @@
                                 </td>
                                 <td class="p-4 text-center">
                                     <div class="flex justify-center gap-2" onclick="event.stopPropagation()">
-                                        <form action="<%= contextPath %>/fasiliti/approve" method="post" class="inline">
+                                        <form action="<%= contextPath %>/fasiliti/approve" method="post" class="inline" onsubmit="confirmApproveBooking(event, this)">
                                             <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                                             <input type="hidden" name="idTempahan" value="<%= t.getId_tempahan() %>">
                                             <button type="submit" class="bg-green-100 text-green-600 px-4 py-2 rounded-xl text-[10px] font-bold hover:bg-green-200 transition uppercase tracking-wider shadow-sm border border-green-200">Lulus</button>
@@ -466,7 +466,7 @@
                 </button>
             </header>
 
-            <form action="<%= contextPath %>/fasiliti/reject" method="post" class="space-y-6">
+            <form id="rejectTempahanForm" action="<%= contextPath %>/fasiliti/reject" method="post" class="space-y-6">
                 <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="idTempahan" id="rejectIdTempahan">
                 
@@ -655,30 +655,133 @@
 
     // Override Form Submission to include Cropped Image
     document.getElementById('formFasiliti').onsubmit = function(e) {
-        if (croppedBlob) {
-            e.preventDefault();
-            const formData = new FormData(this);
-            // Replace the original file with the cropped one
-            formData.set('gambar_fasiliti', croppedBlob, 'fasiliti_cropped.jpg');
-            
-            // Submit using Fetch
-            fetch(this.action, {
-                method: 'POST',
-                body: formData
-            }).then(response => {
-                if (response.redirected) {
-                    window.location.href = response.url;
+        e.preventDefault();
+        const form = this;
+        const isEdit = form.action.includes('edit');
+        const title = isEdit ? 'Simpan Perubahan?' : 'Tambah Fasiliti Baru?';
+        const text = isEdit 
+            ? 'Adakah anda pasti mahu mengemaskini maklumat fasiliti ini?' 
+            : 'Adakah anda pasti mahu menambah fasiliti baharu ini?';
+        const confirmBtnText = isEdit ? 'Ya, Simpan' : 'Ya, Tambah';
+
+        Swal.fire({
+            title: title,
+            text: text,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#4F46E5',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: confirmBtnText,
+            cancelButtonText: 'Batal',
+            customClass: {
+                popup: 'rounded-[2rem]',
+                confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold',
+                cancelButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                if (croppedBlob) {
+                    const formData = new FormData(form);
+                    formData.set('gambar_fasiliti', croppedBlob, 'fasiliti_cropped.jpg');
+                    
+                    fetch(form.action, {
+                        method: 'POST',
+                        body: formData
+                    }).then(response => {
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        } else {
+                            window.location.reload();
+                        }
+                    }).catch(err => {
+                        console.error('Error submitting form:', err);
+                        Swal.fire('Ralat!', 'Gagal menyimpan fasiliti. Sila cuba lagi.', 'error');
+                    });
                 } else {
-                    window.location.reload();
+                    const origOnsubmit = form.onsubmit;
+                    form.onsubmit = null;
+                    form.submit();
+                    form.onsubmit = origOnsubmit;
                 }
-            }).catch(err => {
-                console.error('Error submitting form:', err);
-                alert('Gagal menyimpan fasiliti. Sila cuba lagi.');
-            });
-            return false;
-        }
-        return true;
+            }
+        });
+        return false;
     };
+
+    function confirmPadamFasiliti(event, url) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Padam Fasiliti?',
+            text: "Adakah anda pasti mahu memadam fasiliti ini? Semua rekod tempahan berkaitan akan dipadamkan secara kekal.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: 'Ya, Padam',
+            cancelButtonText: 'Batal',
+            customClass: {
+                popup: 'rounded-[2rem]',
+                confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold',
+                cancelButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+
+    function confirmApproveBooking(event, form) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Luluskan Tempahan?',
+            text: "Adakah anda pasti mahu meluluskan tempahan fasiliti ini?",
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#10B981',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: 'Ya, Luluskan',
+            cancelButtonText: 'Batal',
+            customClass: {
+                popup: 'rounded-[2rem]',
+                confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold',
+                cancelButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const rejectForm = document.getElementById('rejectTempahanForm');
+        if (rejectForm) {
+            rejectForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const form = this;
+                Swal.fire({
+                    title: 'Tolak Tempahan?',
+                    text: "Adakah anda pasti mahu menolak tempahan fasiliti ini?",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#EF4444',
+                    cancelButtonColor: '#6B7280',
+                    confirmButtonText: 'Ya, Tolak',
+                    cancelButtonText: 'Batal',
+                    customClass: {
+                        popup: 'rounded-[2rem]',
+                        confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold',
+                        cancelButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        }
+    });
 
     function openAddModal() {
         document.getElementById('modalTitle').innerText = "Tambah Fasiliti Baru";

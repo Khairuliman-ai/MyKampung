@@ -251,7 +251,7 @@
                                         
                                         <% if (isFuture && (StatusConstant.TEMPAHAN_MENUNGGU.equals(t.getStatus()) || StatusConstant.TEMPAHAN_LULUS.equals(t.getStatus()))) { %>
                                             <a href="<%= contextPath %>/fasiliti/batal?id=<%= t.getId_tempahan() %>" 
-                                               onclick="return confirm('Adakah anda pasti mahu membatalkan tempahan ini?')"
+                                               onclick="confirmBatalTempahan(event, this.href)"
                                                class="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 hover:scale-105 active:scale-95 transition text-[10px] font-black uppercase tracking-wider shadow-sm border border-rose-200">
                                                 <i class="fas fa-trash-can text-rose-500"></i> Batal
                                             </a>
@@ -766,7 +766,16 @@
                         document.getElementById('masa_mula_hidden').value = data[0].mula;
                         document.getElementById('masa_tamat_hidden').value = data[0].tamat;
                     } else {
-                        alert("Fasiliti ini sudah ditempah untuk tempoh tersebut pada tarikh yang dipilih.");
+                        Swal.fire({
+                            title: 'Tidak Tersedia',
+                            text: 'Fasiliti ini sudah ditempah untuk tempoh tersebut pada tarikh yang dipilih.',
+                            icon: 'warning',
+                            confirmButtonColor: '#4F46E5',
+                            customClass: {
+                                popup: 'rounded-[2rem]',
+                                confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                            }
+                        });
                         // Reset selection
                         document.getElementById('tarikh_tempah').value = "";
                     }
@@ -791,14 +800,27 @@
 
     // Update form submission to use hidden inputs if slots are used
     document.getElementById('formTempah').onsubmit = function(e) {
+        e.preventDefault();
+        const form = this;
         const tempoh = document.getElementById('tempoh_tempahan').value;
+        let mula = "";
+        let tamat = "";
+
         if (tempoh !== 'specific') {
-            const mula = document.getElementById('masa_mula_hidden').value;
-            const tamat = document.getElementById('masa_tamat_hidden').value;
+            mula = document.getElementById('masa_mula_hidden').value;
+            tamat = document.getElementById('masa_tamat_hidden').value;
             
             if (!mula || !tamat) {
-                alert("Sila pilih slot masa!");
-                e.preventDefault();
+                Swal.fire({
+                    title: 'Ralat!',
+                    text: 'Sila pilih slot masa!',
+                    icon: 'warning',
+                    confirmButtonColor: '#4F46E5',
+                    customClass: {
+                        popup: 'rounded-[2rem]',
+                        confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                    }
+                });
                 return false;
             }
             
@@ -806,6 +828,31 @@
             document.getElementById('masa_mula').value = mula.substring(0,5);
             document.getElementById('masa_tamat').value = tamat.substring(0,5);
         }
+
+        Swal.fire({
+            title: 'Sahkan Tempahan?',
+            text: 'Adakah anda pasti mahu menghantar permohonan tempahan ini?',
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#4F46E5',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: 'Ya, Sahkan',
+            cancelButtonText: 'Batal',
+            customClass: {
+                popup: 'rounded-[2rem]',
+                confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold',
+                cancelButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const origOnsubmit = form.onsubmit;
+                form.onsubmit = null;
+                form.submit();
+                form.onsubmit = origOnsubmit;
+            }
+        });
+
+        return false;
     };
 
     function switchTab(tabId) {
@@ -958,7 +1005,28 @@
         }, 300);
     }
 
-    // Modal close functions centralized in footer.jsp
+    function confirmBatalTempahan(event, url) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Batal Tempahan?',
+            text: "Adakah anda pasti mahu membatalkan tempahan ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: 'Ya, Batal',
+            cancelButtonText: 'Batal',
+            customClass: {
+                popup: 'rounded-[2rem]',
+                confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold',
+                cancelButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
 
     // Alert Handling
     document.addEventListener('DOMContentLoaded', function() {
