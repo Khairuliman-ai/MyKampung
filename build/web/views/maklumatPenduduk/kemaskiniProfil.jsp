@@ -1091,177 +1091,220 @@
 
         const incomeFormatted = 'RM ' + pendapatan.toFixed(2);
 
-        if (editCardId !== null) {
-            // EDIT MODE
-            const card = document.getElementById(editCardId);
-            
-            // Update hidden inputs
-            card.querySelector('.f-nama').value = nama;
-            card.querySelector('.f-kp').value = kp;
-            card.querySelector('.f-tel').value = tel;
-            card.querySelector('.f-umur').value = umur;
-            card.querySelector('.f-hubungan').value = hubungan;
-            card.querySelector('.f-pekerjaan').value = pekerjaan;
-            card.querySelector('.f-pendapatan').value = pendapatan;
+        const isEdit = editCardId !== null;
+        const confirmTitle = isEdit ? 'Kemaskini Ahli Keluarga?' : 'Tambah Ahli Keluarga?';
+        const confirmText = isEdit 
+            ? 'Adakah anda pasti mahu mengemaskini maklumat ahli keluarga ini?' 
+            : 'Adakah anda pasti mahu menambah ahli keluarga ini?';
+        const confirmBtnText = isEdit ? 'Ya, Kemaskini' : 'Ya, Tambah';
+        const confirmBtnColor = isEdit ? '#D97706' : '#10B981';
 
-            // Update visible fields
-            card.querySelector('.card-icon').className = 'card-icon fas ' + iconClass;
-            card.querySelector('.card-display-nama').innerText = nama;
-            card.querySelector('.card-display-hubungan').innerText = hubungan;
-            card.querySelector('.card-display-umur').innerText = umur + ' Tahun';
-            card.querySelector('.card-display-kp').innerText = kp ? kp : '-';
-            card.querySelector('.card-display-tel').innerText = tel ? tel : '-';
-            card.querySelector('.card-display-pekerjaan').innerText = pekerjaan ? pekerjaan : 'Tiada';
-            card.querySelector('.card-display-pendapatan').innerText = incomeFormatted;
-
-            // Update file if user selected a new one
-            if (hasFile) {
-                // Get f_index[] value
-                const idx = card.querySelector('.f-index').value;
-                
-                // Remove previous file input in card if exists
-                const oldFileInput = card.querySelector('input[type="file"]');
-                if (oldFileInput) oldFileInput.remove();
-                
-                // Clear f_pengesahan_existing value since we are uploading a new file
-                card.querySelector('.f-pengesahan-existing').value = '';
-
-                // Move/append new file input to card
-                fileInput.id = 'f_file_' + idx;
-                fileInput.name = 'f_pengesahan_pendapatan_' + idx;
-                fileInput.style.display = 'none';
-                fileInput.className = 'hidden';
-                card.appendChild(fileInput);
-
-                // Update document badge inside card
-                card.querySelector('.card-display-dokumen').innerHTML = 
-                    "<span class='inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 text-[10px] font-bold animate-in zoom-in-95 duration-200'>" +
-                    "    <i class='fas fa-file-invoice-dollar text-xs'></i>" +
-                    "    Fail Baru Dimuat Naik" +
-                    "</span>";
+        Swal.fire({
+            title: confirmTitle,
+            text: confirmText,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: confirmBtnColor,
+            cancelButtonColor: '#9CA3AF',
+            confirmButtonText: confirmBtnText,
+            cancelButtonText: 'Batal',
+            customClass: {
+                popup: 'rounded-[2rem]',
+                confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold',
+                cancelButton: 'rounded-xl px-6 py-3 text-sm font-bold'
             }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                if (isEdit) {
+                    // EDIT MODE
+                    const card = document.getElementById(editCardId);
+                    
+                    // Update hidden inputs
+                    card.querySelector('.f-nama').value = nama;
+                    card.querySelector('.f-kp').value = kp;
+                    card.querySelector('.f-tel').value = tel;
+                    card.querySelector('.f-umur').value = umur;
+                    card.querySelector('.f-hubungan').value = hubungan;
+                    card.querySelector('.f-pekerjaan').value = pekerjaan;
+                    card.querySelector('.f-pendapatan').value = pendapatan;
 
-            hideAddFamilyModal();
-            return;
-        }
+                    // Update visible fields
+                    card.querySelector('.card-icon').className = 'card-icon fas ' + iconClass;
+                    card.querySelector('.card-display-nama').innerText = nama;
+                    card.querySelector('.card-display-hubungan').innerText = hubungan;
+                    card.querySelector('.card-display-umur').innerText = umur + ' Tahun';
+                    card.querySelector('.card-display-kp').innerText = kp ? kp : '-';
+                    card.querySelector('.card-display-tel').innerText = tel ? tel : '-';
+                    card.querySelector('.card-display-pekerjaan').innerText = pekerjaan ? pekerjaan : 'Tiada';
+                    card.querySelector('.card-display-pendapatan').innerText = incomeFormatted;
 
-        // ADD MODE
-        const container = document.getElementById('familyContainer');
-        const emptyMsg = document.getElementById('emptyFamily');
-        if (emptyMsg) emptyMsg.remove();
+                    // Update file if user selected a new one
+                    if (hasFile) {
+                        // Get f_index[] value
+                        const idx = card.querySelector('.f-index').value;
+                        
+                        // Remove previous file input in card if exists
+                        const oldFileInput = card.querySelector('input[type="file"]');
+                        if (oldFileInput) oldFileInput.remove();
+                        
+                        // Clear f_pengesahan_existing value since we are uploading a new file
+                        card.querySelector('.f-pengesahan-existing').value = '';
 
-        const idx = familyCounter++;
+                        // Move/append new file input to card
+                        fileInput.id = 'f_file_' + idx;
+                        fileInput.name = 'f_pengesahan_pendapatan_' + idx;
+                        fileInput.style.display = 'none';
+                        fileInput.className = 'hidden';
+                        card.appendChild(fileInput);
 
-        const card = document.createElement('div');
-        card.id = 'familyCard_' + idx;
-        card.className = 'family-row group relative bg-white hover:bg-green-50/10 rounded-3xl p-6 border border-gray-150 shadow-sm hover:shadow-md hover:border-green-300 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center gap-6 animate-in slide-in-from-bottom-4 duration-300';
-        
-        let docBadgeHtml = '';
-        if (hasFile) {
-            docBadgeHtml = "<span class='inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 text-[10px] font-bold'>" +
-                           "    <i class='fas fa-file-invoice-dollar text-xs'></i>" +
-                           "    Fail Dimuat Naik" +
-                           "</span>";
-        } else {
-            docBadgeHtml = "<span class='inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-400 text-[10px] font-bold'>" +
-                           "    <i class='fas fa-exclamation-circle text-xs'></i>" +
-                           "    Tiada Dokumen" +
-                           "</span>";
-        }
+                        // Update document badge inside card
+                        card.querySelector('.card-display-dokumen').innerHTML = 
+                            "<span class='inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 text-[10px] font-bold animate-in zoom-in-95 duration-200'>" +
+                            "    <i class='fas fa-file-invoice-dollar text-xs'></i>" +
+                            "    Fail Baru Dimuat Naik" +
+                            "</span>";
+                    }
 
-        card.innerHTML = 
-            "<input type='hidden' name='f_index[]' class='f-index' value='" + idx + "'>" +
-            "<input type='hidden' name='f_nama[]' class='f-nama' value='" + escapeHtml(nama) + "'>" +
-            "<input type='hidden' name='f_kp[]' class='f-kp' value='" + escapeHtml(kp) + "'>" +
-            "<input type='hidden' name='f_tel[]' class='f-tel' value='" + escapeHtml(tel) + "'>" +
-            "<input type='hidden' name='f_umur[]' class='f-umur' value='" + umur + "'>" +
-            "<input type='hidden' name='f_hubungan[]' class='f-hubungan' value='" + escapeHtml(hubungan) + "'>" +
-            "<input type='hidden' name='f_pekerjaan[]' class='f-pekerjaan' value='" + escapeHtml(pekerjaan) + "'>" +
-            "<input type='hidden' name='f_pendapatan[]' class='f-pendapatan' value='" + pendapatan + "'>" +
-            "<input type='hidden' name='f_pengesahan_existing[]' class='f-pengesahan-existing' value=''>" +
-            "" +
-            "<div class='w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center text-2xl shadow-sm border border-gray-100 group-hover:scale-105 transition-transform shrink-0'>" +
-            "    <i class='card-icon fas " + iconClass + "'></i>" +
-            "</div>" +
-            "" +
-            "<div class='flex-1 min-w-0'>" +
-            "    <div class='flex flex-wrap items-center gap-2 mb-2'>" +
-            "        <h5 class='card-display-nama text-sm font-extrabold text-gray-900 truncate'>" + escapeHtml(nama) + "</h5>" +
-            "        <span class='card-display-hubungan inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-700 border border-green-200'>" +
-            "            " + escapeHtml(hubungan) + "" +
-            "        </span>" +
-            "        <span class='card-display-umur inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gray-50 text-gray-600 border border-gray-200'>" +
-            "            " + umur + " Tahun" +
-            "        </span>" +
-            "    </div>" +
-            "" +
-            "    <div class='grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-semibold text-gray-500'>" +
-            "        <div>" +
-            "            <span class='block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5'>No. KP</span>" +
-            "            <span class='card-display-kp text-gray-800'>" + (kp ? escapeHtml(kp) : '-') + "</span>" +
-            "        </div>" +
-            "        <div>" +
-            "            <span class='block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5'>No. Telefon</span>" +
-            "            <span class='card-display-tel text-gray-800'>" + (tel ? escapeHtml(tel) : '-') + "</span>" +
-            "        </div>" +
-            "        <div>" +
-            "            <span class='block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5'>Pekerjaan</span>" +
-            "            <span class='card-display-pekerjaan text-gray-800'>" + (pekerjaan ? escapeHtml(pekerjaan) : 'Tiada') + "</span>" +
-            "        </div>" +
-            "        <div>" +
-            "            <span class='block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5'>Pendapatan</span>" +
-            "            <span class='card-display-pendapatan text-gray-800 font-bold text-blue-600'>" + incomeFormatted + "</span>" +
-            "        </div>" +
-            "    </div>" +
-            "</div>" +
-            "" +
-            "<div class='flex items-center gap-3 w-full md:w-auto shrink-0 md:justify-end border-t md:border-t-0 pt-4 md:pt-0'>" +
-            "    <div class='card-display-dokumen flex items-center shrink-0'>" +
-            "        " + docBadgeHtml +
-            "    </div>" +
-            "" +
-            "    <button type='button' onclick='editFamilyMember(\"familyCard_" + idx + "\")' " +
-            "        class='w-10 h-10 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shrink-0' " +
-            "        title='Kemaskini Ahli Keluarga'>" +
-            "        <i class='fas fa-pencil-alt text-sm'></i>" +
-            "    </button>" +
-            "" +
-            "    <button type='button' onclick='removeFamilyRow(this)' " +
-            "        class='w-10 h-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shrink-0' " +
-            "        title='Hapus Ahli Keluarga'>" +
-            "        <i class='fas fa-trash-alt text-sm'></i>" +
-            "    </button>" +
-            "</div>";
+                    hideAddFamilyModal();
+                } else {
+                    // ADD MODE
+                    const container = document.getElementById('familyContainer');
+                    const emptyMsg = document.getElementById('emptyFamily');
+                    if (emptyMsg) emptyMsg.remove();
 
-        if (hasFile) {
-            fileInput.id = 'f_file_' + idx;
-            fileInput.name = 'f_pengesahan_pendapatan_' + idx;
-            fileInput.style.display = 'none';
-            fileInput.className = 'hidden';
-            card.appendChild(fileInput);
-        }
+                    const idx = familyCounter++;
 
-        container.appendChild(card);
-        hideAddFamilyModal();
+                    const card = document.createElement('div');
+                    card.id = 'familyCard_' + idx;
+                    card.className = 'family-row group relative bg-white hover:bg-green-50/10 rounded-3xl p-6 border border-gray-150 shadow-sm hover:shadow-md hover:border-green-300 transition-all duration-300 flex flex-col md:flex-row items-start md:items-center gap-6 animate-in slide-in-from-bottom-4 duration-300';
+                    
+                    let docBadgeHtml = '';
+                    if (hasFile) {
+                        docBadgeHtml = "<span class='inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 text-[10px] font-bold'>" +
+                                       "    <i class='fas fa-file-invoice-dollar text-xs'></i>" +
+                                       "    Fail Dimuat Naik" +
+                                       "</span>";
+                    } else {
+                        docBadgeHtml = "<span class='inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-gray-50 border border-gray-200 text-gray-400 text-[10px] font-bold'>" +
+                                       "    <i class='fas fa-exclamation-circle text-xs'></i>" +
+                                       "    Tiada Dokumen" +
+                                       "</span>";
+                    }
+
+                    card.innerHTML = 
+                        "<input type='hidden' name='f_index[]' class='f-index' value='" + idx + "'>" +
+                        "<input type='hidden' name='f_nama[]' class='f-nama' value='" + escapeHtml(nama) + "'>" +
+                        "<input type='hidden' name='f_kp[]' class='f-kp' value='" + escapeHtml(kp) + "'>" +
+                        "<input type='hidden' name='f_tel[]' class='f-tel' value='" + escapeHtml(tel) + "'>" +
+                        "<input type='hidden' name='f_umur[]' class='f-umur' value='" + umur + "'>" +
+                        "<input type='hidden' name='f_hubungan[]' class='f-hubungan' value='" + escapeHtml(hubungan) + "'>" +
+                        "<input type='hidden' name='f_pekerjaan[]' class='f-pekerjaan' value='" + escapeHtml(pekerjaan) + "'>" +
+                        "<input type='hidden' name='f_pendapatan[]' class='f-pendapatan' value='" + pendapatan + "'>" +
+                        "<input type='hidden' name='f_pengesahan_existing[]' class='f-pengesahan-existing' value=''>" +
+                        "" +
+                        "<div class='w-14 h-14 rounded-2xl bg-gray-50 flex items-center justify-center text-2xl shadow-sm border border-gray-100 group-hover:scale-105 transition-transform shrink-0'>" +
+                        "    <i class='card-icon fas " + iconClass + "'></i>" +
+                        "</div>" +
+                        "" +
+                        "<div class='flex-1 min-w-0'>" +
+                        "    <div class='flex flex-wrap items-center gap-2 mb-2'>" +
+                        "        <h5 class='card-display-nama text-sm font-extrabold text-gray-900 truncate'>" + escapeHtml(nama) + "</h5>" +
+                        "        <span class='card-display-hubungan inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-green-50 text-green-700 border border-green-200'>" +
+                        "            " + escapeHtml(hubungan) + "" +
+                        "        </span>" +
+                        "        <span class='card-display-umur inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-gray-50 text-gray-600 border border-gray-200'>" +
+                        "            " + umur + " Tahun" +
+                        "        </span>" +
+                        "    </div>" +
+                        "" +
+                        "<div class='grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-semibold text-gray-500'>" +
+                        "        <div>" +
+                        "            <span class='block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5'>No. KP</span>" +
+                        "            <span class='card-display-kp text-gray-800'>" + (kp ? escapeHtml(kp) : '-') + "</span>" +
+                        "        </div>" +
+                        "        <div>" +
+                        "            <span class='block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5'>No. Telefon</span>" +
+                        "            <span class='card-display-tel text-gray-800'>" + (tel ? escapeHtml(tel) : '-') + "</span>" +
+                        "        </div>" +
+                        "        <div>" +
+                        "            <span class='block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5'>Pekerjaan</span>" +
+                        "            <span class='card-display-pekerjaan text-gray-800'>" + (pekerjaan ? escapeHtml(pekerjaan) : 'Tiada') + "</span>" +
+                        "        </div>" +
+                        "        <div>" +
+                        "            <span class='block text-[9px] text-gray-400 font-bold uppercase tracking-wider mb-0.5'>Pendapatan</span>" +
+                        "            <span class='card-display-pendapatan text-gray-800 font-bold text-blue-600'>" + incomeFormatted + "</span>" +
+                        "        </div>" +
+                        "    </div>" +
+                        "</div>" +
+                        "" +
+                        "<div class='flex items-center gap-3 w-full md:w-auto shrink-0 md:justify-end border-t md:border-t-0 pt-4 md:pt-0'>" +
+                        "    <div class='card-display-dokumen flex items-center shrink-0'>" +
+                        "        " + docBadgeHtml +
+                        "    </div>" +
+                        "" +
+                        "    <button type='button' onclick='editFamilyMember(\"familyCard_" + idx + "\")' " +
+                        "        class='w-10 h-10 rounded-xl bg-amber-50 text-amber-600 hover:bg-amber-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shrink-0' " +
+                        "        title='Kemaskini Ahli Keluarga'>" +
+                        "        <i class='fas fa-pencil-alt text-sm'></i>" +
+                        "    </button>" +
+                        "" +
+                        "    <button type='button' onclick='removeFamilyRow(this)' " +
+                        "        class='w-10 h-10 rounded-xl bg-red-50 text-red-500 hover:bg-red-500 hover:text-white transition-all flex items-center justify-center active:scale-95 shrink-0' " +
+                        "        title='Hapus Ahli Keluarga'>" +
+                        "        <i class='fas fa-trash-alt text-sm'></i>" +
+                        "    </button>" +
+                        "</div>";
+
+                    if (hasFile) {
+                        fileInput.id = 'f_file_' + idx;
+                        fileInput.name = 'f_pengesahan_pendapatan_' + idx;
+                        fileInput.style.display = 'none';
+                        fileInput.className = 'hidden';
+                        card.appendChild(fileInput);
+                    }
+
+                    container.appendChild(card);
+                    hideAddFamilyModal();
+                }
+            }
+        });
     }
 
     function removeFamilyRow(btn) {
-        const row = btn.closest('.family-row');
-        row.classList.add('fade-out', 'scale-95');
-        setTimeout(() => {
-            row.remove();
-            const container = document.getElementById('familyContainer');
-            if (container.querySelectorAll('.family-row').length === 0) {
-                container.innerHTML = 
-                    "<div id='emptyFamily' class='text-center py-12 bg-gray-50/50 rounded-3xl border-2 border-dashed border-gray-200 animate-in fade-in duration-300'>" +
-                    "    <div class='w-14 h-14 rounded-full bg-white mx-auto flex items-center justify-center text-gray-300 mb-3 shadow-inner'>" +
-                    "        <i class='fas fa-users text-xl'></i>" +
-                    "    </div>" +
-                    "    <p class='text-xs text-gray-400 font-bold uppercase tracking-wider'>Tiada Maklumat Ahli Keluarga</p>" +
-                    "    <p class='text-[10px] text-gray-400 mt-1'>Sila klik \"+ Tambah Ahli\" di atas untuk mula mengisi.</p>" +
-                    "</div>";
+        Swal.fire({
+            title: 'Hapus Ahli Keluarga?',
+            text: "Adakah anda pasti mahu memadam ahli keluarga ini dari senarai?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            cancelButtonColor: '#9CA3AF',
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal',
+            customClass: {
+                popup: 'rounded-[2rem]',
+                confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold',
+                cancelButton: 'rounded-xl px-6 py-3 text-sm font-bold'
             }
-        }, 300);
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const row = btn.closest('.family-row');
+                row.classList.add('fade-out', 'scale-95');
+                setTimeout(() => {
+                    row.remove();
+                    const container = document.getElementById('familyContainer');
+                    if (container.querySelectorAll('.family-row').length === 0) {
+                        container.innerHTML = 
+                            "<div id='emptyFamily' class='text-center py-12 bg-gray-50/50 rounded-3xl border-2 border-dashed border-gray-200 animate-in fade-in duration-300'>" +
+                            "    <div class='w-14 h-14 rounded-full bg-white mx-auto flex items-center justify-center text-gray-300 mb-3 shadow-inner'>" +
+                            "        <i class='fas fa-users text-xl'></i>" +
+                            "    </div>" +
+                            "    <p class='text-xs text-gray-400 font-bold uppercase tracking-wider'>Tiada Maklumat Ahli Keluarga</p>" +
+                            "    <p class='text-[10px] text-gray-400 mt-1'>Sila klik \"+ Tambah Ahli\" di atas untuk mula mengisi.</p>" +
+                            "</div>";
+                    }
+                }, 300);
+            }
+        });
     }
 
     function escapeHtml(text) {
