@@ -122,6 +122,22 @@
                                     }
                                 }
                                 String jsDokumen = sbDocs.toString();
+
+                                StringBuilder sbDocsJson = new StringBuilder();
+                                sbDocsJson.append("[");
+                                if(pb.getSenaraiLampiran() != null) {
+                                    List<model.BantuanLampiran> lamps = pb.getSenaraiLampiran();
+                                    for(int idx = 0; idx < lamps.size(); idx++) {
+                                        model.BantuanLampiran bl = lamps.get(idx);
+                                        sbDocsJson.append("{");
+                                        sbDocsJson.append("\"id\":").append(bl.getId_lampiran()).append(",");
+                                        sbDocsJson.append("\"nama\":\"").append(cleanForJS(bl.getNama_fail())).append("\"");
+                                        sbDocsJson.append("}");
+                                        if(idx < lamps.size() - 1) sbDocsJson.append(",");
+                                    }
+                                }
+                                sbDocsJson.append("]");
+                                String jsDocsJson = sbDocsJson.toString();
                         %>
                         <tr class="hover:bg-purple-50/50 transition cursor-pointer group" 
                             onclick="openDetailModal('<%= jsNama %>', '<%= displayDate %>', '<%= status %>', '<%= jsCatatan %>', '<%= jsUlasan %>', '<%= jsBank %>', '<%= jsAkaun %>', '<%= jsPenyata %>', '<%= jsDokumen %>')">
@@ -139,18 +155,29 @@
                             </td>
                             <td class="p-4 text-center">
                                 <div class="flex justify-center gap-2" onclick="event.stopPropagation()">
-                                     <% if ("BARU".equalsIgnoreCase(status) || "DIKEMBALIKAN".equalsIgnoreCase(status)) { %>
-                                        <a href="<%= request.getContextPath() %>/bantuan/edit?id=<%= pb.getId_permohonan() %>" 
-                                           class="w-8 h-8 flex items-center justify-center text-blue-600 hover:bg-blue-100 rounded-lg transition" title="Kemaskini">
-                                            <i class="fas fa-pen text-xs"></i>
-                                        </a>
-                                        <a href="<%= request.getContextPath() %>/bantuan/delete?idPermohonan=<%= pb.getId_permohonan() %>" 
-                                           onclick="return confirm('Batal permohonan?')" 
-                                           class="w-8 h-8 flex items-center justify-center text-red-600 hover:bg-red-100 rounded-lg transition" title="Padam">
-                                            <i class="fas fa-trash text-xs"></i>
-                                        </a>
+                                     <% if ("DIKEMBALIKAN".equalsIgnoreCase(status)) { %>
+                                         <button type="button" 
+                                                 class="edit-btn-<%= pb.getId_permohonan() %> w-8 h-8 flex items-center justify-center text-blue-600 hover:bg-blue-100 rounded-lg transition" 
+                                                 title="Kemaskini"
+                                                 data-id="<%= pb.getId_permohonan() %>"
+                                                 data-idbantuan="<%= pb.getId_bantuan() %>"
+                                                 data-nama="<%= jsNama %>"
+                                                 data-catatan="<%= jsCatatan %>"
+                                                 data-bank="<%= jsBank %>"
+                                                 data-akaun="<%= jsAkaun %>"
+                                                 data-penyata="<%= jsPenyata %>"
+                                                 data-israsmi="false"
+                                                 data-docs='<%= jsDocsJson %>'
+                                                 onclick="initiateEdit(this)">
+                                             <i class="fas fa-pen text-xs"></i>
+                                         </button>
+                                         <a href="<%= request.getContextPath() %>/bantuan/delete?idPermohonan=<%= pb.getId_permohonan() %>" 
+                                            onclick="confirmDelete(event, this.href);"
+                                            class="w-8 h-8 flex items-center justify-center text-red-600 hover:bg-red-100 rounded-lg transition" title="Padam">
+                                             <i class="fas fa-trash text-xs"></i>
+                                         </a>
                                      <% } else { %>
-                                        <span class="text-[10px] text-gray-400 italic">Terkunci</span>
+                                         <span class="text-[10px] text-gray-400 italic">Terkunci</span>
                                      <% } %>
                                 </div>
                             </td>
@@ -584,7 +611,7 @@
                             </div>
                             <div>
                                 <label class="text-[10px] text-gray-500 uppercase font-bold">Nombor Akaun</label>
-                                <input type="text" name="nomorAkaun" required placeholder="Sila semak nombor dengan betul" class="w-full bg-white border rounded-xl text-sm px-4 py-3 mt-1 outline-none focus:ring-2 focus:ring-blue-400 transition shadow-sm font-bold tracking-wider">
+                                <input type="text" name="nomorAkaun" required placeholder="Sila semak nombor dengan betul" oninput="this.value = this.value.replace(/[^0-9]/g, '')" pattern="[0-9]*" inputmode="numeric" class="w-full bg-white border rounded-xl text-sm px-4 py-3 mt-1 outline-none focus:ring-2 focus:ring-blue-400 transition shadow-sm font-bold tracking-wider">
                             </div>
                             <div class="md:col-span-2">
                                 <label class="text-[10px] text-gray-500 uppercase font-bold">Muat Naik Penyata Bank (Bukti Kewujudan Akaun)</label>
@@ -1022,6 +1049,298 @@
     window.addEventListener('DOMContentLoaded', function() {
         initClientPagination('tableProses', 'footerProses', 10);
         initClientPagination('tableSejarah', 'footerSejarah', 10);
+    });
+</script>
+
+<!-- Modal Edit Permohonan -->
+<div id="modalEditPermohonan" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-slate-900/60 transition-opacity backdrop-blur-md" onclick="closeEditModal()"></div>
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative w-full max-w-2xl bg-white rounded-[2.5rem] shadow-2xl p-10 transform transition-all animate-fade-in-up flex flex-col max-h-[90vh]">
+            <header class="flex justify-between items-center mb-6 shrink-0">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-800">Kemaskini Permohonan</h3>
+                    <p class="text-xs text-gray-400 mt-1">Sila kemaskini maklumat permohonan anda di bawah.</p>
+                </div>
+                <button type="button" onclick="closeEditModal()" class="w-10 h-10 flex items-center justify-center text-gray-400 hover:text-gray-600 bg-gray-50 rounded-xl">
+                    <i class="fas fa-times"></i>
+                </button>
+            </header>
+
+            <form id="editPermohonanForm" action="<%= request.getContextPath() %>/bantuan/updateMyRequest" method="post" enctype="multipart/form-data" class="space-y-6 overflow-y-auto pr-2 custom-scrollbar flex-1">
+                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
+                <input type="hidden" name="idPermohonan" id="editIdPermohonan">
+                <input type="hidden" name="jenisBantuan" id="editJenisBantuan">
+                <input type="hidden" name="oldPenyataBank" id="editOldPenyataBank">
+
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Jenis Bantuan <span class="text-[9px] bg-gray-100 text-gray-400 px-2 py-0.5 rounded italic">Kunci</span></label>
+                    <input type="text" id="editNamaBantuanDisplay" readonly
+                           class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-500 cursor-not-allowed">
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Keterangan / Sebab Permohonan <span class="text-[9px] bg-gray-100 text-gray-400 px-2 py-0.5 rounded italic">Kunci</span></label>
+                    <textarea id="editCatatanDisplay" readonly rows="3"
+                              class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-medium text-gray-500 cursor-not-allowed"></textarea>
+                </div>
+
+                <div class="space-y-4">
+                    <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-widest px-2">Dokumen Sokongan (PDF)</label>
+                    
+                    <div id="editDokumenList" class="space-y-2">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+
+                    <div class="bg-purple-50/50 p-4 rounded-2xl border border-purple-100 border-dashed">
+                        <label class="block text-[9px] font-bold text-brand-purple uppercase mb-2">Tambah Dokumen Baru</label>
+                        <input type="file" name="dokumenSokongan" accept="application/pdf" multiple
+                               class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-brand-purple file:text-white hover:file:bg-brand-purpleHover transition cursor-pointer">
+                        <p class="text-[9px] text-gray-400 mt-2 italic">Boleh pilih lebih dari satu fail baru untuk ditambah.</p>
+                    </div>
+                </div>
+
+                <!-- Bank Section (Only shown if category is KOMUNITI) -->
+                <div id="editBankSection" class="hidden space-y-6 pt-6 border-t border-dashed border-gray-200">
+                    <h5 class="text-xs font-bold text-blue-600 uppercase tracking-widest flex items-center gap-2">
+                        <i class="fas fa-university"></i> Kemaskini Maklumat Bank
+                    </h5>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Nama Bank</label>
+                            <input type="text" name="namaBank" id="editNamaBank" required
+                                   class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-800">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Nombor Akaun</label>
+                            <input type="text" name="nomorAkaun" id="editNomorAkaun" required
+                                   oninput="this.value = this.value.replace(/[^0-9]/g, '')" pattern="[0-9]*" inputmode="numeric"
+                                   class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl text-sm font-bold text-gray-800 tracking-wider">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Penyata Bank (PDF)</label>
+                        <div id="editPenyataCurrentBox" class="hidden flex items-center gap-3 p-3 bg-green-50 rounded-2xl border border-green-100">
+                            <div class="w-8 h-8 bg-green-100 text-green-600 rounded-lg flex items-center justify-center">
+                                <i class="fas fa-file-invoice-dollar"></i>
+                            </div>
+                            <div class="flex-1 min-w-0 text-xs">
+                                <p class="text-gray-400 uppercase font-bold text-[8px]">Fail Semasa</p>
+                                <p id="editPenyataFileName" class="font-bold text-gray-800 truncate"></p>
+                            </div>
+                        </div>
+                        <input type="file" name="penyataBank" accept="application/pdf"
+                               class="block w-full text-xs text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-[10px] file:font-bold file:bg-blue-600 file:text-white hover:file:bg-blue-700 transition cursor-pointer bg-gray-50 rounded-2xl">
+                        <p class="text-[9px] text-gray-400 mt-2 italic">Kosongkan jika tiada perubahan pada penyata bank.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-center justify-end gap-3 pt-6 border-t border-gray-100 shrink-0">
+                    <button type="button" onclick="closeEditModal()" class="px-6 py-3 rounded-2xl bg-gray-100 text-gray-600 font-bold text-sm hover:bg-gray-200 transition">
+                        Batal
+                    </button>
+                    <button type="submit" class="px-8 py-3 rounded-2xl bg-brand-purple hover:bg-brand-purpleHover text-white font-bold text-sm shadow-md transition flex items-center gap-2">
+                        <i class="fas fa-save"></i> Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    function initiateEdit(btn) {
+        const data = {
+            id: btn.getAttribute('data-id'),
+            idBantuan: btn.getAttribute('data-idbantuan'),
+            nama: btn.getAttribute('data-nama'),
+            catatan: btn.getAttribute('data-catatan'),
+            bank: btn.getAttribute('data-bank'),
+            akaun: btn.getAttribute('data-akaun'),
+            penyata: btn.getAttribute('data-penyata'),
+            isRasmi: btn.getAttribute('data-israsmi') === 'true',
+            docs: JSON.parse(btn.getAttribute('data-docs') || '[]')
+        };
+        openEditModal(data);
+    }
+
+    function openEditModal(data) {
+        document.getElementById('editIdPermohonan').value = data.id;
+        document.getElementById('editJenisBantuan').value = data.idBantuan;
+        document.getElementById('editNamaBantuanDisplay').value = data.nama;
+        
+        let rawCatatan = data.catatan || '';
+        let isLain = (data.idBantuan === '999' || data.idBantuan === '998');
+        let keteranganClean = '';
+        
+        if (isLain) {
+            let bersih = rawCatatan.replace('LAIN-LAIN: ', '');
+            if (bersih.includes('|')) {
+                let parts = bersih.split('|');
+                keteranganClean = parts[1] ? parts[1].trim() : '';
+            } else {
+                keteranganClean = bersih;
+            }
+        } else {
+            keteranganClean = rawCatatan;
+        }
+        document.getElementById('editCatatanDisplay').value = keteranganClean || 'Tiada maklumat.';
+        
+        const editDokumenList = document.getElementById('editDokumenList');
+        editDokumenList.innerHTML = '';
+        
+        if (data.docs && data.docs.length > 0) {
+            data.docs.forEach(doc => {
+                const docDiv = document.createElement('div');
+                docDiv.className = 'flex items-center gap-3 p-3 bg-white border border-gray-100 rounded-2xl shadow-sm hover:border-purple-200 transition';
+                const cleanName = doc.nama.substring(doc.nama.indexOf('_') + 1);
+                
+                docDiv.innerHTML = `
+                    <div class="w-8 h-8 bg-red-50 text-red-500 rounded-lg flex items-center justify-center">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="flex-1 min-w-0 text-xs">
+                        <p class="text-gray-400 uppercase font-bold text-[8px]">Fail Terlampir</p>
+                        <p class="font-bold text-gray-700 truncate" title="\${doc.nama}">\${cleanName}</p>
+                    </div>
+                    <div class="flex gap-2" onclick="event.stopPropagation()">
+                        <a href="<%= request.getContextPath() %>/file/bantuan/\${encodeURIComponent(doc.nama)}" target="_blank" 
+                           class="w-7 h-7 flex items-center justify-center bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition">
+                            <i class="fas fa-eye text-[10px]"></i>
+                        </a>
+                        <a href="<%= request.getContextPath() %>/bantuan/deleteAttachment?idLampiran=\${doc.id}\&idPermohonan=\${data.id}" 
+                           onclick="confirmDeleteAttachment(event, this.href)"
+                           class="w-7 h-7 flex items-center justify-center bg-red-50 text-red-500 rounded-lg hover:bg-red-100 transition">
+                            <i class="fas fa-trash text-[10px]"></i>
+                        </a>
+                    </div>
+                `;
+                editDokumenList.appendChild(docDiv);
+            });
+        } else {
+            editDokumenList.innerHTML = '<p class="text-xs text-gray-400 italic p-4 bg-gray-50 rounded-2xl text-center border border-dashed">Tiada dokumen dilampirkan.</p>';
+        }
+        
+        const bankSection = document.getElementById('editBankSection');
+        if (bankSection) {
+            if (!data.isRasmi) {
+                bankSection.classList.remove('hidden');
+                document.getElementById('editNamaBank').value = (data.bank && data.bank !== 'null') ? data.bank : '';
+                document.getElementById('editNomorAkaun').value = (data.akaun && data.akaun !== 'null') ? data.akaun : '';
+                document.getElementById('editOldPenyataBank').value = (data.penyata && data.penyata !== 'null') ? data.penyata : '';
+                
+                const penyataBox = document.getElementById('editPenyataCurrentBox');
+                if (data.penyata && data.penyata !== 'null' && data.penyata !== '') {
+                    penyataBox.classList.remove('hidden');
+                    document.getElementById('editPenyataFileName').innerText = data.penyata;
+                } else {
+                    penyataBox.classList.add('hidden');
+                }
+            } else {
+                bankSection.classList.add('hidden');
+            }
+        }
+        
+        document.getElementById('modalEditPermohonan').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeEditModal() {
+        document.getElementById('modalEditPermohonan').classList.add('hidden');
+        document.body.style.overflow = 'auto';
+    }
+
+    function confirmDelete(event, url) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Batal Permohonan?',
+            text: "Adakah anda pasti mahu membatalkan permohonan ini? Tindakan ini tidak boleh diundurkan.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: 'Ya, Batal',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+
+    function confirmDeleteAttachment(event, url) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Padam Lampiran?',
+            text: "Adakah anda pasti mahu memadam fail dokumen sokongan ini?",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: 'Ya, Padam',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                window.location.href = url;
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const wizardForm = document.getElementById('wizardForm');
+        if (wizardForm) {
+            wizardForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const form = this;
+                Swal.fire({
+                    title: 'Hantar Permohonan?',
+                    text: "Adakah anda pasti maklumat yang diisi adalah betul dan lengkap?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4F46E5',
+                    cancelButtonColor: '#6B7280',
+                    confirmButtonText: 'Ya, Hantar',
+                    cancelButtonText: 'Semak Semula'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        }
+
+        const editForm = document.getElementById('editPermohonanForm');
+        if (editForm) {
+            editForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const form = this;
+                Swal.fire({
+                    title: 'Simpan Perubahan?',
+                    text: "Adakah anda pasti mahu mengemaskini permohonan ini?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4F46E5',
+                    cancelButtonColor: '#6B7280',
+                    confirmButtonText: 'Ya, Simpan',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const editId = urlParams.get('editId');
+        if (editId) {
+            const editBtn = document.querySelector('.edit-btn-' + editId);
+            if (editBtn) {
+                editBtn.click();
+            }
+        }
     });
 </script>
 

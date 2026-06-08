@@ -879,7 +879,7 @@
     <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal('modalKeputusan')"></div>
     <div class="flex min-h-screen items-center justify-center p-4">
         <div class="relative w-full max-w-md bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-white/20 flex flex-col max-h-[90vh]">
-            <form action="<%= request.getContextPath() %>/bantuan/keputusanKetua" method="post" enctype="multipart/form-data" class="flex flex-col max-h-[90vh] overflow-hidden">
+            <form id="keputusanKetuaForm" action="<%= request.getContextPath() %>/bantuan/keputusanKetua" method="post" enctype="multipart/form-data" class="flex flex-col max-h-[90vh] overflow-hidden">
                 <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="idPermohonan" id="actId">
                 <input type="hidden" name="keputusan" id="actDecision">
@@ -1581,6 +1581,60 @@
             updateDisplay();
         };
     })();
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const keputusanForm = document.getElementById('keputusanKetuaForm');
+        if (keputusanForm) {
+            keputusanForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const form = this;
+                const decision = document.getElementById('actDecision').value;
+                const title = decision === 'LULUS' ? 'Luluskan Permohonan?' : 'Tolak Permohonan?';
+                const text = decision === 'LULUS'
+                    ? 'Adakah anda pasti mahu meluluskan permohonan bantuan ini?'
+                    : 'Adakah anda pasti mahu menolak permohonan bantuan ini?';
+                const icon = decision === 'LULUS' ? 'success' : 'warning';
+                const confirmButtonColor = decision === 'LULUS' ? '#10B981' : '#EF4444';
+
+                Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: icon,
+                    showCancelButton: true,
+                    confirmButtonColor: confirmButtonColor,
+                    cancelButtonColor: '#6B7280',
+                    confirmButtonText: decision === 'LULUS' ? 'Ya, Luluskan' : 'Ya, Tolak',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        }
+
+        const configForm = document.getElementById('configForm');
+        if (configForm) {
+            configForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const form = this;
+                Swal.fire({
+                    title: 'Simpan Konfigurasi?',
+                    text: "Adakah anda pasti mahu mengemaskini wajaran dan aturan kelayakan enjin bantuan?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4F46E5',
+                    cancelButtonColor: '#6B7280',
+                    confirmButtonText: 'Ya, Simpan',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        }
+    });
 
     // Run once on load
     window.addEventListener('DOMContentLoaded', updateSliders);

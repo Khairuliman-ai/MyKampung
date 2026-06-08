@@ -151,19 +151,24 @@ public class BantuanServlet extends HttpServlet {
                     response.sendRedirect(request.getContextPath() + "/dashboard?error=invalid_role");
                 }
             }
-            // --- Route: /edit — Edit existing application ---
+            // --- Route: /edit — Edit existing application (Redirects to list with editId modal) ---
             else if ("/edit".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
                 PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
                 PermohonanBantuan pb = pbDao.getById(id);
 
-                if (pb != null && pb.getId_pengguna() == user.getId_pengguna()) {
-                    BantuanDAO bDao = new BantuanDAO();
-                    List<Bantuan> senaraiBantuan = bDao.getAllBantuan();
-                    request.setAttribute("pb", pb);
-                    request.setAttribute("senaraiJenisBantuan", senaraiBantuan);
-                    request.getRequestDispatcher("/views/bantuan/bantuanEdit.jsp")
-                            .forward(request, response);
+                if (pb != null && pb.getId_pengguna() == user.getId_pengguna() && "DIKEMBALIKAN".equalsIgnoreCase(pb.getStatus())) {
+                    String redirectPage = "/bantuan/rasmi";
+                    if (pb.getId_bantuan() == 999) {
+                        redirectPage = "/bantuan/komuniti";
+                    } else {
+                        BantuanDAO bDao = new BantuanDAO();
+                        Bantuan bDetails = bDao.getBantuanById(pb.getId_bantuan());
+                        if (bDetails != null && !"RASMI".equalsIgnoreCase(bDetails.getJenis_bantuan())) {
+                            redirectPage = "/bantuan/komuniti";
+                        }
+                    }
+                    response.sendRedirect(request.getContextPath() + redirectPage + "?editId=" + id);
                 } else {
                     response.sendRedirect(request.getContextPath() + "/bantuan/list?error=access");
                 }
@@ -213,7 +218,7 @@ public class BantuanServlet extends HttpServlet {
                     
                     String redirectPage = "/bantuan/rasmi"; 
 
-                    if (pb != null) {
+                    if (pb != null && pb.getId_pengguna() == user.getId_pengguna() && "DIKEMBALIKAN".equalsIgnoreCase(pb.getStatus())) {
                         if (pb.getId_bantuan() == 999) {
                             redirectPage = "/bantuan/komuniti";
                         } else {
@@ -240,11 +245,23 @@ public class BantuanServlet extends HttpServlet {
                 PermohonanBantuanDAO pbDao = new PermohonanBantuanDAO();
                 PermohonanBantuan pb = pbDao.getById(idPermohonan);
                 
-                if (pb != null && pb.getId_pengguna() == user.getId_pengguna()) {
-                    lampiranDao.deleteById(idLampiran);
+                String redirectPage = "/bantuan/rasmi";
+                if (pb != null) {
+                    if (pb.getId_bantuan() == 999) {
+                        redirectPage = "/bantuan/komuniti";
+                    } else {
+                        BantuanDAO bDao = new BantuanDAO();
+                        Bantuan bDetails = bDao.getBantuanById(pb.getId_bantuan());
+                        if (bDetails != null && !"RASMI".equalsIgnoreCase(bDetails.getJenis_bantuan())) {
+                            redirectPage = "/bantuan/komuniti";
+                        }
+                    }
+                    if (pb.getId_pengguna() == user.getId_pengguna()) {
+                        lampiranDao.deleteById(idLampiran);
+                    }
                 }
                 
-                response.sendRedirect(request.getContextPath() + "/bantuan/edit?id=" + idPermohonan + "&status=doc_deleted");
+                response.sendRedirect(request.getContextPath() + redirectPage + "?status=doc_deleted&editId=" + idPermohonan);
             } else if ("/config".equals(action)) {
                 response.sendRedirect(request.getContextPath() + "/bantuan/list");
             }
@@ -410,6 +427,11 @@ public class BantuanServlet extends HttpServlet {
             else if ("/updateMyRequest".equals(action) && isPendudukOrStaff(user)) {
 
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
+                PermohonanBantuan pbCheck = pbDao.getById(idPermohonan);
+                if (pbCheck == null || pbCheck.getId_pengguna() != user.getId_pengguna() || !"DIKEMBALIKAN".equalsIgnoreCase(pbCheck.getStatus())) {
+                    response.sendRedirect(request.getContextPath() + "/bantuan/list?error=access");
+                    return;
+                }
                 String oldPenyata = request.getParameter("oldPenyataBank");
 
                 // Handle Multiple Documents (New ones)

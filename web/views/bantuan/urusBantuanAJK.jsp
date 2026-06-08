@@ -489,7 +489,7 @@
                                         class="w-9 h-9 flex items-center justify-center rounded-xl text-blue-600 hover:bg-blue-50/80 border border-transparent hover:border-blue-100 shadow-sm transition-all" title="Edit">
                                     <i class="fas fa-edit text-xs"></i>
                                 </button>
-                                <form action="<%= request.getContextPath() %>/bantuan/padamJenisBantuan" method="post" class="inline" onsubmit="return confirm('Padam jenis bantuan ini?')">
+                                <form action="<%= request.getContextPath() %>/bantuan/padamJenisBantuan" method="post" class="inline" onsubmit="confirmPadamJenisBantuan(event, this)">
                                     <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                                     <input type="hidden" name="id" value="<%= b.getId_bantuan() %>">
                                     <button type="submit" class="w-9 h-9 flex items-center justify-center rounded-xl text-red-600 hover:bg-red-50/80 border border-transparent hover:border-red-100 shadow-sm transition-all" title="Padam">
@@ -899,7 +899,7 @@
                 <span>Tambah Jenis Bantuan</span>
                 <button onclick="closeModal('modalTambahBantuan')"><i class="fas fa-times"></i></button>
             </div>
-            <form action="<%= request.getContextPath() %>/bantuan/tambahJenisBantuan" method="post" class="p-6 space-y-4">
+            <form id="tambahBantuanForm" action="<%= request.getContextPath() %>/bantuan/tambahJenisBantuan" method="post" class="p-6 space-y-4">
                 <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <div>
                     <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nama Bantuan</label>
@@ -938,7 +938,7 @@
                 <span>Kemaskini Jenis Bantuan</span>
                 <button onclick="closeModal('modalEditBantuan')"><i class="fas fa-times"></i></button>
             </div>
-            <form action="<%= request.getContextPath() %>/bantuan/kemaskiniJenisBantuan" method="post" class="p-6 space-y-4">
+            <form id="editBantuanForm" action="<%= request.getContextPath() %>/bantuan/kemaskiniJenisBantuan" method="post" class="p-6 space-y-4">
                 <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="idBantuan" id="editId">
                 <div>
@@ -977,7 +977,7 @@
                 <span id="actTitle">Tindakan AJK</span>
                 <button onclick="closeModal('modalTindakan')"><i class="fas fa-times"></i></button>
             </div>
-            <form action="<%= request.getContextPath() %>/bantuan/reviewAJK" method="post" class="p-6">
+            <form id="tindakanAJKForm" action="<%= request.getContextPath() %>/bantuan/reviewAJK" method="post" class="p-6">
                 <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="idPermohonan" id="actId">
                 <input type="hidden" name="keputusan" id="actDecision">
@@ -1813,6 +1813,122 @@
             button.className = 'inline-flex items-center gap-2 px-6 py-2.5 rounded-2xl text-xs font-bold text-gray-400 bg-gray-100 border border-gray-200 shadow-none cursor-not-allowed';
         }
     }
+
+    function confirmPadamJenisBantuan(event, form) {
+        event.preventDefault();
+        Swal.fire({
+            title: 'Padam Jenis Bantuan?',
+            text: "Adakah anda pasti mahu memadam jenis bantuan ini? Rekod permohonan berkaitan mungkin terjejas.",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#EF4444',
+            cancelButtonColor: '#6B7280',
+            confirmButtonText: 'Ya, Padam',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                form.submit();
+            }
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const tambahForm = document.getElementById('tambahBantuanForm');
+        if (tambahForm) {
+            tambahForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const form = this;
+                Swal.fire({
+                    title: 'Tambah Jenis Bantuan?',
+                    text: "Adakah anda pasti mahu menambah jenis bantuan baru ini?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4F46E5',
+                    cancelButtonColor: '#6B7280',
+                    confirmButtonText: 'Ya, Tambah',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        }
+
+        const editForm = document.getElementById('editBantuanForm');
+        if (editForm) {
+            editForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const form = this;
+                Swal.fire({
+                    title: 'Kemaskini Jenis Bantuan?',
+                    text: "Adakah anda pasti mahu mengemaskini maklumat jenis bantuan ini?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4F46E5',
+                    cancelButtonColor: '#6B7280',
+                    confirmButtonText: 'Ya, Simpan',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        }
+
+        const tindakanForm = document.getElementById('tindakanAJKForm');
+        if (tindakanForm) {
+            tindakanForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const form = this;
+                const decision = document.getElementById('actDecision').value;
+                const title = decision === 'lengkap' ? 'Sokong Permohonan?' : 'Kembalikan/Tolak Permohonan?';
+                const text = decision === 'lengkap' 
+                    ? 'Adakah anda pasti mahu menyokong permohonan ini dan menghantarnya kepada Ketua Kampung?'
+                    : 'Adakah anda pasti mahu mengembalikan permohonan ini ke penduduk untuk dikemaskini?';
+                const icon = decision === 'lengkap' ? 'question' : 'warning';
+                const confirmButtonColor = decision === 'lengkap' ? '#10B981' : '#EF4444';
+
+                Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: icon,
+                    showCancelButton: true,
+                    confirmButtonColor: confirmButtonColor,
+                    cancelButtonColor: '#6B7280',
+                    confirmButtonText: 'Ya, Hantar',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        }
+
+        const configForm = document.getElementById('configForm');
+        if (configForm) {
+            configForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                const form = this;
+                Swal.fire({
+                    title: 'Simpan Konfigurasi?',
+                    text: "Adakah anda pasti mahu mengemaskini wajaran dan aturan kelayakan enjin bantuan?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4F46E5',
+                    cancelButtonColor: '#6B7280',
+                    confirmButtonText: 'Ya, Simpan',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            });
+        }
+    });
 
     // Run once on load
     window.addEventListener('DOMContentLoaded', updateSliders);
