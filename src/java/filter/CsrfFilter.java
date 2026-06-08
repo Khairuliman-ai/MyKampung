@@ -34,7 +34,7 @@ public class CsrfFilter implements Filter {
 
         // Skip AJAX/API and unauthenticated recovery endpoints
         if (uri.contains("/notifikasi/") || uri.contains("/chatbot/")
-                || uri.contains("/getSlots") || uri.contains("/getLogs")
+                || uri.contains("/getSlots") || uri.contains("/getLogs") || uri.contains("/getBookingConfig")
                 || uri.contains("/stats/")
                 || uri.contains("ForgotPass") || uri.contains("VerifyOTP")
                 || uri.contains("UpdatePassword")) {

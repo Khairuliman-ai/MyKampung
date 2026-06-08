@@ -19,6 +19,7 @@ import java.sql.Connection;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Time;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.text.SimpleDateFormat;
@@ -121,6 +122,9 @@ public class FasilitiServlet extends HttpServlet {
                 case "/getSlots":
                     handleGetSlots(request, response);
                     break;
+                case "/getBookingConfig":
+                    handleGetBookingConfig(request, response);
+                    break;
                 default:
                     response.sendRedirect(request.getContextPath() + "/fasiliti/list");
                     break;
@@ -209,6 +213,9 @@ public class FasilitiServlet extends HttpServlet {
         java.sql.Date tarikh = java.sql.Date.valueOf(request.getParameter("tarikh_tempah"));
         Time mula = Time.valueOf(request.getParameter("masa_mula") + ":00");
         Time tamat = Time.valueOf(request.getParameter("masa_tamat") + ":00");
+        if (tamat.toString().equals("00:00:00")) {
+            tamat = Time.valueOf("23:59:00");
+        }
         String catatanPemohon = request.getParameter("catatan_pemohon");
 
         // 1. Check Blackout Dates
@@ -243,19 +250,13 @@ public class FasilitiServlet extends HttpServlet {
         t.setCatatan_pemohon(catatanPemohon);
         
         // 3. Determine Initial Status
+        // Short-slot bookings are auto-approved; HalfDay/FullDay always require manual approval
         String tempoh = request.getParameter("tempoh_tempahan");
-        if ("2".equals(tempoh)) {
-            t.setStatus(StatusConstant.TEMPAHAN_LULUS);
-        } else if ("FullDay".equals(tempoh) || "HalfDay".equals(tempoh)) {
+        Fasiliti facilityForStatus = fasilitiDAO.dapatkanFasilitiById(idFasiliti);
+        if ("FullDay".equals(tempoh) || "HalfDay".equals(tempoh) || facilityForStatus.isRequiresApproval()) {
             t.setStatus(StatusConstant.TEMPAHAN_MENUNGGU);
         } else {
-            // Fallback to facility default
-            Fasiliti f = fasilitiDAO.dapatkanFasilitiById(idFasiliti);
-            if (f.isRequiresApproval()) {
-                t.setStatus(StatusConstant.TEMPAHAN_MENUNGGU);
-            } else {
-                t.setStatus(StatusConstant.TEMPAHAN_LULUS);
-            }
+            t.setStatus(StatusConstant.TEMPAHAN_LULUS);
         }
         
         if (tempahanDAO.simpanTempahanBaru(t)) {
@@ -306,6 +307,14 @@ public class FasilitiServlet extends HttpServlet {
             filePart.write(SAVE_DIR + File.separator + fileName);
             f.setGambar_fasiliti(fileName);
         }
+
+        // Operating hours and slot duration
+        String waktuBukaStr = request.getParameter("waktu_buka");
+        String waktuTutupStr = request.getParameter("waktu_tutup");
+        String durasiSlotStr = request.getParameter("durasi_slot_minit");
+        if (waktuBukaStr != null && !waktuBukaStr.isEmpty()) f.setWaktu_buka(Time.valueOf(waktuBukaStr + ":00"));
+        if (waktuTutupStr != null && !waktuTutupStr.isEmpty()) f.setWaktu_tutup(Time.valueOf(waktuTutupStr + ":00"));
+        if (durasiSlotStr != null && !durasiSlotStr.isEmpty()) f.setDurasi_slot_minit(Integer.parseInt(durasiSlotStr));
         
         if (fasilitiDAO.tambahFasiliti(f)) {
             response.sendRedirect(request.getContextPath() + "/fasiliti/urus?success=added");
@@ -344,6 +353,14 @@ public class FasilitiServlet extends HttpServlet {
             Fasiliti old = fasilitiDAO.dapatkanFasilitiById(f.getId_fasiliti());
             if (old != null) f.setGambar_fasiliti(old.getGambar_fasiliti());
         }
+
+        // Operating hours and slot duration
+        String waktuBukaStr_ = request.getParameter("waktu_buka");
+        String waktuTutupStr_ = request.getParameter("waktu_tutup");
+        String durasiSlotStr_ = request.getParameter("durasi_slot_minit");
+        if (waktuBukaStr_ != null && !waktuBukaStr_.isEmpty()) f.setWaktu_buka(Time.valueOf(waktuBukaStr_ + ":00"));
+        if (waktuTutupStr_ != null && !waktuTutupStr_.isEmpty()) f.setWaktu_tutup(Time.valueOf(waktuTutupStr_ + ":00"));
+        if (durasiSlotStr_ != null && !durasiSlotStr_.isEmpty()) f.setDurasi_slot_minit(Integer.parseInt(durasiSlotStr_));
         
         if (fasilitiDAO.kemaskiniFasiliti(f)) {
             response.sendRedirect(request.getContextPath() + "/fasiliti/urus?success=updated");
@@ -419,50 +436,78 @@ public class FasilitiServlet extends HttpServlet {
                 }
             }
 
+            // Load facility config from database
+            Fasiliti fasiliti = fasilitiDAO.dapatkanFasilitiById(idFasiliti);
+            if (fasiliti == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.getWriter().write("{\"error\":\"Fasiliti tidak dijumpai\"}");
+                return;
+            }
+
+            Time waktuBuka = fasiliti.getWaktu_buka() != null ? fasiliti.getWaktu_buka() : Time.valueOf("08:00:00");
+            Time waktuTutup = fasiliti.getWaktu_tutup() != null ? fasiliti.getWaktu_tutup() : Time.valueOf("22:00:00");
+            int durasiMinit = fasiliti.getDurasi_slot_minit() > 0 ? fasiliti.getDurasi_slot_minit() : 120;
+
+            int waktuBukaMinutes = waktuBuka.toLocalTime().getHour() * 60 + waktuBuka.toLocalTime().getMinute();
+            int waktuTutupMinutes = waktuTutup.toLocalTime().getHour() * 60 + waktuTutup.toLocalTime().getMinute();
+            if (waktuTutupMinutes <= waktuBukaMinutes) {
+                waktuTutupMinutes += 1440;
+            }
 
             List<FasilitiSlot> slots = new ArrayList<>();
-            
-            // Ambil slot dari database (Database-Driven)
-            List<FasilitiSlot> dbSlots = slotDAO.getSlotsByFasilitiAndDurasi(idFasiliti, durasiStr);
-            
-            for (FasilitiSlot ds : dbSlots) {
-                if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, ds.getMasa_mula(), ds.getMasa_tamat())) {
-                    slots.add(ds);
-                }
-            }
-            
-            // Backward compatibility fallback: Older facilities added before the slot_fasiliti
-            // table was introduced have no DB slot records. Generate hardcoded 2-hour windows
-            // (08:00–24:00) so booking still works for them.
-            if (slots.isEmpty() && dbSlots.isEmpty()) {
-                if ("2".equals(durasiStr)) {
-                    int[][] windows = {{8, 10}, {10, 12}, {12, 14}, {14, 16}, {16, 18}, {18, 20}, {20, 22}, {22, 24}};
-                    for (int[] win : windows) {
-                        Time mula = Time.valueOf(String.format("%02d:00:00", win[0]));
-                        Time tamat = Time.valueOf(win[1] == 24 ? "23:59:59" : String.format("%02d:00:00", win[1]));
-                        if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, mula, tamat)) {
-                            FasilitiSlot s = new FasilitiSlot();
-                            s.setMasa_mula(mula);
-                            s.setMasa_tamat(tamat);
-                            slots.add(s);
-                        }
-                    }
-                } else if ("HalfDay".equals(durasiStr)) {
-                    Time mula = Time.valueOf("08:00:00"), tamat = Time.valueOf("14:00:00");
-                    if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, mula, tamat)) {
-                        FasilitiSlot s = new FasilitiSlot();
-                        s.setMasa_mula(mula); s.setMasa_tamat(tamat); slots.add(s);
-                    }
-                } else if ("FullDay".equals(durasiStr)) {
-                    Time mula = Time.valueOf("08:00:00"), tamat = Time.valueOf("22:00:00");
-                    if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, mula, tamat)) {
-                        FasilitiSlot s = new FasilitiSlot();
-                        s.setMasa_mula(mula); s.setMasa_tamat(tamat); slots.add(s);
-                    }
-                }
-            }
-            
 
+            if ("slot".equals(durasiStr)) {
+                int cursor = waktuBukaMinutes;
+                int endLimit = waktuTutupMinutes;
+                
+                while (cursor + durasiMinit <= endLimit) {
+                    int startMins = cursor;
+                    int endMins = cursor + durasiMinit;
+                    
+                    LocalTime slotMulaLT = LocalTime.of((startMins / 60) % 24, startMins % 60);
+                    LocalTime slotTamatLT = LocalTime.of((endMins / 60) % 24, endMins % 60);
+                    
+                    Time mula = Time.valueOf(slotMulaLT);
+                    Time tamat = Time.valueOf(slotTamatLT);
+                    Time checkTamat = tamat.toString().equals("00:00:00") ? Time.valueOf("23:59:00") : tamat;
+                    
+                    if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, mula, checkTamat)) {
+                        FasilitiSlot s = new FasilitiSlot();
+                        s.setMasa_mula(mula);
+                        s.setMasa_tamat(tamat);
+                        slots.add(s);
+                    }
+                    cursor += durasiMinit;
+                }
+            } else if ("HalfDay".equals(durasiStr)) {
+                int totalMins = waktuTutupMinutes - waktuBukaMinutes;
+                int midpointMins = waktuBukaMinutes + (totalMins / 2);
+                
+                LocalTime slotMulaLT = waktuBuka.toLocalTime();
+                LocalTime slotTamatLT = LocalTime.of((midpointMins / 60) % 24, midpointMins % 60);
+                
+                Time mula = Time.valueOf(slotMulaLT);
+                Time tamat = Time.valueOf(slotTamatLT);
+                Time checkTamat = tamat.toString().equals("00:00:00") ? Time.valueOf("23:59:00") : tamat;
+                
+                if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, mula, checkTamat)) {
+                    FasilitiSlot s = new FasilitiSlot();
+                    s.setMasa_mula(mula);
+                    s.setMasa_tamat(tamat);
+                    slots.add(s);
+                }
+            } else if ("FullDay".equals(durasiStr)) {
+                Time mula = waktuBuka;
+                Time tamat = waktuTutup;
+                Time checkTamat = tamat.toString().equals("00:00:00") ? Time.valueOf("23:59:00") : tamat;
+                
+                if (!tempahanDAO.semakKonflikMasa(idFasiliti, tarikh, mula, checkTamat)) {
+                    FasilitiSlot s = new FasilitiSlot();
+                    s.setMasa_mula(mula);
+                    s.setMasa_tamat(tamat);
+                    slots.add(s);
+                }
+            }
 
             java.time.LocalDate todayLD = java.time.LocalDate.now(java.time.ZoneId.of("Asia/Kuala_Lumpur"));
             java.time.LocalTime nowLT = java.time.LocalTime.now(java.time.ZoneId.of("Asia/Kuala_Lumpur"));
@@ -496,6 +541,45 @@ public class FasilitiServlet extends HttpServlet {
                 String msg = (e.getMessage() != null) ? e.getMessage() : e.toString();
                 response.getWriter().write("{\"error\":\"" + msg.replace("\"", "\\\"") + "\"}");
             }
+        }
+    }
+
+    /**
+     * Returns per-facility booking configuration as JSON for the frontend to build
+     * dynamic dropdown options instead of hardcoding duration choices.
+     */
+    private void handleGetBookingConfig(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        String idStr = request.getParameter("id");
+        if (idStr == null || idStr.isEmpty()) {
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
+
+        try {
+            int idFasiliti = Integer.parseInt(idStr);
+            Fasiliti f = fasilitiDAO.dapatkanFasilitiById(idFasiliti);
+            if (f == null) {
+                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                return;
+            }
+
+            String waktuBuka = f.getWaktu_buka() != null ? f.getWaktu_buka().toString() : "08:00:00";
+            String waktuTutup = f.getWaktu_tutup() != null ? f.getWaktu_tutup().toString() : "22:00:00";
+            int durasiSlotMinit = f.getDurasi_slot_minit() > 0 ? f.getDurasi_slot_minit() : 120;
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            PrintWriter out = response.getWriter();
+            out.print("{");
+            out.print("\"waktuBuka\":\"" + waktuBuka + "\",");
+            out.print("\"waktuTutup\":\"" + waktuTutup + "\",");
+            out.print("\"durasiSlotMinit\":" + durasiSlotMinit + ",");
+            out.print("\"requiresApproval\":" + f.isRequiresApproval());
+            out.print("}");
+            out.flush();
+        } catch (Exception e) {
+            e.printStackTrace();
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 

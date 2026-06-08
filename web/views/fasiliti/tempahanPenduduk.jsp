@@ -393,9 +393,7 @@
                     <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Tempoh Tempahan</label>
                     <select name="tempoh_tempahan" id="tempoh_tempahan" onchange="toggleDuration()"
                             class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium">
-                        <option value="1">1 Jam</option>
-                        <option value="2">2 Jam</option>
-                        <option value="specific">Masa Spesifik</option>
+                        <!-- Options populated dynamically by openBookingModal() -->
                     </select>
                 </div>
 
@@ -695,7 +693,7 @@
         tamatHidden.value = "";
         catatanInput.value = "";
 
-        if (tempoh === '2') {
+        if (tempoh === 'slot') {
             // Show Slot Picker, Hide Sebab
             slotContainer.classList.remove('hidden');
             catatanContainer.classList.add('hidden');
@@ -742,7 +740,7 @@
             })
             .then(data => {
                 console.log('Slots received:', data);
-                if (tempoh === '2') {
+                if (tempoh === 'slot') {
                     slotSelect.innerHTML = '<option value="">Pilih Slot Masa</option>';
                     if (data.length === 0) {
                         slotSelect.innerHTML = '<option value="">Tiada slot tersedia untuk tarikh ini</option>';
@@ -776,7 +774,7 @@
             })
             .catch(err => {
                 console.error('Fetch error:', err);
-                if (tempoh === '2') {
+                if (tempoh === 'slot') {
                     slotSelect.innerHTML = '<option value="">Ralat: ' + err.message + '</option>';
                 }
             });
@@ -839,39 +837,63 @@
         document.getElementById('tarikh_tempah').min = today;
         
         const tempohSelect = document.getElementById('tempoh_tempahan');
-        tempohSelect.innerHTML = '';
+        tempohSelect.innerHTML = '<option value="">Memuat konfigurasi...</option>';
         
-        if (requiresApproval) {
-            // Options for facilities that need approval (e.g. Hall)
-            const optHalf = document.createElement('option');
-            optHalf.value = 'HalfDay';
-            optHalf.textContent = 'Separuh Hari (08:00 - 14:00)';
-            
-            const optFull = document.createElement('option');
-            optFull.value = 'FullDay';
-            optFull.textContent = 'Seharian Penuh (08:00 - 22:00)';
-            
-            tempohSelect.appendChild(optHalf);
-            tempohSelect.appendChild(optFull);
-        } else {
-            // Options for auto-approval facilities (e.g. Futsal)
-            const opt2 = document.createElement('option');
-            opt2.value = '2';
-            opt2.textContent = 'Slot 2 Jam (8 pagi - 12 malam)';
-            
-            const optFull = document.createElement('option');
-            optFull.value = 'FullDay';
-            optFull.textContent = 'Seharian Penuh (08:00 - 22:00)';
-            
-            tempohSelect.appendChild(opt2);
-            tempohSelect.appendChild(optFull);
-        }
+        // Fetch facility booking config from database
+        fetch('<%= contextPath %>/fasiliti/getBookingConfig?id=' + id)
+            .then(res => res.json())
+            .then(config => {
+                tempohSelect.innerHTML = '';
+                
+                // Build dynamic duration label from DB config
+                const durasiMinit = config.durasiSlotMinit;
+                const hours = Math.floor(durasiMinit / 60);
+                const mins = durasiMinit % 60;
+                let durasiLabel = '';
+                if (hours > 0) durasiLabel += hours + ' Jam';
+                if (mins > 0) durasiLabel += (durasiLabel ? ' ' : '') + mins + ' Minit';
+                
+                const waktuBuka = config.waktuBuka.substring(0, 5);
+                const waktuTutup = config.waktuTutup.substring(0, 5);
+                
+                // Slot option (always available)
+                const optSlot = document.createElement('option');
+                optSlot.value = 'slot';
+                optSlot.textContent = 'Slot ' + durasiLabel + ' (' + waktuBuka + ' - ' + waktuTutup + ')';
+                tempohSelect.appendChild(optSlot);
+                
+                // HalfDay option (always available)
+                const optHalf = document.createElement('option');
+                optHalf.value = 'HalfDay';
+                optHalf.textContent = 'Separuh Hari (' + waktuBuka + ' - Separuh Waktu Operasi)';
+                tempohSelect.appendChild(optHalf);
+                
+                // FullDay option (always available)
+                const optFull = document.createElement('option');
+                optFull.value = 'FullDay';
+                optFull.textContent = 'Seharian Penuh (' + waktuBuka + ' - ' + waktuTutup + ')';
+                tempohSelect.appendChild(optFull);
+                
+                // Trigger UI update
+                toggleDuration();
+            })
+            .catch(err => {
+                console.error('Failed to load booking config:', err);
+                // Fallback defaults
+                tempohSelect.innerHTML = '';
+                const optSlot = document.createElement('option');
+                optSlot.value = 'slot';
+                optSlot.textContent = 'Slot 2 Jam (08:00 - 22:00)';
+                tempohSelect.appendChild(optSlot);
+                const optFull = document.createElement('option');
+                optFull.value = 'FullDay';
+                optFull.textContent = 'Seharian Penuh (08:00 - 22:00)';
+                tempohSelect.appendChild(optFull);
+                toggleDuration();
+            });
 
         document.getElementById('modalTempah').classList.remove('hidden');
         document.body.style.overflow = 'hidden';
-        
-        // Trigger toggleDuration and loadSlots to refresh UI
-        toggleDuration();
     }
 
     var detailsMap, detailsMarker;

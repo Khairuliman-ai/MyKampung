@@ -1,5 +1,6 @@
 package model;
 
+import java.sql.Time;
 import java.sql.Timestamp;
 
 /**
@@ -19,6 +20,9 @@ public class Fasiliti {
     private boolean occupied;
     private boolean requiresApproval;
     private String gambar_fasiliti;
+    private Time waktu_buka;
+    private Time waktu_tutup;
+    private int durasi_slot_minit;
 
     // --- Constructor Kosong ---
     public Fasiliti() {}
@@ -116,5 +120,29 @@ public class Fasiliti {
 
     public void setGambar_fasiliti(String gambar_fasiliti) {
         this.gambar_fasiliti = gambar_fasiliti;
+    }
+
+    public Time getWaktu_buka() {
+        return waktu_buka;
+    }
+
+    public void setWaktu_buka(Time waktu_buka) {
+        this.waktu_buka = waktu_buka;
+    }
+
+    public Time getWaktu_tutup() {
+        return waktu_tutup;
+    }
+
+    public void setWaktu_tutup(Time waktu_tutup) {
+        this.waktu_tutup = waktu_tutup;
+    }
+
+    public int getDurasi_slot_minit() {
+        return durasi_slot_minit;
+    }
+
+    public void setDurasi_slot_minit(int durasi_slot_minit) {
+        this.durasi_slot_minit = durasi_slot_minit;
     }
 }

@@ -56,6 +56,9 @@ public class FasilitiDAO {
                 f.setOccupied(rs.getInt("occupancy_count") > 0);
                 f.setRequiresApproval(rs.getBoolean("requires_approval"));
                 f.setGambar_fasiliti(rs.getString("gambar_fasiliti"));
+                f.setWaktu_buka(rs.getTime("waktu_buka"));
+                f.setWaktu_tutup(rs.getTime("waktu_tutup"));
+                f.setDurasi_slot_minit(rs.getInt("durasi_slot_minit"));
                 senarai.add(f);
             }
         } catch (SQLException e) {
@@ -95,6 +98,9 @@ public class FasilitiDAO {
                     f.setLongitude(rs.wasNull() ? null : lon);
                     f.setRequiresApproval(rs.getBoolean("requires_approval"));
                     f.setGambar_fasiliti(rs.getString("gambar_fasiliti"));
+                    f.setWaktu_buka(rs.getTime("waktu_buka"));
+                    f.setWaktu_tutup(rs.getTime("waktu_tutup"));
+                    f.setDurasi_slot_minit(rs.getInt("durasi_slot_minit"));
                 }
             }
         } catch (SQLException e) {
@@ -110,7 +116,7 @@ public class FasilitiDAO {
      * @return true if the insert succeeded, false otherwise
      */
     public boolean tambahFasiliti(Fasiliti f) {
-        String sql = "INSERT INTO fasiliti (nama_fasiliti, lokasi, status, latitude, longitude, requires_approval, gambar_fasiliti) VALUES (?, ?, '" + StatusConstant.FASILITI_AKTIF + "', ?, ?, ?, ?)";
+        String sql = "INSERT INTO fasiliti (nama_fasiliti, lokasi, status, latitude, longitude, requires_approval, gambar_fasiliti, waktu_buka, waktu_tutup, durasi_slot_minit) VALUES (?, ?, '" + StatusConstant.FASILITI_AKTIF + "', ?, ?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, f.getNama_fasiliti());
@@ -119,6 +125,9 @@ public class FasilitiDAO {
             if (f.getLongitude() != null) ps.setDouble(4, f.getLongitude()); else ps.setNull(4, java.sql.Types.DECIMAL);
             ps.setBoolean(5, f.isRequiresApproval());
             ps.setString(6, f.getGambar_fasiliti());
+            ps.setTime(7, f.getWaktu_buka() != null ? f.getWaktu_buka() : java.sql.Time.valueOf("08:00:00"));
+            ps.setTime(8, f.getWaktu_tutup() != null ? f.getWaktu_tutup() : java.sql.Time.valueOf("22:00:00"));
+            ps.setInt(9, f.getDurasi_slot_minit() > 0 ? f.getDurasi_slot_minit() : 120);
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Ralat pada FasilitiDAO (tambah): " + e.getMessage());
@@ -133,7 +142,7 @@ public class FasilitiDAO {
      * @return true if the update was successful, false otherwise
      */
     public boolean kemaskiniFasiliti(Fasiliti f) {
-        String sql = "UPDATE fasiliti SET nama_fasiliti=?, lokasi=?, status=?, latitude=?, longitude=?, requires_approval=?, gambar_fasiliti=?, dikemaskini_pada=NOW() WHERE id_fasiliti=?";
+        String sql = "UPDATE fasiliti SET nama_fasiliti=?, lokasi=?, status=?, latitude=?, longitude=?, requires_approval=?, gambar_fasiliti=?, waktu_buka=?, waktu_tutup=?, durasi_slot_minit=?, dikemaskini_pada=NOW() WHERE id_fasiliti=?";
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, f.getNama_fasiliti());
@@ -143,7 +152,10 @@ public class FasilitiDAO {
             if (f.getLongitude() != null) ps.setDouble(5, f.getLongitude()); else ps.setNull(5, java.sql.Types.DECIMAL);
             ps.setBoolean(6, f.isRequiresApproval());
             ps.setString(7, f.getGambar_fasiliti());
-            ps.setInt(8, f.getId_fasiliti());
+            ps.setTime(8, f.getWaktu_buka() != null ? f.getWaktu_buka() : java.sql.Time.valueOf("08:00:00"));
+            ps.setTime(9, f.getWaktu_tutup() != null ? f.getWaktu_tutup() : java.sql.Time.valueOf("22:00:00"));
+            ps.setInt(10, f.getDurasi_slot_minit() > 0 ? f.getDurasi_slot_minit() : 120);
+            ps.setInt(11, f.getId_fasiliti());
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {
             System.out.println("Ralat pada FasilitiDAO (kemaskini): " + e.getMessage());
@@ -205,6 +217,9 @@ public class FasilitiDAO {
                 f.setOccupied(rs.getInt("occupancy_count") > 0);
                 f.setRequiresApproval(rs.getBoolean("requires_approval"));
                 f.setGambar_fasiliti(rs.getString("gambar_fasiliti"));
+                f.setWaktu_buka(rs.getTime("waktu_buka"));
+                f.setWaktu_tutup(rs.getTime("waktu_tutup"));
+                f.setDurasi_slot_minit(rs.getInt("durasi_slot_minit"));
                 senarai.add(f);
             }
         } catch (SQLException e) {

@@ -107,7 +107,7 @@
                                             </a>
                                         <% } } %>
                                         
-                                        <button onclick="openEditModal('<%= f.getId_fasiliti() %>', '<%= f.getNama_fasiliti() %>', '<%= f.getLokasi() %>', '<%= f.getStatus() %>', '<%= f.getLatitude() != null ? f.getLatitude() : "" %>', '<%= f.getLongitude() != null ? f.getLongitude() : "" %>', <%= f.isRequiresApproval() %>, '<%= f.getGambar_fasiliti() != null ? f.getGambar_fasiliti() : "" %>')" 
+                                        <button onclick="openEditModal('<%= f.getId_fasiliti() %>', '<%= f.getNama_fasiliti() %>', '<%= f.getLokasi() %>', '<%= f.getStatus() %>', '<%= f.getLatitude() != null ? f.getLatitude() : "" %>', '<%= f.getLongitude() != null ? f.getLongitude() : "" %>', <%= f.isRequiresApproval() %>, '<%= f.getGambar_fasiliti() != null ? f.getGambar_fasiliti() : "" %>', '<%= f.getWaktu_buka() != null ? f.getWaktu_buka().toString().substring(0,5) : "08:00" %>', '<%= f.getWaktu_tutup() != null ? f.getWaktu_tutup().toString().substring(0,5) : "22:00" %>', <%= f.getDurasi_slot_minit() > 0 ? f.getDurasi_slot_minit() : 120 %>)" 
                                                 class="w-8 h-8 flex items-center justify-center text-blue-600 hover:bg-blue-100 rounded-lg transition" title="Kemaskini">
                                             <i class="fas fa-pen text-xs"></i>
                                         </button>
@@ -410,6 +410,35 @@
                     <span class="text-xs font-bold text-gray-500 uppercase tracking-widest">Perlu Kelulusan Manual</span>
                 </div>
 
+                <!-- Operating Hours & Slot Duration -->
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Waktu Operasi</label>
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-[9px] font-medium text-gray-400 px-2 mb-1">Waktu Buka</label>
+                            <input type="time" name="waktu_buka" id="fasilitiWaktuBuka" value="08:00"
+                                   class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium">
+                        </div>
+                        <div>
+                            <label class="block text-[9px] font-medium text-gray-400 px-2 mb-1">Waktu Tutup</label>
+                            <input type="time" name="waktu_tutup" id="fasilitiWaktuTutup" value="22:00"
+                                   class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="space-y-2">
+                    <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Durasi Setiap Slot Tempahan</label>
+                    <select name="durasi_slot_minit" id="fasilitiDurasiSlot"
+                            class="w-full px-6 py-4 bg-gray-50 border-none rounded-2xl focus:ring-2 focus:ring-brand-purple text-sm font-medium appearance-none">
+                        <option value="60">1 Jam</option>
+                        <option value="90">1 Jam 30 Minit</option>
+                        <option value="120" selected>2 Jam</option>
+                        <option value="180">3 Jam</option>
+                        <option value="240">4 Jam</option>
+                    </select>
+                </div>
+
                 <div class="space-y-2">
                     <label class="block text-[10px] font-bold text-gray-400 uppercase tracking-widest px-2">Lokasi Pada Peta</label>
                     <div id="mapFasiliti" style="height: 250px; border-radius: 1rem; z-index: 0;" class="border-2 border-dashed border-gray-100"></div>
@@ -661,12 +690,15 @@
         document.getElementById('cardPreviewNama').innerText = "Nama Fasiliti";
         document.getElementById('cardPreviewLokasi').innerText = "Lokasi";
         document.getElementById('cardPreviewImg').src = "${pageContext.request.contextPath}/assets/img/placeholder.png";
+        document.getElementById('fasilitiWaktuBuka').value = "08:00";
+        document.getElementById('fasilitiWaktuTutup').value = "22:00";
+        document.getElementById('fasilitiDurasiSlot').value = "120";
         croppedBlob = null;
         openModal('modalFasiliti');
         setTimeout(function(){ initFasilitiMap(); }, 100);
     }
 
-    function openEditModal(id, nama, lokasi, status, lat, lon, requiresApproval, currentImage) {
+    function openEditModal(id, nama, lokasi, status, lat, lon, requiresApproval, currentImage, waktuBuka, waktuTutup, durasiSlot) {
         document.getElementById('modalTitle').innerText = "Kemaskini Fasiliti";
         document.getElementById('formFasiliti').action = "<%= contextPath %>/fasiliti/edit";
         document.getElementById('fasilitiId').value = id;
@@ -674,6 +706,9 @@
         document.getElementById('fasilitiLokasi').value = lokasi;
         document.getElementById('fasilitiStatus').value = status;
         document.getElementById('fasilitiRequiresApproval').checked = requiresApproval;
+        document.getElementById('fasilitiWaktuBuka').value = waktuBuka || '08:00';
+        document.getElementById('fasilitiWaktuTutup').value = waktuTutup || '22:00';
+        document.getElementById('fasilitiDurasiSlot').value = durasiSlot || '120';
         
         document.getElementById('cardPreviewNama').innerText = nama;
         document.getElementById('cardPreviewLokasi').innerText = lokasi;
