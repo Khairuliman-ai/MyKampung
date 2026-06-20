@@ -7,6 +7,13 @@
     List<Hebahan> list = (List<Hebahan>) request.getAttribute("hebahanList");
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     String keyword = request.getParameter("q");
+    Integer currentPage = (Integer) request.getAttribute("currentPage");
+    Integer totalPages = (Integer) request.getAttribute("totalPages");
+    if (currentPage == null) currentPage = 1;
+    if (totalPages == null) totalPages = 1;
+    String kategoriParam = request.getParameter("kategori");
+    String sortParam = request.getParameter("sort");
+    if (sortParam == null || sortParam.isEmpty()) sortParam = "DESC";
 %>
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F7F7F9]">
@@ -20,6 +27,9 @@
     <!-- Search & Filter Bar -->
     <div class="flex gap-4 mb-6">
         <form action="${pageContext.request.contextPath}/hebahan/list" method="get" class="flex gap-3 flex-1">
+            <% if (kategoriParam != null && !kategoriParam.isEmpty()) { %>
+                <input type="hidden" name="kategori" value="<%= kategoriParam %>">
+            <% } %>
             <div class="flex-1 relative">
                 <i class="fas fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
                 <input type="text" name="q" placeholder="Cari hebahan..." value="<%= keyword != null ? keyword : "" %>"
@@ -28,8 +38,8 @@
             
             <div class="relative min-w-[160px]">
                 <select name="sort" onchange="this.form.submit()" class="w-full px-4 py-3 rounded-xl bg-white border border-gray-100 focus:ring-2 focus:ring-brand-purple text-sm appearance-none cursor-pointer">
-                    <option value="DESC" <%= "DESC".equals(request.getParameter("sort")) ? "selected" : "" %>>Terbaru</option>
-                    <option value="ASC" <%= "ASC".equals(request.getParameter("sort")) ? "selected" : "" %>>Terlama</option>
+                    <option value="DESC" <%= "DESC".equals(sortParam) ? "selected" : "" %>>Terbaru</option>
+                    <option value="ASC" <%= "ASC".equals(sortParam) ? "selected" : "" %>>Terlama</option>
                 </select>
                 <i class="fas fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none text-[10px]"></i>
             </div>
@@ -42,10 +52,22 @@
 
     <!-- Category Filter Pills -->
     <div class="flex gap-2 mb-6">
-        <a href="${pageContext.request.contextPath}/hebahan/list" class="px-4 py-2 rounded-full text-xs font-bold bg-brand-purple text-white">Semua</a>
-        <a href="?kategori=Kecemasan" class="px-4 py-2 rounded-full text-xs font-bold bg-red-50 text-red-600 border border-red-100">Kecemasan</a>
-        <a href="?kategori=Aktiviti" class="px-4 py-2 rounded-full text-xs font-bold bg-blue-50 text-blue-600 border border-blue-100">Aktiviti</a>
-        <a href="?kategori=Umum" class="px-4 py-2 rounded-full text-xs font-bold bg-green-50 text-green-600 border border-green-100">Umum</a>
+        <a href="${pageContext.request.contextPath}/hebahan/list?sort=<%= sortParam %><%= keyword != null ? "&q=" + keyword : "" %>" 
+           class="px-4 py-2 rounded-full text-xs font-bold transition <%= (kategoriParam == null || kategoriParam.isEmpty()) ? "bg-brand-purple text-white shadow-lg shadow-purple-100" : "bg-gray-100 text-gray-600 hover:bg-gray-200" %>">
+           Semua
+        </a>
+        <a href="?kategori=Kecemasan&sort=<%= sortParam %><%= keyword != null ? "&q=" + keyword : "" %>" 
+           class="px-4 py-2 rounded-full text-xs font-bold transition <%= "Kecemasan".equals(kategoriParam) ? "bg-red-600 text-white shadow-lg shadow-red-100" : "bg-red-50 text-red-600 border border-red-100 hover:bg-red-100/50" %>">
+           Kecemasan
+        </a>
+        <a href="?kategori=Aktiviti&sort=<%= sortParam %><%= keyword != null ? "&q=" + keyword : "" %>" 
+           class="px-4 py-2 rounded-full text-xs font-bold transition <%= "Aktiviti".equals(kategoriParam) ? "bg-blue-600 text-white shadow-lg shadow-blue-100" : "bg-blue-50 text-blue-600 border border-blue-100 hover:bg-blue-100/50" %>">
+           Aktiviti
+        </a>
+        <a href="?kategori=Umum&sort=<%= sortParam %><%= keyword != null ? "&q=" + keyword : "" %>" 
+           class="px-4 py-2 rounded-full text-xs font-bold transition <%= "Umum".equals(kategoriParam) ? "bg-green-600 text-white shadow-lg shadow-green-100" : "bg-green-50 text-green-600 border border-green-100 hover:bg-green-100/50" %>">
+           Umum
+        </a>
     </div>
 
     <!-- List Layout -->
@@ -61,19 +83,22 @@
                     }
                 }
         %>
-        <div onclick="showHebahanDetail({
-                id: '<%= h.getId_hebahan() %>',
-                tajuk: '<%= h.getTajuk().replace("'", "\\'") %>',
-                kandungan: `<%= h.getKandungan().replace("`", "\\`") %>`,
-                kategori: '<%= h.getKategori() %>',
-                badgeClass: '<%= h.getKategoriBadgeClass() %>',
-                icon: '<%= h.getKategoriIcon() %>',
-                gambar: '<%= h.getGambar_poster() != null ? h.getGambar_poster() : "" %>',
-                lokasi: '<%= h.getLokasi_acara() != null ? h.getLokasi_acara().replace("'", "\\'") : "-" %>',
-                tarikhHebahan: '<%= fullDate %>',
-                tarikhAcara: '<%= eventDateRange %>'
-             })"
-           class="bg-white rounded-[2rem] shadow-sm border border-gray-50 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col md:flex-row md:h-64 cursor-pointer">
+        <%
+            java.util.Map<String, String> hData = new java.util.LinkedHashMap<>();
+            hData.put("id", String.valueOf(h.getId_hebahan()));
+            hData.put("tajuk", h.getTajuk());
+            hData.put("kandungan", h.getKandungan());
+            hData.put("kategori", h.getKategori());
+            hData.put("badgeClass", h.getKategoriBadgeClass());
+            hData.put("icon", h.getKategoriIcon());
+            hData.put("gambar", h.getGambar_poster() != null ? h.getGambar_poster() : "");
+            hData.put("lokasi", h.getLokasi_acara() != null ? h.getLokasi_acara() : "-");
+            hData.put("tarikhHebahan", fullDate);
+            hData.put("tarikhAcara", eventDateRange);
+            String jsonAttr = util.JsonUtil.toSafeAttr(hData);
+        %>
+        <div data-hebahan="<%= jsonAttr %>"
+           class="hebahan-card bg-white rounded-[2rem] shadow-sm border border-gray-50 overflow-hidden hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group flex flex-col md:flex-row md:h-64 cursor-pointer">
 
             <!-- Poster Image Section -->
             <div class="w-full md:w-72 lg:w-96 shrink-0 relative overflow-hidden bg-gray-100">
@@ -140,76 +165,70 @@
             </div>
         <% } %>
     </div> <!-- Closes List Layout -->
+
+    <!-- Pagination Bar -->
+    <% if (totalPages > 1) { %>
+    <div class="flex justify-center items-center gap-2 mt-12 bg-white px-6 py-4 rounded-[2rem] shadow-sm border border-gray-50 max-w-fit mx-auto">
+        <%-- Previous Button --%>
+        <% if (currentPage > 1) { %>
+            <a href="?page=<%= currentPage - 1 %><%= sortParam != null ? "&sort=" + sortParam : "" %><%= keyword != null ? "&q=" + keyword : "" %><%= kategoriParam != null ? "&kategori=" + kategoriParam : "" %>" 
+               class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-600 flex items-center justify-center transition border border-gray-100 text-xs">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        <% } else { %>
+            <span class="w-10 h-10 rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center border border-gray-100 text-xs cursor-not-allowed">
+                <i class="fas fa-chevron-left"></i>
+            </span>
+        <% } %>
+
+        <%-- Page Numbers --%>
+        <% for (int i = 1; i <= totalPages; i++) { 
+            if (i == currentPage) { %>
+                <span class="w-10 h-10 rounded-xl bg-brand-purple text-white flex items-center justify-center font-bold text-xs shadow-md shadow-purple-100">
+                    <%= i %>
+                </span>
+            <% } else { %>
+                <a href="?page=<%= i %><%= sortParam != null ? "&sort=" + sortParam : "" %><%= keyword != null ? "&q=" + keyword : "" %><%= kategoriParam != null ? "&kategori=" + kategoriParam : "" %>" 
+                   class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-600 flex items-center justify-center transition border border-gray-100 text-xs font-semibold">
+                    <%= i %>
+                </a>
+            <% } %>
+        <% } %>
+
+        <%-- Next Button --%>
+        <% if (currentPage < totalPages) { %>
+            <a href="?page=<%= currentPage + 1 %><%= sortParam != null ? "&sort=" + sortParam : "" %><%= keyword != null ? "&q=" + keyword : "" %><%= kategoriParam != null ? "&kategori=" + kategoriParam : "" %>" 
+               class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-600 flex items-center justify-center transition border border-gray-100 text-xs">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        <% } else { %>
+            <span class="w-10 h-10 rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center border border-gray-100 text-xs cursor-not-allowed">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+        <% } %>
+    </div>
+    <% } %>
 </div> <!-- Closes flex-1 main scrollable area -->
 
-<!-- Modal Detail Hebahan -->
-<div id="modalHebahan" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-gray-900 bg-opacity-40 transition-opacity backdrop-blur-sm" onclick="closeHebahanModal()"></div>
-    <div class="flex min-h-screen items-center justify-center p-4">
-        <div class="relative w-full max-w-4xl bg-white rounded-[3rem] shadow-2xl overflow-hidden transform transition-all duration-300">
-            <!-- Header Image -->
-            <div id="modalImageContainer" class="h-64 md:h-96 bg-gray-100 overflow-hidden relative">
-                <img id="modalImage" src="" class="w-full h-full object-cover">
-                <div id="modalGradient" class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                <button onclick="closeHebahanModal()" class="absolute top-6 right-6 w-12 h-12 bg-white/20 hover:bg-white/40 backdrop-blur-md text-white rounded-2xl flex items-center justify-center transition-all">
-                    <i class="fas fa-times"></i>
-                </button>
-                <div class="absolute bottom-8 left-8 right-8 text-white">
-                    <div id="modalBadge" class="inline-block px-4 py-1.5 rounded-full text-[10px] font-bold uppercase mb-4 backdrop-blur-md border border-white/20"></div>
-                    <h2 id="modalTitle" class="text-2xl md:text-4xl font-bold"></h2>
-                </div>
-            </div>
-
-            <!-- Content Body -->
-            <div class="p-8 md:p-12">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-                    <div class="md:col-span-2">
-                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-100 pb-2">Kandungan Hebahan</h3>
-                        <div id="modalKandungan" class="text-gray-600 leading-relaxed space-y-4 whitespace-pre-wrap"></div>
-                    </div>
-                    <div class="space-y-8">
-                        <div>
-                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-100 pb-2">Maklumat Acara</h3>
-                            <div class="space-y-4">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-xl bg-purple-50 text-brand-purple flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-[10px] font-bold text-gray-400 uppercase">Lokasi</p>
-                                        <p id="modalLokasi" class="text-sm font-bold text-gray-700"></p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-clock"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-[10px] font-bold text-gray-400 uppercase">Tarikh Acara</p>
-                                        <p id="modalTarikhAcara" class="text-sm font-bold text-gray-700"></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="p-6 bg-gray-50 rounded-[2rem] border border-gray-100">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Hebahan Diterbitkan Pada</p>
-                            <p id="modalTarikhHebahan" class="text-xs font-bold text-gray-600"></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+<%@ include file="/views/hebahan/components/modalDetail.jsp" %>
 
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.hebahan-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const data = JSON.parse(card.dataset.hebahan);
+                showHebahanDetail(data);
+            });
+        });
+    });
+
     function showHebahanDetail(data) {
-        const modal = document.getElementById('modalHebahan');
+        const modal = document.getElementById('modalDetailPreview');
         const img = document.getElementById('modalImage');
         const imgContainer = document.getElementById('modalImageContainer');
         const grad = document.getElementById('modalGradient');
         
-        document.getElementById('modalTitle').innerText = data.tajuk;
+        document.getElementById('modalTitlePreview').innerText = data.tajuk;
         document.getElementById('modalKandungan').innerText = data.kandungan;
         document.getElementById('modalLokasi').innerText = data.lokasi;
         document.getElementById('modalTarikhAcara').innerText = data.tarikhAcara;
@@ -239,8 +258,8 @@
         document.body.style.overflow = 'hidden';
     }
 
-    function closeHebahanModal() {
-        const modal = document.getElementById('modalHebahan');
+    function closeDetailModal() {
+        const modal = document.getElementById('modalDetailPreview');
         modal.classList.add('hidden');
         document.body.style.overflow = 'auto';
         

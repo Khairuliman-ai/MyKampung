@@ -13,6 +13,8 @@ import util.DBUtil;
  */
 public class HebahanDAO {
 
+    private static final java.util.logging.Logger LOGGER = java.util.logging.Logger.getLogger(HebahanDAO.class.getName());
+
     /**
      * Inserts a new announcement record into the database.
      * The announcement date (tarikh_hebahan) is automatically set to CURDATE().
@@ -41,7 +43,9 @@ public class HebahanDAO {
             ps.setTimestamp(10, h.getTarikh_tamat() != null
                 ? new Timestamp(h.getTarikh_tamat().getTime()) : null);
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam insertHebahan", e);
+        }
         return false;
     }
 
@@ -64,7 +68,9 @@ public class HebahanDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) list.add(mapRow(rs));
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam getAll(sortOrder)", e);
+        }
         return list;
     }
 
@@ -75,6 +81,46 @@ public class HebahanDAO {
      */
     public List<Hebahan> getAll() {
         return getAll("DESC");
+    }
+
+    /**
+     * Retrieves all announcements (paginated).
+     */
+    public List<Hebahan> getAll(String sortOrder, int page, int pageSize) {
+        if (sortOrder == null || (!sortOrder.equalsIgnoreCase("ASC") && !sortOrder.equalsIgnoreCase("DESC"))) {
+            sortOrder = "DESC";
+        }
+        List<Hebahan> list = new ArrayList<>();
+        String sql = "SELECT h.*, p.nama_penuh FROM hebahan h "
+            + "JOIN pengguna p ON h.id_pengguna = p.id_pengguna "
+            + "WHERE h.dipadam_pada IS NULL ORDER BY h.tarikh_hebahan " + sortOrder + ", h.dibuat_pada " + sortOrder
+            + " LIMIT ? OFFSET ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, pageSize);
+            ps.setInt(2, (page - 1) * pageSize);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam getAll(sortOrder, page, pageSize)", e);
+        }
+        return list;
+    }
+
+    /**
+     * Counts all non-deleted announcements.
+     */
+    public int countAll() {
+        String sql = "SELECT COUNT(*) FROM hebahan WHERE dipadam_pada IS NULL";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam countAll", e);
+        }
+        return 0;
     }
 
     /**
@@ -100,8 +146,55 @@ public class HebahanDAO {
              PreparedStatement ps = conn.prepareStatement(sql);
              ResultSet rs = ps.executeQuery()) {
             while (rs.next()) list.add(mapRow(rs));
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam getPublished(sortOrder)", e);
+        }
         return list;
+    }
+
+    /**
+     * Retrieves published announcements (paginated).
+     */
+    public List<Hebahan> getPublished(String sortOrder, int page, int pageSize) {
+        if (sortOrder == null || (!sortOrder.equalsIgnoreCase("ASC") && !sortOrder.equalsIgnoreCase("DESC"))) {
+            sortOrder = "DESC";
+        }
+        List<Hebahan> list = new ArrayList<>();
+        String sql = "SELECT h.*, p.nama_penuh FROM hebahan h "
+            + "JOIN pengguna p ON h.id_pengguna = p.id_pengguna "
+            + "WHERE h.status_hebahan = 'Published' "
+            + "AND h.dipadam_pada IS NULL "
+            + "AND (h.tarikh_tamat IS NULL OR h.tarikh_tamat > NOW()) "
+            + "ORDER BY FIELD(h.kategori, 'Kecemasan', 'Aktiviti', 'Umum'), "
+            + "h.tarikh_hebahan " + sortOrder
+            + " LIMIT ? OFFSET ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, pageSize);
+            ps.setInt(2, (page - 1) * pageSize);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam getPublished(sortOrder, page, pageSize)", e);
+        }
+        return list;
+    }
+
+    /**
+     * Counts total current published announcements.
+     */
+    public int countPublished() {
+        String sql = "SELECT COUNT(*) FROM hebahan WHERE status_hebahan = 'Published' "
+            + "AND dipadam_pada IS NULL AND (tarikh_tamat IS NULL OR tarikh_tamat > NOW())";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) return rs.getInt(1);
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam countPublished", e);
+        }
+        return 0;
     }
 
     /**
@@ -111,6 +204,55 @@ public class HebahanDAO {
      */
     public List<Hebahan> getPublished() {
         return getPublished("DESC");
+    }
+
+    /**
+     * Retrieves published announcements filtered by category (paginated).
+     */
+    public List<Hebahan> getPublishedByKategori(String kategori, String sortOrder, int page, int pageSize) {
+        if (sortOrder == null || (!sortOrder.equalsIgnoreCase("ASC") && !sortOrder.equalsIgnoreCase("DESC"))) {
+            sortOrder = "DESC";
+        }
+        List<Hebahan> list = new ArrayList<>();
+        String sql = "SELECT h.*, p.nama_penuh FROM hebahan h "
+            + "JOIN pengguna p ON h.id_pengguna = p.id_pengguna "
+            + "WHERE h.status_hebahan = 'Published' "
+            + "AND h.dipadam_pada IS NULL "
+            + "AND (h.tarikh_tamat IS NULL OR h.tarikh_tamat > NOW()) "
+            + "AND h.kategori = ? "
+            + "ORDER BY h.tarikh_hebahan " + sortOrder
+            + " LIMIT ? OFFSET ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, kategori);
+            ps.setInt(2, pageSize);
+            ps.setInt(3, (page - 1) * pageSize);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam getPublishedByKategori", e);
+        }
+        return list;
+    }
+
+    /**
+     * Counts current published announcements filtered by category.
+     */
+    public int countPublishedByKategori(String kategori) {
+        String sql = "SELECT COUNT(*) FROM hebahan WHERE status_hebahan = 'Published' "
+            + "AND dipadam_pada IS NULL AND (tarikh_tamat IS NULL OR tarikh_tamat > NOW()) "
+            + "AND kategori = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, kategori);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam countPublishedByKategori", e);
+        }
+        return 0;
     }
 
     /**
@@ -129,7 +271,9 @@ public class HebahanDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return mapRow(rs);
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam getById", e);
+        }
         return null;
     }
 
@@ -161,8 +305,64 @@ public class HebahanDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) list.add(mapRow(rs));
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam searchPublished(keyword, sortOrder)", e);
+        }
         return list;
+    }
+
+    /**
+     * Searches current published announcements (paginated).
+     */
+    public List<Hebahan> searchPublished(String keyword, String sortOrder, int page, int pageSize) {
+        if (sortOrder == null || (!sortOrder.equalsIgnoreCase("ASC") && !sortOrder.equalsIgnoreCase("DESC"))) {
+            sortOrder = "DESC";
+        }
+        List<Hebahan> list = new ArrayList<>();
+        String sql = "SELECT h.*, p.nama_penuh FROM hebahan h "
+            + "JOIN pengguna p ON h.id_pengguna = p.id_pengguna "
+            + "WHERE h.status_hebahan = 'Published' "
+            + "AND h.dipadam_pada IS NULL "
+            + "AND (h.tarikh_tamat IS NULL OR h.tarikh_tamat > NOW()) "
+            + "AND (h.tajuk LIKE ? OR h.kandungan LIKE ?) "
+            + "ORDER BY FIELD(h.kategori, 'Kecemasan', 'Aktiviti', 'Umum'), "
+            + "h.tarikh_hebahan " + sortOrder
+            + " LIMIT ? OFFSET ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            String q = "%" + keyword + "%";
+            ps.setString(1, q);
+            ps.setString(2, q);
+            ps.setInt(3, pageSize);
+            ps.setInt(4, (page - 1) * pageSize);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) list.add(mapRow(rs));
+            }
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam searchPublished(keyword, sortOrder, page, pageSize)", e);
+        }
+        return list;
+    }
+
+    /**
+     * Counts current published announcements matching the keyword.
+     */
+    public int countSearchPublished(String keyword) {
+        String sql = "SELECT COUNT(*) FROM hebahan WHERE status_hebahan = 'Published' "
+            + "AND dipadam_pada IS NULL AND (tarikh_tamat IS NULL OR tarikh_tamat > NOW()) "
+            + "AND (tajuk LIKE ? OR kandungan LIKE ?)";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            String q = "%" + keyword + "%";
+            ps.setString(1, q);
+            ps.setString(2, q);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) return rs.getInt(1);
+            }
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam countSearchPublished", e);
+        }
+        return 0;
     }
 
     /**
@@ -193,7 +393,9 @@ public class HebahanDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) list.add(mapRow(rs));
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam getByPengguna", e);
+        }
         return list;
     }
 
@@ -225,7 +427,9 @@ public class HebahanDAO {
                 ? new Timestamp(h.getTarikh_tamat().getTime()) : null);
             ps.setInt(10, h.getId_hebahan());
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam updateHebahan", e);
+        }
         return false;
     }
 
@@ -241,7 +445,9 @@ public class HebahanDAO {
              PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, id);
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam softDelete", e);
+        }
         return false;
     }
 
@@ -259,7 +465,9 @@ public class HebahanDAO {
             ps.setString(1, status);
             ps.setInt(2, id);
             return ps.executeUpdate() > 0;
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam updateStatus", e);
+        }
         return false;
     }
 
@@ -277,7 +485,9 @@ public class HebahanDAO {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) return rs.getInt(1);
             }
-        } catch (SQLException e) { e.printStackTrace(); }
+        } catch (SQLException e) {
+            LOGGER.log(java.util.logging.Level.SEVERE, "Ralat SQL dalam countByStatus", e);
+        }
         return 0;
     }
 

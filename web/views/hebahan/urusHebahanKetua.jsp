@@ -9,6 +9,12 @@
     Integer totalPublished = (Integer) request.getAttribute("totalPublished");
     Integer totalDraft = (Integer) request.getAttribute("totalDraft");
     Integer totalArchived = (Integer) request.getAttribute("totalArchived");
+    Integer currentPage = (Integer) request.getAttribute("currentPage");
+    Integer totalPages = (Integer) request.getAttribute("totalPages");
+    if (currentPage == null) currentPage = 1;
+    if (totalPages == null) totalPages = 1;
+    String sortParam = request.getParameter("sort");
+    if (sortParam == null || sortParam.isEmpty()) sortParam = "DESC";
 %>
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F7F7F9]">
@@ -63,34 +69,42 @@
         <div class="overflow-x-auto">
             <table class="w-full text-left border-collapse">
                 <thead>
-                    <tr class="bg-purple-50 border-b border-purple-100">
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Tajuk</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Pencipta</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Kategori</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider">Status</th>
-                        <th class="p-4 text-xs font-bold text-brand-purple uppercase tracking-wider text-center">Tindakan</th>
+                    <tr class="bg-gray-50 border-b border-gray-100">
+                        <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Tajuk</th>
+                        <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Pencipta</th>
+                        <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Kategori</th>
+                        <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Status</th>
+                        <th class="p-4 text-xs font-bold text-gray-500 uppercase tracking-wider text-center">Tindakan</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-gray-100">
                     <% if (list != null && !list.isEmpty()) { 
                         for (Hebahan h : list) { %>
-                    <tr class="hover:bg-purple-50/30 transition">
+                    <tr class="hover:bg-gray-50/50 transition group">
                         <td class="p-4">
                             <div class="flex flex-col">
-                                <span class="text-sm font-bold text-gray-800"><%= h.getTajuk() %></span>
-                                <span class="text-[10px] text-gray-400"><%= sdf.format(h.getTarikh_hebahan()) %></span>
+                                <span class="text-sm font-bold text-gray-800 group-hover:text-brand-purple transition-colors"><%= h.getTajuk() %></span>
+                                <span class="text-[10px] text-gray-400 block mt-1"><%= sdf.format(h.getTarikh_hebahan()) %></span>
                             </div>
                         </td>
                         <td class="p-4 text-sm text-gray-600"><%= h.getNama_penuh() %></td>
-                        <td class="p-4">
-                            <span class="px-3 py-1 rounded-lg text-[10px] font-bold uppercase <%= h.getKategoriBadgeClass() %>">
-                                <%= h.getKategori() %>
-                            </span>
+                        <td class="p-4 text-center">
+                            <% if ("Kecemasan".equals(h.getKategori())) { %>
+                                <span class="px-2 py-1 rounded-lg text-[9px] font-bold bg-red-50 text-red-600 border border-red-100">KECEMASAN</span>
+                            <% } else if ("Aktiviti".equals(h.getKategori())) { %>
+                                <span class="px-2 py-1 rounded-lg text-[9px] font-bold bg-blue-50 text-blue-600 border border-blue-100">AKTIVITI</span>
+                            <% } else { %>
+                                <span class="px-2 py-1 rounded-lg text-[9px] font-bold bg-green-50 text-green-600 border border-green-100">UMUM</span>
+                            <% } %>
                         </td>
-                        <td class="p-4">
-                            <span class="px-3 py-1 rounded-full text-[10px] font-bold uppercase <%= h.getStatusBadgeClass() %>">
-                                <%= h.getStatus_hebahan() %>
-                            </span>
+                        <td class="p-4 text-center">
+                            <% if ("Published".equals(h.getStatus_hebahan())) { %>
+                                <span class="bg-green-50 text-green-600 text-[10px] font-bold px-3 py-1.5 rounded-full border border-green-100">PUBLISHED</span>
+                            <% } else if ("Draft".equals(h.getStatus_hebahan())) { %>
+                                <span class="bg-yellow-50 text-yellow-600 text-[10px] font-bold px-3 py-1.5 rounded-full border border-yellow-100">DRAFT</span>
+                            <% } else { %>
+                                <span class="bg-gray-50 text-gray-600 text-[10px] font-bold px-3 py-1.5 rounded-full border border-gray-100">ARCHIVED</span>
+                            <% } %>
                         </td>
                         <td class="p-4 text-center">
                             <button onclick="confirmDelete(<%= h.getId_hebahan() %>)" class="text-red-400 hover:text-red-600 transition">
@@ -101,8 +115,8 @@
                     <% } } else { %>
                     <tr>
                         <td colspan="5" class="p-12 text-center text-gray-400">
-                            <i class="fas fa-bullhorn text-4xl mb-4 opacity-20"></i>
-                            <p class="font-bold">Tiada Rekod Hebahan</p>
+                            <i class="fas fa-bullhorn text-4xl mb-4 block opacity-20 text-gray-300"></i>
+                            <span class="block mt-2 font-medium">Tiada Rekod Hebahan.</span>
                         </td>
                     </tr>
                     <% } %>
@@ -110,8 +124,50 @@
             </table>
         </div>
     </div>
+
+    <!-- Pagination Bar -->
+    <% if (totalPages > 1) { %>
+    <div class="flex justify-center items-center gap-2 mt-8 bg-white px-6 py-4 rounded-[2rem] shadow-sm border border-gray-50 max-w-fit mx-auto">
+        <%-- Previous Button --%>
+        <% if (currentPage > 1) { %>
+            <a href="?page=<%= currentPage - 1 %><%= sortParam != null ? "&sort=" + sortParam : "" %>" 
+               class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-600 flex items-center justify-center transition border border-gray-100 text-xs">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        <% } else { %>
+            <span class="w-10 h-10 rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center border border-gray-100 text-xs cursor-not-allowed">
+                <i class="fas fa-chevron-left"></i>
+            </span>
+        <% } %>
+
+        <%-- Page Numbers --%>
+        <% for (int i = 1; i <= totalPages; i++) { 
+            if (i == currentPage) { %>
+                <span class="w-10 h-10 rounded-xl bg-brand-purple text-white flex items-center justify-center font-bold text-xs shadow-md shadow-purple-100">
+                    <%= i %>
+                </span>
+            <% } else { %>
+                <a href="?page=<%= i %><%= sortParam != null ? "&sort=" + sortParam : "" %>" 
+                   class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-600 flex items-center justify-center transition border border-gray-100 text-xs font-semibold">
+                    <%= i %>
+                </a>
+            <% } %>
+        <% } %>
+
+        <%-- Next Button --%>
+        <% if (currentPage < totalPages) { %>
+            <a href="?page=<%= currentPage + 1 %><%= sortParam != null ? "&sort=" + sortParam : "" %>" 
+               class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-600 flex items-center justify-center transition border border-gray-100 text-xs">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        <% } else { %>
+            <span class="w-10 h-10 rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center border border-gray-100 text-xs cursor-not-allowed">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+        <% } %>
     </div>
-</div>
+    <% } %>
+    </div>
 
 <!-- Right Aside Bar -->
 <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
@@ -152,32 +208,64 @@
     </div>
 </aside>
 
-<!-- Modal Delete -->
-<div id="modalDelete" class="fixed inset-0 z-[100] hidden">
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur-sm" onclick="closeModal('modalDelete')"></div>
-    <div class="flex min-h-full items-center justify-center p-4">
-        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm">
-            <div class="p-6 text-center">
-                <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 mb-4">
-                    <i class="fas fa-trash text-red-600"></i>
-                </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2">Padam Hebahan?</h3>
-                <p class="text-sm text-gray-500">Anda mempunyai kuasa untuk memoderasi hebahan ini.</p>
-            </div>
-            <form action="<%= request.getContextPath() %>/hebahan/delete" method="post" class="bg-gray-50 px-6 py-4 flex flex-row-reverse gap-2">
-                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
-                <input type="hidden" name="id_hebahan" id="delete_id">
-                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-sm">Ya, Padam</button>
-                <button type="button" onclick="closeModal('modalDelete')" class="bg-white text-gray-500 px-4 py-2 rounded-xl font-bold text-sm border">Batal</button>
-            </form>
-        </div>
-    </div>
-</div>
-
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const msg = urlParams.get('msg');
+        if (msg) {
+            const messages = {
+                'deleted': 'Hebahan berjaya dipadam.'
+            };
+            const alertText = messages[msg];
+            if (alertText) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: alertText,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+        }
+    });
+
     function confirmDelete(id) {
-        document.getElementById('delete_id').value = id;
-        document.getElementById('modalDelete').classList.remove('hidden');
+        Swal.fire({
+            title: 'Padam Hebahan?',
+            text: 'Anda mempunyai kuasa untuk memoderasi hebahan ini.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, Padam!',
+            cancelButtonText: 'Batal',
+            customClass: {
+                popup: 'rounded-[2rem]'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = '<%= request.getContextPath() %>/hebahan/delete';
+                
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_csrf';
+                csrfInput.value = '${sessionScope.csrf_token}';
+                form.appendChild(csrfInput);
+                
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'id_hebahan';
+                idInput.value = id;
+                form.appendChild(idInput);
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
     }
     // closeModal centralized in footer.jsp
 </script>

@@ -266,14 +266,6 @@
                 <span class="nav-label font-medium text-sm">Urus Hebahan</span>
             </a>
 
-            <a href="<%= contextPath %>/fasiliti/urus" 
-               class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/fasiliti/urus") ? activeClass : inactiveClass %>">
-                <div class="w-6 text-center">
-                    <i class="fas fa-calendar-check <%= currentPath.contains("/fasiliti/urus") ? "text-white" : "text-gray-400 group-hover:text-[var(--brand-color)]" %> transition"></i>
-                </div>
-                <span class="nav-label font-medium text-sm">Urus Fasiliti</span>
-            </a>
-
             <a href="<%= contextPath %>/laporan/view" 
                class="flex items-center gap-3 px-4 py-3 rounded-2xl transition-all duration-200 group <%= currentPath.contains("/laporan/") ? activeClass : inactiveClass %>">
                 <div class="w-6 text-center">

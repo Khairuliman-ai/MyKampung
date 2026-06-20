@@ -11,6 +11,12 @@
     List<Hebahan> list = (List<Hebahan>) request.getAttribute("hebahanList");
     SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
     SimpleDateFormat sdfInput = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm");
+    Integer currentPage = (Integer) request.getAttribute("currentPage");
+    Integer totalPages = (Integer) request.getAttribute("totalPages");
+    if (currentPage == null) currentPage = 1;
+    if (totalPages == null) totalPages = 1;
+    String sortParam = request.getParameter("sort");
+    if (sortParam == null || sortParam.isEmpty()) sortParam = "DESC";
 %>
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F7F7F9]">
@@ -90,17 +96,21 @@
 
                     <!-- Management Actions -->
                     <div class="ml-auto flex items-center gap-3">
-                        <button onclick="showHebahanDetail({
-                            tajuk: '<%= h.getTajuk().replace("'", "\\'") %>',
-                            kandungan: `<%= h.getKandungan().replace("`", "\\`") %>`,
-                            kategori: '<%= h.getKategori() %>',
-                            badgeClass: '<%= h.getKategoriBadgeClass() %>',
-                            icon: '<%= h.getKategoriIcon() %>',
-                            gambar: '<%= h.getGambar_poster() != null ? h.getGambar_poster() : "" %>',
-                            lokasi: '<%= h.getLokasi_acara() != null ? h.getLokasi_acara().replace("'", "\\'") : "-" %>',
-                            tarikhHebahan: '<%= fullDate %>',
-                            tarikhAcara: '<%= eventDateRange %>'
-                        })" class="px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-xl text-xs font-bold transition flex items-center gap-2">
+                        <%
+                            java.util.Map<String, String> hData = new java.util.LinkedHashMap<>();
+                            hData.put("id", String.valueOf(h.getId_hebahan()));
+                            hData.put("tajuk", h.getTajuk());
+                            hData.put("kandungan", h.getKandungan());
+                            hData.put("kategori", h.getKategori());
+                            hData.put("badgeClass", h.getKategoriBadgeClass());
+                            hData.put("icon", h.getKategoriIcon());
+                            hData.put("gambar", h.getGambar_poster() != null ? h.getGambar_poster() : "");
+                            hData.put("lokasi", h.getLokasi_acara() != null ? h.getLokasi_acara() : "-");
+                            hData.put("tarikhHebahan", fullDate);
+                            hData.put("tarikhAcara", eventDateRange);
+                            String jsonAttr = util.JsonUtil.toSafeAttr(hData);
+                        %>
+                        <button data-hebahan="<%= jsonAttr %>" class="btn-preview px-4 py-2 bg-gray-50 hover:bg-gray-100 text-gray-600 rounded-xl text-xs font-bold transition flex items-center gap-2">
                             <i class="fas fa-eye"></i> Pratinjau
                         </button>
 
@@ -136,67 +146,52 @@
             </div>
         <% } %>
     </div>
-</div>
 
-<!-- Modal Detail Hebahan (Pratinjau Paparan Penduduk) -->
-<div id="modalDetailPreview" class="fixed inset-0 z-[60] hidden overflow-y-auto" role="dialog" aria-modal="true">
-    <div class="fixed inset-0 bg-gray-900 bg-opacity-40 transition-opacity backdrop-blur-sm" onclick="closeDetailModal()"></div>
-    <div class="flex min-h-screen items-center justify-center p-4">
-        <div class="relative w-full max-w-4xl bg-white rounded-[3rem] shadow-2xl overflow-hidden transform transition-all duration-300">
-            <!-- Header Image -->
-            <div id="modalImageContainer" class="h-64 md:h-96 bg-gray-100 overflow-hidden relative">
-                <img id="modalImage" src="" class="w-full h-full object-cover">
-                <div id="modalGradient" class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
-                <button onclick="closeDetailModal()" class="absolute top-6 right-6 w-12 h-12 bg-white/20 hover:bg-white/40 backdrop-blur-md text-white rounded-2xl flex items-center justify-center transition-all">
-                    <i class="fas fa-times"></i>
-                </button>
-                <div class="absolute bottom-8 left-8 right-8 text-white text-left">
-                    <div id="modalBadge" class="inline-block px-4 py-1.5 rounded-full text-[10px] font-bold uppercase mb-4 backdrop-blur-md border border-white/20"></div>
-                    <h2 id="modalTitlePreview" class="text-2xl md:text-4xl font-bold"></h2>
-                </div>
-            </div>
+    <!-- Pagination Bar -->
+    <% if (totalPages > 1) { %>
+    <div class="flex justify-center items-center gap-2 mt-12 bg-white px-6 py-4 rounded-[2rem] shadow-sm border border-gray-50 max-w-fit mx-auto">
+        <%-- Previous Button --%>
+        <% if (currentPage > 1) { %>
+            <a href="?page=<%= currentPage - 1 %><%= sortParam != null ? "&sort=" + sortParam : "" %>" 
+               class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-600 flex items-center justify-center transition border border-gray-100 text-xs">
+                <i class="fas fa-chevron-left"></i>
+            </a>
+        <% } else { %>
+            <span class="w-10 h-10 rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center border border-gray-100 text-xs cursor-not-allowed">
+                <i class="fas fa-chevron-left"></i>
+            </span>
+        <% } %>
 
-            <!-- Content Body -->
-            <div class="p-8 md:p-12 text-left">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-12">
-                    <div class="md:col-span-2">
-                        <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-100 pb-2">Kandungan Hebahan</h3>
-                        <div id="modalKandungan" class="text-gray-600 leading-relaxed space-y-4 whitespace-pre-wrap"></div>
-                    </div>
-                    <div class="space-y-8">
-                        <div>
-                            <h3 class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-6 border-b border-gray-100 pb-2">Maklumat Acara</h3>
-                            <div class="space-y-4">
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-xl bg-purple-50 text-brand-purple flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-[10px] font-bold text-gray-400 uppercase">Lokasi</p>
-                                        <p id="modalLokasi" class="text-sm font-bold text-gray-700"></p>
-                                    </div>
-                                </div>
-                                <div class="flex items-center gap-4">
-                                    <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center flex-shrink-0">
-                                        <i class="fas fa-clock"></i>
-                                    </div>
-                                    <div>
-                                        <p class="text-[10px] font-bold text-gray-400 uppercase">Tarikh Acara</p>
-                                        <p id="modalTarikhAcara" class="text-sm font-bold text-gray-700"></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="p-6 bg-gray-50 rounded-[2rem] border border-gray-100 text-center">
-                            <p class="text-[10px] font-bold text-gray-400 uppercase mb-2">Hebahan Diterbitkan Pada</p>
-                            <p id="modalTarikhHebahan" class="text-xs font-bold text-gray-600"></p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <%-- Page Numbers --%>
+        <% for (int i = 1; i <= totalPages; i++) { 
+            if (i == currentPage) { %>
+                <span class="w-10 h-10 rounded-xl bg-brand-purple text-white flex items-center justify-center font-bold text-xs shadow-md shadow-purple-100">
+                    <%= i %>
+                </span>
+            <% } else { %>
+                <a href="?page=<%= i %><%= sortParam != null ? "&sort=" + sortParam : "" %>" 
+                   class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-600 flex items-center justify-center transition border border-gray-100 text-xs font-semibold">
+                    <%= i %>
+                </a>
+            <% } %>
+        <% } %>
+
+        <%-- Next Button --%>
+        <% if (currentPage < totalPages) { %>
+            <a href="?page=<%= currentPage + 1 %><%= sortParam != null ? "&sort=" + sortParam : "" %>" 
+               class="w-10 h-10 rounded-xl bg-gray-50 hover:bg-gray-100 text-gray-600 flex items-center justify-center transition border border-gray-100 text-xs">
+                <i class="fas fa-chevron-right"></i>
+            </a>
+        <% } else { %>
+            <span class="w-10 h-10 rounded-xl bg-gray-50 text-gray-300 flex items-center justify-center border border-gray-100 text-xs cursor-not-allowed">
+                <i class="fas fa-chevron-right"></i>
+            </span>
+        <% } %>
     </div>
+    <% } %>
 </div>
+
+<%@ include file="/views/hebahan/components/modalDetail.jsp" %>
 
 <!-- Right Aside Bar -->
 <aside class="w-80 bg-white border-l border-gray-100 hidden xl:flex flex-col p-8 overflow-y-auto h-full">
@@ -388,29 +383,60 @@
     </div>
 </div>
 
-<!-- Modal Delete -->
-<div id="modalDelete" class="fixed inset-0 z-[100] hidden">
-    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur-sm" onclick="closeModal('modalDelete')"></div>
-    <div class="flex min-h-full items-center justify-center p-4">
-        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm">
-            <div class="p-6 text-center">
-                <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-red-100 mb-4">
-                    <i class="fas fa-trash text-red-600"></i>
-                </div>
-                <h3 class="text-lg font-bold text-gray-900 mb-2">Padam Hebahan?</h3>
-                <p class="text-sm text-gray-500">Tindakan ini tidak boleh diundur.</p>
-            </div>
-            <form action="<%= request.getContextPath() %>/hebahan/delete" method="post" class="bg-gray-50 px-6 py-4 flex flex-row-reverse gap-2">
-                <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
-                <input type="hidden" name="id_hebahan" id="delete_id">
-                <button type="submit" class="bg-red-600 text-white px-4 py-2 rounded-xl font-bold text-sm">Ya, Padam</button>
-                <button type="button" onclick="closeModal('modalDelete')" class="bg-white text-gray-500 px-4 py-2 rounded-xl font-bold text-sm border">Batal</button>
-            </form>
-        </div>
-    </div>
-</div>
+
 
 <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.btn-preview').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const data = JSON.parse(btn.dataset.hebahan);
+                showHebahanDetail(data);
+            });
+        });
+
+        // Toast success message using SweetAlert2
+        const urlParams = new URLSearchParams(window.location.search);
+        const msg = urlParams.get('msg');
+        const err = urlParams.get('error');
+        if (msg) {
+            const messages = {
+                'created': 'Hebahan berjaya dicipta!',
+                'updated': 'Hebahan berjaya dikemaskini!',
+                'deleted': 'Hebahan berjaya dipadam.',
+                'statusUpdated': 'Status hebahan berjaya dikemaskini.'
+            };
+            const alertText = messages[msg];
+            if (alertText) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: alertText,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+        } else if (err) {
+            const errors = {
+                'invalid_id': 'ID Hebahan tidak sah!',
+                'not_found': 'Hebahan tidak ditemui!'
+            };
+            const errText = errors[err];
+            if (errText) {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'error',
+                    title: errText,
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true
+                });
+            }
+        }
+    });
+
     function openAddModal() {
         document.getElementById('modalTitle').innerText = 'Hebahan Baru';
         document.getElementById('formHebahan').action = '<%= request.getContextPath() %>/hebahan/create';
@@ -486,8 +512,40 @@
     }
 
     function confirmDelete(id) {
-        document.getElementById('delete_id').value = id;
-        document.getElementById('modalDelete').classList.remove('hidden');
+        Swal.fire({
+            title: 'Padam Hebahan?',
+            text: 'Tindakan ini tidak boleh diundur.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#ef4444',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Ya, Padam!',
+            cancelButtonText: 'Batal',
+            customClass: {
+                popup: 'rounded-[2rem]'
+            }
+        }).then((result) => {
+            if (result.isConfirmed) {
+                const form = document.createElement('form');
+                form.method = 'post';
+                form.action = '<%= request.getContextPath() %>/hebahan/delete';
+                
+                const csrfInput = document.createElement('input');
+                csrfInput.type = 'hidden';
+                csrfInput.name = '_csrf';
+                csrfInput.value = '${sessionScope.csrf_token}';
+                form.appendChild(csrfInput);
+                
+                const idInput = document.createElement('input');
+                idInput.type = 'hidden';
+                idInput.name = 'id_hebahan';
+                idInput.value = id;
+                form.appendChild(idInput);
+                
+                document.body.appendChild(form);
+                form.submit();
+            }
+        });
     }
 
     // closeModal centralized in footer.jsp

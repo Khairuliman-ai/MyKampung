@@ -25,6 +25,11 @@ secrets/
 credentials/
 web/META-INF/context.xml.local
 
+# Abaikan backup pangkalan data & sql dump
+db/
+*.sql
+
+
 # Abaikan fail pengujian mengandungi maklumat sensitif (Public Repo Security)
 docs/roles_list.md
 docs/roles_list.pdf
