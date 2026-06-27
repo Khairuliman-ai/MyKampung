@@ -32,6 +32,8 @@ public class Pengguna {
     private String lampiran_pengesahan;
     private String email;
     private String foto_profil;
+    private String digital_signature;
+    private String official_stamp;
 
     // Alamat
     private String nama_jalan;
@@ -295,5 +297,21 @@ public class Pengguna {
 
     public void setSenaraiAhliKeluarga(List<AhliKeluarga> senaraiAhliKeluarga) {
         this.senaraiAhliKeluarga = senaraiAhliKeluarga;
+    }
+
+    public String getDigital_signature() {
+        return digital_signature;
+    }
+
+    public void setDigital_signature(String digital_signature) {
+        this.digital_signature = digital_signature;
+    }
+
+    public String getOfficial_stamp() {
+        return official_stamp;
+    }
+
+    public void setOfficial_stamp(String official_stamp) {
+        this.official_stamp = official_stamp;
     }
 }

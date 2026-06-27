@@ -75,6 +75,30 @@ public class ProfileServlet extends HttpServlet {
             try (Connection conn = DBUtil.getConnection()) {
                 // --- TUKAR KATA LALUAN ---
                 String action = request.getParameter("action");
+                if ("saveSignature".equals(action)) {
+                    if (!"Ketua Kampung".equalsIgnoreCase(currentUser.getNama_peranan())) {
+                        response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                        response.getWriter().print("{\"success\":false,\"message\":\"Hanya Ketua Kampung dibenarkan.\"}");
+                        return;
+                    }
+                    String type = request.getParameter("type"); // "signature" or "stamp"
+                    String data = request.getParameter("data"); // Base64 PNG string
+                    
+                    PenggunaDAO pDao = new PenggunaDAO();
+                    boolean success = false;
+                    if ("signature".equals(type)) {
+                        success = pDao.saveDigitalSignature(currentUser.getId_pengguna(), data);
+                        if (success) currentUser.setDigital_signature(data);
+                    } else if ("stamp".equals(type)) {
+                        success = pDao.saveOfficialStamp(currentUser.getId_pengguna(), data);
+                        if (success) currentUser.setOfficial_stamp(data);
+                    }
+                    
+                    session.setAttribute("currentUser", currentUser);
+                    response.setContentType("application/json");
+                    response.getWriter().print("{\"success\":" + success + "}");
+                    return;
+                }
                 if ("changePassword".equals(action)) {
                     // ... (password change logic remains unchanged)
                     String oldPass = request.getParameter("oldPassword");

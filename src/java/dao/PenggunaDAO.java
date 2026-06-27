@@ -338,6 +338,13 @@ public class PenggunaDAO {
             // These fields remain null in that context, which is the expected behavior.
         }
 
+        try {
+            p.setDigital_signature(rs.getString("digital_signature"));
+        } catch (SQLException e) {}
+        try {
+            p.setOfficial_stamp(rs.getString("official_stamp"));
+        } catch (SQLException e) {}
+
         double lat = rs.getDouble("latitude");
         p.setLatitude(rs.wasNull() ? null : lat);
         double lon = rs.getDouble("longitude");
@@ -634,5 +641,31 @@ public class PenggunaDAO {
             e.printStackTrace();
         }
         return list;
+    }
+
+    public boolean saveDigitalSignature(int id, String signatureBase64) {
+        String sql = "UPDATE pengguna SET digital_signature = ? WHERE id_pengguna = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, signatureBase64);
+            ps.setInt(2, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public boolean saveOfficialStamp(int id, String stampBase64) {
+        String sql = "UPDATE pengguna SET official_stamp = ? WHERE id_pengguna = ?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, stampBase64);
+            ps.setInt(2, id);
+            return ps.executeUpdate() > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

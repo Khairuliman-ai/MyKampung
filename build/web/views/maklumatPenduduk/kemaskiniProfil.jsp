@@ -556,6 +556,101 @@
 
             </div>
         </form>
+
+        <% if ("Ketua Kampung".equalsIgnoreCase(pDetail.getNama_peranan())) { %>
+            <%-- E-Tandatangan & Cap Rasmi Section --%>
+            <div class="mt-12 bg-white/80 backdrop-blur-xl rounded-[2.5rem] p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:shadow-purple-500/5 transition-all duration-500">
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-[#6C5DD3] shadow-inner">
+                        <i class="fas fa-file-signature text-xl"></i>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-bold text-gray-900">E-Tandatangan & Cap Rasmi Kampung</h4>
+                        <p class="text-xs text-gray-500 font-medium tracking-wide uppercase">Daftarkan tandatangan digital dan muat naik cap rasmi untuk kegunaan pengesahan dokumen bantuan.</p>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <%-- Tandatangan Digital Card --%>
+                    <div class="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100 flex flex-col justify-between min-h-[350px]">
+                        <div>
+                            <h5 class="text-sm font-bold text-gray-800 mb-2 flex items-center gap-2">
+                                <i class="fas fa-pen-fancy text-purple-500"></i> Tandatangan Digital (Melukis)
+                            </h5>
+                            <p class="text-[11px] text-gray-400 mb-4">Gunakan tetikus (mouse) atau skrin sentuh untuk melukis tandatangan Ketua Kampung di bawah.</p>
+                            
+                            <div class="relative w-full aspect-[4/2] bg-white rounded-2xl border border-gray-200 overflow-hidden shadow-inner flex items-center justify-center">
+                                <canvas id="signature-pad" class="absolute inset-0 w-full h-full cursor-crosshair"></canvas>
+                                <div id="no-signature-tip" class="text-xs text-gray-300 pointer-events-none select-none flex flex-col items-center gap-2">
+                                    <i class="fas fa-hand-pointer text-xl animate-bounce"></i>
+                                    <span>Klik & seret untuk melukis di sini</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-6 flex flex-col gap-4">
+                            <%-- Saved signature preview --%>
+                            <div id="saved-sig-box" class="<%= (pDetail.getDigital_signature() != null) ? "" : "hidden" %>">
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2">Tandatangan Aktif Semasa:</p>
+                                <div class="bg-white rounded-xl border border-gray-100 p-2 max-w-[180px] aspect-[4/2] flex items-center justify-center">
+                                    <img id="saved-signature-img" src="<%= (pDetail.getDigital_signature() != null) ? pDetail.getDigital_signature() : "" %>" class="max-h-full max-w-full object-contain">
+                                </div>
+                            </div>
+                            
+                            <div class="flex gap-2">
+                                <button type="button" onclick="clearSignatureCanvas()" class="px-5 py-3 bg-gray-100 text-gray-600 text-xs font-bold rounded-xl hover:bg-gray-200 transition-all flex items-center justify-center gap-2">
+                                    <i class="fas fa-eraser"></i> Padam
+                                </button>
+                                <button type="button" onclick="saveSignatureCanvas()" class="flex-1 px-5 py-3 bg-[#6C5DD3] text-white text-xs font-bold rounded-xl hover:bg-[#5b4eb8] transition-all shadow-md shadow-purple-200 flex items-center justify-center gap-2">
+                                    <i class="fas fa-save"></i> Simpan Tandatangan
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <%-- Cap Rasmi Kampung Card --%>
+                    <div class="bg-slate-50/50 p-6 rounded-[2rem] border border-slate-100 flex flex-col justify-between min-h-[350px]">
+                        <div>
+                            <h5 class="text-sm font-bold text-gray-800 mb-2 flex items-center gap-2">
+                                <i class="fas fa-stamp text-blue-500"></i> Cap Rasmi Kampung (Muat Naik)
+                            </h5>
+                            <p class="text-[11px] text-gray-400 mb-4">Muat naik gambar cap rasmi kampung (Format PNG dengan latar belakang lutsinar/transparent amat digalakkan).</p>
+                            
+                            <div class="relative w-full aspect-[4/2] bg-white rounded-2xl border border-gray-200 border-dashed overflow-hidden shadow-inner flex flex-col items-center justify-center p-4">
+                                <input type="file" id="stamp-file-input" accept="image/png,image/jpeg,image/jpg" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="previewStampFile(this)">
+                                <div id="stamp-upload-placeholder" class="text-center flex flex-col items-center gap-2 pointer-events-none">
+                                    <i class="fas fa-cloud-upload-alt text-2xl text-blue-400"></i>
+                                    <span class="text-xs font-bold text-gray-500">Klik / Seret fail imej di sini</span>
+                                    <span class="text-[9px] text-gray-400">Format: PNG / JPG (Max 5MB)</span>
+                                </div>
+                                <div id="stamp-preview-container" class="hidden absolute inset-0 bg-white p-2 flex items-center justify-center">
+                                    <img id="stamp-preview-img" class="max-h-full max-w-full object-contain">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex flex-col gap-4">
+                            <%-- Saved stamp preview --%>
+                            <div id="saved-stamp-box" class="<%= (pDetail.getOfficial_stamp() != null) ? "" : "hidden" %>">
+                                <p class="text-[10px] text-gray-400 font-bold uppercase tracking-widest mb-2">Cap Aktif Semasa:</p>
+                                <div class="bg-white rounded-xl border border-gray-100 p-2 max-w-[180px] aspect-[4/2] flex items-center justify-center">
+                                    <img id="saved-stamp-img" src="<%= (pDetail.getOfficial_stamp() != null) ? pDetail.getOfficial_stamp() : "" %>" class="max-h-full max-w-full object-contain">
+                                </div>
+                            </div>
+
+                            <div class="flex gap-2">
+                                <button type="button" id="btn-cancel-stamp" onclick="cancelStampUpload()" class="hidden px-5 py-3 bg-gray-100 text-gray-600 text-xs font-bold rounded-xl hover:bg-gray-200 transition-all flex items-center justify-center gap-2">
+                                    <i class="fas fa-times"></i> Batal
+                                </button>
+                                <button type="button" id="btn-save-stamp" onclick="saveOfficialStamp()" class="flex-1 px-5 py-3 bg-[#6C5DD3] text-white text-xs font-bold rounded-xl hover:bg-[#5b4eb8] transition-all shadow-md shadow-purple-200 flex items-center justify-center gap-2 opacity-50 cursor-not-allowed" disabled>
+                                    <i class="fas fa-save"></i> Simpan Cap Rasmi
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        <% } %>
     </div>
 
     <%-- 
@@ -1470,5 +1565,194 @@
         setTimeout(function () { mainMap.invalidateSize(); }, 300);
     })();
 </script>
+
+<% if ("Ketua Kampung".equalsIgnoreCase(pDetail.getNama_peranan())) { %>
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.2.0/dist/signature_pad.umd.min.js"></script>
+    <script>
+        (function() {
+            var canvas = document.getElementById('signature-pad');
+            var tip = document.getElementById('no-signature-tip');
+            var signaturePad = null;
+            
+            // Adjust canvas size for high-dpi screens
+            function resizeCanvas() {
+                var ratio = Math.max(window.devicePixelRatio || 1, 1);
+                canvas.width = canvas.offsetWidth * ratio;
+                canvas.height = canvas.offsetHeight * ratio;
+                canvas.getContext("2d").scale(ratio, ratio);
+                if (signaturePad) signaturePad.clear();
+            }
+            
+            signaturePad = new SignaturePad(canvas, {
+                backgroundColor: 'rgba(255, 255, 255, 0)', // transparent background
+                penColor: 'rgb(0, 0, 0)'
+            });
+
+            signaturePad.addEventListener("beginStroke", () => {
+                tip.classList.add('hidden');
+            });
+            
+            // Initialize sizing
+            setTimeout(resizeCanvas, 300);
+            window.addEventListener("resize", resizeCanvas);
+
+            window.clearSignatureCanvas = function() {
+                signaturePad.clear();
+                tip.classList.remove('hidden');
+            };
+
+            window.saveSignatureCanvas = function() {
+                if (signaturePad.isEmpty()) {
+                    Swal.fire({
+                        title: 'Melukis Terlebih Dahulu',
+                        text: 'Sila lukis tandatangan anda sebelum menyimpan.',
+                        icon: 'warning',
+                        confirmButtonColor: '#6C5DD3',
+                        customClass: {
+                            popup: 'rounded-[2rem]',
+                            confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                        }
+                    });
+                    return;
+                }
+                
+                var base64Data = signaturePad.toDataURL("image/png");
+                
+                saveDataAjax("signature", base64Data, function(response) {
+                    if (response.success) {
+                        document.getElementById('saved-sig-box').classList.remove('hidden');
+                        document.getElementById('saved-signature-img').src = base64Data;
+                        Swal.fire({
+                            title: 'Berjaya!',
+                            text: 'Tandatangan digital anda telah disimpan.',
+                            icon: 'success',
+                            confirmButtonColor: '#00B69B',
+                            customClass: {
+                                popup: 'rounded-[2rem]',
+                                confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Gagal Menyimpan',
+                            text: 'Ralat berlaku semasa menghubungi pelayan.',
+                            icon: 'error',
+                            confirmButtonColor: '#6C5DD3',
+                            customClass: {
+                                popup: 'rounded-[2rem]',
+                                confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                            }
+                        });
+                    }
+                });
+            };
+
+            // Stamp Upload logic
+            let stampBase64 = null;
+            window.previewStampFile = function(input) {
+                var file = input.files[0];
+                if (!file) return;
+
+                if (file.size > 5 * 1024 * 1024) {
+                    Swal.fire({
+                        title: 'Fail Terlalu Besar',
+                        text: 'Had saiz fail adalah 5MB.',
+                        icon: 'warning',
+                        confirmButtonColor: '#6C5DD3',
+                        customClass: {
+                            popup: 'rounded-[2rem]',
+                            confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                        }
+                    });
+                    input.value = "";
+                    return;
+                }
+
+                var reader = new FileReader();
+                reader.onload = function(e) {
+                    stampBase64 = e.target.result;
+                    document.getElementById('stamp-preview-img').src = stampBase64;
+                    document.getElementById('stamp-preview-container').classList.remove('hidden');
+                    
+                    var btnSave = document.getElementById('btn-save-stamp');
+                    btnSave.disabled = false;
+                    btnSave.classList.remove('opacity-50', 'cursor-not-allowed');
+                    
+                    document.getElementById('btn-cancel-stamp').classList.remove('hidden');
+                };
+                reader.readAsDataURL(file);
+            };
+
+            window.cancelStampUpload = function() {
+                document.getElementById('stamp-file-input').value = "";
+                document.getElementById('stamp-preview-container').classList.add('hidden');
+                document.getElementById('stamp-preview-img').src = "";
+                stampBase64 = null;
+                
+                var btnSave = document.getElementById('btn-save-stamp');
+                btnSave.disabled = true;
+                btnSave.classList.add('opacity-50', 'cursor-not-allowed');
+                document.getElementById('btn-cancel-stamp').classList.add('hidden');
+            };
+
+            window.saveOfficialStamp = function() {
+                if (!stampBase64) return;
+
+                saveDataAjax("stamp", stampBase64, function(response) {
+                    if (response.success) {
+                        document.getElementById('saved-stamp-box').classList.remove('hidden');
+                        document.getElementById('saved-stamp-img').src = stampBase64;
+                        cancelStampUpload();
+                        Swal.fire({
+                            title: 'Berjaya!',
+                            text: 'Cap rasmi kampung telah dikemaskini.',
+                            icon: 'success',
+                            confirmButtonColor: '#00B69B',
+                            customClass: {
+                                popup: 'rounded-[2rem]',
+                                confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                            }
+                        });
+                    } else {
+                        Swal.fire({
+                            title: 'Gagal Menyimpan',
+                            text: 'Ralat berlaku semasa menghubungi pelayan.',
+                            icon: 'error',
+                            confirmButtonColor: '#6C5DD3',
+                            customClass: {
+                                popup: 'rounded-[2rem]',
+                                confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                            }
+                        });
+                    }
+                });
+            };
+
+            function saveDataAjax(type, base64Str, callback) {
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "<%= request.getContextPath() %>/profil/update", true);
+                xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+                
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status === 200) {
+                            try {
+                                var response = JSON.parse(xhr.responseText);
+                                callback(response);
+                            } catch(e) {
+                                callback({ success: false });
+                            }
+                        } else {
+                            callback({ success: false });
+                        }
+                    }
+                };
+                
+                var body = "action=saveSignature&type=" + encodeURIComponent(type) + "&data=" + encodeURIComponent(base64Str) + "&_csrf=" + encodeURIComponent("<%= session.getAttribute("csrf_token") %>");
+                xhr.send(body);
+            }
+        })();
+    </script>
+<% } %>
 
 <%@ include file="/views/common/footer.jsp" %>

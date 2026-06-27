@@ -856,17 +856,96 @@
                         </div>
                     </div>
                 </div>
-            </div>
-
-            <!-- Modal Footer -->
+            </div>             <!-- Modal Footer -->
             <div id="detActionBox" class="p-8 bg-gray-50 border-t border-gray-100 shrink-0 flex flex-col md:flex-row justify-between items-center gap-4">
                 <button onclick="closeModal('modalDetail')" class="text-gray-400 hover:text-gray-600 font-bold text-sm transition order-2 md:order-1">Kembali ke Senarai</button>
-                <div class="flex gap-3 order-1 md:order-2 w-full md:w-auto">
+                <div class="flex flex-wrap gap-3 order-1 md:order-2 w-full md:w-auto justify-end">
+                    <button id="btnDetSign" class="flex-1 md:flex-none px-8 py-3 bg-[#6C5DD3] hover:bg-[#5b4eb8] text-white rounded-2xl font-bold text-sm shadow-md transition-all flex items-center justify-center gap-2 hidden">
+                        <i class="fas fa-file-signature"></i> Tandatangan PDF
+                    </button>
                     <button id="btnDetReject" class="flex-1 md:flex-none px-8 py-3 bg-white text-red-500 border border-red-100 rounded-2xl font-bold text-sm shadow-sm hover:bg-red-50 transition-all flex items-center justify-center gap-2">
                         <i class="fas fa-times-circle"></i> Tolak
                     </button>
                     <button id="btnDetApprove" class="flex-1 md:flex-none px-10 py-3 bg-[#00B69B] text-white rounded-2xl font-bold text-sm shadow-lg shadow-teal-100 hover:bg-[#00a38b] transition-all flex items-center justify-center gap-2">
                         <i class="fas fa-check-circle"></i> Luluskan
+                    </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: PDF SIGNER OVERLAY -->
+<div id="modalTandatanganPDF" class="fixed inset-0 z-[70] hidden" role="dialog">
+    <div class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm" onclick="closePdfSignerConfirm()"></div>
+    <div class="flex min-h-screen items-center justify-center p-4 w-full">
+        <div class="relative w-full max-w-5xl bg-white rounded-[2.5rem] shadow-2xl overflow-hidden border border-white/20 flex flex-col h-[90vh]">
+            <!-- Modal Header -->
+            <div class="bg-gradient-to-r from-[#6C5DD3] to-[#8B7EF8] px-8 py-4 text-white relative shrink-0 flex justify-between items-center">
+                <div>
+                    <span id="signerPermohonanId" class="bg-white/20 backdrop-blur-md px-3 py-1 rounded-full text-[10px] font-bold tracking-widest uppercase border border-white/20">Permohonan #000</span>
+                    <h3 class="text-lg font-bold mt-1">E-Tandatangan & Cap Rasmi PDF</h3>
+                </div>
+                <button onclick="closePdfSignerConfirm()" class="w-8 h-8 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 transition-all">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <!-- Main Editor Area (Scrollable) -->
+            <div class="flex-1 bg-gray-100 overflow-y-auto p-4 flex justify-center items-start custom-scrollbar">
+                <div id="pdf-rendering-container" class="relative bg-white shadow-lg border border-gray-200 select-none">
+                    <!-- Canvas where PDF.js will render the active page -->
+                    <canvas id="pdf-render-canvas" class="block"></canvas>
+                    
+                    <!-- Draggable overlays container -->
+                    <div id="signature-overlay" class="absolute hidden cursor-move select-none border-2 border-dashed border-purple-500 bg-purple-500/10" style="width: 150px; height: 75px; left: 50px; top: 50px; z-index: 10;">
+                        <img src="<%= (currentUser.getDigital_signature() != null) ? currentUser.getDigital_signature() : "" %>" class="w-full h-full object-contain pointer-events-none">
+                        <div class="absolute -top-3 -right-3 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center cursor-pointer shadow-md hover:bg-red-600" onclick="removeOverlay('signature', event)">
+                            <i class="fas fa-times text-[10px]"></i>
+                        </div>
+                        <div class="absolute -bottom-1 -right-1 w-3 h-3 bg-purple-500 cursor-se-resize shadow-md" id="sig-resize-handle"></div>
+                    </div>
+
+                    <div id="stamp-overlay" class="absolute hidden cursor-move select-none border-2 border-dashed border-blue-500 bg-blue-500/10" style="width: 120px; height: 120px; left: 50px; top: 150px; z-index: 10;">
+                        <img src="<%= (currentUser.getOfficial_stamp() != null) ? currentUser.getOfficial_stamp() : "" %>" class="w-full h-full object-contain pointer-events-none">
+                        <div class="absolute -top-3 -right-3 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center cursor-pointer shadow-md hover:bg-red-600" onclick="removeOverlay('stamp', event)">
+                            <i class="fas fa-times text-[10px]"></i>
+                        </div>
+                        <div class="absolute -bottom-1 -right-1 w-3 h-3 bg-blue-500 cursor-se-resize shadow-md" id="stamp-resize-handle"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Navigation & Actions -->
+            <div class="p-6 bg-white border-t border-gray-100 shrink-0 flex flex-col md:flex-row justify-between items-center gap-4">
+                <!-- PDF Pagination -->
+                <div class="flex items-center gap-4">
+                    <button type="button" onclick="prevPdfPage()" id="btn-prev-page" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition flex items-center gap-2">
+                        <i class="fas fa-chevron-left"></i> Halaman Sebelum
+                    </button>
+                    <span class="text-xs font-bold text-gray-500" id="pdf-page-num-display">Halaman 1 / 1</span>
+                    <button type="button" onclick="nextPdfPage()" id="btn-next-page" class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition flex items-center gap-2">
+                        Halaman Seterusnya <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+
+                <!-- Tool actions -->
+                <div class="flex flex-wrap gap-2 justify-center">
+                    <button type="button" onclick="placeOverlay('signature')" class="px-4 py-2.5 bg-purple-50 text-[#6C5DD3] border border-purple-100 rounded-xl text-xs font-bold hover:bg-purple-100 transition-all flex items-center gap-2">
+                        <i class="fas fa-signature"></i> Tampal Tandatangan
+                    </button>
+                    <button type="button" onclick="placeOverlay('stamp')" class="px-4 py-2.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-xl text-xs font-bold hover:bg-blue-100 transition-all flex items-center gap-2">
+                        <i class="fas fa-stamp"></i> Tampal Cap Rasmi
+                    </button>
+                    <button type="button" onclick="resetOverlayPositions()" class="px-4 py-2.5 bg-gray-50 text-gray-500 border border-gray-100 rounded-xl text-xs font-bold hover:bg-gray-100 transition-all flex items-center gap-2">
+                        <i class="fas fa-redo"></i> Set Semula
+                    </button>
+                </div>
+
+                <!-- Final Approval / Submit -->
+                <div class="flex gap-2 w-full md:w-auto">
+                    <button type="button" onclick="closePdfSignerConfirm()" class="flex-1 md:flex-none px-6 py-3 bg-gray-100 text-gray-500 rounded-xl font-bold text-xs hover:bg-gray-200 transition">Batal</button>
+                    <button type="button" id="btn-save-pdf-approve" onclick="saveSignedPdfAndApprove()" class="flex-2 md:flex-none px-8 py-3 bg-[#00B69B] text-white rounded-xl font-bold text-xs shadow-lg shadow-teal-100 hover:bg-[#00a38b] transition flex items-center justify-center gap-2">
+                        <i class="fas fa-cloud-upload-alt"></i> Simpan & Luluskan
                     </button>
                 </div>
             </div>
@@ -1369,12 +1448,60 @@
 
         // Handle Action Buttons
         const actionBox = document.getElementById('detActionBox');
+        const btnDetSign = document.getElementById('btnDetSign');
         if (showAction) {
             actionBox.classList.remove('hidden');
             document.getElementById('btnDetReject').onclick = () => { closeModal('modalDetail'); openActionModal(id, 'tak_lengkap'); };
             document.getElementById('btnDetApprove').onclick = () => { closeModal('modalDetail'); openActionModal(id, 'lengkap'); };
+            
+            if (kategori === "RASMI") {
+                btnDetSign.classList.remove('hidden');
+                btnDetSign.onclick = () => {
+                    const hasSig = <%= (currentUser.getDigital_signature() != null) ? "true" : "false" %>;
+                    const hasStamp = <%= (currentUser.getOfficial_stamp() != null) ? "true" : "false" %>;
+                    
+                    if (!hasSig || !hasStamp) {
+                        Swal.fire({
+                            title: 'Pengesahan Diperlukan',
+                            text: 'Sila lengkapkan tetapan Tandatangan Digital dan Cap Rasmi anda di menu Profil terlebih dahulu.',
+                            icon: 'info',
+                            showCancelButton: true,
+                            confirmButtonColor: '#6C5DD3',
+                            confirmButtonText: 'Pergi Ke Profil',
+                            cancelButtonText: 'Batal',
+                            customClass: {
+                                popup: 'rounded-[2rem]',
+                                confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold',
+                                cancelButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                            }
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = ctx + '/profil/view';
+                            }
+                        });
+                        return;
+                    }
+                    
+                    closeModal('modalDetail');
+                    if (dok && dok.trim() !== "") {
+                        const firstFile = decodeURIComponent(dok.split(',')[0]);
+                        openPdfSigner(id, firstFile);
+                    } else {
+                        Swal.fire({
+                            title: 'Tiada Dokumen',
+                            text: 'Pemohon tidak memuat naik sebarang dokumen/borang untuk ditandatangani.',
+                            icon: 'warning',
+                            confirmButtonColor: '#6C5DD3',
+                            customClass: { popup: 'rounded-[2rem]' }
+                        });
+                    }
+                };
+            } else {
+                btnDetSign.classList.add('hidden');
+            }
         } else {
             actionBox.classList.add('hidden');
+            btnDetSign.classList.add('hidden');
         }
 
         // Handle Multiple Documents
@@ -1638,6 +1765,529 @@
 
     // Run once on load
     window.addEventListener('DOMContentLoaded', updateSliders);
+</script>
+
+<!-- PDF.js and PDF-lib for E-Tandatangan -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+
+<script>
+    (function() {
+        // Set PDF.js worker path
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+
+        let pdfDoc = null;
+        let pdfPageNum = 1;
+        let pdfPageRendering = false;
+        let pdfPendingPageNum = null;
+        let pdfScale = 1.35; 
+        let currentPdfBytes = null;
+        let activePermohonanId = null;
+        let currentPdfFilename = null;
+
+        // Position/size overlays
+        let overlays = {
+            signature: { visible: false, x: 50, y: 50, w: 150, h: 75, page: 1 },
+            stamp: { visible: false, x: 50, y: 150, w: 120, h: 120, page: 1 }
+        };
+
+        window.openPdfSigner = function(permohonanId, filename) {
+            activePermohonanId = permohonanId;
+            currentPdfFilename = filename;
+            pdfPageNum = 1;
+            
+            // Set modal info
+            document.getElementById('signerPermohonanId').innerText = "Permohonan #" + permohonanId;
+            
+            // Reset overlays state
+            overlays.signature.visible = false;
+            overlays.stamp.visible = false;
+            document.getElementById('signature-overlay').classList.add('hidden');
+            document.getElementById('stamp-overlay').classList.add('hidden');
+
+            // Load indicator
+            Swal.fire({
+                title: 'Memuatkan PDF...',
+                text: 'Sila tunggu sebentar sementara memuat turun borang permohonan.',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            // Fetch the PDF
+            const pdfUrl = "<%= request.getContextPath() %>/file/bantuan/" + filename;
+            fetch(pdfUrl)
+                .then(res => {
+                    if (!res.ok) throw new Error("Gagal membaca fail PDF dari pelayan.");
+                    return res.arrayBuffer();
+                })
+                .then(bytes => {
+                    currentPdfBytes = bytes;
+                    
+                    // Render using PDF.js
+                    return pdfjsLib.getDocument({ data: bytes }).promise;
+                })
+                .then(pdf => {
+                    pdfDoc = pdf;
+                    document.getElementById('pdf-page-num-display').innerText = `Halaman ${pdfPageNum} / ${pdfDoc.numPages}`;
+                    
+                    // Show modal
+                    openModal('modalTandatanganPDF');
+                    Swal.close();
+                    
+                    // Render page 1
+                    renderPdfPage(pdfPageNum);
+                })
+                .catch(err => {
+                    console.error(err);
+                    Swal.fire({
+                        title: 'Ralat Membuka PDF',
+                        text: err.message,
+                        icon: 'error',
+                        confirmButtonColor: '#6C5DD3',
+                        customClass: { popup: 'rounded-[2rem]' }
+                    });
+                });
+        };
+
+        function renderPdfPage(num) {
+            pdfPageRendering = true;
+            
+            // Render the page on canvas
+            pdfDoc.getPage(num).then(page => {
+                const canvas = document.getElementById('pdf-render-canvas');
+                const ctx = canvas.getContext('2d');
+                
+                const viewport = page.getViewport({ scale: pdfScale });
+                canvas.height = viewport.height;
+                canvas.width = viewport.width;
+                
+                // Adjust overlay container sizes
+                const container = document.getElementById('pdf-rendering-container');
+                container.style.width = viewport.width + 'px';
+                container.style.height = viewport.height + 'px';
+
+                const renderContext = {
+                    canvasContext: ctx,
+                    viewport: viewport
+                };
+                
+                const renderTask = page.render(renderContext);
+                
+                renderTask.promise.then(() => {
+                    pdfPageRendering = false;
+                    
+                    // Show/hide overlays based on active page
+                    updateOverlayVisibility();
+
+                    if (pdfPendingPageNum !== null) {
+                        renderPdfPage(pdfPendingPageNum);
+                        pdfPendingPageNum = null;
+                    }
+                });
+            });
+
+            // Pagination button states
+            document.getElementById('btn-prev-page').disabled = (num <= 1);
+            document.getElementById('btn-next-page').disabled = (num >= pdfDoc.numPages);
+            document.getElementById('pdf-page-num-display').innerText = `Halaman ${num} / ${pdfDoc.numPages}`;
+        }
+
+        function updateOverlayVisibility() {
+            const sigEl = document.getElementById('signature-overlay');
+            const stampEl = document.getElementById('stamp-overlay');
+
+            if (overlays.signature.visible && overlays.signature.page === pdfPageNum) {
+                sigEl.classList.remove('hidden');
+            } else {
+                sigEl.classList.add('hidden');
+            }
+
+            if (overlays.stamp.visible && overlays.stamp.page === pdfPageNum) {
+                document.getElementById('stamp-overlay').classList.remove('hidden');
+            } else {
+                document.getElementById('stamp-overlay').classList.add('hidden');
+            }
+        }
+
+        window.prevPdfPage = function() {
+            if (pdfPageNum <= 1 || pdfPageRendering) return;
+            pdfPageNum--;
+            renderPdfPage(pdfPageNum);
+        };
+
+        window.nextPdfPage = function() {
+            if (pdfPageNum >= pdfDoc.numPages || pdfPageRendering) return;
+            pdfPageNum++;
+            renderPdfPage(pdfPageNum);
+        };
+
+        window.placeOverlay = function(type) {
+            const el = document.getElementById(type + '-overlay');
+            overlays[type].visible = true;
+            overlays[type].page = pdfPageNum;
+            
+            // Set default placement (center of active view)
+            const container = document.getElementById('pdf-rendering-container');
+            const defaultX = (container.offsetWidth - el.offsetWidth) / 2;
+            const defaultY = (container.offsetHeight - el.offsetHeight) / 2;
+            
+            el.style.left = defaultX + 'px';
+            el.style.top = defaultY + 'px';
+            overlays[type].x = defaultX;
+            overlays[type].y = defaultY;
+            
+            el.classList.remove('hidden');
+        };
+
+        window.removeOverlay = function(type, e) {
+            if (e) e.stopPropagation();
+            overlays[type].visible = false;
+            document.getElementById(type + '-overlay').classList.add('hidden');
+        };
+
+        window.resetOverlayPositions = function() {
+            removeOverlay('signature');
+            removeOverlay('stamp');
+        };
+
+        window.closePdfSignerConfirm = function() {
+            Swal.fire({
+                title: 'Tutup Editor?',
+                text: 'Sebarang perubahan yang belum disimpan akan hilang.',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#6C5DD3',
+                confirmButtonText: 'Ya, Tutup',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    popup: 'rounded-[2rem]',
+                    confirmButton: 'rounded-xl px-6 py-3 text-sm font-bold',
+                    cancelButton: 'rounded-xl px-6 py-3 text-sm font-bold'
+                }
+            }).then(result => {
+                if (result.isConfirmed) {
+                    closeModal('modalTandatanganPDF');
+                }
+            });
+        };
+
+        window.saveSignedPdfAndApprove = function() {
+            if (!overlays.signature.visible && !overlays.stamp.visible) {
+                Swal.fire({
+                    title: 'Tiada Perubahan',
+                    text: 'Sila letakkan sekurang-kurangnya tandatangan atau cap rasmi terlebih dahulu sebelum menyimpan.',
+                    icon: 'warning',
+                    confirmButtonColor: '#6C5DD3',
+                    customClass: { popup: 'rounded-[2rem]' }
+                });
+                return;
+            }
+
+            Swal.fire({
+                title: 'Menjana PDF...',
+                text: 'Sila tunggu sebentar sementara proses penggabungan tandatangan sedang berjalan.',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            // Run in setTimeout to prevent UI blocking
+            setTimeout(async function() {
+                try {
+                    const { PDFDocument } = PDFLib;
+                    const pdfDocToUpdate = await PDFDocument.load(currentPdfBytes);
+                    const pages = pdfDocToUpdate.getPages();
+                    
+                    const canvas = document.getElementById('pdf-render-canvas');
+                    const cWidth = canvas.width / (window.devicePixelRatio || 1);
+                    const cHeight = canvas.height / (window.devicePixelRatio || 1);
+
+                    // Signature
+                    if (overlays.signature.visible) {
+                        const over = overlays.signature;
+                        const targetPage = pages[over.page - 1];
+                        const { width: pWidth, height: pHeight } = targetPage.getSize();
+                        
+                        const scaleX = pWidth / cWidth;
+                        const scaleY = pHeight / cHeight;
+                        
+                        const pdfX = over.x * scaleX;
+                        const pdfY = (cHeight - (over.y + over.h)) * scaleY;
+                        const pdfW = over.w * scaleX;
+                        const pdfH = over.h * scaleY;
+                        
+                        const base64Data = '<%= (currentUser.getDigital_signature() != null) ? currentUser.getDigital_signature() : "" %>';
+                        if (!base64Data || !base64Data.includes(",")) throw new Error("Data tandatangan tidak ditemui.");
+                        const cleanBase64 = base64Data.split(',')[1].replace(/\s/g, '');
+                        const imageBytes = Uint8Array.from(atob(cleanBase64), c => c.charCodeAt(0));
+                        
+                        let img;
+                        if (base64Data.includes("image/jpeg") || base64Data.includes("image/jpg")) {
+                            img = await pdfDocToUpdate.embedJpg(imageBytes);
+                        } else {
+                            img = await pdfDocToUpdate.embedPng(imageBytes);
+                        }
+
+                        targetPage.drawImage(img, {
+                            x: pdfX,
+                            y: pdfY,
+                            width: pdfW,
+                            height: pdfH
+                        });
+                    }
+
+                    // Stamp
+                    if (overlays.stamp.visible) {
+                        const over = overlays.stamp;
+                        const targetPage = pages[over.page - 1];
+                        const { width: pWidth, height: pHeight } = targetPage.getSize();
+                        
+                        const scaleX = pWidth / cWidth;
+                        const scaleY = pHeight / cHeight;
+                        
+                        const pdfX = over.x * scaleX;
+                        const pdfY = (cHeight - (over.y + over.h)) * scaleY;
+                        const pdfW = over.w * scaleX;
+                        const pdfH = over.h * scaleY;
+                        
+                        const base64Data = '<%= (currentUser.getOfficial_stamp() != null) ? currentUser.getOfficial_stamp() : "" %>';
+                        if (!base64Data || !base64Data.includes(",")) throw new Error("Data cap rasmi tidak ditemui.");
+                        const cleanBase64 = base64Data.split(',')[1].replace(/\s/g, '');
+                        const imageBytes = Uint8Array.from(atob(cleanBase64), c => c.charCodeAt(0));
+                        
+                        let img;
+                        if (base64Data.includes("image/jpeg") || base64Data.includes("image/jpg")) {
+                            img = await pdfDocToUpdate.embedJpg(imageBytes);
+                        } else {
+                            img = await pdfDocToUpdate.embedPng(imageBytes);
+                        }
+
+                        targetPage.drawImage(img, {
+                            x: pdfX,
+                            y: pdfY,
+                            width: pdfW,
+                            height: pdfH
+                        });
+                    }
+
+                    const modifiedPdfBytes = await pdfDocToUpdate.save();
+                    
+                    // Upload via FormData
+                    const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
+                    const cleanFilename = currentPdfFilename.replace("KETUA_SIGNED_", "");
+                    const file = new File([blob], "KETUA_SIGNED_" + cleanFilename, { type: 'application/pdf' });
+                    
+                    const formData = new FormData();
+                    formData.append("idPermohonan", activePermohonanId);
+                    formData.append("keputusan", "LULUS");
+                    formData.append("ulasan", "DILULUSKAN: Permohonan telah ditandatangani dan dicop rasmi oleh Ketua Kampung.");
+                    formData.append("dokumenBalas", file);
+                    
+                    fetch("<%= request.getContextPath() %>/bantuan/keputusanKetua", {
+                        method: "POST",
+                        body: formData
+                    })
+                    .then(response => {
+                        Swal.close();
+                        if (response.redirected) {
+                            window.location.href = response.url;
+                        } else {
+                            window.location.href = "<%= request.getContextPath() %>/bantuan/list?msg=decision_made";
+                        }
+                    })
+                    .catch(err => {
+                        console.error(err);
+                        Swal.fire({
+                            title: 'Gagal Memuat Naik',
+                            text: 'Ralat berlaku semasa memuat naik borang yang telah ditandatangani ke pelayan.',
+                            icon: 'error',
+                            confirmButtonColor: '#6C5DD3',
+                            customClass: { popup: 'rounded-[2rem]' }
+                        });
+                    });
+
+                } catch (e) {
+                    console.error(e);
+                    Swal.fire({
+                        title: 'Ralat Proses PDF',
+                        text: 'Gagal menampal tandatangan/cap rasmi ke dalam fail PDF. Rincian ralat: ' + e.message,
+                        icon: 'error',
+                        confirmButtonColor: '#6C5DD3',
+                        customClass: { popup: 'rounded-[2rem]' }
+                    });
+                }
+            }, 500);
+        };
+
+        // Initialize drag & resize logic on startup
+        document.addEventListener('DOMContentLoaded', () => {
+            const sigEl = document.getElementById('signature-overlay');
+            const stampEl = document.getElementById('stamp-overlay');
+            
+            if (sigEl && stampEl) {
+                makeElementDraggableAndResizable(sigEl, 'signature');
+                makeElementDraggableAndResizable(stampEl, 'stamp');
+            }
+        });
+
+        function makeElementDraggableAndResizable(el, type) {
+            let isDragging = false;
+            let isResizing = false;
+            let startX, startY, startLeft, startTop, startWidth, startHeight;
+            
+            const container = document.getElementById('pdf-rendering-container');
+            const handle = el.querySelector('#' + (type === 'signature' ? 'sig' : 'stamp') + '-resize-handle');
+
+            el.addEventListener('mousedown', function(e) {
+                if (e.target === handle || e.target.closest('#' + (type === 'signature' ? 'sig' : 'stamp') + '-resize-handle')) {
+                    return;
+                }
+                if (e.target.closest('.fa-times')) return; 
+                
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startLeft = el.offsetLeft;
+                startTop = el.offsetTop;
+                
+                e.preventDefault();
+            });
+
+            handle.addEventListener('mousedown', function(e) {
+                isResizing = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startWidth = el.offsetWidth;
+                startHeight = el.offsetHeight;
+                
+                e.preventDefault();
+                e.stopPropagation();
+            });
+
+            document.addEventListener('mousemove', function(e) {
+                if (isDragging) {
+                    let dx = e.clientX - startX;
+                    let dy = e.clientY - startY;
+                    let newLeft = startLeft + dx;
+                    let newTop = startTop + dy;
+                    
+                    newLeft = Math.max(0, Math.min(newLeft, container.offsetWidth - el.offsetWidth));
+                    newTop = Math.max(0, Math.min(newTop, container.offsetHeight - el.offsetHeight));
+                    
+                    el.style.left = newLeft + 'px';
+                    el.style.top = newTop + 'px';
+                    
+                    overlays[type].x = newLeft;
+                    overlays[type].y = newTop;
+                }
+                
+                if (isResizing) {
+                    let dx = e.clientX - startX;
+                    let dy = e.clientY - startY;
+                    let newWidth, newHeight;
+                    
+                    if (type === 'stamp') {
+                        let side = Math.max(40, startWidth + dx);
+                        newWidth = side;
+                        newHeight = side;
+                    } else {
+                        newWidth = Math.max(50, startWidth + dx);
+                        newHeight = Math.max(25, startHeight + dy);
+                    }
+                    
+                    if (el.offsetLeft + newWidth <= container.offsetWidth) {
+                        el.style.width = newWidth + 'px';
+                        overlays[type].w = newWidth;
+                    }
+                    if (el.offsetTop + newHeight <= container.offsetHeight) {
+                        el.style.height = newHeight + 'px';
+                        overlays[type].h = newHeight;
+                    }
+                }
+            });
+
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
+                isResizing = false;
+            });
+
+            // Touch events
+            el.addEventListener('touchstart', function(e) {
+                if (e.target === handle || e.target.closest('#' + (type === 'signature' ? 'sig' : 'stamp') + '-resize-handle')) {
+                    return;
+                }
+                if (e.target.closest('.fa-times')) return;
+                
+                let touch = e.touches[0];
+                isDragging = true;
+                startX = touch.clientX;
+                startY = touch.clientY;
+                startLeft = el.offsetLeft;
+                startTop = el.offsetTop;
+            });
+
+            handle.addEventListener('touchstart', function(e) {
+                let touch = e.touches[0];
+                isResizing = true;
+                startX = touch.clientX;
+                startY = touch.clientY;
+                startWidth = el.offsetWidth;
+                startHeight = el.offsetHeight;
+                e.stopPropagation();
+            });
+
+            document.addEventListener('touchmove', function(e) {
+                if (e.touches.length === 0) return;
+                let touch = e.touches[0];
+                
+                if (isDragging) {
+                    let dx = touch.clientX - startX;
+                    let dy = touch.clientY - startY;
+                    let newLeft = startLeft + dx;
+                    let newTop = startTop + dy;
+                    
+                    newLeft = Math.max(0, Math.min(newLeft, container.offsetWidth - el.offsetWidth));
+                    newTop = Math.max(0, Math.min(newTop, container.offsetHeight - el.offsetHeight));
+                    
+                    el.style.left = newLeft + 'px';
+                    el.style.top = newTop + 'px';
+                    
+                    overlays[type].x = newLeft;
+                    overlays[type].y = newTop;
+                }
+                
+                if (isResizing) {
+                    let dx = touch.clientX - startX;
+                    let dy = touch.clientY - startY;
+                    let newWidth, newHeight;
+                    
+                    if (type === 'stamp') {
+                        let side = Math.max(40, startWidth + dx);
+                        newWidth = side;
+                        newHeight = side;
+                    } else {
+                        newWidth = Math.max(50, startWidth + dx);
+                        newHeight = Math.max(25, startHeight + dy);
+                    }
+                    
+                    if (el.offsetLeft + newWidth <= container.offsetWidth) {
+                        el.style.width = newWidth + 'px';
+                        overlays[type].w = newWidth;
+                    }
+                    if (el.offsetTop + newHeight <= container.offsetHeight) {
+                        el.style.height = newHeight + 'px';
+                        overlays[type].h = newHeight;
+                    }
+                }
+            });
+
+            document.addEventListener('touchend', function() {
+                isDragging = false;
+                isResizing = false;
+            });
+        }
+    })();
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>
