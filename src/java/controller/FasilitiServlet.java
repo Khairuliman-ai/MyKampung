@@ -13,6 +13,7 @@ import dao.ActivityLogDAO;
 import util.AppConfig;
 import util.DBUtil;
 import util.StatusConstant;
+import util.FileUploadUtil;
 
 import java.sql.Connection;
 
@@ -298,14 +299,14 @@ public class FasilitiServlet extends HttpServlet {
         f.setRequiresApproval("1".equals(reqApp));
 
         // Handle Image Upload
-        File saveDir = new File(SAVE_DIR);
-        if (!saveDir.exists()) saveDir.mkdirs();
-
         Part filePart = request.getPart("gambar_fasiliti");
         if (filePart != null && filePart.getSize() > 0) {
-            String fileName = "fasiliti_" + System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
-            filePart.write(SAVE_DIR + File.separator + fileName);
-            f.setGambar_fasiliti(fileName);
+            try {
+                String fileName = FileUploadUtil.saveFile(filePart, SAVE_DIR, "fasiliti_");
+                f.setGambar_fasiliti(fileName);
+            } catch (Exception e) {
+                throw new ServletException("Gagal menyimpan gambar fasiliti", e);
+            }
         }
 
         // Operating hours and slot duration
@@ -342,12 +343,12 @@ public class FasilitiServlet extends HttpServlet {
         // Handle Image Upload
         Part filePart = request.getPart("gambar_fasiliti");
         if (filePart != null && filePart.getSize() > 0) {
-            File saveDir = new File(SAVE_DIR);
-            if (!saveDir.exists()) saveDir.mkdirs();
-
-            String fileName = "fasiliti_" + System.currentTimeMillis() + "_" + filePart.getSubmittedFileName();
-            filePart.write(SAVE_DIR + File.separator + fileName);
-            f.setGambar_fasiliti(fileName);
+            try {
+                String fileName = FileUploadUtil.saveFile(filePart, SAVE_DIR, "fasiliti_");
+                f.setGambar_fasiliti(fileName);
+            } catch (Exception e) {
+                throw new ServletException("Gagal menyimpan gambar fasiliti", e);
+            }
         } else {
             // Keep old image if no new one uploaded
             Fasiliti old = fasilitiDAO.dapatkanFasilitiById(f.getId_fasiliti());

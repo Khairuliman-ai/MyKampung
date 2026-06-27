@@ -10,6 +10,7 @@ import model.BantuanLampiran;
 import dao.BantuanLampiranDAO;
 import util.AppConfig;
 import util.InputSanitizer;
+import util.FileUploadUtil;
 
 
 import java.util.Collection;
@@ -304,11 +305,10 @@ public class BantuanServlet extends HttpServlet {
 
                 for (Part part : parts) {
                     if ("dokumenSokongan".equals(part.getName()) && part.getSize() > 0) {
-                        String submitted = part.getSubmittedFileName().replaceAll("\\s+", "_");
-                        String fileName = System.currentTimeMillis() + "_" + submitted;
-                        File saveFile = new File(SAVE_DIR, fileName);
-                        part.write(saveFile.getAbsolutePath());
-                        savedFiles.add(fileName);
+                        String fileName = FileUploadUtil.saveFile(part, SAVE_DIR, "");
+                        if (fileName != null) {
+                            savedFiles.add(fileName);
+                        }
                     }
                 }
 
@@ -322,9 +322,7 @@ public class BantuanServlet extends HttpServlet {
                 Part penyataPart = request.getPart("penyataBank");
                 String penyataFileName = null;
                 if (penyataPart != null && penyataPart.getSize() > 0) {
-                    String submitted = penyataPart.getSubmittedFileName().replaceAll("\\s+", "_");
-                    penyataFileName = "BANK_" + System.currentTimeMillis() + "_" + submitted;
-                    penyataPart.write(SAVE_DIR + File.separator + penyataFileName);
+                    penyataFileName = FileUploadUtil.saveFile(penyataPart, SAVE_DIR, "BANK_");
                 }
 
                 PermohonanBantuan pb = new PermohonanBantuan();
@@ -415,9 +413,7 @@ public class BantuanServlet extends HttpServlet {
                 String fileName = null;
 
                 if (filePart != null && filePart.getSize() > 0) {
-                    String submitted = filePart.getSubmittedFileName().replaceAll("\\s+", "_");
-                    fileName = "BALAS_" + System.currentTimeMillis() + "_" + submitted;
-                    filePart.write(SAVE_DIR + File.separator + fileName);
+                    fileName = FileUploadUtil.saveFile(filePart, SAVE_DIR, "BALAS_");
                 }
 
                 pbDao.updateInfo(idPermohonan, catatan, fileName);
@@ -440,22 +436,18 @@ public class BantuanServlet extends HttpServlet {
                 
                 for (Part part : parts) {
                     if ("dokumenSokongan".equals(part.getName()) && part.getSize() > 0) {
-                        String submitted = part.getSubmittedFileName().replaceAll("\\s+", "_");
-                        String newFileName = System.currentTimeMillis() + "_" + submitted;
-                        File saveFile = new File(SAVE_DIR, newFileName);
-                        part.write(saveFile.getAbsolutePath());
-                        
-                        BantuanLampiran bl = new BantuanLampiran(idPermohonan, newFileName, "PEMOHON");
-                        lampiranDao.insert(bl);
+                        String newFileName = FileUploadUtil.saveFile(part, SAVE_DIR, "");
+                        if (newFileName != null) {
+                            BantuanLampiran bl = new BantuanLampiran(idPermohonan, newFileName, "PEMOHON");
+                            lampiranDao.insert(bl);
+                        }
                     }
                 }
                 
                 Part penyataPart = request.getPart("penyataBank");
                 String penyataFileName = oldPenyata;
                 if (penyataPart != null && penyataPart.getSize() > 0) {
-                    String submitted = penyataPart.getSubmittedFileName().replaceAll("\\s+", "_");
-                    penyataFileName = "BANK_" + System.currentTimeMillis() + "_" + submitted;
-                    penyataPart.write(SAVE_DIR + File.separator + penyataFileName);
+                    penyataFileName = FileUploadUtil.saveFile(penyataPart, SAVE_DIR, "BANK_");
                 }
 
                 String jenisBantuan = request.getParameter("jenisBantuan");
@@ -580,15 +572,14 @@ public class BantuanServlet extends HttpServlet {
 
                 for (Part part : parts) {
                     if ("dokumenBalas".equals(part.getName()) && part.getSize() > 0) {
-                        String submitted = part.getSubmittedFileName().replaceAll("\\s+", "_");
-                        String fileName = "KETUA_" + System.currentTimeMillis() + "_" + submitted;
-                        part.write(SAVE_DIR + File.separator + fileName);
-                        
-                        // Insert into bantuan_lampiran table
-                        model.BantuanLampiran bl = new model.BantuanLampiran(idPermohonan, fileName, "PENTADBIR");
-                        lampiranDao.insert(bl);
-                        
-                        if (firstFileName == null) firstFileName = fileName;
+                        String fileName = FileUploadUtil.saveFile(part, SAVE_DIR, "KETUA_");
+                        if (fileName != null) {
+                            // Insert into bantuan_lampiran table
+                            model.BantuanLampiran bl = new model.BantuanLampiran(idPermohonan, fileName, "PENTADBIR");
+                            lampiranDao.insert(bl);
+                            
+                            if (firstFileName == null) firstFileName = fileName;
+                        }
                     }
                 }
 

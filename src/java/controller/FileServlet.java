@@ -12,7 +12,8 @@ import javax.servlet.http.HttpServletResponse;
 @WebServlet("/file/*")
 public class FileServlet extends HttpServlet {
 
-    private static final String BASE_PATH = "C:\\Users\\khayx\\OneDrive\\Documents\\SEM5_UMT\\PITA1\\MyKampungData\\";
+    // FileServlet will read the configured path directly from AppConfig
+    private static final String BASE_PATH = util.AppConfig.DATA_DIR + "/";
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)

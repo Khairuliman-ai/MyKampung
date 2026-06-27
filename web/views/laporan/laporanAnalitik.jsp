@@ -758,6 +758,7 @@
 
         const params = new URLSearchParams();
         params.append('reportType', reportType);
+        params.append('_csrf', '${sessionScope.csrf_token}');
 
         fetch('<%= request.getContextPath() %>/laporan/ai/generate', {
             method: 'POST',
@@ -818,8 +819,15 @@
             return;
         }
 
+        const params = new URLSearchParams();
+        params.append('_csrf', '${sessionScope.csrf_token}');
+
         fetch('<%= request.getContextPath() %>/laporan/snapshot/save', {
-            method: 'POST'
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: params
         })
         .then(response => response.json())
         .then(data => {
