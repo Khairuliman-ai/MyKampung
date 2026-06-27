@@ -92,7 +92,7 @@ public class PenggunaDAO {
                 + "JOIN peranan r ON pp.id_peranan = r.id_peranan "
                 + "LEFT JOIN ajk_jawatan aj ON p.id_pengguna = aj.id_pengguna "
                 + "LEFT JOIN jawatan_ajk j ON aj.id_jawatan = j.id_jawatan "
-                + "WHERE p.nombor_kp = ? "
+                + "WHERE REPLACE(p.nombor_kp, '-', '') = ? "
                 + "ORDER BY r.id_peranan ASC LIMIT 1";
 
         try (Connection conn = DBUtil.getConnection();

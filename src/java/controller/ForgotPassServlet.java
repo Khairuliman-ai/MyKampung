@@ -43,7 +43,7 @@ public class ForgotPassServlet extends HttpServlet {
         try (Connection conn = DBUtil.getConnection()) {
             
             // 1. Semak sama ada emel DAN nombor_kp wujud dan sepadan
-            String sqlCheck = "SELECT id_pengguna, token_expiry FROM pengguna WHERE email = ? AND nombor_kp = ?";
+            String sqlCheck = "SELECT id_pengguna, token_expiry FROM pengguna WHERE email = ? AND REPLACE(nombor_kp, '-', '') = ?";
             PreparedStatement psCheck = conn.prepareStatement(sqlCheck);
             psCheck.setString(1, emailInput);
             psCheck.setString(2, icInput);

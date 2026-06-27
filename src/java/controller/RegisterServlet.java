@@ -46,6 +46,9 @@ public class RegisterServlet extends HttpServlet {
             
             String nama_penuh = request.getParameter("nama_penuh");
             String nombor_kp = request.getParameter("nombor_kp");
+            if (nombor_kp != null) {
+                nombor_kp = nombor_kp.replaceAll("[^0-9]", "");
+            }
             String nombor_telefon = request.getParameter("nombor_telefon");
             String email = request.getParameter("email");
             String kata_laluan_mentah = request.getParameter("kata_laluan");
