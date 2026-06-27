@@ -12,7 +12,7 @@ public final class AppConfig {
     private AppConfig() {}
 
     // A. Local Windows DIR
-    public static final String DATA_DIR = "C:/Users/khayx/OneDrive/Documents/SEM5_UMT/PITA1/MyKampungData";
+    public static final String DATA_DIR = "C:/MyKampung_System/MyKampungData";
 
     // B. Server Linux DIR
     // public static final String DATA_DIR = "/home/s71383/MyKampungData";
