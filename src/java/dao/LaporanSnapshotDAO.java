@@ -38,6 +38,7 @@ public class LaporanSnapshotDAO {
                 s.setTotal_tempahan_fasiliti(rs.getInt("total_tempahan_fasiliti"));
                 s.setPurata_pendapatan(rs.getDouble("purata_pendapatan"));
                 s.setSnapshot_pada(rs.getTimestamp("snapshot_pada"));
+                s.setAi_executive_summary(rs.getString("ai_executive_summary"));
                 list.add(s);
             }
         } catch (SQLException e) {
@@ -56,8 +57,8 @@ public class LaporanSnapshotDAO {
     public boolean insertSnapshot(LaporanSnapshot s) {
         String sql = "INSERT INTO laporan_snapshot " +
                      "(tahun, bulan, total_penduduk, total_bantuan_dipohon, total_bantuan_diluluskan, " +
-                     "total_aduan_diterima, total_aduan_selesai, total_tempahan_fasiliti, purata_pendapatan) " +
-                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?) " +
+                     "total_aduan_diterima, total_aduan_selesai, total_tempahan_fasiliti, purata_pendapatan, ai_executive_summary) " +
+                     "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?) " +
                      "ON DUPLICATE KEY UPDATE " +
                      "total_penduduk = VALUES(total_penduduk), " +
                      "total_bantuan_dipohon = VALUES(total_bantuan_dipohon), " +
@@ -65,7 +66,8 @@ public class LaporanSnapshotDAO {
                      "total_aduan_diterima = VALUES(total_aduan_diterima), " +
                      "total_aduan_selesai = VALUES(total_aduan_selesai), " +
                      "total_tempahan_fasiliti = VALUES(total_tempahan_fasiliti), " +
-                     "purata_pendapatan = VALUES(purata_pendapatan)";
+                     "purata_pendapatan = VALUES(purata_pendapatan), " +
+                     "ai_executive_summary = VALUES(ai_executive_summary)";
                      
         try (Connection conn = DBUtil.getConnection();
              PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -79,6 +81,7 @@ public class LaporanSnapshotDAO {
             ps.setInt(7, s.getTotal_aduan_selesai());
             ps.setInt(8, s.getTotal_tempahan_fasiliti());
             ps.setDouble(9, s.getPurata_pendapatan());
+            ps.setString(10, s.getAi_executive_summary());
             
             return ps.executeUpdate() > 0;
         } catch (SQLException e) {

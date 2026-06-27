@@ -8,6 +8,10 @@ import util.GeminiUtil;
 
 import java.io.IOException;
 import java.io.PrintWriter;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import java.util.Calendar;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -149,14 +153,45 @@ public class LaporanServlet extends HttpServlet {
             // Dynamically detect connection or configuration errors returned by GeminiUtil.chat
             boolean isError = reply != null && (reply.startsWith("Maaf, ") || reply.startsWith("Gagal "));
             
-            if (isError) {
-                LOGGER.log(Level.WARNING, "LaporanServlet [AI] - Ralat dikesan semasa panggilan Gemini API: {0}", reply);
-            } else {
-                LOGGER.log(Level.INFO, "LaporanServlet [AI] - Penjanaan laporan AI berjaya diselesaikan.");
+            String structuredJson = null;
+            HttpSession session = request.getSession();
+            if (!isError && "eksekutif_json".equalsIgnoreCase(reportType)) {
+                structuredJson = sanitizeAIJsonResponse(reply);
+                if (structuredJson != null) {
+                    try {
+                        // Validate parsing
+                        JsonObject jsonObject = JsonParser.parseString(structuredJson).getAsJsonObject();
+                        
+                        // Store the executive summary in session so it can be saved in the monthly snapshot
+                        if (jsonObject.has("executive_summary")) {
+                            session.setAttribute("latest_ai_executive_summary", jsonObject.get("executive_summary").getAsString());
+                        }
+                        // Also store the entire structured report in session for the dashboard widget
+                        session.setAttribute("latest_ai_structured_report", structuredJson);
+                    } catch (Exception parseEx) {
+                        LOGGER.log(Level.WARNING, "LaporanServlet [AI] - Gagal menghuraikan JSON AI: " + parseEx.getMessage());
+                        isError = true;
+                        reply = "Gagal memproses maklumat AI kerana format tindak balas yang tidak sah.";
+                    }
+                } else {
+                    isError = true;
+                    reply = "Gagal memproses maklumat AI kerana maklum balas bukan dalam format JSON.";
+                }
             }
 
-            String escapedReply = escapeJson(reply);
-            out.print("{\"reply\":\"" + escapedReply + "\",\"error\":" + isError + "}");
+            if (isError) {
+                LOGGER.log(Level.WARNING, "LaporanServlet [AI] - Ralat dikesan semasa panggilan Gemini API atau proses JSON: {0}", reply);
+                String escapedReply = escapeJson(reply);
+                out.print("{\"reply\":\"" + escapedReply + "\",\"error\":true}");
+            } else {
+                LOGGER.log(Level.INFO, "LaporanServlet [AI] - Penjanaan laporan AI berjaya diselesaikan.");
+                if ("eksekutif_json".equalsIgnoreCase(reportType) && structuredJson != null) {
+                    out.print("{\"reply\":\"" + escapeJson(reply) + "\",\"structured_report\":" + structuredJson + ",\"error\":false}");
+                } else {
+                    String escapedReply = escapeJson(reply);
+                    out.print("{\"reply\":\"" + escapedReply + "\",\"error\":false}");
+                }
+            }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "LaporanServlet [AI] - Ralat teruk dikesan semasa menjana laporan AI: " + e.getMessage(), e);
             // Do NOT set response.setStatus(500) to prevent Tomcat from replacing the JSON response with its HTML error page.
@@ -165,6 +200,37 @@ public class LaporanServlet extends HttpServlet {
         } finally {
             out.flush();
         }
+    }
+
+    private String sanitizeAIJsonResponse(String raw) {
+        if (raw == null) return null;
+        raw = raw.trim();
+        // Remove markdown block wraps: ```json ... ``` or ``` ... ```
+        if (raw.startsWith("```")) {
+            int firstLineBreak = raw.indexOf("\n");
+            if (firstLineBreak != -1) {
+                raw = raw.substring(firstLineBreak).trim();
+            } else {
+                raw = raw.substring(3).trim();
+            }
+        }
+        if (raw.endsWith("```")) {
+            raw = raw.substring(0, raw.length() - 3).trim();
+        }
+        
+        // Ensure it looks like a JSON object
+        if (raw.startsWith("{") && raw.endsWith("}")) {
+            return raw;
+        }
+        
+        // If not, try to find the first '{' and last '}'
+        int firstBrace = raw.indexOf("{");
+        int lastBrace = raw.lastIndexOf("}");
+        if (firstBrace != -1 && lastBrace != -1 && lastBrace > firstBrace) {
+            return raw.substring(firstBrace, lastBrace + 1);
+        }
+        
+        return null;
     }
 
     @SuppressWarnings("unchecked")
@@ -223,6 +289,13 @@ public class LaporanServlet extends HttpServlet {
             s.setTotal_aduan_selesai(totalAduanSelesai);
             s.setTotal_tempahan_fasiliti((Integer) stats.getOrDefault("totalTempahan", 0));
             s.setPurata_pendapatan((Double) stats.getOrDefault("averageIncome", 0.0));
+
+            // Retrieve and set session-cached AI summary
+            HttpSession session = request.getSession();
+            String aiSummary = (String) session.getAttribute("latest_ai_executive_summary");
+            if (aiSummary != null) {
+                s.setAi_executive_summary(aiSummary);
+            }
 
             boolean success = snapshotDao.insertSnapshot(s);
             if (success) {

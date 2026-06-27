@@ -556,7 +556,8 @@
                         </div>
                         <div class="flex flex-wrap items-center gap-3">
                             <select id="aiReportType" class="px-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-bold text-slate-700 focus:outline-none focus:border-indigo-300">
-                                <option value="eksekutif">Ringkasan Eksekutif Kampung</option>
+                                <option value="eksekutif">Ringkasan Eksekutif Kampung (Naratif)</option>
+                                <option value="eksekutif_json">Laporan Eksekutif Berstruktur (JSON)</option>
                                 <option value="kebajikan">Analisis Kebajikan & Bantuan</option>
                                 <option value="aduan">Analisis Isu & Aduan Komuniti</option>
                                 <option value="fasiliti">Analisis Penggunaan Fasiliti</option>
@@ -795,8 +796,100 @@
                 container.className = 'p-6 md:p-8 rounded-3xl bg-white border border-slate-100 min-h-[300px] block';
                 result.classList.remove('hidden');
                 
-                // Very simple markdown to HTML renderer for clean visualization
-                result.innerHTML = formatMarkdown(data.reply);
+                if (data.structured_report) {
+                    let report = data.structured_report;
+                    let alertsHtml = '';
+                    if (report.critical_alerts && report.critical_alerts.length > 0) {
+                        alertsHtml = `
+                            <div class="space-y-3">
+                                \${report.critical_alerts.map(alert => `
+                                    <div class="flex items-start gap-3 p-4 bg-rose-50 border border-rose-100 rounded-2xl">
+                                        <div class="w-6 h-6 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-xs shrink-0 animate-pulse">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <span class="text-xs text-rose-700 font-semibold">\${alert}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        `;
+                    } else {
+                        alertsHtml = `
+                            <div class="p-4 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-3">
+                                <div class="w-6 h-6 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-xs shrink-0">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <span class="text-xs text-emerald-700 font-semibold">Tiada isu kritikal dikesan buat masa ini.</span>
+                            </div>
+                        `;
+                    }
+
+                    let actionsHtml = '';
+                    if (report.recommended_actions && report.recommended_actions.length > 0) {
+                        actionsHtml = `
+                            <ol class="space-y-3">
+                                \${report.recommended_actions.map((action, i) => `
+                                    <li class="flex items-start gap-3 p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                                        <div class="w-6 h-6 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center text-xs font-bold shrink-0">
+                                            \${i + 1}
+                                        </div>
+                                        <span class="text-xs text-slate-700 font-medium">\${action}</span>
+                                    </li>
+                                `).join('')}
+                            </ol>
+                        `;
+                    }
+
+                    result.innerHTML = `
+                        <div class="space-y-8">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                                    <h3 class="text-xs font-extrabold text-slate-800 uppercase tracking-wider">Laporan Eksekutif AI Berstruktur</h3>
+                                </div>
+                                <button onclick="copyStructuredReportJSON()" class="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 text-[10px] font-bold flex items-center gap-1.5 transition-all">
+                                    <i class="fas fa-copy"></i> Salin JSON
+                                </button>
+                            </div>
+
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                                <!-- Executive Summary -->
+                                <div class="lg:col-span-2 p-6 rounded-3xl bg-gradient-to-r from-purple-50 to-indigo-50 border border-indigo-100/50">
+                                    <h4 class="text-[10px] font-black text-indigo-900 uppercase tracking-widest mb-3 flex items-center gap-2">
+                                        <i class="fas fa-file-invoice text-indigo-500"></i> Ringkasan Eksekutif
+                                    </h4>
+                                    <p class="text-xs text-indigo-950 font-medium leading-relaxed">\${report.executive_summary}</p>
+                                </div>
+
+                                <!-- Economic and Welfare Status -->
+                                <div class="p-6 rounded-3xl border border-slate-100 bg-white shadow-sm">
+                                    <h4 class="text-[10px] font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                        <i class="fas fa-wallet text-amber-500"></i> Analisis Ekonomi & Kebajikan
+                                    </h4>
+                                    <p class="text-xs text-slate-600 leading-relaxed font-medium">\${report.economic_and_welfare_status}</p>
+                                </div>
+
+                                <!-- Critical Alerts -->
+                                <div class="p-6 rounded-3xl border border-slate-100 bg-white shadow-sm">
+                                    <h4 class="text-[10px] font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                        <i class="fas fa-bell text-rose-500"></i> Amaran & Bottlenecks Kritikal
+                                    </h4>
+                                    \${alertsHtml}
+                                </div>
+
+                                <!-- Recommended Actions -->
+                                <div class="lg:col-span-2 p-6 rounded-3xl border border-slate-100 bg-white shadow-sm">
+                                    <h4 class="text-[10px] font-black text-slate-800 uppercase tracking-widest mb-4 flex items-center gap-2">
+                                        <i class="fas fa-list-check text-emerald-500"></i> Syor & Pelan Tindakan Ketua Kampung
+                                    </h4>
+                                    \${actionsHtml}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                    window.latestStructuredReportJSON = JSON.stringify(report, null, 2);
+                } else {
+                    result.innerHTML = formatMarkdown(data.reply);
+                }
             }
         })
         .catch(err => {
@@ -809,6 +902,19 @@
             document.querySelector('#aiPlaceholder h4').innerText = 'Ralat Sambungan';
             document.querySelector('#aiPlaceholder p').innerText = err.message || 'Sambungan ke pelayan terputus. Sila cuba lagi.';
         });
+    }
+
+    // Salin JSON Laporan
+    function copyStructuredReportJSON() {
+        if (!window.latestStructuredReportJSON) return;
+        navigator.clipboard.writeText(window.latestStructuredReportJSON)
+            .then(() => {
+                alert('JSON laporan eksekutif berjaya disalin ke papan klip.');
+            })
+            .catch(err => {
+                console.error('Gagal menyalin JSON:', err);
+                alert('Gagal menyalin JSON secara automatik.');
+            });
     }
 
     // Save Monthly Snapshot (AJAX)

@@ -19,6 +19,7 @@ public class LaporanSnapshot {
     private int total_tempahan_fasiliti;
     private double purata_pendapatan;
     private Timestamp snapshot_pada;
+    private String ai_executive_summary;
 
     // Getters and Setters
     public int getId_snapshot() { return id_snapshot; }
@@ -53,4 +54,7 @@ public class LaporanSnapshot {
 
     public Timestamp getSnapshot_pada() { return snapshot_pada; }
     public void setSnapshot_pada(Timestamp snapshot_pada) { this.snapshot_pada = snapshot_pada; }
+
+    public String getAi_executive_summary() { return ai_executive_summary; }
+    public void setAi_executive_summary(String ai_executive_summary) { this.ai_executive_summary = ai_executive_summary; }
 }

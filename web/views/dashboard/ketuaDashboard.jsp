@@ -146,6 +146,92 @@
             </div>
         </div>
 
+        <%-- AI Insights Widget --%>
+        <%
+            String latestReportJson = (String) session.getAttribute("latest_ai_structured_report");
+            String aiSummary = null;
+            List<String> aiAlerts = null;
+            if (latestReportJson != null) {
+                try {
+                    com.google.gson.JsonObject reportObj = com.google.gson.JsonParser.parseString(latestReportJson).getAsJsonObject();
+                    if (reportObj.has("executive_summary")) {
+                        aiSummary = reportObj.get("executive_summary").getAsString();
+                    }
+                    if (reportObj.has("critical_alerts")) {
+                        com.google.gson.JsonArray alertsArr = reportObj.getAsJsonArray("critical_alerts");
+                        aiAlerts = new java.util.ArrayList<>();
+                        for (int i = 0; i < alertsArr.size(); i++) {
+                            aiAlerts.add(alertsArr.get(i).getAsString());
+                        }
+                    }
+                } catch (Exception e) {
+                    // Ignore or log
+                }
+            }
+        %>
+        <div class="glass-card rounded-[2.5rem] p-6 mb-8 border border-purple-100 bg-gradient-to-r from-purple-50/30 via-white to-indigo-50/10">
+            <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-10 h-10 rounded-2xl bg-purple-50 text-purple-600 border border-purple-100/50 flex items-center justify-center text-lg">
+                        <i class="fas fa-robot text-purple-500"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-black text-slate-800 text-sm tracking-tight">AI Insights & Amaran Komuniti</h3>
+                        <p class="text-[10px] text-slate-400 font-bold uppercase tracking-wider mt-0.5">Analisis Pintar Bulanan</p>
+                    </div>
+                </div>
+                <a href="<%= request.getContextPath() %>/laporan/view" class="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1.5 transition">
+                    Portal Laporan <i class="fas fa-arrow-right text-[10px]"></i>
+                </a>
+            </div>
+
+            <% if (aiSummary != null) { %>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 space-y-4">
+                        <div class="p-5 rounded-3xl bg-white border border-slate-100 shadow-sm h-full">
+                            <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-2 flex items-center gap-1.5">
+                                <i class="fas fa-file-invoice text-indigo-500"></i> Ringkasan Eksekutif AI
+                            </h4>
+                            <p class="text-xs text-slate-600 leading-relaxed font-medium"><%= aiSummary %></p>
+                        </div>
+                    </div>
+                    <div class="lg:col-span-1 space-y-3">
+                        <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 flex items-center gap-1.5">
+                            <i class="fas fa-bell text-rose-500"></i> Amaran Kritikal
+                        </h4>
+                        <% if (aiAlerts != null && !aiAlerts.isEmpty()) { 
+                            for (String alert : aiAlerts) { %>
+                                <div class="flex items-start gap-2.5 p-3 bg-rose-50 border border-rose-100 rounded-2xl">
+                                    <div class="w-5 h-5 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center text-[10px] shrink-0 animate-pulse">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                    </div>
+                                    <span class="text-[11px] text-rose-700 font-semibold"><%= alert %></span>
+                                </div>
+                            <% } 
+                        } else { %>
+                            <div class="p-3 bg-emerald-50 border border-emerald-100 rounded-2xl flex items-center gap-2">
+                                <div class="w-5 h-5 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center text-[10px]">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <span class="text-[11px] text-emerald-700 font-semibold">Tiada amaran kritikal dikesan.</span>
+                            </div>
+                        <% } %>
+                    </div>
+                </div>
+            <% } else { %>
+                <div class="p-8 text-center max-w-lg mx-auto space-y-3">
+                    <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 border border-purple-100/50 flex items-center justify-center text-xl mx-auto">
+                        <i class="fas fa-wand-magic-sparkles"></i>
+                    </div>
+                    <h4 class="text-xs font-bold text-slate-800">Ulasan AI Bulanan Belum Dijana</h4>
+                    <p class="text-xs text-slate-400 leading-relaxed">Ketua Kampung boleh menjana laporan eksekutif berstruktur berasaskan statistik semasa kampung untuk mendapatkan ringkasan AI dan senarai amaran komuniti di sini.</p>
+                    <a href="<%= request.getContextPath() %>/laporan/view" class="inline-flex items-center gap-2 px-5 py-2.5 rounded-2xl bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold transition shadow-md shadow-purple-100">
+                        <i class="fas fa-sparkles"></i> Jana Ulasan Pertama Anda
+                    </a>
+                </div>
+            <% } %>
+        </div>
+
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
             
             <!-- Left Side: Bantuan Awaiting Endorsement -->
