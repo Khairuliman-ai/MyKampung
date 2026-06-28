@@ -944,8 +944,8 @@
                 <!-- Final Approval / Submit -->
                 <div class="flex gap-2 w-full md:w-auto">
                     <button type="button" onclick="closePdfSignerConfirm()" class="flex-1 md:flex-none px-6 py-3 bg-gray-100 text-gray-500 rounded-xl font-bold text-xs hover:bg-gray-200 transition">Batal</button>
-                    <button type="button" id="btn-save-pdf-approve" onclick="saveSignedPdfAndApprove()" class="flex-2 md:flex-none px-8 py-3 bg-[#00B69B] text-white rounded-xl font-bold text-xs shadow-lg shadow-teal-100 hover:bg-[#00a38b] transition flex items-center justify-center gap-2">
-                        <i class="fas fa-cloud-upload-alt"></i> Simpan & Luluskan
+                    <button type="button" id="btn-save-pdf-approve" onclick="saveSignedPdfAndDownload()" class="flex-2 md:flex-none px-8 py-3 bg-[#00B69B] text-white rounded-xl font-bold text-xs shadow-lg shadow-teal-100 hover:bg-[#00a38b] transition flex items-center justify-center gap-2">
+                        <i class="fas fa-download"></i> Simpan & Muat Turun
                     </button>
                 </div>
             </div>
@@ -1451,8 +1451,8 @@
         const btnDetSign = document.getElementById('btnDetSign');
         if (showAction) {
             actionBox.classList.remove('hidden');
-            document.getElementById('btnDetReject').onclick = () => { closeModal('modalDetail'); openActionModal(id, 'tak_lengkap'); };
-            document.getElementById('btnDetApprove').onclick = () => { closeModal('modalDetail'); openActionModal(id, 'lengkap'); };
+            document.getElementById('btnDetReject').onclick = () => { openActionModal(id, 'tak_lengkap'); };
+            document.getElementById('btnDetApprove').onclick = () => { openActionModal(id, 'lengkap'); };
             
             if (kategori === "RASMI") {
                 btnDetSign.classList.remove('hidden');
@@ -1482,7 +1482,6 @@
                         return;
                     }
                     
-                    closeModal('modalDetail');
                     if (dok && dok.trim() !== "") {
                         const firstFile = decodeURIComponent(dok.split(',')[0]);
                         openPdfSigner(id, firstFile);
@@ -1825,8 +1824,8 @@
                 .then(bytes => {
                     currentPdfBytes = bytes;
                     
-                    // Render using PDF.js
-                    return pdfjsLib.getDocument({ data: bytes }).promise;
+                    // Render using PDF.js (use a copy via slice so the original ArrayBuffer is not detached by the worker)
+                    return pdfjsLib.getDocument({ data: bytes.slice(0) }).promise;
                 })
                 .then(pdf => {
                     pdfDoc = pdf;
@@ -1973,7 +1972,7 @@
             });
         };
 
-        window.saveSignedPdfAndApprove = function() {
+        window.saveSignedPdfAndDownload = function() {
             if (!overlays.signature.visible && !overlays.stamp.visible) {
                 Swal.fire({
                     title: 'Tiada Perubahan',
@@ -1996,7 +1995,7 @@
             setTimeout(async function() {
                 try {
                     const { PDFDocument } = PDFLib;
-                    const pdfDocToUpdate = await PDFDocument.load(currentPdfBytes);
+                    const pdfDocToUpdate = await PDFDocument.load(currentPdfBytes.slice(0));
                     const pages = pdfDocToUpdate.getPages();
                     
                     const canvas = document.getElementById('pdf-render-canvas');
@@ -2073,39 +2072,32 @@
 
                     const modifiedPdfBytes = await pdfDocToUpdate.save();
                     
-                    // Upload via FormData
+                    // Local browser download trigger
                     const blob = new Blob([modifiedPdfBytes], { type: 'application/pdf' });
                     const cleanFilename = currentPdfFilename.replace("KETUA_SIGNED_", "");
-                    const file = new File([blob], "KETUA_SIGNED_" + cleanFilename, { type: 'application/pdf' });
+                    const downloadUrl = URL.createObjectURL(blob);
                     
-                    const formData = new FormData();
-                    formData.append("idPermohonan", activePermohonanId);
-                    formData.append("keputusan", "LULUS");
-                    formData.append("ulasan", "DILULUSKAN: Permohonan telah ditandatangani dan dicop rasmi oleh Ketua Kampung.");
-                    formData.append("dokumenBalas", file);
+                    const link = document.createElement('a');
+                    link.href = downloadUrl;
+                    link.download = "KETUA_SIGNED_" + cleanFilename;
+                    document.body.appendChild(link);
+                    link.click();
+                    document.body.removeChild(link);
                     
-                    fetch("<%= request.getContextPath() %>/bantuan/keputusanKetua", {
-                        method: "POST",
-                        body: formData
-                    })
-                    .then(response => {
-                        Swal.close();
-                        if (response.redirected) {
-                            window.location.href = response.url;
-                        } else {
-                            window.location.href = "<%= request.getContextPath() %>/bantuan/list?msg=decision_made";
-                        }
-                    })
-                    .catch(err => {
-                        console.error(err);
-                        Swal.fire({
-                            title: 'Gagal Memuat Naik',
-                            text: 'Ralat berlaku semasa memuat naik borang yang telah ditandatangani ke pelayan.',
-                            icon: 'error',
-                            confirmButtonColor: '#6C5DD3',
-                            customClass: { popup: 'rounded-[2rem]' }
-                        });
+                    // Cleanup resource
+                    setTimeout(() => URL.revokeObjectURL(downloadUrl), 100);
+
+                    Swal.close();
+                    Swal.fire({
+                        title: 'Berjaya!',
+                        text: 'Fail PDF yang ditandatangani telah dijana dan dimuat turun ke komputer anda.',
+                        icon: 'success',
+                        confirmButtonColor: '#00B69B',
+                        customClass: { popup: 'rounded-[2rem]' }
                     });
+
+                    // Close the modal
+                    closeModal('modalTandatanganPDF');
 
                 } catch (e) {
                     console.error(e);

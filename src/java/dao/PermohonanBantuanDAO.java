@@ -380,13 +380,12 @@ public class PermohonanBantuanDAO {
      * @param idPermohonan application ID
      * @param statusInt status index code (1=LULUS, 2=DIKEMBALIKAN, 3=MENUNGGU_KETUA, 4=DITOLAK)
      * @param ulasanAdmin evaluation remarks
-     * @param dokumenSokongan legacy document attachment path (ignored by sql query)
      * @return true if updated successfully
      */
-    public boolean updateStatus(int idPermohonan, int statusInt, String ulasanAdmin, String dokumenSokongan) {
+    public boolean updateStatus(int idPermohonan, int statusInt, String ulasanAdmin) {
         // Legacy mapping: Early forms submitted status as int codes (1=Approved, 2=Returned, etc.).
         // Retained for backward compatibility with the AJK review and Ketua decision forms.
-        // TODO: Refactor forms to submit status strings directly and remove this mapping.
+        // Refactoring opportunity: Forms can be updated to submit status strings directly to remove this mapping.
         String statusStr = "BARU";
         if (statusInt == 1) statusStr = "LULUS";
         else if (statusInt == 2) statusStr = "DIKEMBALIKAN";

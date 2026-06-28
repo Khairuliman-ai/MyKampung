@@ -1,7 +1,6 @@
 package controller;
 
 import dao.FasilitiDAO;
-import dao.FasilitiSlotDAO;
 import dao.FasilitiSekatanDAO;
 import dao.TempahanFasilitiDAO;
 import model.Fasiliti;
@@ -31,7 +30,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.servlet.http.Part;
-import java.io.File;
 import javax.servlet.annotation.MultipartConfig;
 
 @MultipartConfig(
@@ -75,7 +73,6 @@ public class FasilitiServlet extends HttpServlet {
 
     private FasilitiDAO fasilitiDAO = new FasilitiDAO();
     private TempahanFasilitiDAO tempahanDAO = new TempahanFasilitiDAO();
-    private FasilitiSlotDAO slotDAO = new FasilitiSlotDAO();
     private FasilitiSekatanDAO sekatanDAO = new FasilitiSekatanDAO();
 
     @Override

@@ -8,10 +8,8 @@ import util.GeminiUtil;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
 import java.util.Calendar;
 import java.util.Map;
 import java.util.logging.Logger;

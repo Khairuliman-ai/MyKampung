@@ -401,7 +401,7 @@ public class BantuanServlet extends HttpServlet {
                 int idPermohonan = Integer.parseInt(request.getParameter("idPermohonan"));
                 int status = "/approve".equals(action) ? 1 : 2;
 
-                pbDao.updateStatus(idPermohonan, status, request.getParameter("catatan"), null);
+                pbDao.updateStatus(idPermohonan, status, request.getParameter("catatan"));
                 response.sendRedirect(request.getContextPath() + "/bantuan/list");
             }
             // --- Route: /update — Update assistance info ---
@@ -532,7 +532,7 @@ public class BantuanServlet extends HttpServlet {
                             : "Dokumen tidak lengkap. Sila hubungi AJK.";
                 }
 
-                pbDao.updateStatus(idPermohonan, statusBaru, catatanSimpan, null);
+                pbDao.updateStatus(idPermohonan, statusBaru, catatanSimpan);
 
                 // Trigger Notifikasi selepas review AJK
                 if ("lengkap".equals(keputusan)) {
@@ -566,9 +566,6 @@ public class BantuanServlet extends HttpServlet {
 
                 BantuanLampiranDAO lampiranDao = new BantuanLampiranDAO();
                 Collection<Part> parts = request.getParts();
-                // FIXME: firstFileName is passed to updateStatus() but the DAO ignores the dokumen parameter.
-                // Remove this variable after confirming no other code path depends on it.
-                String firstFileName = null;
 
                 for (Part part : parts) {
                     if ("dokumenBalas".equals(part.getName()) && part.getSize() > 0) {
@@ -577,8 +574,6 @@ public class BantuanServlet extends HttpServlet {
                             // Insert into bantuan_lampiran table
                             model.BantuanLampiran bl = new model.BantuanLampiran(idPermohonan, fileName, "PENTADBIR");
                             lampiranDao.insert(bl);
-                            
-                            if (firstFileName == null) firstFileName = fileName;
                         }
                     }
                 }
@@ -595,7 +590,7 @@ public class BantuanServlet extends HttpServlet {
                     ulasanAdmin = "DITOLAK oleh Ketua Kampung: " + (ulasanKetua != null ? ulasanKetua : "Tidak menepati syarat.");
                 }
 
-                pbDao.updateStatus(idPermohonan, statusBaru, ulasanAdmin, firstFileName);
+                pbDao.updateStatus(idPermohonan, statusBaru, ulasanAdmin);
 
                 // Trigger Notifikasi selepas keputusan Ketua Kampung
                 if ("LULUS".equalsIgnoreCase(keputusan)) {
