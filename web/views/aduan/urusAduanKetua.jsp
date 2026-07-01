@@ -53,36 +53,6 @@
 
 <div class="flex-1 overflow-y-auto p-4 md:p-8 bg-[#F8FAFC]">
     
-    <!-- Executive Dashboard Header (Hero) -->
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-800 to-slate-900 text-white p-6 md:p-8 shadow-xl mb-8 border border-slate-700/50">
-        <div class="absolute right-0 bottom-0 opacity-5 pointer-events-none transform translate-y-8 translate-x-8">
-            <i class="fas fa-landmark text-9xl"></i>
-        </div>
-        <div class="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-            <div>
-                <span class="px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-wider bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">Panel Eksekutif Ketua Kampung</span>
-                <h2 class="text-xl md:text-3xl font-extrabold tracking-tight mt-2">Urusan & Pemantauan Aduan</h2>
-                <p class="text-xs md:text-sm text-slate-300 mt-1 font-medium max-w-xl">Memantau prestasi penyelesaian Biro Keselamatan dan meluluskan penutupan kes secara muktamad.</p>
-            </div>
-            
-            <!-- Resolution Rate Gauge -->
-            <div class="flex items-center gap-4 bg-white/5 backdrop-blur-md p-4 rounded-2xl border border-white/10 shadow-inner">
-                <div class="relative flex items-center justify-center">
-                    <!-- Donut chart via CSS -->
-                    <div class="w-16 h-16 rounded-full flex items-center justify-center bg-slate-800 border-4 border-indigo-500/20" style="background: conic-gradient(#6366f1 <%= resolutionRate %>%, transparent 0)">
-                        <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center">
-                            <span class="text-xs font-black text-white"><%= String.format("%.0f", resolutionRate) %>%</span>
-                        </div>
-                    </div>
-                </div>
-                <div>
-                    <h5 class="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Kadar Penyelesaian</h5>
-                    <p class="text-xs text-white/90 font-medium mt-0.5"><span class="font-extrabold text-indigo-400"><%= resolvedCount %></span> daripada <%= totalAduan %> kes selesai</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <!-- Carian & Penapis Card -->
     <div class="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm mb-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -274,7 +244,7 @@
 <div id="modalStatus" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalStatus')"></div>
     <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-slate-100">
+        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all w-full sm:my-8 sm:max-w-md border border-slate-100">
             <div class="bg-gradient-to-r from-slate-800 to-slate-900 px-6 py-5 text-white">
                 <h3 class="text-sm font-black uppercase tracking-wider flex items-center gap-2"><i class="fas fa-balance-scale"></i> Keputusan Ketua Kampung</h3>
             </div>

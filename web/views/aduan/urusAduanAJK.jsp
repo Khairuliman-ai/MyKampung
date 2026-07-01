@@ -264,7 +264,7 @@
 <div id="modalStatus" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalStatus')"></div>
     <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-slate-100">
+        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all w-full sm:my-8 sm:max-w-md border border-slate-100">
             <div class="bg-gradient-to-r from-indigo-600 to-purple-700 px-6 py-5 text-white">
                 <h3 class="text-sm font-black uppercase tracking-wider flex items-center gap-2"><i class="fas fa-edit"></i> Kemaskini Status Aduan</h3>
             </div>

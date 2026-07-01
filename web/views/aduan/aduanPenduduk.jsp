@@ -325,14 +325,14 @@
 <div id="modalAduanBaru" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalAduanBaru')"></div>
     <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-lg border border-slate-100">
+        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all w-full sm:my-8 sm:max-w-lg border border-slate-100">
             <div class="bg-gradient-to-r from-emerald-600 to-teal-700 px-6 py-5 flex justify-between items-center text-white">
                 <h3 class="text-sm font-black uppercase tracking-wider flex items-center gap-2"><i class="fas fa-pen-nib"></i> Hantar Aduan Baru</h3>
                 <button class="text-white/60 hover:text-white" onclick="closeModal('modalAduanBaru')"><i class="fas fa-times"></i></button>
             </div>
             <form action="<%= request.getContextPath() %>/aduan/submit" method="post" enctype="multipart/form-data" id="aduanForm">
                 <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
-                <div class="bg-white px-6 py-6 space-y-5 max-h-[70vh] overflow-y-auto custom-scrollbar">
+                <div class="bg-white px-4 py-6 sm:px-6 space-y-5 max-h-[70vh] overflow-y-auto custom-scrollbar">
                     
                     <!-- Tajuk -->
                     <div>

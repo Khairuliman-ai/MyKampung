@@ -242,7 +242,7 @@
 <div id="modalHebahan" class="fixed inset-0 z-50 hidden">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 backdrop-blur-sm" onclick="closeModal('modalHebahan')"></div>
     <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-lg">
+        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-xl transition-all w-full sm:my-8 sm:max-w-lg">
             <div class="bg-brand-purple px-6 py-4 flex justify-between items-center">
                 <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fas fa-bullhorn"></i> <span id="modalTitle">Hebahan Baru</span></h3>
                 <button class="text-white hover:text-gray-200" onclick="closeModal('modalHebahan')"><i class="fas fa-times"></i></button>

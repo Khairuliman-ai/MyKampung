@@ -575,7 +575,7 @@
 <div id="modalEdit" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity" onclick="closeModal('modalEdit')"></div>
     <div class="flex min-h-full items-center justify-center p-4">
-        <div class="relative transform overflow-hidden rounded-[2.5rem] bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-3xl border border-white/20 flex flex-col max-h-[90vh]">
+        <div class="relative transform overflow-hidden rounded-[2.5rem] bg-white text-left shadow-2xl transition-all w-full sm:w-full sm:max-w-3xl border border-white/20 flex flex-col max-h-[90vh]">
             <form action="<%= request.getContextPath() %>/ketua/update" method="post" class="flex flex-col h-full" onsubmit="return confirmAction(event, 'Simpan Perubahan?', 'Adakah anda mahu menyimpan maklumat profil yang dikemaskini?', 'Ya, Simpan', '<%= primaryColor %>')">
                 <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="idPengguna" id="editId">
@@ -599,7 +599,7 @@
                 </div>
 
                 <!-- Scrollable Body -->
-                <div class="p-8 overflow-y-auto custom-scrollbar flex-1 bg-gray-50/30">
+                <div class="p-4 sm:p-8 overflow-y-auto custom-scrollbar flex-1 bg-gray-50/30">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Peribadi -->
                         <div class="space-y-4">
@@ -662,7 +662,7 @@
                 </div>
 
                 <!-- Footer -->
-                <div class="p-8 bg-gray-50 border-t border-gray-100 shrink-0 flex justify-between items-center">
+                <div class="p-4 sm:p-8 bg-gray-50 border-t border-gray-100 shrink-0 flex justify-between items-center">
                     <button type="button" onclick="closeModal('modalEdit')" class="text-gray-400 hover:text-gray-600 font-bold text-sm transition-colors">Batal</button>
                     <button type="submit" class="px-10 py-3 bg-brand-purple text-white rounded-2xl font-bold text-sm shadow-lg shadow-purple-100 hover:bg-purple-700 transition-all flex items-center gap-2">
                         <i class="fas fa-save"></i> Simpan Perubahan
@@ -678,14 +678,14 @@
 <div id="modalInfoUser" class="fixed inset-0 z-50 hidden" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-900/40 backdrop-blur-sm transition-opacity" onclick="closeModal('modalInfoUser')"></div>
     <div class="flex min-h-full items-center justify-center p-4">
-        <div class="relative transform overflow-hidden rounded-[2.5rem] bg-white text-left shadow-2xl transition-all sm:w-full sm:max-w-3xl border border-white/20 flex flex-col max-h-[90vh]">
+        <div class="relative transform overflow-hidden rounded-[2.5rem] bg-white text-left shadow-2xl transition-all w-full sm:w-full sm:max-w-3xl border border-white/20 flex flex-col max-h-[90vh]">
             <!-- Header Modal -->
-            <div class="bg-gradient-to-r from-brand-purple to-brand-secondary px-8 py-10 text-white relative shrink-0">
+            <div class="bg-gradient-to-r from-brand-purple to-brand-secondary p-6 sm:px-8 sm:py-10 text-white relative shrink-0">
                 <div class="absolute top-0 right-0 p-8 opacity-10">
                     <i class="fas fa-user-circle text-8xl"></i>
                 </div>
-                <div class="flex justify-between items-start relative z-10">
-                    <div class="flex items-center gap-6">
+                <div class="flex justify-between items-start relative z-10 w-full">
+                    <div class="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left">
                         <div class="relative group/avatar cursor-pointer" onclick="zoomProfilePic()">
                             <img id="infoFoto" src="" class="w-24 h-24 rounded-3xl object-cover border-4 border-white/30 shadow-xl group-hover:scale-105 transition-transform">
                             <div class="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity rounded-3xl">
@@ -705,7 +705,7 @@
             </div>
 
             <!-- Scrollable Content -->
-            <div class="p-8 overflow-y-auto custom-scrollbar flex-1 bg-gray-50/30">
+            <div class="p-4 sm:p-8 overflow-y-auto custom-scrollbar flex-1 bg-gray-50/30">
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                     <!-- Maklumat Peribadi -->
                     <div class="space-y-4">
@@ -816,7 +816,7 @@
             </div>
 
             <!-- Action Footer -->
-            <div class="p-8 bg-gray-50 border-t border-gray-100 shrink-0 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="p-4 sm:p-8 bg-gray-50 border-t border-gray-100 shrink-0 flex flex-col md:flex-row justify-between items-center gap-4">
                 <button onclick="closeModal('modalInfoUser')" class="text-gray-400 hover:text-gray-600 font-bold text-sm transition order-2 md:order-1">Tutup Profil</button>
                 <div class="flex gap-3 order-1 md:order-2 w-full md:w-auto">
                     <!-- Drop/Gugurkan Form (Only for AJK) -->

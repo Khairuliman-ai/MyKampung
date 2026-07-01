@@ -7,7 +7,7 @@
 <div id="modalAduanDetail" class="fixed inset-0 z-[60] hidden" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalAduanDetail')"></div>
     <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-4xl border border-gray-100">
+        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all w-full sm:my-8 sm:max-w-4xl border border-gray-100">
             <!-- Header -->
             <div id="det-header-bg" class="bg-gradient-to-r from-blue-600 to-indigo-700 text-white px-8 py-6 flex justify-between items-center">
                 <div class="flex items-center gap-3">
@@ -25,7 +25,7 @@
             </div>
 
             <!-- Content Area -->
-            <div class="p-8 max-h-[75vh] overflow-y-auto custom-scrollbar">
+            <div class="p-4 sm:p-8 max-h-[75vh] overflow-y-auto custom-scrollbar">
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                     <!-- Column 1: Main Info & Images (2/3 width) -->
                     <div class="lg:col-span-2 space-y-6">
@@ -110,7 +110,7 @@
             </div>
             
             <!-- Footer -->
-            <div class="bg-slate-50 px-8 py-5 flex justify-between items-center border-t border-slate-100 rounded-b-3xl">
+            <div class="bg-slate-50 px-4 py-4 sm:px-8 sm:py-5 flex flex-col sm:flex-row gap-4 justify-between sm:items-center border-t border-slate-100 rounded-b-3xl">
                 <div id="det-actions" class="flex gap-2">
                     <!-- Dynamic Action Buttons (e.g. Reopen) -->
                 </div>
@@ -127,7 +127,7 @@
 <div id="modalAduanReopen" class="fixed inset-0 z-[70] hidden" role="dialog" aria-modal="true">
     <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity backdrop-blur-sm" onclick="closeModal('modalAduanReopen')"></div>
     <div class="flex min-h-full items-center justify-center p-4 text-center sm:p-0">
-        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all sm:my-8 sm:w-full sm:max-w-md border border-gray-100">
+        <div class="relative transform overflow-hidden rounded-3xl bg-white text-left shadow-2xl transition-all w-full sm:my-8 sm:max-w-md border border-gray-100">
             <div class="bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-4 flex justify-between items-center">
                 <h3 class="text-xs font-black uppercase tracking-wider flex items-center gap-2"><i class="fas fa-undo"></i> Buka Semula Aduan</h3>
                 <button class="text-white/60 hover:text-white" onclick="closeModal('modalAduanReopen')"><i class="fas fa-times"></i></button>
