@@ -297,14 +297,48 @@
             })
             .then(data => {
                 removeTypingIndicator();
-                appendMessage('model', data.reply, true);
+                
+                const replyText = data.reply || '';
+                const is503 = replyText.includes('503') || replyText.toLowerCase().includes('unavailable') || replyText.toLowerCase().includes('demand');
+                const is429 = replyText.includes('429') || replyText.toLowerCase().includes('quota') || replyText.toLowerCase().includes('exhausted') || replyText.toLowerCase().includes('limit');
+                
+                if (is503) {
+                    const beautifulMessage = '🤖 <strong>KampungBot Sedang Sibuk (HTTP 503):</strong><br><br>' +
+                                             'Model AI Gemini sedang mengalami kesesakan lalu lintas atau permintaan yang sangat tinggi di pelayan Google buat sementara waktu.<br><br>' +
+                                             'Sila tunggu <strong>1-2 minit</strong> dan hantar semula mesej anda.';
+                    appendMessage('model', beautifulMessage, true);
+                } else if (is429) {
+                    const beautifulMessage = '🤖 <strong>Had Kuota AI Melebihi Had (HTTP 429):</strong><br><br>' +
+                                             'Had kuota harian/minit KampungBot telah dicapai (had panggilan harian/minit bagi model percuma Gemini telah melebihi had).<br><br>' +
+                                             'Sila **tunggu seketika** sebelum cuba menghantar mesej semula.';
+                    appendMessage('model', beautifulMessage, true);
+                } else {
+                    appendMessage('model', data.reply, true);
+                }
             })
             .catch(error => {
                 console.error('Chatbot error:', error);
                 removeTypingIndicator();
-                appendMessage('model', '⚠️ <strong>Masalah Sambungan Dikesan:</strong><br>' + 
-                              'Sila pastikan anda telah melakukan <strong>Clean & Build</strong> dan **Restart Server (Tomcat)** selepas perubahan web.xml.<br><br>' +
-                              '<small class="text-gray-400">Ralat: ' + error.message + '</small>', true);
+                
+                const errMsg = error.message || '';
+                const is503 = errMsg.includes('503') || errMsg.toLowerCase().includes('unavailable') || errMsg.toLowerCase().includes('demand');
+                const is429 = errMsg.includes('429') || errMsg.toLowerCase().includes('quota') || errMsg.toLowerCase().includes('exhausted') || errMsg.toLowerCase().includes('limit');
+                
+                if (is503) {
+                    const beautifulMessage = '🤖 <strong>KampungBot Sedang Sibuk (HTTP 503):</strong><br><br>' +
+                                             'Model AI Gemini sedang mengalami kesesakan lalu lintas atau permintaan yang sangat tinggi di pelayan Google buat sementara waktu.<br><br>' +
+                                             'Sila tunggu <strong>1-2 minit</strong> dan hantar semula mesej anda.';
+                    appendMessage('model', beautifulMessage, true);
+                } else if (is429) {
+                    const beautifulMessage = '🤖 <strong>Had Kuota AI Melebihi Had (HTTP 429):</strong><br><br>' +
+                                             'Had kuota harian/minit KampungBot telah dicapai (had panggilan harian/minit bagi model percuma Gemini telah melebihi had).<br><br>' +
+                                             'Sila **tunggu seketika** sebelum cuba menghantar mesej semula.';
+                    appendMessage('model', beautifulMessage, true);
+                } else {
+                    appendMessage('model', '⚠️ <strong>Masalah Sambungan Dikesan:</strong><br>' + 
+                                  'Sila pastikan anda telah melakukan <strong>Clean & Build</strong> dan **Restart Server (Tomcat)** selepas perubahan web.xml.<br><br>' +
+                                  '<small class="text-gray-400">Ralat: ' + error.message + '</small>', true);
+                }
             });
         } catch (err) {
             console.error("Error in handleChatSubmit:", err);

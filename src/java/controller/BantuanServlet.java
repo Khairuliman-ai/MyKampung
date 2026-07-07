@@ -27,8 +27,8 @@ import javax.servlet.http.*;
 
 @MultipartConfig(
         fileSizeThreshold = 1024 * 1024,
-        maxFileSize = 5 * 1024 * 1024,
-        maxRequestSize = 10 * 1024 * 1024
+        maxFileSize = 10 * 1024 * 1024,
+        maxRequestSize = 20 * 1024 * 1024
 )
 /**
  * BantuanServlet — Handles all welfare aid (Bantuan) operations.
@@ -283,6 +283,25 @@ public class BantuanServlet extends HttpServlet {
         if (user == null) {
             response.sendRedirect(request.getContextPath());
             return;
+        }
+
+        // Force parsing of multipart requests in Tomcat to populate parameter map
+        String contentType = request.getContentType();
+        if (contentType != null && contentType.toLowerCase().startsWith("multipart/form-data")) {
+            try {
+                request.getParts();
+            } catch (Exception e) {
+                // Catch FileSizeLimitExceededException or generic file size issues
+                Throwable t = e;
+                while (t != null) {
+                    if (t.getClass().getName().contains("SizeLimitExceededException")) {
+                        response.sendRedirect(request.getContextPath() + "/bantuan/list?error=" + java.net.URLEncoder.encode("Had saiz fail melebihi 10MB. Sila kecilkan saiz fail lampiran anda dan cuba lagi.", "UTF-8"));
+                        return;
+                    }
+                    t = t.getCause();
+                }
+                throw new ServletException("Gagal menganalisis fail lampiran", e);
+            }
         }
 
         String action = request.getPathInfo();

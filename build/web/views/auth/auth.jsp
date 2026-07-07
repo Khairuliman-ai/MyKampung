@@ -416,7 +416,7 @@
 
             <!-- ===== Register ===== -->
 <div class="form-container sign-up-container">
-    <form action="${pageContext.request.contextPath}/RegisterServlet" method="post" enctype="multipart/form-data" class="py-3 px-4" onsubmit="return validateRegisterForm(this)">
+    <form action="${pageContext.request.contextPath}/RegisterServlet?_csrf=${sessionScope.csrf_token}" method="post" enctype="multipart/form-data" class="py-3 px-4" onsubmit="return validateRegisterForm(this)">
         <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
 
         <h4 class="fw-bold text-center mb-1">Daftar Penduduk</h4>

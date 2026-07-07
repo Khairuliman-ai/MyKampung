@@ -249,7 +249,7 @@
                 <h3 class="text-sm font-black uppercase tracking-wider flex items-center gap-2"><i class="fas fa-balance-scale"></i> Keputusan Ketua Kampung</h3>
             </div>
             
-            <form action="<%= request.getContextPath() %>/aduan/updateStatus" method="post" enctype="multipart/form-data" id="statusForm">
+            <form action="<%= request.getContextPath() %>/aduan/updateStatus?_csrf=<%= session.getAttribute("csrf_token") %>" method="post" enctype="multipart/form-data" id="statusForm">
                 <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="id_aduan" id="modal-id">
                 <input type="hidden" name="current_status" id="modal-current">

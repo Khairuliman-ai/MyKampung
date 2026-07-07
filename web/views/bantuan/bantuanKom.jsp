@@ -494,7 +494,7 @@
     <div class="flex min-h-full items-center justify-center p-4">
         <div class="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl overflow-hidden transition-all duration-300">
             
-            <form action="<%= request.getContextPath() %>/bantuan/apply" method="post" enctype="multipart/form-data" id="wizardForm">
+            <form action="<%= request.getContextPath() %>/bantuan/apply?_csrf=<%= session.getAttribute("csrf_token") %>" method="post" enctype="multipart/form-data" id="wizardForm">
                 <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="bantuanSource" value="komuniti">
                 
@@ -1067,7 +1067,7 @@
                 </button>
             </header>
 
-            <form id="editPermohonanForm" action="<%= request.getContextPath() %>/bantuan/updateMyRequest" method="post" enctype="multipart/form-data" class="space-y-6 overflow-y-auto pr-2 custom-scrollbar flex-1">
+            <form id="editPermohonanForm" action="<%= request.getContextPath() %>/bantuan/updateMyRequest?_csrf=<%= session.getAttribute("csrf_token") %>" method="post" enctype="multipart/form-data" class="space-y-6 overflow-y-auto pr-2 custom-scrollbar flex-1">
                 <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="idPermohonan" id="editIdPermohonan">
                 <input type="hidden" name="jenisBantuan" id="editJenisBantuan">

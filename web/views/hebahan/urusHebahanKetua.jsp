@@ -267,6 +267,19 @@
             }
         });
     }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('error') === 'file_too_large') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Had Saiz Fail Dilebihi!',
+                text: 'Gambar poster hebahan melebihi had saiz maksimum (10MB). Sila kecilkan saiz fail gambar anda dan cuba lagi.',
+                confirmButtonColor: '#D97706',
+                customClass: { popup: 'rounded-[2rem] font-sans' }
+            });
+        }
+    });
     // closeModal centralized in footer.jsp
 </script>
 

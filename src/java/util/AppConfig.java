@@ -12,10 +12,10 @@ public final class AppConfig {
     private AppConfig() {}
 
     // A. Local Windows DIR
-    public static final String DATA_DIR = "C:/MyKampung_System/MyKampungData";
+    //public static final String DATA_DIR = "C:/MyKampung_System/MyKampungData";
 
     // B. Server Linux DIR
-    // public static final String DATA_DIR = "/home/s71383/MyKampungData";
+    public static final String DATA_DIR = "/home/s71383/MyKampungData";
 
     public static final String DIR_LAMPIRAN_BANTUAN  = DATA_DIR + "/lampiranBantuan";
     public static final String DIR_GAMBAR_ADUAN      = DATA_DIR + "/gambarAduan";

@@ -5,7 +5,7 @@
     <!-- ======================================================== -->
 
     <!-- PILIHAN A: LOCAL DATABASE (WINDOWS) -->
-    
+      <!--
     <Resource name="jdbc/mykampung"
               auth="Container"
               type="javax.sql.DataSource"
@@ -21,9 +21,9 @@
               validationQuery="SELECT 1"
               testOnBorrow="true"
               closeMethod="close"/>
-    
+    -->
     <!-- PILIHAN B: SERVER DATABASE (LINUX) -->
-  <!--
+  
     <Resource name="jdbc/mykampung"
               auth="Container"
               type="javax.sql.DataSource"
@@ -39,5 +39,5 @@
               validationQuery="SELECT 1"
               testOnBorrow="true"
               closeMethod="close"/>
-   -->
+   
 </Context>

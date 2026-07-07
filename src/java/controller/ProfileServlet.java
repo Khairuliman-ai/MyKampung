@@ -68,6 +68,24 @@ public class ProfileServlet extends HttpServlet {
             throws ServletException, IOException {
         
         request.setCharacterEncoding("UTF-8");
+        // Force parsing of multipart requests in Tomcat to populate parameter map
+        String contentType = request.getContentType();
+        if (contentType != null && contentType.toLowerCase().startsWith("multipart/form-data")) {
+            try {
+                request.getParts();
+            } catch (Exception e) {
+                // Catch FileSizeLimitExceededException or generic file size issues
+                Throwable t = e;
+                while (t != null) {
+                    if (t.getClass().getName().contains("SizeLimitExceededException")) {
+                        response.sendRedirect(request.getContextPath() + "/profil/view?status=error&error=file_too_large");
+                        return;
+                    }
+                    t = t.getCause();
+                }
+                throw new ServletException("Gagal menganalisis fail lampiran", e);
+            }
+        }
         HttpSession session = request.getSession();
         Pengguna currentUser = (Pengguna) session.getAttribute("currentUser");
         

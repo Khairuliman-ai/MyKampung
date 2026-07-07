@@ -83,7 +83,12 @@
                 textColor = "text-green-700";
                 icon = "fa-check-circle";
             } else if (status.equals("error")) {
-                msg = "Ralat! Berlaku masalah semasa mengemaskini maklumat.";
+                String err = request.getParameter("error");
+                if ("file_too_large".equals(err)) {
+                    msg = "Had saiz fail foto profil atau dokumen sokongan melebihi 10MB. Sila kecilkan fail gambar dan cuba lagi.";
+                } else {
+                    msg = "Ralat! Berlaku masalah semasa mengemaskini maklumat.";
+                }
                 bgColor = "bg-red-500/10 border-red-500/20";
                 textColor = "text-red-700";
                 icon = "fa-exclamation-circle";
@@ -115,7 +120,7 @@
         </div>
         <% } %>
 
-        <form action="<%= request.getContextPath()%>/profil/update" method="post" enctype="multipart/form-data" class="w-full space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000" onsubmit="return confirmAction(event, 'Simpan Perubahan?', 'Adakah anda pasti mahu menyimpan maklumat profil yang baharu?', 'Ya, Simpan!', '<%= primaryColor %>')">
+        <form action="<%= request.getContextPath()%>/profil/update?_csrf=<%= session.getAttribute("csrf_token") %>" method="post" enctype="multipart/form-data" class="w-full space-y-8 animate-in fade-in slide-in-from-bottom-8 duration-1000" onsubmit="return confirmAction(event, 'Simpan Perubahan?', 'Adakah anda pasti mahu menyimpan maklumat profil yang baharu?', 'Ya, Simpan!', '<%= primaryColor %>')">
             <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
 
             <%-- Bekas Kad Tunggal (Single Form Card Container) --%>

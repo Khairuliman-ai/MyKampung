@@ -58,7 +58,18 @@ public class CsrfFilter implements Filter {
                 return;
             }
             String sessionToken = (String) session.getAttribute(TOKEN_KEY);
-            String formToken = request.getParameter("_csrf");
+            
+            String formToken = null;
+            String contentType = request.getContentType();
+            if (contentType != null && contentType.toLowerCase().startsWith("multipart/form-data")) {
+                // Parse token ONLY from query string for multipart requests.
+                // This prevents Tomcat from parsing the body as url-encoded parameters
+                // in the filter, which would disable the servlet's @MultipartConfig parser.
+                formToken = getCsrfFromQueryString(request.getQueryString());
+            } else {
+                formToken = request.getParameter("_csrf");
+            }
+
             if (sessionToken == null || !sessionToken.equals(formToken)) {
                 response.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid CSRF token");
                 return;
@@ -67,6 +78,23 @@ public class CsrfFilter implements Filter {
         } else {
             chain.doFilter(req, res);
         }
+    }
+
+    private String getCsrfFromQueryString(String queryString) {
+        if (queryString == null || queryString.isEmpty()) {
+            return null;
+        }
+        for (String param : queryString.split("&")) {
+            String[] pair = param.split("=");
+            if (pair.length > 0 && "_csrf".equals(pair[0])) {
+                try {
+                    return pair.length > 1 ? java.net.URLDecoder.decode(pair[1], "UTF-8") : "";
+                } catch (java.io.UnsupportedEncodingException e) {
+                    return pair.length > 1 ? pair[1] : "";
+                }
+            }
+        }
+        return null;
     }
 
     /**

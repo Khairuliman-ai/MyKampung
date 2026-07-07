@@ -17,8 +17,8 @@ import util.InputSanitizer;
 
 @MultipartConfig(
     fileSizeThreshold = 1024 * 1024,     // 1MB
-    maxFileSize = 5 * 1024 * 1024,       // 5MB
-    maxRequestSize = 10 * 1024 * 1024    // 10MB
+    maxFileSize = 10 * 1024 * 1024,      // 10MB
+    maxRequestSize = 20 * 1024 * 1024    // 20MB
 )
 /**
  * HebahanServlet handles community announcements (hebahan).
@@ -189,6 +189,25 @@ public class HebahanServlet extends HttpServlet {
         if (user == null) {
             resp.sendRedirect(req.getContextPath() + "/views/auth/auth.jsp");
             return;
+        }
+
+        // Force parsing of multipart requests in Tomcat to populate parameter map
+        String contentType = req.getContentType();
+        if (contentType != null && contentType.toLowerCase().startsWith("multipart/form-data")) {
+            try {
+                req.getParts();
+            } catch (Exception e) {
+                // Catch FileSizeLimitExceededException or generic file size issues
+                Throwable t = e;
+                while (t != null) {
+                    if (t.getClass().getName().contains("SizeLimitExceededException")) {
+                        resp.sendRedirect(req.getContextPath() + "/hebahan/list?error=file_too_large");
+                        return;
+                    }
+                    t = t.getCause();
+                }
+                throw new ServletException("Gagal menganalisis fail lampiran", e);
+            }
         }
 
         String path = req.getPathInfo();

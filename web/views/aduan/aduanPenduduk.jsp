@@ -330,7 +330,7 @@
                 <h3 class="text-sm font-black uppercase tracking-wider flex items-center gap-2"><i class="fas fa-pen-nib"></i> Hantar Aduan Baru</h3>
                 <button class="text-white/60 hover:text-white" onclick="closeModal('modalAduanBaru')"><i class="fas fa-times"></i></button>
             </div>
-            <form action="<%= request.getContextPath() %>/aduan/submit" method="post" enctype="multipart/form-data" id="aduanForm">
+            <form action="<%= request.getContextPath() %>/aduan/submit?_csrf=<%= session.getAttribute("csrf_token") %>" method="post" enctype="multipart/form-data" id="aduanForm">
                 <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <div class="bg-white px-4 py-6 sm:px-6 space-y-5 max-h-[70vh] overflow-y-auto custom-scrollbar">
                     
@@ -609,6 +609,14 @@
                 text: 'Aduan hanya boleh dibuka semula sekiranya ia telah diselesaikan atau ditolak oleh pihak pengurusan.',
                 confirmButtonColor: '#DC2626',
                 customClass: { popup: 'rounded-3xl' }
+            });
+        <% } else if ("file_too_large".equals(errorParam)) { %>
+            Swal.fire({
+                icon: 'warning',
+                title: 'Had Saiz Fail Dilebihi!',
+                text: 'Gambar aduan melebihi had saiz maksimum (10MB). Sila kecilkan saiz fail gambar anda dan cuba lagi.',
+                confirmButtonColor: '#D97706',
+                customClass: { popup: 'rounded-3xl font-sans' }
             });
         <% } %>
     });

@@ -347,7 +347,7 @@
                 </button>
             </header>
 
-            <form action="<%= contextPath %>/fasiliti/tambah" method="post" id="formFasiliti" class="space-y-6" enctype="multipart/form-data">
+            <form action="<%= contextPath %>/fasiliti/tambah?_csrf=<%= session.getAttribute("csrf_token") %>" method="post" id="formFasiliti" class="space-y-6" enctype="multipart/form-data">
                 <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="id" id="fasilitiId">
                 
@@ -785,7 +785,7 @@
 
     function openAddModal() {
         document.getElementById('modalTitle').innerText = "Tambah Fasiliti Baru";
-        document.getElementById('formFasiliti').action = "<%= contextPath %>/fasiliti/tambah";
+        document.getElementById('formFasiliti').action = "<%= contextPath %>/fasiliti/tambah?_csrf=<%= session.getAttribute("csrf_token") %>";
         document.getElementById('fasilitiId').value = "";
         document.getElementById('fasilitiNama').value = "";
         document.getElementById('fasilitiLokasi').value = "";
@@ -803,7 +803,7 @@
 
     function openEditModal(id, nama, lokasi, status, lat, lon, requiresApproval, currentImage, waktuBuka, waktuTutup, durasiSlot) {
         document.getElementById('modalTitle').innerText = "Kemaskini Fasiliti";
-        document.getElementById('formFasiliti').action = "<%= contextPath %>/fasiliti/edit";
+        document.getElementById('formFasiliti').action = "<%= contextPath %>/fasiliti/edit?_csrf=<%= session.getAttribute("csrf_token") %>";
         document.getElementById('fasilitiId').value = id;
         document.getElementById('fasilitiNama').value = nama;
         document.getElementById('fasilitiLokasi').value = lokasi;
@@ -834,6 +834,18 @@
         document.getElementById('cardPreviewLokasi').innerText = this.value || "Lokasi";
     });
 
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('error') === 'file_too_large') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Had Saiz Fail Dilebihi!',
+                text: 'Gambar fasiliti melebihi had saiz maksimum (10MB). Sila kecilkan saiz fail gambar anda dan cuba lagi.',
+                confirmButtonColor: '#D97706',
+                customClass: { popup: 'rounded-[2rem] font-sans' }
+            });
+        }
+    });
     // closeModal centralized in footer.jsp
 
 </script>

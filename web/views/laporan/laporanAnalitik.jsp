@@ -757,6 +757,23 @@
         result.classList.add('hidden');
         container.className = 'p-6 md:p-8 rounded-3xl bg-slate-50 border border-slate-200 min-h-[300px] flex items-center justify-center';
 
+        // Reset placeholder states to default before starting a new request
+        const iconBox = document.querySelector('#aiPlaceholder div');
+        const titleEl = document.querySelector('#aiPlaceholder h4');
+        const textEl = document.querySelector('#aiPlaceholder p');
+        if (iconBox) {
+            iconBox.className = 'w-16 h-16 rounded-3xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl mx-auto border border-purple-100';
+            iconBox.innerHTML = '<i class="fas fa-robot"></i>';
+        }
+        if (titleEl) {
+            titleEl.className = 'text-sm font-bold text-slate-800';
+            titleEl.innerText = 'Menunggu Permintaan Penjanaan';
+        }
+        if (textEl) {
+            textEl.className = 'text-xs text-slate-400';
+            textEl.innerText = 'Sila pilih jenis laporan berfokus di atas dan klik butang "Jana Laporan AI" untuk memulakan analisa pintar Gemini.';
+        }
+
         const params = new URLSearchParams();
         params.append('reportType', reportType);
         params.append('_csrf', '${sessionScope.csrf_token}');
@@ -788,10 +805,58 @@
             spinner.classList.add('hidden');
 
             if (data.error) {
-                container.className = 'p-6 md:p-8 rounded-3xl bg-red-50 border border-red-200 min-h-[300px] flex items-center justify-center';
                 placeholder.classList.remove('hidden');
-                document.querySelector('#aiPlaceholder h4').innerText = 'Ralat Dikesan';
-                document.querySelector('#aiPlaceholder p').innerText = data.reply;
+                
+                const is503 = data.reply && (data.reply.includes('503') || data.reply.toLowerCase().includes('unavailable') || data.reply.toLowerCase().includes('demand'));
+                const is429 = data.reply && (data.reply.includes('429') || data.reply.toLowerCase().includes('quota') || data.reply.toLowerCase().includes('exhausted') || data.reply.toLowerCase().includes('limit'));
+                
+                const iconBox = document.querySelector('#aiPlaceholder div');
+                const titleEl = document.querySelector('#aiPlaceholder h4');
+                const textEl = document.querySelector('#aiPlaceholder p');
+                
+                if (is503) {
+                    container.className = 'p-6 md:p-8 rounded-3xl bg-amber-50 border border-amber-200 min-h-[300px] flex items-center justify-center text-center';
+                    if (iconBox) {
+                        iconBox.className = 'w-16 h-16 rounded-3xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl mx-auto border border-amber-200';
+                        iconBox.innerHTML = '<i class="fas fa-hourglass-half animate-pulse"></i>';
+                    }
+                    if (titleEl) {
+                        titleEl.className = 'text-sm font-bold text-amber-800';
+                        titleEl.innerText = 'KampungBot Sedang Sibuk (HTTP 503)';
+                    }
+                    if (textEl) {
+                        textEl.className = 'text-xs text-amber-600 font-medium leading-relaxed max-w-sm mx-auto';
+                        textEl.innerHTML = 'Model AI Gemini sedang mengalami kesesakan lalu lintas atau permintaan yang sangat tinggi di pelayan Google buat sementara waktu.<br><br>Sila tunggu <strong>1-2 minit</strong> dan klik butang <strong>Jana Laporan AI</strong> semula.';
+                    }
+                } else if (is429) {
+                    container.className = 'p-6 md:p-8 rounded-3xl bg-amber-50 border border-amber-200 min-h-[300px] flex items-center justify-center text-center';
+                    if (iconBox) {
+                        iconBox.className = 'w-16 h-16 rounded-3xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl mx-auto border border-amber-200';
+                        iconBox.innerHTML = '<i class="fas fa-clock animate-pulse"></i>';
+                    }
+                    if (titleEl) {
+                        titleEl.className = 'text-sm font-bold text-amber-800';
+                        titleEl.innerText = 'Had Kuota AI Melebihi Had (HTTP 429)';
+                    }
+                    if (textEl) {
+                        textEl.className = 'text-xs text-amber-600 font-medium leading-relaxed max-w-sm mx-auto';
+                        textEl.innerHTML = 'Had kuota harian/minit KampungBot telah dicapai (had panggilan harian/minit bagi model percuma Gemini telah melebihi had).<br><br>Sila **tunggu seketika** (rujuk ralat sistem untuk tempoh sekatan) sebelum cuba menjana semula.';
+                    }
+                } else {
+                    container.className = 'p-6 md:p-8 rounded-3xl bg-red-50 border border-red-200 min-h-[300px] flex items-center justify-center text-center';
+                    if (iconBox) {
+                        iconBox.className = 'w-16 h-16 rounded-3xl bg-red-100 text-red-600 flex items-center justify-center text-2xl mx-auto border border-red-200';
+                        iconBox.innerHTML = '<i class="fas fa-exclamation-triangle animate-bounce"></i>';
+                    }
+                    if (titleEl) {
+                        titleEl.className = 'text-sm font-bold text-red-800';
+                        titleEl.innerText = 'Ralat Dikesan';
+                    }
+                    if (textEl) {
+                        textEl.className = 'text-xs text-red-600 font-medium leading-relaxed max-w-sm mx-auto';
+                        textEl.innerText = data.reply;
+                    }
+                }
             } else {
                 container.className = 'p-6 md:p-8 rounded-3xl bg-white border border-slate-100 min-h-[300px] block';
                 result.classList.remove('hidden');
@@ -897,10 +962,59 @@
             btn.disabled = false;
             btn.innerHTML = '<i class="fas fa-sparkles"></i> Jana Laporan AI';
             spinner.classList.add('hidden');
-            container.className = 'p-6 md:p-8 rounded-3xl bg-red-50 border border-red-200 min-h-[300px] flex items-center justify-center';
             placeholder.classList.remove('hidden');
-            document.querySelector('#aiPlaceholder h4').innerText = 'Ralat Sambungan';
-            document.querySelector('#aiPlaceholder p').innerText = err.message || 'Sambungan ke pelayan terputus. Sila cuba lagi.';
+            
+            const errMsg = err.message || '';
+            const is503 = errMsg.includes('503') || errMsg.toLowerCase().includes('unavailable') || errMsg.toLowerCase().includes('demand');
+            const is429 = errMsg.includes('429') || errMsg.toLowerCase().includes('quota') || errMsg.toLowerCase().includes('exhausted') || errMsg.toLowerCase().includes('limit');
+            
+            const iconBox = document.querySelector('#aiPlaceholder div');
+            const titleEl = document.querySelector('#aiPlaceholder h4');
+            const textEl = document.querySelector('#aiPlaceholder p');
+            
+            if (is503) {
+                container.className = 'p-6 md:p-8 rounded-3xl bg-amber-50 border border-amber-200 min-h-[300px] flex items-center justify-center text-center';
+                if (iconBox) {
+                    iconBox.className = 'w-16 h-16 rounded-3xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl mx-auto border border-amber-200';
+                    iconBox.innerHTML = '<i class="fas fa-hourglass-half animate-pulse"></i>';
+                }
+                if (titleEl) {
+                    titleEl.className = 'text-sm font-bold text-amber-800';
+                    titleEl.innerText = 'KampungBot Sedang Sibuk (HTTP 503)';
+                }
+                if (textEl) {
+                    textEl.className = 'text-xs text-amber-600 font-medium leading-relaxed max-w-sm mx-auto';
+                    textEl.innerHTML = 'Model AI Gemini sedang mengalami kesesakan lalu lintas atau permintaan yang sangat tinggi di pelayan Google buat sementara waktu.<br><br>Sila tunggu <strong>1-2 minit</strong> dan klik butang <strong>Jana Laporan AI</strong> semula.';
+                }
+            } else if (is429) {
+                container.className = 'p-6 md:p-8 rounded-3xl bg-amber-50 border border-amber-200 min-h-[300px] flex items-center justify-center text-center';
+                if (iconBox) {
+                    iconBox.className = 'w-16 h-16 rounded-3xl bg-amber-100 text-amber-600 flex items-center justify-center text-2xl mx-auto border border-amber-200';
+                    iconBox.innerHTML = '<i class="fas fa-clock animate-pulse"></i>';
+                }
+                if (titleEl) {
+                    titleEl.className = 'text-sm font-bold text-amber-800';
+                    titleEl.innerText = 'Had Kuota AI Melebihi Had (HTTP 429)';
+                }
+                if (textEl) {
+                    textEl.className = 'text-xs text-amber-600 font-medium leading-relaxed max-w-sm mx-auto';
+                    textEl.innerHTML = 'Had kuota harian/minit KampungBot telah dicapai (had panggilan harian/minit bagi model percuma Gemini telah melebihi had).<br><br>Sila **tunggu seketika** (rujuk ralat sistem untuk tempoh sekatan) sebelum cuba menjana semula.';
+                }
+            } else {
+                container.className = 'p-6 md:p-8 rounded-3xl bg-red-50 border border-red-200 min-h-[300px] flex items-center justify-center text-center';
+                if (iconBox) {
+                    iconBox.className = 'w-16 h-16 rounded-3xl bg-red-100 text-red-600 flex items-center justify-center text-2xl mx-auto border border-red-200';
+                    iconBox.innerHTML = '<i class="fas fa-exclamation-triangle animate-bounce"></i>';
+                }
+                if (titleEl) {
+                    titleEl.className = 'text-sm font-bold text-red-800';
+                    titleEl.innerText = 'Ralat Sambungan';
+                }
+                if (textEl) {
+                    textEl.className = 'text-xs text-red-600 font-medium leading-relaxed max-w-sm mx-auto';
+                    textEl.innerText = errMsg || 'Sambungan ke pelayan terputus. Sila cuba lagi.';
+                }
+            }
         });
     }
 

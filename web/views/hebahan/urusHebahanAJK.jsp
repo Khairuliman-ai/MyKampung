@@ -247,7 +247,7 @@
                 <h3 class="text-lg font-bold text-white flex items-center gap-2"><i class="fas fa-bullhorn"></i> <span id="modalTitle">Hebahan Baru</span></h3>
                 <button class="text-white hover:text-gray-200" onclick="closeModal('modalHebahan')"><i class="fas fa-times"></i></button>
             </div>
-            <form id="formHebahan" action="<%= request.getContextPath() %>/hebahan/create" method="post" enctype="multipart/form-data" onsubmit="return validateHebahanForm()">
+            <form id="formHebahan" action="<%= request.getContextPath() %>/hebahan/create?_csrf=<%= session.getAttribute("csrf_token") %>" method="post" enctype="multipart/form-data" onsubmit="return validateHebahanForm()">
                 <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="id_hebahan" id="id_hebahan">
                 <div class="bg-white px-8 py-6 space-y-4 max-h-[70vh] overflow-y-auto">
@@ -439,7 +439,7 @@
 
     function openAddModal() {
         document.getElementById('modalTitle').innerText = 'Hebahan Baru';
-        document.getElementById('formHebahan').action = '<%= request.getContextPath() %>/hebahan/create';
+        document.getElementById('formHebahan').action = '<%= request.getContextPath() %>/hebahan/create?_csrf=<%= session.getAttribute("csrf_token") %>';
         document.getElementById('id_hebahan').value = '';
         document.getElementById('formHebahan').reset();
         resetPosterSelection();
@@ -448,7 +448,7 @@
 
     function openEditModal(btn) {
         document.getElementById('modalTitle').innerText = 'Kemaskini Hebahan';
-        document.getElementById('formHebahan').action = '<%= request.getContextPath() %>/hebahan/update';
+        document.getElementById('formHebahan').action = '<%= request.getContextPath() %>/hebahan/update?_csrf=<%= session.getAttribute("csrf_token") %>';
         document.getElementById('id_hebahan').value = btn.getAttribute('data-id');
         document.getElementById('tajuk').value = btn.getAttribute('data-tajuk');
         document.getElementById('kandungan').value = btn.getAttribute('data-kandungan');
@@ -650,6 +650,19 @@
         previewImage.src = '';
         fileNameLabel.innerText = 'Pilih atau Seret Gambar Poster';
     }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('error') === 'file_too_large') {
+            Swal.fire({
+                icon: 'warning',
+                title: 'Had Saiz Fail Dilebihi!',
+                text: 'Gambar poster hebahan melebihi had saiz maksimum (10MB). Sila kecilkan saiz fail gambar anda dan cuba lagi.',
+                confirmButtonColor: '#D97706',
+                customClass: { popup: 'rounded-[2rem] font-sans' }
+            });
+        }
+    });
 </script>
 
 <%@ include file="/views/common/footer.jsp" %>

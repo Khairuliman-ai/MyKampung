@@ -43,7 +43,7 @@ import util.InputSanitizer;
  *   <li>/reopen - Allows the resident to reopen a complaint (max 2 times per JKKK rules).</li>
  * </ul>
  */
-@MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 5 * 1024 * 1024, maxRequestSize = 10 * 1024 * 1024)
+@MultipartConfig(fileSizeThreshold = 1024 * 1024, maxFileSize = 10 * 1024 * 1024, maxRequestSize = 20 * 1024 * 1024)
 public class AduanServlet extends HttpServlet {
 
     private static final String SAVE_DIR = AppConfig.DIR_GAMBAR_ADUAN;
@@ -201,6 +201,26 @@ public class AduanServlet extends HttpServlet {
             response.sendRedirect(request.getContextPath() + "/views/auth/auth.jsp");
             return;
         }
+
+        // Force parsing of multipart requests in Tomcat to populate parameter map
+        String contentType = request.getContentType();
+        if (contentType != null && contentType.toLowerCase().startsWith("multipart/form-data")) {
+            try {
+                request.getParts();
+            } catch (Exception e) {
+                // Catch FileSizeLimitExceededException or generic file size issues
+                Throwable t = e;
+                while (t != null) {
+                    if (t.getClass().getName().contains("SizeLimitExceededException")) {
+                        response.sendRedirect(request.getContextPath() + "/aduan/list?error=file_too_large");
+                        return;
+                    }
+                    t = t.getCause();
+                }
+                throw new ServletException("Gagal menganalisis fail lampiran", e);
+            }
+        }
+
         String pathInfo = request.getPathInfo();
         AduanDAO aduanDAO = new AduanDAO();
 
@@ -272,7 +292,6 @@ public class AduanServlet extends HttpServlet {
                 // Manage the completion proof (bukti selesai) for RESOLVED status
                 String buktiSelesaiFileName = aduan.getBukti_selesai();
                 if ("RESOLVED".equals(nextStatus)) {
-                    String contentType = request.getContentType();
                     if (contentType != null && contentType.startsWith("multipart/")) {
                         try {
                             Part part = request.getPart("bukti_selesai_file");

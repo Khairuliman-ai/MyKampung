@@ -958,7 +958,7 @@
     <div class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal('modalKeputusan')"></div>
     <div class="flex min-h-screen items-center justify-center p-4">
         <div class="relative w-full max-w-md bg-white rounded-[2rem] shadow-2xl overflow-hidden border border-white/20 flex flex-col max-h-[90vh]">
-            <form id="keputusanKetuaForm" action="<%= request.getContextPath() %>/bantuan/keputusanKetua" method="post" enctype="multipart/form-data" class="flex flex-col max-h-[90vh] overflow-hidden">
+            <form id="keputusanKetuaForm" action="<%= request.getContextPath() %>/bantuan/keputusanKetua?_csrf=<%= session.getAttribute("csrf_token") %>" method="post" enctype="multipart/form-data" class="flex flex-col max-h-[90vh] overflow-hidden">
                 <input type="hidden" name="_csrf" value="${sessionScope.csrf_token}"/>
                 <input type="hidden" name="idPermohonan" id="actId">
                 <input type="hidden" name="keputusan" id="actDecision">
@@ -1999,8 +1999,8 @@
                     const pages = pdfDocToUpdate.getPages();
                     
                     const canvas = document.getElementById('pdf-render-canvas');
-                    const cWidth = canvas.width / (window.devicePixelRatio || 1);
-                    const cHeight = canvas.height / (window.devicePixelRatio || 1);
+                    const cWidth = canvas.width;
+                    const cHeight = canvas.height;
 
                     // Signature
                     if (overlays.signature.visible) {
